@@ -1,0 +1,124 @@
+# ------------------------------
+# Core dependencies and package managers
+# ------------------------------
+node_modules/
+bower_components/
+jspm_packages/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ------------------------------
+# Angular / Frontend build outputs
+# ------------------------------
+.angular/
+.angular/cache/
+dist/
+out-tsc/
+coverage/
+.sass-cache/
+.cache/
+tmp/
+temp/
+
+# Tooling caches (Nx, Turborepo, Vite, Parcel, etc.)
+.nx/
+.turbo/
+.vite/
+.parcel-cache/
+
+# Test and report artifacts
+test-results/
+playwright-report/
+*.lcov
+
+# ------------------------------
+# Python / Flask
+# ------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Python packaging / build
+build/
+dist/
+site/
+*.egg-info/
+.eggs/
+pip-wheel-metadata/
+
+# Python tooling caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.tox/
+.nox/
+.hypothesis/
+.pyre/
+.pytype/
+
+# Coverage and notebooks
+.coverage
+.coverage.*
+htmlcov/
+.ipynb_checkpoints/
+
+# Flask specifics
+instance/
+.webassets-cache/
+flask_session/
+
+# Environment and local config
+.env
+*.local
+
+# ------------------------------
+# Logs, dumps and temporary files
+# ------------------------------
+*.log
+*.pid
+*.seed
+*.pid.lock
+*.out
+*.err
+*.stackdump
+
+# ------------------------------
+# IDE / Editor
+# ------------------------------
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/*.code-snippets
+.idea/
+*.iml
+
+# ------------------------------
+# OS generated files
+# ------------------------------
+.DS_Store
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# ------------------------------
+# Documentation videos (Sprint Reviews)
+# ------------------------------
+docs/videos/
+docs/**/videos/
+
+# Common media formats for sprint review recordings in docs
+docs/**/*.mp4
+docs/**/*.mov
+docs/**/*.avi
+docs/**/*.mkv
+docs/**/*.webm
