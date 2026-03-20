@@ -1,0 +1,79 @@
+backend/
+├── Dockerfile
+├── requirements.txt              # ← pom.xml
+├── .env                          # ← application.properties
+├── .env.example
+├── run.py                        # ← DiscsAndRecordsApplication.java
+│
+├── app/
+│   ├── __init__.py               # create_app() — el corazón de Flask
+│   ├── extensions.py             # db, jwt, ma (instancias globales)
+│   │
+│   ├── config/
+│   │   ├── __init__.py
+│   │   └── settings.py           # ← WebConfig, OpenApiConfig, etc.
+│   │
+│   ├── models/                   # ← entities/ (SQLAlchemy ORM)
+│   │   ├── __init__.py
+│   │   ├── album.py
+│   │   ├── artista.py
+│   │   ├── cancion.py
+│   │   ├── genero.py
+│   │   └── usuario.py
+│   │
+│   ├── schemas/                  # ← dto/ (Marshmallow)
+│   │   ├── __init__.py
+│   │   ├── album_schema.py       # AlbumResponseDTO, CreateAlbumDTO, etc.
+│   │   ├── artista_schema.py
+│   │   ├── auth_schema.py        # LoginRequestDTO, RegisterRequestDTO
+│   │   ├── cancion_schema.py
+│   │   ├── genero_schema.py
+│   │   └── usuario_schema.py
+│   │
+│   ├── repositories/             # ← repositories/
+│   │   ├── __init__.py
+│   │   ├── album_repository.py
+│   │   ├── artista_repository.py
+│   │   ├── cancion_repository.py
+│   │   ├── genero_repository.py
+│   │   └── usuario_repository.py
+│   │
+│   ├── services/                 # ← services/ (lógica de negocio)
+│   │   ├── __init__.py
+│   │   ├── album_service.py
+│   │   ├── artista_service.py
+│   │   ├── auth_service.py
+│   │   ├── cancion_service.py
+│   │   ├── deezer_service.py
+│   │   ├── genero_service.py
+│   │   └── usuario_service.py
+│   │
+│   ├── routes/                   # ← controllers/ (Flask Blueprints)
+│   │   ├── __init__.py
+│   │   ├── album_routes.py
+│   │   ├── artista_routes.py
+│   │   ├── auth_routes.py
+│   │   ├── cancion_routes.py
+│   │   ├── deezer_routes.py
+│   │   ├── genero_routes.py
+│   │   └── usuario_routes.py
+│   │
+│   ├── security/                 # ← security/
+│   │   ├── __init__.py
+│   │   └── jwt_helpers.py        # JwtService + filtros
+│   │
+│   └── exceptions/               # ← exceptions/
+│       ├── __init__.py
+│       └── handlers.py           # GlobalExceptionHandler + custom exceptions
+│
+└── tests/                        # ← test/
+    ├── __init__.py
+    ├── conftest.py               # fixtures (equivalente a @SpringBootTest)
+    ├── controllers/
+    │   ├── test_album_routes.py
+    │   └── test_auth_routes.py
+    ├── repositories/
+    │   └── test_usuario_repository.py
+    └── services/
+        ├── test_album_service.py
+        └── test_auth_service.py
