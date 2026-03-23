@@ -1,6 +1,6 @@
-"""DEPRECATED: usa app.common.sanitizers.text en su lugar."""
-from app.common.sanitizers.text import *  # noqa: F401,F403
-import re  # mantener para imports existentes
+"""Sanitización y limpieza de campos de texto libre y nombres."""
+
+import re
 import unicodedata
 
 import nh3

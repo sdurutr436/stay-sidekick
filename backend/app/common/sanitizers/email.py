@@ -1,5 +1,8 @@
-"""DEPRECATED: usa app.common.sanitizers.email en su lugar."""
-from app.common.sanitizers.email import *  # noqa: F401,F403
+"""Validación y normalización de direcciones de correo electrónico."""
+
+from email_validator import EmailNotValidError, validate_email
+
+MAX_LEN_EMAIL = 254  # RFC 5321
 
 
 def sanitize_email(value: str) -> str | None:
