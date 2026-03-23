@@ -1,13 +1,7 @@
-"""Blueprint de la ruta de contacto / solicitud de herramienta."""
+"""DEPRECATED: usa app.contact.routes en su lugar."""
+from app.contact.routes import contact_bp  # noqa: F401
 
-import logging
-
-from flask import Blueprint, jsonify, request
-
-from app.extensions import limiter
-from app.services.contact import process_contact_form
-
-logger = logging.getLogger(__name__)
+__all__ = ["contact_bp"]
 
 contact_bp = Blueprint("contact", __name__)
 
@@ -30,8 +24,5 @@ def contact():
     if errors:
         status = 403 if "captcha" in " ".join(errors).lower() else 422
         return jsonify({"ok": False, "errors": errors}), status
-
-    # TODO: Aquí se conectará con el servicio de persistencia / email
-    logger.info("Datos de contacto listos para procesar: %s", clean_data)
 
     return jsonify({"ok": True, "message": "Formulario recibido correctamente."}), 200

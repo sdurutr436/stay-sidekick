@@ -1,10 +1,7 @@
-"""Esquema Marshmallow para el formulario de contacto / solicitud de herramienta."""
+"""DEPRECATED: usa app.contact.schemas en su lugar."""
+from app.contact.schemas import ContactFormSchema  # noqa: F401
 
-from marshmallow import Schema, fields, validate, validates, validates_schema, ValidationError, pre_load
-
-from app.sanitizers.text import sanitize_name, sanitize_text
-from app.sanitizers.phone import sanitize_phone
-from app.sanitizers.email import sanitize_email
+__all__ = ["ContactFormSchema"]
 
 
 # Códigos ISO 3166-1 alpha-2 más habituales; ampliar según necesidades.
