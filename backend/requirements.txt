@@ -1,0 +1,24 @@
+# Framework
+flask==3.1.1
+python-dotenv==1.1.0
+
+# CORS
+flask-cors==5.0.1
+
+# Validación de esquemas
+marshmallow==3.26.1
+
+# Sanitización HTML (reemplazo de bleach, basado en Rust/ammonia)
+nh3==0.2.21
+
+# Validación de email
+email-validator==2.2.0
+
+# Validación de teléfono (libphonenumber de Google)
+phonenumbers==8.13.55
+
+# Cliente HTTP (verificación Turnstile)
+requests==2.32.3
+
+# Rate limiting
+flask-limiter==3.12
