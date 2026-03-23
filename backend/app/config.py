@@ -28,5 +28,17 @@ class Config:
         "https://challenges.cloudflare.com/turnstile/v0/siteverify",
     )
 
+    # Gmail SMTP
+    GMAIL_USER: str = os.environ.get("GMAIL_USER", "")
+    GMAIL_APP_PASSWORD: str = os.environ.get("GMAIL_APP_PASSWORD", "")
+    MAIL_RECIPIENT: str = os.environ.get("MAIL_RECIPIENT", "")
+
+    # Discord
+    DISCORD_WEBHOOK_URL: str = os.environ.get("DISCORD_WEBHOOK_URL", "")
+
+    # JWT (para rutas autenticadas del panel)
+    JWT_SECRET_KEY: str = os.environ.get("JWT_SECRET_KEY", "change-me-jwt")
+    JWT_ACCESS_TOKEN_HOURS: int = int(os.environ.get("JWT_ACCESS_TOKEN_HOURS", "1"))
+
     # Rate limiting
     RATE_LIMIT_CONTACT: str = os.environ.get("RATE_LIMIT_CONTACT", "5/hour")

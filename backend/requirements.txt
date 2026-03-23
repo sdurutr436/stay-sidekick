@@ -22,3 +22,6 @@ requests==2.32.3
 
 # Rate limiting
 flask-limiter==3.12
+
+# JWT (autenticación panel)
+PyJWT==2.9.0

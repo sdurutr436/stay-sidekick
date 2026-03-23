@@ -1,4 +1,15 @@
-"""Application factory de Flask."""
+"""Application factory de Flask.
+
+Estructura del proyecto:
+    app/
+    ├── common/         → Utilidades compartidas (sanitizers, notifications)
+    ├── security/       → CSRF, honeypot, JWT
+    ├── contact/        → Feature: formulario de contacto público
+    ├── exceptions/     → Excepciones personalizadas
+    ├── models/         → Modelos de datos (futuro)
+    ├── repositories/   → Repositorios de datos (futuro)
+    └── services/       → Servicios compartidos (Turnstile, etc.)
+"""
 
 import logging
 
@@ -20,11 +31,15 @@ def create_app(config_class: type = Config) -> Flask:
     )
 
     # ── Extensiones ──────────────────────────────────────────────────────
-    cors.init_app(app, origins=app.config["ALLOWED_ORIGINS"])
+    cors.init_app(
+        app,
+        origins=app.config["ALLOWED_ORIGINS"],
+        supports_credentials=True,  # necesario para cookies CSRF
+    )
     limiter.init_app(app)
 
     # ── Blueprints ───────────────────────────────────────────────────────
-    from app.routes.contact import contact_bp  # noqa: E402
+    from app.contact.routes import contact_bp  # noqa: E402
     app.register_blueprint(contact_bp)
 
     # ── Error handlers ───────────────────────────────────────────────────
