@@ -21,21 +21,21 @@ _TIMEOUT = 5
 
 def _build_embed(clean_data: dict) -> dict:
     """Construye el payload de embed de Discord."""
-    is_member = "✅ Sí" if clean_data.get("is_member") else "❌ No"
+    is_member = "Si" if clean_data.get("is_member") else "No"
 
     fields = [
-        {"name": "🏢 Empresa", "value": clean_data.get("company_name", "N/A"), "inline": True},
-        {"name": "📧 Email", "value": clean_data.get("company_email", "N/A"), "inline": True},
-        {"name": "📞 Teléfono", "value": clean_data.get("phone", "N/A"), "inline": True},
-        {"name": "🌍 País", "value": clean_data.get("country_code", "N/A"), "inline": True},
-        {"name": "👤 Miembro", "value": is_member, "inline": True},
-        {"name": "💬 Mensaje", "value": clean_data.get("message", "(sin mensaje)")[:1024], "inline": False},
+        {"name": "Empresa", "value": clean_data.get("company_name", "N/A"), "inline": True},
+        {"name": "Email", "value": clean_data.get("company_email", "N/A"), "inline": True},
+        {"name": "Telefono", "value": clean_data.get("phone", "N/A"), "inline": True},
+        {"name": "Pais", "value": clean_data.get("country_code", "N/A"), "inline": True},
+        {"name": "Miembro", "value": is_member, "inline": True},
+        {"name": "Mensaje", "value": clean_data.get("message", "(sin mensaje)")[:1024], "inline": False},
     ]
 
     return {
         "embeds": [
             {
-                "title": "📩 Nueva solicitud de contacto",
+                "title": "Nueva solicitud de contacto",
                 "color": 0x5865F2,  # Blurple de Discord
                 "fields": fields,
                 "footer": {"text": "Stay Sidekick — Formulario de contacto"},

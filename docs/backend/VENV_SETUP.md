@@ -73,4 +73,4 @@ pip freeze > requirements.txt
 
 - La carpeta `venv/` está en `.gitignore` y **no se sube al repositorio**
 - `requirements.txt` es el equivalente al `pom.xml` de Spring Boot
-- Si ves el prefijo `(venv)` en la terminal, el entorno está activo ✅
+- Si ves el prefijo `(venv)` en la terminal, el entorno está activo
