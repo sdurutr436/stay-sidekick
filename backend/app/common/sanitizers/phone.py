@@ -1,5 +1,7 @@
-"""DEPRECATED: usa app.common.sanitizers.phone en su lugar."""
-from app.common.sanitizers.phone import *  # noqa: F401,F403
+"""Validación y normalización de números de teléfono con phonenumbers."""
+
+import phonenumbers
+from phonenumbers import NumberParseException
 
 
 def sanitize_phone(number: str, country_code: str = "ES") -> str | None:

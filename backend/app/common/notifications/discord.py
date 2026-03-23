@@ -1,7 +1,20 @@
-"""DEPRECATED: usa app.common.notifications.discord en su lugar."""
-from app.common.notifications.discord import send_discord_notification  # noqa: F401
+"""Servicio de notificación por Discord Webhook.
 
-__all__ = ["send_discord_notification"]
+Envía un embed enriquecido a un canal de Discord cada vez que se recibe
+una solicitud de contacto válida. Usa únicamente ``requests`` (ya presente
+en el proyecto) — no requiere dependencias adicionales.
+
+Configuración necesaria en .env:
+    DISCORD_WEBHOOK_URL → URL del webhook de Discord
+"""
+
+import logging
+from datetime import datetime, timezone
+
+import requests
+from flask import current_app
+
+logger = logging.getLogger(__name__)
 
 _TIMEOUT = 5
 

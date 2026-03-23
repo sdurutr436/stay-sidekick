@@ -1,7 +1,22 @@
-"""DEPRECATED: usa app.common.notifications.gmail en su lugar."""
-from app.common.notifications.gmail import send_contact_email  # noqa: F401
+"""Servicio de envío de correo electrónico vía Gmail SMTP.
 
-__all__ = ["send_contact_email"]
+Usa la librería estándar ``smtplib`` + ``email`` de Python — no requiere
+dependencias externas. Se conecta al servidor SMTP de Gmail con TLS y
+autenticación mediante *App Password* (contraseña de aplicación).
+
+Configuración necesaria en .env:
+    GMAIL_USER        → tu-correo@gmail.com
+    GMAIL_APP_PASSWORD→ contraseña de aplicación de 16 caracteres
+    MAIL_RECIPIENT    → correo destino que recibe las solicitudes
+"""
+
+import logging
+import smtplib
+from email.message import EmailMessage
+
+from flask import current_app
+
+logger = logging.getLogger(__name__)
 
 _SMTP_HOST = "smtp.gmail.com"
 _SMTP_PORT = 587
