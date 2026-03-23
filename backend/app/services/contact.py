@@ -1,14 +1,7 @@
-"""Servicio de procesamiento del formulario de contacto."""
+"""DEPRECATED: usa app.contact.service en su lugar."""
+from app.contact.service import process_contact_form  # noqa: F401
 
-import logging
-
-from flask import request
-from marshmallow import ValidationError
-
-from app.schemas.contact import ContactFormSchema
-from app.services.turnstile import verify_turnstile
-
-logger = logging.getLogger(__name__)
+__all__ = ["process_contact_form"]
 
 _schema = ContactFormSchema()
 
@@ -38,12 +31,30 @@ def process_contact_form(json_data: dict) -> tuple[dict, list[str]]:
     # 3. Eliminar campo de aceptación de privacidad (ya validado, no se almacena)
     clean_data.pop("privacy_accepted", None)
 
+    # 4. Despachar notificaciones (no bloquean la respuesta al usuario)
+    _dispatch_notifications(clean_data)
+
     logger.info(
         "Formulario de contacto procesado correctamente para: %s",
         clean_data.get("company_email"),
     )
 
     return clean_data, []
+
+
+def _dispatch_notifications(clean_data: dict) -> None:
+    """Envía las notificaciones de email y Discord.
+
+    Los fallos se registran en log pero no impiden devolver 200 al
+    usuario — la solicitud ya fue validada y sanitizada.
+    """
+    email_ok = send_contact_email(clean_data)
+    discord_ok = send_discord_notification(clean_data)
+
+    if not email_ok:
+        logger.warning("No se pudo enviar el email de notificación.")
+    if not discord_ok:
+        logger.warning("No se pudo enviar la notificación de Discord.")
 
 
 def _flatten_errors(messages: dict) -> list[str]:
