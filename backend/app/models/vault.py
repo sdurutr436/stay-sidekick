@@ -56,8 +56,9 @@ class PlantillaVault(db.Model):
 class MensajeGenerado(db.Model):
     """Registro de mensajes generados por IA a partir de una plantilla.
 
-    No almacena datos personales de huéspedes. La reserva se referencia
-    únicamente por su ID externo del PMS (sin nombre, email ni teléfono)."""
+    No almacena ningún dato de huéspedes ni referencia a reservas.
+    Los datos de contexto opcionales (reserva, destinatario) se usan en
+    memoria durante la generación y se descartan sin persistirse."""
 
     __tablename__ = "mensajes_generados"
 
@@ -73,8 +74,6 @@ class MensajeGenerado(db.Model):
         db.ForeignKey("plantillas_vault.id", ondelete="SET NULL"),
         nullable=True,
     )
-    # ID de la reserva en el PMS. No se persiste ningún dato personal del huésped.
-    reserva_id_externo = db.Column(db.String(100), nullable=True)
     contenido_final = db.Column(db.Text, nullable=False)
     # Modelo de IA utilizado: 'gemini-2.0-flash' | 'gpt-4o' | 'claude-3-5-sonnet' | etc.
     modelo_ia = db.Column(db.String(100), nullable=True)
@@ -91,4 +90,4 @@ class MensajeGenerado(db.Model):
     plantilla = db.relationship("PlantillaVault", back_populates="mensajes_generados")
 
     def __repr__(self) -> str:
-        return f"<MensajeGenerado plantilla={self.plantilla_id} reserva={self.reserva_id_externo}>"
+        return f"<MensajeGenerado plantilla={self.plantilla_id} modelo={self.modelo_ia}>"
