@@ -3,6 +3,7 @@
 from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+from flask_sqlalchemy import SQLAlchemy
 
 cors = CORS()
 
@@ -11,3 +12,5 @@ limiter = Limiter(
     default_limits=["200/day", "50/hour"],
     storage_uri="memory://",
 )
+
+db = SQLAlchemy()
