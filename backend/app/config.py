@@ -42,3 +42,10 @@ class Config:
 
     # Rate limiting
     RATE_LIMIT_CONTACT: str = os.environ.get("RATE_LIMIT_CONTACT", "5/hour")
+
+    # PostgreSQL
+    SQLALCHEMY_DATABASE_URI: str = os.environ.get(
+        "DATABASE_URL",
+        "postgresql://postgres:postgres@localhost:5432/stay_sidekick",
+    )
+    SQLALCHEMY_TRACK_MODIFICATIONS: bool = False

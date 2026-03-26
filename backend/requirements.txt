@@ -25,3 +25,7 @@ flask-limiter==3.12
 
 # JWT (autenticación panel)
 PyJWT==2.9.0
+
+# ORM y base de datos
+flask-sqlalchemy==3.1.1
+psycopg2-binary==2.9.10
