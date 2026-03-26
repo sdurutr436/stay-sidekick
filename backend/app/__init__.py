@@ -16,7 +16,7 @@ import logging
 from flask import Flask, jsonify
 
 from app.config import Config
-from app.extensions import cors, limiter
+from app.extensions import cors, db, limiter
 
 
 def create_app(config_class: type = Config) -> Flask:
@@ -37,6 +37,11 @@ def create_app(config_class: type = Config) -> Flask:
         supports_credentials=True,  # necesario para cookies CSRF
     )
     limiter.init_app(app)
+    db.init_app(app)
+
+    # ── Modelos (registro en metadata de SQLAlchemy) ──────────────────────
+    with app.app_context():
+        import app.models  # noqa: F401
 
     # ── Blueprints ───────────────────────────────────────────────────────
     from app.contact.routes import contact_bp  # noqa: E402
