@@ -1,0 +1,126 @@
+// =============================================================================
+// TOOLS: MIXINS
+// Combinaciones de estilos reutilizables — sin generar CSS por sí solos
+// =============================================================================
+
+// -----------------------------------------------------------------------------
+// Responsive — media query desde un breakpoint hacia arriba
+// Uso: @include respond-from('md') { ... }
+// -----------------------------------------------------------------------------
+@mixin respond-from($bp) {
+  $value: map-get($breakpoints, $bp);
+
+  @if $value == null {
+    @warn "Breakpoint `#{$bp}` no existe. Usa: #{map-keys($breakpoints)}";
+  } @else if $value == 0px {
+    @content;
+  } @else {
+    @media (min-width: $value) {
+      @content;
+    }
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Responsive — media query hasta un breakpoint (max)
+// Uso: @include respond-until('md') { ... }
+// -----------------------------------------------------------------------------
+@mixin respond-until($bp) {
+  $value: map-get($breakpoints, $bp);
+
+  @if $value == null {
+    @warn "Breakpoint `#{$bp}` no existe.";
+  } @else {
+    @media (max-width: calc(#{$value} - 1px)) {
+      @content;
+    }
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Tipografía — aplica el conjunto completo de una escala tipográfica
+// Uso: @include text-style($font-size-body-md, $font-weight-body, $line-height-body)
+// -----------------------------------------------------------------------------
+@mixin text-style($size, $weight, $line-height) {
+  font-size: $size;
+  font-weight: $weight;
+  line-height: $line-height;
+}
+
+// Shorthands por categoría
+@mixin text-display-2xl { @include text-style($font-size-display-2xl, $font-weight-display, $line-height-display); }
+@mixin text-display-xl  { @include text-style($font-size-display-xl,  $font-weight-display, $line-height-display); }
+@mixin text-display-lg  { @include text-style($font-size-display-lg,  $font-weight-display, $line-height-display); }
+
+@mixin text-h1 { @include text-style($font-size-h1, $font-weight-heading, $line-height-heading); }
+@mixin text-h2 { @include text-style($font-size-h2, $font-weight-heading, $line-height-heading); }
+@mixin text-h3 { @include text-style($font-size-h3, $font-weight-heading, $line-height-heading); }
+@mixin text-h4 { @include text-style($font-size-h4, $font-weight-body,    $line-height-heading); }
+
+@mixin text-body-xl { @include text-style($font-size-body-xl, $font-weight-body, $line-height-body); }
+@mixin text-body-lg { @include text-style($font-size-body-lg, $font-weight-body, $line-height-body); }
+@mixin text-body-md { @include text-style($font-size-body-md, $font-weight-body, $line-height-body); }
+@mixin text-body-sm { @include text-style($font-size-body-sm, $font-weight-body, $line-height-body); }
+
+@mixin text-label-lg { @include text-style($font-size-label-lg, $font-weight-label, $line-height-label); }
+@mixin text-label-md { @include text-style($font-size-label-md, $font-weight-label, $line-height-label); }
+@mixin text-label-sm { @include text-style($font-size-label-sm, $font-weight-label, $line-height-label); }
+
+@mixin text-caption-md { @include text-style($font-size-caption-md, $font-weight-caption, $line-height-caption); }
+@mixin text-caption-sm { @include text-style($font-size-caption-sm, $font-weight-caption, $line-height-caption); }
+@mixin text-caption-xs { @include text-style($font-size-caption-xs, $font-weight-caption, $line-height-caption); }
+
+// -----------------------------------------------------------------------------
+// Flexbox helpers
+// -----------------------------------------------------------------------------
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@mixin flex-start {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+// -----------------------------------------------------------------------------
+// Contenedor centrado con max-width
+// -----------------------------------------------------------------------------
+@mixin container {
+  width: 100%;
+  max-width: $container-max-width;
+  margin-inline: auto;
+  padding-inline: $container-padding-x;
+}
+
+// -----------------------------------------------------------------------------
+// Visualmente oculto (accesible)
+// -----------------------------------------------------------------------------
+@mixin visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+// -----------------------------------------------------------------------------
+// Truncar texto con ellipsis
+// -----------------------------------------------------------------------------
+@mixin text-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
