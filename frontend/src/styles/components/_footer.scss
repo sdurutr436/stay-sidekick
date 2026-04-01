@@ -1,0 +1,149 @@
+// =============================================================================
+// COMPONENTS: FOOTER
+// Organismo — pie de página con grid de 5 columnas
+//
+// Estructura BEM:
+//   .footer
+//     .footer__inner          (contenedor centrado)
+//       .footer__grid
+//         .footer__brand      (col 1: logo + descripción)
+//         .footer__nav        (col 2-5: grupos de enlaces)
+//           .footer__nav-title
+//           .footer__nav-list
+//             .footer__nav-item
+//               .footer__nav-link
+//               .footer__social-link  (variante con ícono)
+//                 .footer__social-icon
+//     .footer__bar            (barra de copyright)
+//       .footer__copyright
+// =============================================================================
+
+.footer {
+  background-color: $color-surface-alt;
+  border-top: $border-width $border-style $color-border;
+
+  // -------------------------------------------------------------------------
+  // Inner — contenedor centrado
+  // -------------------------------------------------------------------------
+  &__inner {
+    @include container;
+    padding-block: $space-8;
+  }
+
+  // -------------------------------------------------------------------------
+  // Grid de 5 columnas
+  // Col 1 (brand) más ancha que las de navegación
+  // -------------------------------------------------------------------------
+  &__grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+    gap: $space-8;
+
+    @include respond-until('xl') {
+      grid-template-columns: 2fr repeat(2, 1fr);
+      row-gap: $space-8;
+    }
+
+    @include respond-until('md') {
+      grid-template-columns: repeat(2, 1fr);
+      gap: $space-6;
+    }
+
+    @include respond-until('sm') {
+      grid-template-columns: 1fr;
+      gap: $space-6;
+    }
+  }
+
+  // -------------------------------------------------------------------------
+  // Col 1 — Brand (logo + descripción)
+  // -------------------------------------------------------------------------
+  &__brand {
+    display: flex;
+    flex-direction: column;
+    gap: $space-4;
+
+    // En breakpoints intermedios ocupa ambas columnas para dar más espacio
+    @include respond-until('xl') {
+      grid-column: 1 / -1;  // ocupa todo el ancho en tablet
+    }
+
+    @include respond-from('xl') {
+      grid-column: auto;
+    }
+  }
+
+  &__description {
+    @include text-body-sm;
+    color: $color-text-secondary;
+    max-width: 28ch;
+  }
+
+  // -------------------------------------------------------------------------
+  // Cols 2-5 — Grupos de navegación
+  // -------------------------------------------------------------------------
+  &__nav {
+    display: flex;
+    flex-direction: column;
+    gap: $space-3;
+  }
+
+  &__nav-title {
+    @include text-label-lg;
+    font-weight: $font-weight-heading;
+    color: $color-text-primary;
+  }
+
+  &__nav-list {
+    display: flex;
+    flex-direction: column;
+    gap: $space-2;
+  }
+
+  &__nav-item {
+    display: flex;
+  }
+
+  &__nav-link {
+    @include text-body-sm;
+    color: $color-text-secondary;
+    text-decoration: none;
+    transition: color var(--transition-base);
+
+    &:hover {
+      color: $color-text-primary;
+    }
+  }
+
+  // -------------------------------------------------------------------------
+  // Variante enlace social — con ícono placeholder
+  // -------------------------------------------------------------------------
+  &__social-link {
+    display: inline-flex;
+    align-items: center;
+    gap: $space-2;
+  }
+
+  &__social-icon {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    color: $color-text-secondary;
+  }
+
+  // -------------------------------------------------------------------------
+  // Barra de copyright
+  // -------------------------------------------------------------------------
+  &__bar {
+    border-top: $border-width $border-style $color-border;
+    background-color: $color-gray-100;
+    padding-block: $space-4;
+  }
+
+  &__copyright {
+    @include container;
+    @include text-caption-md;
+    color: $color-text-secondary;
+    text-align: center;
+  }
+}
