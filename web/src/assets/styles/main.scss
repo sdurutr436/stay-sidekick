@@ -1,0 +1,38 @@
+// =============================================================================
+// ESTILOS GLOBALES — SITIO ESTÁTICO (11ty)
+// Compilado desde los mismos archivos SCSS que el frontend Angular.
+// loadPaths configurado en package.json para resolver desde:
+//   ../frontend/src/styles/
+//
+// Orden ITCSS: Settings → Tools → Generic → Elements →
+//              Layout → Components → Utilities → Animations
+// =============================================================================
+
+// 1. Settings — variables, sin CSS generado
+@import 'settings/tipografia';
+@import 'settings/colores';
+@import 'settings/breakpoints';
+@import 'settings/variables';
+@import 'settings/css-variables';
+
+// 2. Tools — mixins, sin CSS generado
+@import 'tools/mixins';
+
+// 3. Generic — resets
+@import 'generic/resets';
+
+// 4. Elements — estilos de elementos HTML sin clase
+@import 'elements/base';
+
+// 5. Layout — contenedor, grid, flex
+@import 'layout/grid';
+@import 'layout/flex';
+
+// 6. Components — todos los componentes y organismos
+@import 'components/index';
+
+// 7. Utilities — clases de ayuda de alta especificidad
+@import 'utilities/index';
+
+// 8. Animations — keyframes y clases de animación
+@import 'animations/index';
