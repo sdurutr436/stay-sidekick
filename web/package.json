@@ -1,0 +1,21 @@
+{
+  "name": "stay-sidekick-web",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Sitio estático de Stay Sidekick — páginas de marketing, legales y empresa",
+  "scripts": {
+    "build:css": "sass src/assets/styles/main.scss:_site/assets/styles/main.css --load-path=../frontend/src/styles --no-source-map --style=compressed",
+    "build:11ty": "eleventy",
+    "build": "npm run build:css && npm run build:11ty",
+    "watch:css": "sass --watch src/assets/styles/main.scss:_site/assets/styles/main.css --load-path=../frontend/src/styles",
+    "watch:11ty": "eleventy --serve --port=8080",
+    "start": "npm run build:css && npm-run-all --parallel watch:11ty watch:css"
+  },
+  "dependencies": {
+    "@11ty/eleventy": "^3.0.0"
+  },
+  "devDependencies": {
+    "npm-run-all": "^4.1.5",
+    "sass": "^1.89.0"
+  }
+}
