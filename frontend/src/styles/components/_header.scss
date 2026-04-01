@@ -1,0 +1,57 @@
+// =============================================================================
+// COMPONENTS: HEADER
+// Organismo — barra de navegación principal
+//
+// Estructura BEM:
+//   .header
+//     .header__inner          (contenedor centrado)
+//       .header__brand        (logo + nombre app)
+//       .header__actions      (botones de CTA)
+// =============================================================================
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: $z-header;
+  width: 100%;
+  height: $header-height;
+  background-color: $color-header-bg;
+  border-bottom: $border-width $border-style $color-header-border;
+
+  // -------------------------------------------------------------------------
+  // Inner — centra el contenido con max-width
+  // -------------------------------------------------------------------------
+  &__inner {
+    @include container;
+    @include flex-between;
+    height: 100%;
+  }
+
+  // -------------------------------------------------------------------------
+  // Brand — logo + nombre
+  // -------------------------------------------------------------------------
+  &__brand {
+    display: flex;
+    align-items: center;
+  }
+
+  // -------------------------------------------------------------------------
+  // Acciones — botones de la derecha
+  // -------------------------------------------------------------------------
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: $space-3;
+  }
+
+  // -------------------------------------------------------------------------
+  // Responsivo — mobile
+  // -------------------------------------------------------------------------
+  @include respond-until('md') {
+    height: $header-height-mobile;
+
+    &__actions {
+      gap: $space-2;
+    }
+  }
+}
