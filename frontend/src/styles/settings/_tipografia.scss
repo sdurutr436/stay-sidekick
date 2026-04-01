@@ -1,0 +1,52 @@
+// =============================================================================
+// SETTINGS: TIPOGRAFÍA
+// Fuente: Archivo (variable font 100–900)
+// Escala definida desde Figma
+// =============================================================================
+
+$font-family-base: 'Archivo', sans-serif;
+
+// -----------------------------------------------------------------------------
+// Tamaños
+// -----------------------------------------------------------------------------
+$font-size-display-2xl:   4rem;       // 64px
+$font-size-display-xl:    3rem;       // 48px
+$font-size-display-lg:    2.25rem;    // 36px
+
+$font-size-h1:            2.25rem;    // 36px
+$font-size-h2:            2rem;       // 32px
+$font-size-h3:            1.5rem;     // 24px
+$font-size-h4:            1.25rem;    // 20px
+
+$font-size-body-xl:       1.125rem;   // 18px
+$font-size-body-lg:       1rem;       // 16px
+$font-size-body-md:       0.875rem;   // 14px
+$font-size-body-sm:       0.75rem;    // 12px
+
+$font-size-label-lg:      0.875rem;   // 14px
+$font-size-label-md:      0.75rem;    // 12px
+$font-size-label-sm:      0.6875rem;  // 11px
+
+$font-size-caption-md:    0.75rem;    // 12px
+$font-size-caption-sm:    0.6875rem;  // 11px
+$font-size-caption-xs:    0.625rem;   // 10px
+
+// -----------------------------------------------------------------------------
+// Pesos
+// Display (800) > Heading H1-H3 (700) > Body / Label / H4 (500) > Caption (400)
+// -----------------------------------------------------------------------------
+$font-weight-display:   800;
+$font-weight-heading:   700;
+$font-weight-body:      500;
+$font-weight-label:     500;
+$font-weight-caption:   400;
+
+// -----------------------------------------------------------------------------
+// Interlineado (line-height)
+// Figma muestra "Auto" → valores convencionales por tipo
+// -----------------------------------------------------------------------------
+$line-height-display:   1.1;
+$line-height-heading:   1.2;
+$line-height-body:      1.5;
+$line-height-label:     1.4;
+$line-height-caption:   1.4;
