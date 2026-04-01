@@ -1,0 +1,17 @@
+// =============================================================================
+// COMPONENTS: SVG
+// Tamaños estándar para iconos SVG
+// =============================================================================
+
+.svg {
+  display: inline-block;
+  fill: currentColor;
+  flex-shrink: 0;
+  vertical-align: middle;
+
+  &--xs { width: $svg-xs; height: $svg-xs; }
+  &--sm { width: $svg-sm; height: $svg-sm; }
+  &--md { width: $svg-md; height: $svg-md; }
+  &--lg { width: $svg-lg; height: $svg-lg; }
+  &--xl { width: $svg-xl; height: $svg-xl; }
+}
