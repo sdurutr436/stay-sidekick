@@ -1,0 +1,94 @@
+// =============================================================================
+// COMPONENTS: BUTTON
+// Átomos de botón — primario y secundario
+// Estructura BEM: .btn.btn--{variante}.btn--{tamaño}
+// =============================================================================
+
+.btn {
+  // Base
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: $space-2;
+  padding: $space-2 $space-4;
+  border: $border-width $border-style transparent;
+  border-radius: $border-radius-default;
+  font-family: $font-family-base;
+  font-weight: $font-weight-label;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color var(--transition-base),
+              color var(--transition-base),
+              border-color var(--transition-base);
+
+  // Tamaño por defecto → md
+  @include text-label-md;
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  // -------------------------------------------------------------------------
+  // Tamaños
+  // -------------------------------------------------------------------------
+  &--sm {
+    @include text-label-sm;
+    padding: $space-1 $space-3;
+  }
+
+  &--md {
+    @include text-label-md;
+    padding: $space-2 $space-4;
+  }
+
+  &--lg {
+    @include text-label-lg;
+    padding: $space-3 $space-6;
+  }
+
+  // -------------------------------------------------------------------------
+  // Variante primaria — relleno oscuro, texto claro
+  // -------------------------------------------------------------------------
+  &--primary {
+    background-color: $color-btn-primary-bg;
+    border-color:     $color-btn-primary-bg;
+    color:            $color-btn-primary-text;
+
+    &:hover:not(:disabled) {
+      background-color: $color-btn-primary-bg-hover;
+      border-color:     $color-btn-primary-bg-hover;
+    }
+
+    &:active:not(:disabled) {
+      background-color: $color-btn-primary-bg-active;
+    }
+  }
+
+  // -------------------------------------------------------------------------
+  // Variante secundaria — borde oscuro, fondo claro
+  // -------------------------------------------------------------------------
+  &--secondary {
+    background-color: $color-btn-secondary-bg;
+    border-color:     $color-btn-secondary-border;
+    color:            $color-btn-secondary-text;
+
+    &:hover:not(:disabled) {
+      background-color: $color-btn-secondary-bg-hover;
+    }
+
+    &:active:not(:disabled) {
+      background-color: $color-btn-secondary-bg-active;
+    }
+  }
+
+  // -------------------------------------------------------------------------
+  // Con icono
+  // -------------------------------------------------------------------------
+  &__icon {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
+}
