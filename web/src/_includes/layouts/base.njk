@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="{{ description or site.description }}" />
+
+  <title>{% if title %}{{ title }} | {% endif %}{{ site.name }}</title>
+
+  <!-- Fuente: Archivo — preconnect para rendimiento -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,100..900;1,100..900&display=swap"
+  />
+
+  <!-- Estilos globales compilados desde SCSS compartido con Angular -->
+  <link rel="stylesheet" href="/assets/styles/main.css" />
+
+  {% block head %}{% endblock %}
+</head>
+<body>
+  <div class="l-page">
+
+    <div class="l-page__header">
+      {% include "partials/header.njk" %}
+    </div>
+
+    <main class="l-page__main" id="main-content">
+      {{ content | safe }}
+    </main>
+
+    <div class="l-page__footer">
+      {% include "partials/footer.njk" %}
+    </div>
+
+  </div>
+</body>
+</html>
