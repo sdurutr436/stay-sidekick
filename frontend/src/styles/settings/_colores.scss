@@ -1,0 +1,56 @@
+// =============================================================================
+// SETTINGS: COLORES
+// Paleta wireframe — escala de grises
+// Los colores de marca se definirán cuando el diseño esté cerrado
+// =============================================================================
+
+// Escala base
+$color-white:     #ffffff;
+$color-gray-50:   #fafafa;
+$color-gray-100:  #f5f5f5;
+$color-gray-200:  #ebebeb;
+$color-gray-300:  #d4d4d4;
+$color-gray-400:  #b0b0b0;
+$color-gray-500:  #8c8c8c;
+$color-gray-600:  #6b6b6b;
+$color-gray-700:  #4a4a4a;
+$color-gray-800:  #2e2e2e;
+$color-gray-900:  #1a1a1a;
+$color-black:     #000000;
+
+// Superficies
+$color-surface:        $color-white;
+$color-surface-alt:    $color-gray-50;
+$color-surface-raised: $color-white;
+
+// Bordes
+$color-border:        $color-gray-300;
+$color-border-strong: $color-gray-500;
+
+// Texto
+$color-text-primary:     $color-gray-900;
+$color-text-secondary:   $color-gray-600;
+$color-text-disabled:    $color-gray-400;
+$color-text-inverse:     $color-white;
+$color-text-placeholder: $color-gray-400;
+
+// Botones — primario
+$color-btn-primary-bg:        $color-gray-800;
+$color-btn-primary-bg-hover:  $color-gray-900;
+$color-btn-primary-bg-active: $color-black;
+$color-btn-primary-text:      $color-white;
+
+// Botones — secundario
+$color-btn-secondary-bg:        $color-white;
+$color-btn-secondary-bg-hover:  $color-gray-100;
+$color-btn-secondary-bg-active: $color-gray-200;
+$color-btn-secondary-border:    $color-gray-800;
+$color-btn-secondary-text:      $color-gray-800;
+
+// Badges
+$color-badge-bg:   $color-gray-200;
+$color-badge-text: $color-gray-700;
+
+// Header
+$color-header-bg:     $color-white;
+$color-header-border: $color-gray-200;
