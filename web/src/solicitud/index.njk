@@ -22,19 +22,6 @@ section: solicitud
   </div>
 </div>
 
-<script>
-  (function () {
-    var radios     = document.querySelectorAll('input[name="tipo_solicitud"]');
-    var conditional = document.getElementById('solicitud-mensaje');
-
-    if (!conditional) return;
-
-    radios.forEach(function (radio) {
-      radio.addEventListener('change', function () {
-        var isVisible = this.value === 'beneficiario';
-        conditional.classList.toggle('form-solicitud__conditional--visible', isVisible);
-        conditional.setAttribute('aria-hidden', String(!isVisible));
-      });
-    });
-  }());
-</script>
+{% block scripts %}
+<script src="/assets/js/form-solicitud.js" defer></script>
+{% endblock %}

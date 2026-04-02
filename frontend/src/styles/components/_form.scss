@@ -240,4 +240,47 @@ $_form-input-padding-y: $space-2;
   display: flex;
   flex-direction: column;
   gap: $space-3;
+
+  // Estado de error (radio group sin selección)
+  &--error {
+    padding-left: $space-3;
+    border-left: 2px solid $color-gray-700;
+  }
+
+  &__error {
+    @include text-caption-md;
+    color: $color-gray-700;
+    margin-top: $space-1;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Estados de validación — error en campo
+// Se aplica sobre .form-field con modificador --error
+// -----------------------------------------------------------------------------
+.form-field {
+  &--error {
+    // Marca el wrapper del input con borde oscuro
+    .form-input-wrapper {
+      border-color: $color-gray-700;
+      border-width: 2px;
+    }
+
+    // Input standalone
+    .form-input {
+      border-color: $color-gray-700;
+      border-width: 2px;
+    }
+
+    // Textarea standalone (fuera del editor)
+    .form-textarea {
+      border: 2px solid $color-gray-700;
+    }
+  }
+
+  &__error {
+    @include text-caption-md;
+    color: $color-gray-700;
+    margin-top: $space-1;
+  }
 }

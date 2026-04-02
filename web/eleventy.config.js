@@ -11,6 +11,7 @@ module.exports = function (eleventyConfig) {
   // ---------------------------------------------------------------------------
   eleventyConfig.addPassthroughCopy("src/assets/images");
   eleventyConfig.addPassthroughCopy("src/assets/fonts");
+  eleventyConfig.addPassthroughCopy("src/assets/js");
   // Nota: el CSS se compila directamente a _site/ por el proceso sass externo.
   // No se registra como passthrough para evitar conflictos.
 
