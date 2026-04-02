@@ -1,0 +1,243 @@
+// =============================================================================
+// COMPONENTS: FORM
+// Átomos de formulario — inputs, labels, radios, checkboxes, textarea, editor
+// Estructura BEM: .form-field, .form-input-wrapper, .form-input,
+//                 .form-textarea, .form-editor, .form-choice, .form-group
+// =============================================================================
+
+// Variables locales
+$_form-input-height:    2.75rem;  // 44px — altura estándar
+$_form-input-padding-x: $space-4;
+$_form-input-padding-y: $space-2;
+
+// -----------------------------------------------------------------------------
+// Field — contenedor label + control
+// -----------------------------------------------------------------------------
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;
+}
+
+// -----------------------------------------------------------------------------
+// Label
+// -----------------------------------------------------------------------------
+.form-label {
+  @include text-label-md;
+  color: $color-text-primary;
+}
+
+// -----------------------------------------------------------------------------
+// Input wrapper — ícono a la izquierda + input
+// -----------------------------------------------------------------------------
+.form-input-wrapper {
+  display: flex;
+  align-items: center;
+  border: $border-width $border-style $color-border;
+  background-color: $color-surface;
+  transition: border-color var(--transition-base);
+
+  &:focus-within {
+    border-color: $color-border-strong;
+  }
+
+  &__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: $_form-input-height;
+    height: $_form-input-height;
+    color: $color-text-placeholder;
+    pointer-events: none;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Input base
+// -----------------------------------------------------------------------------
+.form-input {
+  display: block;
+  width: 100%;
+  height: $_form-input-height;
+  padding: $_form-input-padding-y $_form-input-padding-x;
+  border: $border-width $border-style $color-border;
+  background-color: $color-surface;
+  font-family: $font-family-base;
+  @include text-body-sm;
+  color: $color-text-primary;
+  transition: border-color var(--transition-base);
+
+  &::placeholder {
+    color: $color-text-placeholder;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: $color-border-strong;
+  }
+
+  // Dentro del wrapper: sin borde propio, sin padding izquierdo
+  .form-input-wrapper & {
+    border: none;
+    padding-left: 0;
+
+    &:focus {
+      border: none;
+    }
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Textarea
+// -----------------------------------------------------------------------------
+.form-textarea {
+  display: block;
+  width: 100%;
+  min-height: 12rem;
+  padding: $_form-input-padding-y $_form-input-padding-x;
+  border: none;
+  background-color: $color-surface;
+  font-family: $font-family-base;
+  @include text-body-sm;
+  color: $color-text-primary;
+  resize: vertical;
+
+  &::placeholder {
+    color: $color-text-placeholder;
+  }
+
+  &:focus {
+    outline: none;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Editor estilo GitHub — textarea enriquecida con tabs y toolbar
+// -----------------------------------------------------------------------------
+.form-editor {
+  border: $border-width $border-style $color-border;
+  background-color: $color-surface;
+
+  &__header {
+    display: flex;
+    align-items: stretch;
+    border-bottom: $border-width $border-style $color-border;
+    background-color: $color-surface-alt;
+  }
+
+  &__tabs {
+    display: flex;
+  }
+
+  &__tab {
+    @include text-label-md;
+    padding: $space-2 $space-4;
+    border: none;
+    border-bottom: 2px solid transparent;
+    background: transparent;
+    color: $color-text-secondary;
+    cursor: pointer;
+    transition: color var(--transition-base),
+                border-color var(--transition-base);
+
+    &--active {
+      color: $color-text-primary;
+      border-bottom-color: $color-gray-800;
+      background-color: $color-surface;
+    }
+
+    &:hover:not(.form-editor__tab--active) {
+      color: $color-text-primary;
+    }
+  }
+
+  &__toolbar {
+    display: flex;
+    align-items: center;
+    gap: $space-1;
+    padding: $space-1 $space-3;
+    margin-left: auto;
+    border-left: $border-width $border-style $color-border;
+  }
+
+  &__tool {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border: none;
+    background: transparent;
+    color: $color-text-secondary;
+    font-family: $font-family-base;
+    @include text-label-sm;
+    cursor: pointer;
+    transition: color var(--transition-base),
+                background-color var(--transition-base);
+
+    &:hover {
+      color: $color-text-primary;
+      background-color: $color-gray-200;
+    }
+
+    &--separator {
+      width: 1px;
+      height: 1.25rem;
+      background-color: $color-border;
+      cursor: default;
+      pointer-events: none;
+
+      &:hover {
+        background-color: $color-border;
+      }
+    }
+  }
+
+  &__body {
+    // Sin padding — el textarea llena el área
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Choice — item de radio o checkbox con label en línea
+// -----------------------------------------------------------------------------
+.form-choice {
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+  cursor: pointer;
+
+  &__input {
+    flex-shrink: 0;
+    width: 1rem;
+    height: 1rem;
+    border: $border-width $border-style $color-border-strong;
+    accent-color: $color-gray-800;
+    cursor: pointer;
+  }
+
+  &__label {
+    @include text-body-md;
+    color: $color-text-primary;
+    cursor: pointer;
+
+    a {
+      color: $color-text-primary;
+      text-decoration: underline;
+
+      &:hover {
+        color: $color-text-secondary;
+      }
+    }
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Group — agrupación vertical de choices
+// -----------------------------------------------------------------------------
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: $space-3;
+}

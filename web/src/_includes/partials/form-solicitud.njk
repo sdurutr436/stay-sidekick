@@ -1,0 +1,204 @@
+{#
+  PARTIAL: FORM-SOLICITUD
+  Formulario de presentar solicitud / nueva herramienta
+  BEM: .form-solicitud (organismo)
+  Wireframe: estilos blocky, escala de grises
+#}
+
+<form
+  class="form-solicitud"
+  id="form-solicitud"
+  method="post"
+  action="/api/solicitud"
+  novalidate
+>
+
+  {# ── Datos de la empresa ───────────────────────────────────────────── #}
+  <div class="form-solicitud__section">
+
+    <div class="form-field">
+      <label class="form-label" for="empresa-nombre">Nombre de la empresa</label>
+      <div class="form-input-wrapper">
+        <span class="form-input-wrapper__icon" aria-hidden="true">
+          <svg class="svg svg--md" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="9.5" stroke="currentColor" stroke-width="1.5"/>
+            <line x1="12" y1="7.5" x2="12" y2="16.5" stroke="currentColor" stroke-width="1.5"/>
+            <line x1="7.5" y1="12" x2="16.5" y2="12" stroke="currentColor" stroke-width="1.5"/>
+          </svg>
+        </span>
+        <input
+          class="form-input"
+          type="text"
+          id="empresa-nombre"
+          name="empresa_nombre"
+          placeholder="Nombre..."
+          autocomplete="organization"
+        />
+      </div>
+    </div>
+
+    <div class="form-field">
+      <label class="form-label" for="empresa-correo">Correo de contacto</label>
+      <div class="form-input-wrapper">
+        <span class="form-input-wrapper__icon" aria-hidden="true">
+          <svg class="svg svg--md" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="9.5" stroke="currentColor" stroke-width="1.5"/>
+            <line x1="12" y1="7.5" x2="12" y2="16.5" stroke="currentColor" stroke-width="1.5"/>
+            <line x1="7.5" y1="12" x2="16.5" y2="12" stroke="currentColor" stroke-width="1.5"/>
+          </svg>
+        </span>
+        <input
+          class="form-input"
+          type="email"
+          id="empresa-correo"
+          name="empresa_correo"
+          placeholder="Correo ejemplo..."
+          autocomplete="email"
+        />
+      </div>
+    </div>
+
+    <div class="form-field">
+      <label class="form-label" for="empresa-telefono">Teléfono de contacto</label>
+      <div class="form-input-wrapper">
+        <span class="form-input-wrapper__icon" aria-hidden="true">
+          <svg class="svg svg--md" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="9.5" stroke="currentColor" stroke-width="1.5"/>
+            <line x1="12" y1="7.5" x2="12" y2="16.5" stroke="currentColor" stroke-width="1.5"/>
+            <line x1="7.5" y1="12" x2="16.5" y2="12" stroke="currentColor" stroke-width="1.5"/>
+          </svg>
+        </span>
+        <input
+          class="form-input"
+          type="tel"
+          id="empresa-telefono"
+          name="empresa_telefono"
+          placeholder="Teléfono de contacto..."
+          autocomplete="tel"
+        />
+      </div>
+    </div>
+
+  </div>
+
+  {# ── Tipo de solicitud — radio buttons ────────────────────────────── #}
+  <div class="form-solicitud__section">
+    <div class="form-group" role="radiogroup" aria-labelledby="tipo-solicitud-legend">
+      <span id="tipo-solicitud-legend" class="u-visually-hidden">Tipo de solicitud</span>
+
+      <label class="form-choice">
+        <input
+          class="form-choice__input"
+          type="radio"
+          name="tipo_solicitud"
+          value="beneficiario"
+          id="tipo-beneficiario"
+        />
+        <span class="form-choice__label">Ya soy beneficiario</span>
+      </label>
+
+      <label class="form-choice">
+        <input
+          class="form-choice__input"
+          type="radio"
+          name="tipo_solicitud"
+          value="empresa"
+          id="tipo-empresa"
+        />
+        <span class="form-choice__label">Empresa interesada</span>
+      </label>
+
+    </div>
+  </div>
+
+  {# ── Mensaje libre (solo beneficiarios) ── visible con JS ─────────── #}
+  <div
+    class="form-solicitud__conditional"
+    id="solicitud-mensaje"
+    aria-live="polite"
+    aria-hidden="true"
+  >
+    <div class="form-field">
+      <label class="form-label" for="solicitud-detalle">Cuéntanos tu situación</label>
+      <p class="form-solicitud__helper">
+        Incluye todos los detalles que normalmente enviarías por correo o Discord.
+      </p>
+      <div class="form-editor">
+        <div class="form-editor__header">
+          <div class="form-editor__tabs">
+            <button type="button" class="form-editor__tab form-editor__tab--active" aria-selected="true">
+              Escribir
+            </button>
+            <button type="button" class="form-editor__tab" aria-selected="false">
+              Vista previa
+            </button>
+          </div>
+          <div class="form-editor__toolbar" aria-label="Herramientas de formato">
+            <button type="button" class="form-editor__tool" title="Encabezado">H</button>
+            <button type="button" class="form-editor__tool" title="Negrita"><strong>B</strong></button>
+            <button type="button" class="form-editor__tool" title="Cursiva"><em>I</em></button>
+            <button type="button" class="form-editor__tool" title="Lista">≡</button>
+            <button type="button" class="form-editor__tool" title="Código">&lt;&gt;</button>
+            <button type="button" class="form-editor__tool" title="Enlace">&#128279;</button>
+            <span class="form-editor__tool form-editor__tool--separator" aria-hidden="true"></span>
+            <button type="button" class="form-editor__tool" title="Lista con viñetas">&#8226;&#8801;</button>
+            <button type="button" class="form-editor__tool" title="Lista numerada">1&#8801;</button>
+            <span class="form-editor__tool form-editor__tool--separator" aria-hidden="true"></span>
+            <button type="button" class="form-editor__tool" title="Deshacer">&#8617;</button>
+          </div>
+        </div>
+        <div class="form-editor__body">
+          <textarea
+            class="form-textarea"
+            id="solicitud-detalle"
+            name="solicitud_detalle"
+            rows="8"
+            placeholder="Escribe aquí con todos los detalles..."
+          ></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {# ── Condiciones ───────────────────────────────────────────────────── #}
+  <div class="form-solicitud__section">
+    <div class="form-group">
+
+      <label class="form-choice">
+        <input
+          class="form-choice__input"
+          type="checkbox"
+          id="acepta-terminos"
+          name="acepta_terminos"
+          required
+        />
+        <span class="form-choice__label">
+          He leído y acepto los
+          <a href="/legal/terminos">Términos y condiciones</a>
+          y la
+          <a href="/legal/privacidad">Política de privacidad</a>
+        </span>
+      </label>
+
+      <label class="form-choice">
+        <input
+          class="form-choice__input"
+          type="checkbox"
+          id="captcha"
+          name="captcha"
+          required
+        />
+        <span class="form-choice__label">Captcha</span>
+      </label>
+
+    </div>
+  </div>
+
+  {# ── Enviar ────────────────────────────────────────────────────────── #}
+  <div class="form-solicitud__actions">
+    <button type="submit" class="btn btn--primary btn--md">
+      Enviar formulario
+    </button>
+  </div>
+
+</form>
