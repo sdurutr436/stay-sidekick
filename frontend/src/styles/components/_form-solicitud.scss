@@ -1,0 +1,61 @@
+// =============================================================================
+// COMPONENTS: FORM-SOLICITUD
+// Organismo — formulario de presentar solicitud / nueva herramienta
+// Estructura BEM: .form-solicitud
+// =============================================================================
+
+.form-solicitud {
+  display: flex;
+  flex-direction: column;
+  gap: $space-6;
+
+  // -------------------------------------------------------------------------
+  // Sección — agrupación visual de campos relacionados
+  // -------------------------------------------------------------------------
+  &__section {
+    display: flex;
+    flex-direction: column;
+    gap: $space-4;
+  }
+
+  // -------------------------------------------------------------------------
+  // Texto auxiliar debajo de un label
+  // -------------------------------------------------------------------------
+  &__helper {
+    @include text-caption-md;
+    color: $color-text-secondary;
+    margin-top: -$space-1;
+  }
+
+  // -------------------------------------------------------------------------
+  // Área condicional — oculta por defecto, visible con JS cuando
+  // el radio "beneficiario" está seleccionado
+  // -------------------------------------------------------------------------
+  &__conditional {
+    display: none;
+
+    &--visible {
+      display: block;
+    }
+  }
+
+  // -------------------------------------------------------------------------
+  // Acciones — botón de envío alineado a la derecha
+  // -------------------------------------------------------------------------
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Página de solicitud — wrapper para centrar y limitar el ancho del formulario
+// -----------------------------------------------------------------------------
+.solicitud-page {
+  max-width: 44rem;
+  margin-inline: auto;
+
+  &__intro {
+    margin-bottom: $space-8;
+  }
+}
