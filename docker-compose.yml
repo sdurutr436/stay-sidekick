@@ -1,0 +1,75 @@
+# =============================================================================
+# DOCKER COMPOSE — Stay Sidekick
+#
+# Servicios:
+#   nginx     → proxy inverso, único punto de entrada en localhost:80
+#   frontend  → Angular SPA  (nginx interno, puerto 80)
+#   web       → 11ty estático (nginx interno, puerto 80)
+#   backend   → Flask API     (Python, puerto 5000)
+#
+# Primer uso:
+#   cp backend/.env.example backend/.env   # rellenar variables reales
+#   docker compose up --build
+#
+# URLs tras levantar:
+#   http://localhost/          → sitio estático 11ty
+#   http://localhost/app/      → app Angular
+#   http://localhost/api/      → API Flask
+# =============================================================================
+
+services:
+
+  # ── Proxy inverso ───────────────────────────────────────────────────────────
+  nginx:
+    build: ./nginx
+    ports:
+      - "80:80"
+    depends_on:
+      - frontend
+      - web
+      - backend
+    networks:
+      - app-net
+
+  # ── Angular SPA ─────────────────────────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    expose:
+      - "80"
+    networks:
+      - app-net
+
+  # ── 11ty sitio estático ─────────────────────────────────────────────────────
+  # El contexto de build es la raíz del proyecto (.) porque el Dockerfile
+  # necesita acceder a frontend/src/styles/ para compilar el SCSS compartido.
+  web:
+    build:
+      context: .
+      dockerfile: web/Dockerfile
+    expose:
+      - "80"
+    networks:
+      - app-net
+
+  # ── Flask API ────────────────────────────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    expose:
+      - "5000"
+    env_file:
+      - path: ./backend/.env
+        required: true   # crear desde backend/.env.example antes de levantar
+    environment:
+      # En Docker todos los servicios pasan por nginx (:80) → mismo origen
+      ALLOWED_ORIGINS: "http://localhost"
+    networks:
+      - app-net
+
+# ── Red interna ──────────────────────────────────────────────────────────────
+networks:
+  app-net:
+    driver: bridge

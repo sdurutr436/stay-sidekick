@@ -1,0 +1,32 @@
+# .dockerignore raíz — aplica al contexto de build del servicio web (context: .)
+# Solo son necesarios web/ y frontend/src/styles/
+
+.git
+.github
+.vscode
+.claude
+
+node_modules
+backend
+docs
+*.md
+*.sh
+*.bat
+dev.bat
+dev.sh
+
+# Artefactos de build
+frontend/node_modules
+frontend/dist
+frontend/.angular
+frontend/src/app
+frontend/src/main.ts
+frontend/src/index.html
+frontend/src/styles.scss
+frontend/angular.json
+frontend/tsconfig*.json
+frontend/*.json
+frontend/public
+
+web/node_modules
+web/_site
