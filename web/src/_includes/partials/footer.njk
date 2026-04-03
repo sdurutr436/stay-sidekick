@@ -1,0 +1,125 @@
+{#
+  PARTIAL: FOOTER
+  Estructura BEM idéntica al componente Angular (footer.html)
+  Los estilos provienen de styles/components/_footer.scss (compartido)
+#}
+<footer class="footer">
+  <div class="footer__inner">
+    <div class="footer__grid">
+
+      {# Col 1: Brand #}
+      <div class="footer__brand">
+        <a href="/" class="logo" aria-label="{{ site.name }} — Inicio">
+          <div class="logo__icon">
+            <svg
+              class="svg svg--lg"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 32 32"
+              fill="none"
+              aria-hidden="true"
+            >
+              <rect x="2" y="2" width="28" height="28" rx="0" fill="#2e2e2e"/>
+              <rect x="8" y="14" width="6" height="12" fill="#ffffff"/>
+              <rect x="18" y="8" width="6" height="18" fill="#ffffff"/>
+              <rect x="8" y="8" width="6" height="4" fill="#ffffff"/>
+            </svg>
+          </div>
+          <span class="logo__name">{{ site.name }}</span>
+        </a>
+        <p class="footer__description">
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+          Ut elementum libero id porttitor consectetur.
+        </p>
+      </div>
+
+      {# Col 2: Producto #}
+      <nav class="footer__nav" aria-label="Producto">
+        <h3 class="footer__nav-title">Producto</h3>
+        <ul class="footer__nav-list">
+          <li class="footer__nav-item">
+            <a href="/producto/funcionalidades" class="footer__nav-link">Funcionalidades</a>
+          </li>
+          <li class="footer__nav-item">
+            <a href="/producto/precios" class="footer__nav-link">Precios</a>
+          </li>
+          <li class="footer__nav-item">
+            <a href="/producto/nuevas-herramientas" class="footer__nav-link">Nuevas herramientas</a>
+          </li>
+        </ul>
+      </nav>
+
+      {# Col 3: Legal #}
+      <nav class="footer__nav" aria-label="Legal">
+        <h3 class="footer__nav-title">Legal</h3>
+        <ul class="footer__nav-list">
+          <li class="footer__nav-item">
+            <a href="/legal/privacidad" class="footer__nav-link">Política de privacidad</a>
+          </li>
+          <li class="footer__nav-item">
+            <a href="/legal/terminos" class="footer__nav-link">Términos de uso</a>
+          </li>
+          <li class="footer__nav-item">
+            <a href="/legal/cookies" class="footer__nav-link">Política de cookies</a>
+          </li>
+        </ul>
+      </nav>
+
+      {# Col 4: Empresa #}
+      <nav class="footer__nav" aria-label="Empresa">
+        <h3 class="footer__nav-title">Empresa</h3>
+        <ul class="footer__nav-list">
+          <li class="footer__nav-item">
+            <a href="/empresa/sobre-nosotros" class="footer__nav-link">Sobre nosotros</a>
+          </li>
+          <li class="footer__nav-item">
+            <a href="/empresa/contacto" class="footer__nav-link">Contacto</a>
+          </li>
+          <li class="footer__nav-item">
+            <a href="/empresa/nuevas-herramientas" class="footer__nav-link">Nuevas herramientas</a>
+          </li>
+        </ul>
+      </nav>
+
+      {# Col 5: Redes sociales #}
+      <nav class="footer__nav" aria-label="Redes sociales">
+        <h3 class="footer__nav-title">Redes sociales</h3>
+        <ul class="footer__nav-list">
+          <li class="footer__nav-item">
+            {# TODO: reemplazar SVG placeholder con ícono de librería oficial #}
+            <a href="#" class="footer__nav-link footer__social-link" aria-label="GitHub">
+              <span class="footer__social-icon">
+                <svg class="svg svg--sm" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                  <rect x="2" y="2" width="16" height="16" rx="2"/>
+                  <line x1="10" y1="6" x2="10" y2="14" stroke-linecap="round"/>
+                  <line x1="6" y1="10" x2="14" y2="10" stroke-linecap="round"/>
+                </svg>
+              </span>
+              GitHub
+            </a>
+          </li>
+          <li class="footer__nav-item">
+            {# TODO: reemplazar SVG placeholder con ícono de librería oficial #}
+            <a href="#" class="footer__nav-link footer__social-link" aria-label="LinkedIn">
+              <span class="footer__social-icon">
+                <svg class="svg svg--sm" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                  <rect x="2" y="2" width="16" height="16" rx="2"/>
+                  <line x1="10" y1="6" x2="10" y2="14" stroke-linecap="round"/>
+                  <line x1="6" y1="10" x2="14" y2="10" stroke-linecap="round"/>
+                </svg>
+              </span>
+              LinkedIn
+            </a>
+          </li>
+        </ul>
+      </nav>
+
+    </div>{# /.footer__grid #}
+  </div>{# /.footer__inner #}
+
+  {# Barra de copyright #}
+  <div class="footer__bar">
+    <p class="footer__copyright">
+      &copy; {% year %} {{ site.name }} &middot; Todos los derechos reservados
+    </p>
+  </div>
+</footer>

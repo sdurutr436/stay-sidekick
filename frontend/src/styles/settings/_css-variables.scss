@@ -1,0 +1,52 @@
+// =============================================================================
+// SETTINGS: CSS CUSTOM PROPERTIES
+// Expone variables SCSS como tokens CSS nativos.
+// Importar después del resto de archivos de settings.
+// =============================================================================
+
+:root {
+  // Tipografía
+  --font-family-base:      #{$font-family-base};
+
+  --font-size-display-2xl: #{$font-size-display-2xl};
+  --font-size-display-xl:  #{$font-size-display-xl};
+  --font-size-display-lg:  #{$font-size-display-lg};
+  --font-size-h1:          #{$font-size-h1};
+  --font-size-h2:          #{$font-size-h2};
+  --font-size-h3:          #{$font-size-h3};
+  --font-size-h4:          #{$font-size-h4};
+  --font-size-body-xl:     #{$font-size-body-xl};
+  --font-size-body-lg:     #{$font-size-body-lg};
+  --font-size-body-md:     #{$font-size-body-md};
+  --font-size-body-sm:     #{$font-size-body-sm};
+  --font-size-label-lg:    #{$font-size-label-lg};
+  --font-size-label-md:    #{$font-size-label-md};
+  --font-size-caption-md:  #{$font-size-caption-md};
+
+  --font-weight-display: #{$font-weight-display};
+  --font-weight-heading: #{$font-weight-heading};
+  --font-weight-body:    #{$font-weight-body};
+  --font-weight-caption: #{$font-weight-caption};
+
+  // Colores
+  --color-surface:        #{$color-surface};
+  --color-surface-alt:    #{$color-surface-alt};
+  --color-border:         #{$color-border};
+  --color-text-primary:   #{$color-text-primary};
+  --color-text-secondary: #{$color-text-secondary};
+  --color-text-inverse:   #{$color-text-inverse};
+
+  // Espaciado
+  --space-2: #{$space-2};
+  --space-4: #{$space-4};
+  --space-6: #{$space-6};
+  --space-8: #{$space-8};
+
+  // Layout
+  --header-height:       #{$header-height};
+  --container-max-width: #{$container-max-width};
+
+  // Transiciones
+  --transition-base: 150ms ease;
+  --transition-slow: 300ms ease;
+}

@@ -1,0 +1,76 @@
+// =============================================================================
+// ELEMENTS: BASE
+// Estilos de elementos HTML sin clases — usa las variables de settings
+// =============================================================================
+
+body {
+  font-family: $font-family-base;
+  font-size: $font-size-body-lg;
+  font-weight: $font-weight-body;
+  color: $color-text-primary;
+  background-color: $color-surface;
+}
+
+// -----------------------------------------------------------------------------
+// Encabezados
+// -----------------------------------------------------------------------------
+h1 {
+  @include text-h1;
+}
+
+h2 {
+  @include text-h2;
+}
+
+h3 {
+  @include text-h3;
+}
+
+h4 {
+  @include text-h4;
+}
+
+h5,
+h6 {
+  @include text-style($font-size-body-lg, $font-weight-body, $line-height-heading);
+}
+
+// -----------------------------------------------------------------------------
+// Texto en línea
+// -----------------------------------------------------------------------------
+p {
+  @include text-body-md;
+}
+
+small {
+  @include text-caption-md;
+}
+
+strong,
+b {
+  font-weight: $font-weight-heading;
+}
+
+// -----------------------------------------------------------------------------
+// Imágenes base (sin clase)
+// -----------------------------------------------------------------------------
+img {
+  height: auto;
+  max-width: 100%;
+}
+
+// -----------------------------------------------------------------------------
+// SVG base (sin clase)
+// -----------------------------------------------------------------------------
+svg {
+  fill: currentColor;
+  flex-shrink: 0;
+}
+
+// -----------------------------------------------------------------------------
+// Enfoque accesible
+// -----------------------------------------------------------------------------
+:focus-visible {
+  outline: 2px solid $color-gray-800;
+  outline-offset: 2px;
+}

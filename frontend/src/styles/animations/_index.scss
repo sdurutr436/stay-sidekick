@@ -1,0 +1,43 @@
+// =============================================================================
+// ANIMATIONS
+// Definiciones de animaciones y transiciones reutilizables
+// Prefijo: a-
+// =============================================================================
+
+// -----------------------------------------------------------------------------
+// Keyframes base
+// -----------------------------------------------------------------------------
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-$space-2);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Clases de utilidad de animación
+// -----------------------------------------------------------------------------
+.a-fade-in {
+  animation: fade-in var(--transition-slow) ease both;
+}
+
+.a-slide-down {
+  animation: slide-down var(--transition-slow) ease both;
+}
+
+// Respetar preferencia de movimiento reducido
+@media (prefers-reduced-motion: reduce) {
+  .a-fade-in,
+  .a-slide-down {
+    animation: none;
+  }
+}

@@ -1,0 +1,35 @@
+// =============================================================================
+// UTILITIES
+// Clases de ayuda de alta especificidad — sobreescriben componentes
+// Prefijo: u-
+// =============================================================================
+
+// Visibilidad
+.u-hidden          { display: none !important; }
+.u-invisible       { visibility: hidden !important; }
+.u-sr-only         { @include visually-hidden; }
+
+// Desbordamiento
+.u-overflow-hidden { overflow: hidden !important; }
+.u-nowrap          { white-space: nowrap !important; }
+.u-truncate        { @include text-truncate; }
+
+// Espaciado rápido (margen)
+.u-mt-0  { margin-top: 0 !important; }
+.u-mt-4  { margin-top: $space-4 !important; }
+.u-mt-8  { margin-top: $space-8 !important; }
+.u-mb-0  { margin-bottom: 0 !important; }
+.u-mb-4  { margin-bottom: $space-4 !important; }
+.u-mb-8  { margin-bottom: $space-8 !important; }
+
+// Texto
+.u-text-left    { text-align: left !important; }
+.u-text-center  { text-align: center !important; }
+.u-text-right   { text-align: right !important; }
+
+.u-text-primary   { color: $color-text-primary !important; }
+.u-text-secondary { color: $color-text-secondary !important; }
+.u-text-inverse   { color: $color-text-inverse !important; }
+
+// Ancho completo
+.u-w-full { width: 100% !important; }

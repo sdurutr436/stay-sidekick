@@ -1,0 +1,36 @@
+// =============================================================================
+// LAYOUT: FLEX
+// Utilidades de layout flexbox reutilizables
+// =============================================================================
+
+.l-flex {
+  display: flex;
+}
+
+.l-flex--row    { flex-direction: row; }
+.l-flex--col    { flex-direction: column; }
+.l-flex--wrap   { flex-wrap: wrap; }
+.l-flex--nowrap { flex-wrap: nowrap; }
+
+.l-flex--center  { @include flex-center; }
+.l-flex--between { @include flex-between; }
+.l-flex--start   { @include flex-start; }
+.l-flex--end     { display: flex; align-items: center; justify-content: flex-end; }
+
+.l-flex--align-start   { align-items: flex-start; }
+.l-flex--align-center  { align-items: center; }
+.l-flex--align-end     { align-items: flex-end; }
+.l-flex--align-stretch { align-items: stretch; }
+
+// Gap helpers — basados en la escala de espaciado
+.l-flex--gap-1 { gap: $space-1; }
+.l-flex--gap-2 { gap: $space-2; }
+.l-flex--gap-3 { gap: $space-3; }
+.l-flex--gap-4 { gap: $space-4; }
+.l-flex--gap-6 { gap: $space-6; }
+.l-flex--gap-8 { gap: $space-8; }
+
+// Flex item helpers
+.l-flex__item--grow   { flex: 1 1 auto; }
+.l-flex__item--shrink { flex: 0 0 auto; }
+.l-flex__item--none   { flex: none; }
