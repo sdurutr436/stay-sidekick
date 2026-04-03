@@ -1,0 +1,78 @@
+// =============================================================================
+// LAYOUT: GRID
+// Sistema de cuadrícula y contenedor base
+// =============================================================================
+
+// -----------------------------------------------------------------------------
+// Contenedor centrado
+// -----------------------------------------------------------------------------
+.l-container {
+  @include container;
+}
+
+// -----------------------------------------------------------------------------
+// Grid base — 12 columnas
+// -----------------------------------------------------------------------------
+.l-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: $space-6;
+
+  @include respond-until('md') {
+    grid-template-columns: repeat(4, 1fr);
+    gap: $space-4;
+  }
+
+  @include respond-from('md') {
+    grid-template-columns: repeat(8, 1fr);
+  }
+
+  @include respond-from('lg') {
+    grid-template-columns: repeat(12, 1fr);
+  }
+}
+
+// Spans de columna — uso: .l-col-4
+@for $i from 1 through 12 {
+  .l-col-#{$i} {
+    grid-column: span #{$i};
+  }
+}
+
+// Columnas responsivas
+@each $name, $value in $breakpoints {
+  @if $value != 0px {
+    @media (min-width: $value) {
+      @for $i from 1 through 12 {
+        .l-col-#{$name}-#{$i} {
+          grid-column: span #{$i};
+        }
+      }
+    }
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Layout de página principal
+// -----------------------------------------------------------------------------
+.l-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.l-page__header {
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  z-index: $z-header;
+}
+
+.l-page__main {
+  flex: 1 1 auto;
+  padding-block: $space-8;
+}
+
+.l-page__footer {
+  flex-shrink: 0;
+}

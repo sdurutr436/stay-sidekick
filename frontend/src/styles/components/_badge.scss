@@ -1,0 +1,53 @@
+// =============================================================================
+// COMPONENTS: BADGE
+// Etiquetas informativas compactas
+// Estructura BEM: .badge.badge--{variante}
+// =============================================================================
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: $space-1;
+  padding: $space-1 $space-2;
+  border-radius: $border-radius-default;
+  border: $border-width $border-style $color-border;
+  background-color: $color-badge-bg;
+  color: $color-badge-text;
+
+  @include text-caption-md;
+  font-weight: $font-weight-label;
+  white-space: nowrap;
+
+  // -------------------------------------------------------------------------
+  // Variantes (wireframe — se distinguen por borde y opacidad de fondo)
+  // -------------------------------------------------------------------------
+  &--default {
+    background-color: $color-gray-200;
+    border-color:     $color-gray-300;
+    color:            $color-gray-700;
+  }
+
+  &--outline {
+    background-color: transparent;
+    border-color:     $color-gray-500;
+    color:            $color-gray-700;
+  }
+
+  &--solid {
+    background-color: $color-gray-800;
+    border-color:     $color-gray-800;
+    color:            $color-white;
+  }
+
+  // -------------------------------------------------------------------------
+  // Dot indicador
+  // -------------------------------------------------------------------------
+  &__dot {
+    display: inline-block;
+    width: $space-2;
+    height: $space-2;
+    border-radius: 50%;
+    background-color: currentColor;
+    flex-shrink: 0;
+  }
+}

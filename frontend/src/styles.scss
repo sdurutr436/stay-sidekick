@@ -1,1 +1,37 @@
-/* You can add global styles to this file, and also import other style files */
+// =============================================================================
+// ESTILOS GLOBALES — ITCSS
+// Orden de importación: Settings → Tools → Generic → Elements →
+//                       Layout → Components → Utilities → Animations
+// =============================================================================
+
+// Fuente: Archivo (variable font)
+@import url('https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,100..900;1,100..900&display=swap');
+
+// 1. Settings — variables, sin CSS generado
+@import 'styles/settings/tipografia';
+@import 'styles/settings/colores';
+@import 'styles/settings/breakpoints';
+@import 'styles/settings/variables';
+@import 'styles/settings/css-variables'; // :root con custom properties (genera CSS)
+
+// 2. Tools — mixins, sin CSS generado
+@import 'styles/tools/mixins';
+
+// 3. Generic — resets
+@import 'styles/generic/resets';
+
+// 4. Elements — estilos de elementos HTML sin clase
+@import 'styles/elements/base';
+
+// 5. Layout — contenedor, grid, flex
+@import 'styles/layout/grid';
+@import 'styles/layout/flex';
+
+// 6. Components — todos los componentes y organismos
+@import 'styles/components/index';
+
+// 7. Utilities — clases de ayuda de alta especificidad
+@import 'styles/utilities/index';
+
+// 8. Animations — keyframes y clases de animación
+@import 'styles/animations/index';
