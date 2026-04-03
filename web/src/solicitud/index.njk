@@ -1,0 +1,27 @@
+---
+layout: base.njk
+title: Presentar solicitud
+description: Presenta tu solicitud de estancia o de nueva herramienta en Stay Sidekick.
+section: solicitud
+---
+
+<div class="l-container">
+  <div class="solicitud-page">
+
+    <div class="solicitud-page__intro">
+      <h1>Presentar solicitud</h1>
+      <p class="u-text-secondary u-mt-4">
+        Rellena el formulario para ponerte en contacto con nosotros.
+        Si ya eres beneficiario, selecciona la opción correspondiente
+        para enviarnos un mensaje con todos los detalles.
+      </p>
+    </div>
+
+    {% include "partials/form-solicitud.njk" %}
+
+  </div>
+</div>
+
+{% block scripts %}
+<script src="/assets/js/form-solicitud.js" defer></script>
+{% endblock %}
