@@ -20,22 +20,15 @@
 
   {% block head %}{% endblock %}
 </head>
-<body>
-  <div class="l-page">
+<body class="l-page">
 
-    <div class="l-page__header">
-      {% include "partials/header.njk" %}
-    </div>
+  {% include "partials/header.njk" %}
 
-    <main class="l-page__main" id="main-content">
-      {{ content | safe }}
-    </main>
+  <main class="l-page__main" id="main-content">
+    {{ content | safe }}
+  </main>
 
-    <div class="l-page__footer">
-      {% include "partials/footer.njk" %}
-    </div>
-
-  </div>
+  {% include "partials/footer.njk" %}
 
   {% block scripts %}{% endblock %}
 </body>
