@@ -40,7 +40,9 @@ def create_app(config_class: type = Config) -> Flask:
 
     # ── Blueprints ───────────────────────────────────────────────────────
     from app.contact.routes import contact_bp  # noqa: E402
+    from app.auth.routes import auth_bp        # noqa: E402
     app.register_blueprint(contact_bp)
+    app.register_blueprint(auth_bp)
 
     # ── Error handlers ───────────────────────────────────────────────────
     @app.errorhandler(429)

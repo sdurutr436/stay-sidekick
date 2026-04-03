@@ -1,0 +1,83 @@
+---
+layout: base.njk
+title: Iniciar sesión
+description: Accede a tu panel de Stay Sidekick.
+section: login
+---
+
+<div class="l-container">
+  <div class="login-page">
+
+    <div class="login-page__intro">
+      <h1>Iniciar sesión</h1>
+      <p class="u-text-secondary u-mt-4">
+        Accede a tu panel de herramientas.
+      </p>
+    </div>
+
+    <form class="form-login" id="form-login" novalidate>
+
+      {# ── Correo electrónico ──────────────────────────────────────────── #}
+      <div class="form-field">
+        <label class="form-label" for="login-email">Correo electrónico</label>
+        <div class="form-input-wrapper">
+          <span class="form-input-wrapper__icon" aria-hidden="true">
+            <svg class="svg svg--md" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
+              <rect x="3" y="5" width="18" height="14" rx="0" stroke="currentColor" stroke-width="1.5"/>
+              <polyline points="3,5 12,13 21,5" stroke="currentColor" stroke-width="1.5" fill="none"/>
+            </svg>
+          </span>
+          <input
+            class="form-input"
+            type="email"
+            id="login-email"
+            name="email"
+            placeholder="correo@empresa.com"
+            autocomplete="email"
+          />
+        </div>
+      </div>
+
+      {# ── Contraseña ──────────────────────────────────────────────────── #}
+      <div class="form-field">
+        <label class="form-label" for="login-password">Contraseña</label>
+        <div class="form-input-wrapper">
+          <span class="form-input-wrapper__icon" aria-hidden="true">
+            <svg class="svg svg--md" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
+              <rect x="5" y="11" width="14" height="10" rx="0" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M8 11V7a4 4 0 0 1 8 0v4" stroke="currentColor" stroke-width="1.5" fill="none"/>
+              <circle cx="12" cy="16" r="1.5" fill="currentColor"/>
+            </svg>
+          </span>
+          <input
+            class="form-input"
+            type="password"
+            id="login-password"
+            name="password"
+            placeholder="••••••••"
+            autocomplete="current-password"
+          />
+        </div>
+      </div>
+
+      {# ── Enviar ──────────────────────────────────────────────────────── #}
+      <div class="form-login__actions">
+        <button type="submit" class="btn btn--primary btn--md">
+          Iniciar sesión
+        </button>
+      </div>
+
+      {# ── Pie — enlace a solicitud ─────────────────────────────────────── #}
+      <p class="form-login__footer">
+        ¿Sin acceso todavía?
+        <a href="/solicitud">Presentar solicitud</a>
+      </p>
+
+    </form>
+
+  </div>
+</div>
+
+{% block scripts %}
+<script src="/assets/js/form-login.js" defer></script>
+{% endblock %}

@@ -1,0 +1,57 @@
+// =============================================================================
+// COMPONENTS: FORM-LOGIN
+// Organismo — formulario de inicio de sesión
+// Estructura BEM: .form-login, .login-page
+// =============================================================================
+
+.form-login {
+  display: flex;
+  flex-direction: column;
+  gap: $space-6;
+
+  // -------------------------------------------------------------------------
+  // Acciones — botón de submit a ancho completo
+  // -------------------------------------------------------------------------
+  &__actions {
+    display: flex;
+    flex-direction: column;
+    gap: $space-3;
+
+    .btn {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
+  // -------------------------------------------------------------------------
+  // Pie del formulario — enlace secundario (presentar solicitud)
+  // -------------------------------------------------------------------------
+  &__footer {
+    @include text-body-sm;
+    color: $color-text-secondary;
+    text-align: center;
+    padding-top: $space-4;
+    border-top: $border-width $border-style $color-border;
+
+    a {
+      color: $color-text-primary;
+      text-decoration: underline;
+
+      &:hover {
+        color: $color-text-secondary;
+      }
+    }
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Página de login — contenedor centrado y estrecho
+// -----------------------------------------------------------------------------
+.login-page {
+  max-width: 28rem;
+  margin-inline: auto;
+
+  &__intro {
+    margin-bottom: $space-8;
+  }
+}
