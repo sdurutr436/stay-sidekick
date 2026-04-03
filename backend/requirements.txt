@@ -25,3 +25,6 @@ flask-limiter==3.12
 
 # JWT (autenticación panel)
 PyJWT==2.9.0
+
+# Hashing de contraseñas
+bcrypt==5.0.0
