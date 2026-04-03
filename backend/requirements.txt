@@ -28,3 +28,7 @@ PyJWT==2.9.0
 
 # Hashing de contraseñas
 bcrypt==5.0.0
+
+# ORM y base de datos
+flask-sqlalchemy==3.1.1
+psycopg2-binary==2.9.10
