@@ -1,15 +1,9 @@
-<div class="l-page">
-  <div class="l-page__header">
-    <app-header />
-  </div>
+<app-header class="l-page__header" />
 
-  <main class="l-page__main">
-    <div class="l-container">
-      <router-outlet />
-    </div>
-  </main>
-
-  <div class="l-page__footer">
-    <app-footer />
+<main class="l-page__main">
+  <div class="l-container">
+    <router-outlet />
   </div>
-</div>
+</main>
+
+<app-footer class="l-page__footer" />
