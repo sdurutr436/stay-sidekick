@@ -16,14 +16,16 @@
   min-height: calc(100vh - #{$header-height});
 
   // -------------------------------------------------------------------------
-  // Sidenav — columna lateral izquierda
+  // Sidenav — landmark semántico (<aside>), no ocupa espacio en el flujo
+  // El nav-sidenav interno usa position: fixed
   // -------------------------------------------------------------------------
   &__sidenav {
+    width: 0;
     flex-shrink: 0;
   }
 
   // -------------------------------------------------------------------------
-  // Contenido principal — ocupa el espacio restante
+  // Contenido principal — ocupa todo el ancho, sidenav flota encima
   // -------------------------------------------------------------------------
   &__content {
     flex: 1 1 auto;
