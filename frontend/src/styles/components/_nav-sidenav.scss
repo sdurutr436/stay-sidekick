@@ -1,0 +1,143 @@
+// =============================================================================
+// COMPONENTS: NAV SIDENAV
+// Molécula — menú lateral de herramientas
+//
+// Estructura BEM:
+//   .nav-sidenav
+//     .nav-sidenav__tools         (lista de herramientas, ul)
+//       .nav-sidenav__item        (li)
+//         .nav-sidenav__tool-link (a)
+//           .nav-sidenav__tool-icon   (span > svg)
+//           .nav-sidenav__tool-label  (span)
+//     .nav-sidenav__footer        (footer)
+//       .nav-sidenav__collapse-btn    (button)
+//         .nav-sidenav__collapse-icon (span > svg)
+//         .nav-sidenav__collapse-label (span)
+// =============================================================================
+
+$sidenav-width:           240px;
+$sidenav-width-collapsed: 56px;
+
+.nav-sidenav {
+  display: flex;
+  flex-direction: column;
+  width: $sidenav-width;
+  height: 100%;
+  background-color: $color-surface;
+  border-right: $border-width $border-style $color-border;
+  overflow: hidden;
+  transition: width var(--transition-slow);
+
+  // -------------------------------------------------------------------------
+  // Estado colapsado — solo iconos, sin etiquetas
+  // -------------------------------------------------------------------------
+  &--collapsed {
+    width: $sidenav-width-collapsed;
+
+    .nav-sidenav__tool-label,
+    .nav-sidenav__collapse-label {
+      opacity: 0;
+      width: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .nav-sidenav__tool-link,
+    .nav-sidenav__collapse-btn {
+      justify-content: center;
+      padding-inline: 0;
+    }
+  }
+
+  // -------------------------------------------------------------------------
+  // Lista de herramientas
+  // -------------------------------------------------------------------------
+  &__tools {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    list-style: none;
+    margin: 0;
+    padding: $space-2 0;
+  }
+
+  &__item {
+    // Sin estilos propios — el enlace ocupa el bloque completo
+  }
+
+  &__tool-link {
+    display: flex;
+    align-items: center;
+    gap: $space-3;
+    width: 100%;
+    padding: $space-3 $space-4;
+    text-decoration: none;
+    color: $color-text-primary;
+    transition: background-color var(--transition-base);
+
+    @include text-label-md;
+
+    &:hover {
+      background-color: $color-gray-100;
+    }
+
+    &:focus-visible {
+      outline: 2px solid $color-gray-800;
+      outline-offset: -2px;
+    }
+  }
+
+  &__tool-icon {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  &__tool-label {
+    @include text-truncate;
+    transition: opacity var(--transition-slow), width var(--transition-slow);
+  }
+
+  // -------------------------------------------------------------------------
+  // Footer — botón de colapso
+  // -------------------------------------------------------------------------
+  &__footer {
+    flex-shrink: 0;
+    border-top: $border-width $border-style $color-border;
+    padding: $space-2 0;
+  }
+
+  &__collapse-btn {
+    display: flex;
+    align-items: center;
+    gap: $space-3;
+    width: 100%;
+    padding: $space-3 $space-4;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: $color-text-secondary;
+    transition: background-color var(--transition-base), color var(--transition-base);
+
+    @include text-label-sm;
+
+    &:hover {
+      background-color: $color-gray-100;
+      color: $color-text-primary;
+    }
+
+    &:focus-visible {
+      outline: 2px solid $color-gray-800;
+      outline-offset: -2px;
+    }
+  }
+
+  &__collapse-icon {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  &__collapse-label {
+    transition: opacity var(--transition-slow), width var(--transition-slow);
+  }
+}
