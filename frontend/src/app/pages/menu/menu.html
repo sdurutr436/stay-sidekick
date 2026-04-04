@@ -1,0 +1,21 @@
+<!-- Layout de página de menú: sidenav lateral + contenido principal -->
+<div class="menu-layout">
+
+  <!-- Sidenav lateral (abre/cierra con el botón hamburguesa del header) -->
+  @if (sidenavService.isOpen()) {
+    <aside class="menu-layout__sidenav" aria-label="Panel de herramientas">
+      <app-sidenav />
+    </aside>
+  }
+
+  <!-- Área de contenido principal -->
+  <section class="menu-layout__content" aria-label="Contenido principal">
+    <div class="l-container">
+      <h1 class="menu-layout__title">Mis herramientas</h1>
+      <p class="menu-layout__desc">
+        Selecciona una herramienta del menú lateral para empezar.
+      </p>
+    </div>
+  </section>
+
+</div>
