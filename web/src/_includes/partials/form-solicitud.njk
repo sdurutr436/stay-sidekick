@@ -9,9 +9,21 @@
   class="form-solicitud"
   id="form-solicitud"
   method="post"
-  action="/api/solicitud"
+  action="/api/contact"
   novalidate
 >
+
+  {# ── Honeypot — oculto para usuarios, atrae bots ──────────────────── #}
+  <div class="form-solicitud__honeypot" aria-hidden="true">
+    <label for="website">No rellenes este campo</label>
+    <input
+      type="text"
+      id="website"
+      name="website"
+      tabindex="-1"
+      autocomplete="off"
+    />
+  </div>
 
   {# ── Datos de la empresa ───────────────────────────────────────────── #}
   <div class="form-solicitud__section">
@@ -21,18 +33,20 @@
       <div class="form-input-wrapper">
         <span class="form-input-wrapper__icon" aria-hidden="true">
           <svg class="svg svg--md" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
-            <circle cx="12" cy="12" r="9.5" stroke="currentColor" stroke-width="1.5"/>
-            <line x1="12" y1="7.5" x2="12" y2="16.5" stroke="currentColor" stroke-width="1.5"/>
-            <line x1="7.5" y1="12" x2="16.5" y2="12" stroke="currentColor" stroke-width="1.5"/>
+            <rect x="3" y="3" width="18" height="18" stroke="currentColor" stroke-width="1.5"/>
+            <line x1="7" y1="9" x2="17" y2="9" stroke="currentColor" stroke-width="1.5"/>
+            <line x1="7" y1="13" x2="17" y2="13" stroke="currentColor" stroke-width="1.5"/>
+            <line x1="7" y1="17" x2="12" y2="17" stroke="currentColor" stroke-width="1.5"/>
           </svg>
         </span>
         <input
           class="form-input"
           type="text"
           id="empresa-nombre"
-          name="empresa_nombre"
-          placeholder="Nombre..."
+          name="company_name"
+          placeholder="Nombre de la empresa..."
           autocomplete="organization"
+          maxlength="150"
         />
       </div>
     </div>
@@ -42,40 +56,72 @@
       <div class="form-input-wrapper">
         <span class="form-input-wrapper__icon" aria-hidden="true">
           <svg class="svg svg--md" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
-            <circle cx="12" cy="12" r="9.5" stroke="currentColor" stroke-width="1.5"/>
-            <line x1="12" y1="7.5" x2="12" y2="16.5" stroke="currentColor" stroke-width="1.5"/>
-            <line x1="7.5" y1="12" x2="16.5" y2="12" stroke="currentColor" stroke-width="1.5"/>
+            <rect x="3" y="5" width="18" height="14" stroke="currentColor" stroke-width="1.5"/>
+            <polyline points="3,5 12,13 21,5" stroke="currentColor" stroke-width="1.5" fill="none"/>
           </svg>
         </span>
         <input
           class="form-input"
           type="email"
           id="empresa-correo"
-          name="empresa_correo"
-          placeholder="Correo ejemplo..."
+          name="company_email"
+          placeholder="correo@empresa.com"
           autocomplete="email"
+          maxlength="254"
         />
       </div>
     </div>
 
+    {# ── Teléfono con selector de prefijo de país ──────────────────────── #}
     <div class="form-field">
       <label class="form-label" for="empresa-telefono">Teléfono de contacto</label>
-      <div class="form-input-wrapper">
-        <span class="form-input-wrapper__icon" aria-hidden="true">
-          <svg class="svg svg--md" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
-            <circle cx="12" cy="12" r="9.5" stroke="currentColor" stroke-width="1.5"/>
-            <line x1="12" y1="7.5" x2="12" y2="16.5" stroke="currentColor" stroke-width="1.5"/>
-            <line x1="7.5" y1="12" x2="16.5" y2="12" stroke="currentColor" stroke-width="1.5"/>
-          </svg>
-        </span>
-        <input
-          class="form-input"
-          type="tel"
-          id="empresa-telefono"
-          name="empresa_telefono"
-          placeholder="Teléfono de contacto..."
-          autocomplete="tel"
-        />
+      <div class="form-phone">
+        <div class="form-phone__prefix">
+          <label class="u-visually-hidden" for="country-code">Prefijo de país</label>
+          <select
+            class="form-select form-phone__select"
+            id="country-code"
+            name="country_code"
+            autocomplete="tel-country-code"
+          >
+            <option value="ES" selected>🇪🇸 +34</option>
+            <option value="MX">🇲🇽 +52</option>
+            <option value="AR">🇦🇷 +54</option>
+            <option value="CO">🇨🇴 +57</option>
+            <option value="CL">🇨🇱 +56</option>
+            <option value="PE">🇵🇪 +51</option>
+            <option value="US">🇺🇸 +1</option>
+            <option value="GB">🇬🇧 +44</option>
+            <option value="FR">🇫🇷 +33</option>
+            <option value="DE">🇩🇪 +49</option>
+            <option value="IT">🇮🇹 +39</option>
+            <option value="PT">🇵🇹 +351</option>
+            <option value="BR">🇧🇷 +55</option>
+            <option value="NL">🇳🇱 +31</option>
+            <option value="BE">🇧🇪 +32</option>
+            <option value="CH">🇨🇭 +41</option>
+            <option value="AU">🇦🇺 +61</option>
+            <option value="CA">🇨🇦 +1</option>
+          </select>
+        </div>
+        <div class="form-input-wrapper form-phone__input">
+          <span class="form-input-wrapper__icon" aria-hidden="true">
+            <svg class="svg svg--md" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
+              <rect x="5" y="2" width="14" height="20" stroke="currentColor" stroke-width="1.5"/>
+              <line x1="5" y1="17" x2="19" y2="17" stroke="currentColor" stroke-width="1.5"/>
+              <circle cx="12" cy="19.5" r="0.75" fill="currentColor"/>
+            </svg>
+          </span>
+          <input
+            class="form-input"
+            type="tel"
+            id="empresa-telefono"
+            name="phone"
+            placeholder="600 000 000"
+            autocomplete="tel-national"
+            maxlength="20"
+          />
+        </div>
       </div>
     </div>
 
@@ -84,14 +130,14 @@
   {# ── Tipo de solicitud — radio buttons ────────────────────────────── #}
   <div class="form-solicitud__section">
     <div class="form-group" role="radiogroup" aria-labelledby="tipo-solicitud-legend">
-      <span id="tipo-solicitud-legend" class="u-visually-hidden">Tipo de solicitud</span>
+      <p id="tipo-solicitud-legend" class="form-label">Tipo de solicitud</p>
 
       <label class="form-choice">
         <input
           class="form-choice__input"
           type="radio"
-          name="tipo_solicitud"
-          value="beneficiario"
+          name="is_member"
+          value="true"
           id="tipo-beneficiario"
         />
         <span class="form-choice__label">Ya soy beneficiario</span>
@@ -101,8 +147,8 @@
         <input
           class="form-choice__input"
           type="radio"
-          name="tipo_solicitud"
-          value="empresa"
+          name="is_member"
+          value="false"
           id="tipo-empresa"
         />
         <span class="form-choice__label">Empresa interesada</span>
@@ -111,7 +157,7 @@
     </div>
   </div>
 
-  {# ── Mensaje libre (solo beneficiarios) ── visible con JS ─────────── #}
+  {# ── Mensaje libre (siempre requerido — campo "message" del backend) ── #}
   <div
     class="form-solicitud__conditional"
     id="solicitud-mensaje"
@@ -129,30 +175,15 @@
             <button type="button" class="form-editor__tab form-editor__tab--active" aria-selected="true">
               Escribir
             </button>
-            <button type="button" class="form-editor__tab" aria-selected="false">
-              Vista previa
-            </button>
-          </div>
-          <div class="form-editor__toolbar" aria-label="Herramientas de formato">
-            <button type="button" class="form-editor__tool" title="Encabezado">H</button>
-            <button type="button" class="form-editor__tool" title="Negrita"><strong>B</strong></button>
-            <button type="button" class="form-editor__tool" title="Cursiva"><em>I</em></button>
-            <button type="button" class="form-editor__tool" title="Lista">≡</button>
-            <button type="button" class="form-editor__tool" title="Código">&lt;&gt;</button>
-            <button type="button" class="form-editor__tool" title="Enlace">&#128279;</button>
-            <span class="form-editor__tool form-editor__tool--separator" aria-hidden="true"></span>
-            <button type="button" class="form-editor__tool" title="Lista con viñetas">&#8226;&#8801;</button>
-            <button type="button" class="form-editor__tool" title="Lista numerada">1&#8801;</button>
-            <span class="form-editor__tool form-editor__tool--separator" aria-hidden="true"></span>
-            <button type="button" class="form-editor__tool" title="Deshacer">&#8617;</button>
           </div>
         </div>
         <div class="form-editor__body">
           <textarea
             class="form-textarea"
             id="solicitud-detalle"
-            name="solicitud_detalle"
+            name="message"
             rows="8"
+            maxlength="2000"
             placeholder="Escribe aquí con todos los detalles..."
           ></textarea>
         </div>
@@ -169,7 +200,7 @@
           class="form-choice__input"
           type="checkbox"
           id="acepta-terminos"
-          name="acepta_terminos"
+          name="privacy_accepted"
           required
         />
         <span class="form-choice__label">
@@ -180,23 +211,32 @@
         </span>
       </label>
 
-      <label class="form-choice">
-        <input
-          class="form-choice__input"
-          type="checkbox"
-          id="captcha"
-          name="captcha"
-          required
-        />
-        <span class="form-choice__label">Captcha</span>
-      </label>
-
     </div>
   </div>
 
+  {# ── Turnstile ─────────────────────────────────────────────────────── #}
+  <div class="form-solicitud__section">
+    <div
+      class="cf-turnstile"
+      data-sitekey="{{ config.turnstileSiteKey }}"
+      data-theme="light"
+      data-language="es"
+    ></div>
+  </div>
+
+  {# ── Feedback al usuario ───────────────────────────────────────────── #}
+  <div
+    class="form-solicitud__feedback"
+    id="form-feedback"
+    role="status"
+    aria-live="polite"
+    aria-atomic="true"
+    hidden
+  ></div>
+
   {# ── Enviar ────────────────────────────────────────────────────────── #}
   <div class="form-solicitud__actions">
-    <button type="submit" class="btn btn--primary btn--md">
+    <button type="submit" class="btn btn--primary btn--md" id="form-submit-btn">
       Enviar formulario
     </button>
   </div>
