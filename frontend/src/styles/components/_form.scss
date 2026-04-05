@@ -200,6 +200,57 @@ $_form-input-padding-y: $space-2;
 }
 
 // -----------------------------------------------------------------------------
+// Select — desplegable nativo
+// -----------------------------------------------------------------------------
+.form-select {
+  display: block;
+  width: 100%;
+  height: $_form-input-height;
+  padding: $_form-input-padding-y $_form-input-padding-x;
+  border: $border-width $border-style $color-border;
+  background-color: $color-surface;
+  font-family: $font-family-base;
+  @include text-body-sm;
+  color: $color-text-primary;
+  cursor: pointer;
+  appearance: none;
+  transition: border-color var(--transition-base);
+
+  &:focus {
+    outline: none;
+    border-color: $color-border-strong;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Phone — prefijo de país + input en línea
+// -----------------------------------------------------------------------------
+.form-phone {
+  display: flex;
+  gap: 0;
+
+  &__prefix {
+    flex-shrink: 0;
+  }
+
+  &__select {
+    height: $_form-input-height;
+    border-right: none;
+    white-space: nowrap;
+  }
+
+  &__input {
+    flex: 1 1 auto;
+    min-width: 0;
+
+    // El border-left se elimina para unirse visualmente al select
+    .form-input-wrapper {
+      border-left: none;
+    }
+  }
+}
+
+// -----------------------------------------------------------------------------
 // Choice — item de radio o checkbox con label en línea
 // -----------------------------------------------------------------------------
 .form-choice {
