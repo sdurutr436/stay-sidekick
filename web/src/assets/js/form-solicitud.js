@@ -5,8 +5,9 @@
  * Capas:
  *   1. Sanitización  — limpieza de strings antes de cualquier operación
  *   2. Validación    — reglas de negocio por campo
- *   3. Payload       — construcción del objeto JSON limpio
- *   4. Transporte    — fetch con CSRF token + JWT opcional
+ *   3. Payload       — construcción del objeto JSON alineado con ContactFormSchema
+ *   4. Transporte    — fetch con CSRF token hacia POST /api/contact
+ *   5. UI            — feedback de éxito / error visible al usuario
  *
  * La sanitización en cliente NO sustituye la del backend; es una primera
  * línea de defensa y garantía de que el payload llega bien formado.
@@ -18,10 +19,7 @@
 // 1. SANITIZACIÓN
 // =============================================================================
 
-/**
- * Elimina todas las etiquetas HTML/XML del string.
- * Previene inyección de markup en los campos de texto.
- */
+/** Elimina todas las etiquetas HTML/XML del string. */
 function stripTags(str) {
   return String(str).replace(/<[^>]*>/g, '');
 }
@@ -42,15 +40,12 @@ function normalizeWs(str) {
   return str.trim().replace(/[ \t]{2,}/g, ' ');
 }
 
-/** Sanitización para campos de texto cortos (nombre, empresa…). */
+/** Sanitización para campos de texto cortos. */
 function sanitizeText(str, maxLen) {
   return normalizeWs(stripControlChars(stripTags(str), false)).slice(0, maxLen);
 }
 
-/**
- * Sanitización de email: strip tags, control chars, lowercase, sin espacios.
- * RFC 5321 limita a 254 caracteres.
- */
+/** Sanitización de email: strip tags, control chars, lowercase, sin espacios. */
 function sanitizeEmail(str) {
   return stripControlChars(stripTags(str), false)
     .trim()
@@ -61,7 +56,6 @@ function sanitizeEmail(str) {
 
 /**
  * Sanitización de teléfono: solo dígitos, +, espacios, guiones y paréntesis.
- * Elimina cualquier otro carácter.
  */
 function sanitizePhone(str) {
   return stripControlChars(stripTags(str), false)
@@ -70,18 +64,12 @@ function sanitizePhone(str) {
     .slice(0, 20);
 }
 
-/**
- * Sanitización para el textarea largo.
- * Conserva saltos de línea (\n) pero elimina etiquetas y control chars.
- */
+/** Sanitización para el textarea largo. Conserva saltos de línea. */
 function sanitizeTextarea(str, maxLen) {
   return stripControlChars(stripTags(str), true).trim().slice(0, maxLen);
 }
 
-/**
- * Comprueba que el valor de un radio/select pertenece a la lista blanca.
- * Devuelve el valor si es válido, null si no.
- */
+/** Comprueba que el valor pertenece a la lista blanca. */
 function whitelistEnum(val, allowed) {
   return allowed.includes(val) ? val : null;
 }
@@ -91,42 +79,45 @@ function whitelistEnum(val, allowed) {
 // =============================================================================
 
 const _EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-// Teléfono: 7-15 dígitos con separadores opcionales (formato internacional E.164 o local)
 const _PHONE_RE = /^\+?[\d][\d\s\-().]{5,18}[\d]$/;
 
 const validators = {
-  nombre(val) {
-    if (!val)          return 'El nombre de la empresa es obligatorio.';
-    if (val.length < 2) return 'El nombre debe tener al menos 2 caracteres.';
+  companyName(val) {
+    if (!val || val.length < 2) return 'El nombre de la empresa es obligatorio (mínimo 2 caracteres).';
     return null;
   },
 
-  correo(val) {
+  companyEmail(val) {
     if (!val)                 return 'El correo de contacto es obligatorio.';
     if (!_EMAIL_RE.test(val)) return 'Introduce un correo electrónico válido.';
     return null;
   },
 
-  telefono(val) {
+  phone(val) {
     if (!val)                 return 'El teléfono de contacto es obligatorio.';
     if (!_PHONE_RE.test(val)) return 'Introduce un teléfono válido (mínimo 7 dígitos).';
     return null;
   },
 
-  tipo(val) {
-    if (!val) return 'Selecciona el tipo de solicitud.';
+  isMember(val) {
+    if (val === null) return 'Selecciona el tipo de solicitud.';
     return null;
   },
 
-  detalle(val, isBeneficiario) {
-    if (!isBeneficiario) return null;
-    if (!val)            return 'Describe tu situación para que podamos ayudarte.';
+  message(val, isMember) {
+    if (!isMember) return null;
+    if (!val)      return 'Describe tu situación para que podamos ayudarte.';
     if (val.length < 20) return 'El mensaje debe tener al menos 20 caracteres.';
     return null;
   },
 
-  terminos(checked) {
+  privacyAccepted(checked) {
     if (!checked) return 'Debes aceptar los términos y condiciones para continuar.';
+    return null;
+  },
+
+  turnstile(token) {
+    if (!token) return 'Completa la verificación de seguridad.';
     return null;
   },
 };
@@ -181,12 +172,28 @@ function clearAllErrors(form) {
 }
 
 // =============================================================================
-// 4. CSRF + JWT
+// 4. FEEDBACK DE ESTADO (éxito / error)
+// =============================================================================
+
+function showFeedback(feedbackEl, type, message) {
+  feedbackEl.textContent = message;
+  feedbackEl.className = 'form-solicitud__feedback form-solicitud__feedback--' + type;
+  feedbackEl.removeAttribute('hidden');
+}
+
+function hideFeedback(feedbackEl) {
+  feedbackEl.setAttribute('hidden', '');
+  feedbackEl.textContent = '';
+  feedbackEl.className = 'form-solicitud__feedback';
+}
+
+// =============================================================================
+// 5. CSRF
 // =============================================================================
 
 /**
- * Obtiene el token CSRF del backend.
- * El backend expone GET /api/csrf-token → { csrf_token: "..." }
+ * Obtiene el token CSRF del backend (GET /api/csrf-token).
+ * El backend lo devuelve como cookie + JSON.
  */
 async function fetchCsrfToken() {
   try {
@@ -203,207 +210,210 @@ async function fetchCsrfToken() {
   }
 }
 
-/**
- * Lee el JWT almacenado por la app Angular tras el login.
- * Clave: 'ss_token' en localStorage del mismo origen.
- */
-function getJwt() {
-  try {
-    const token = localStorage.getItem('ss_token');
-    // Validación mínima de estructura JWT (tres segmentos base64url)
-    if (token && /^[\w-]+\.[\w-]+\.[\w-]+$/.test(token)) return token;
-    return null;
-  } catch {
-    return null;
-  }
-}
-
 // =============================================================================
-// 5. CONSTRUCCIÓN DEL PAYLOAD
+// 6. CONSTRUCCIÓN DEL PAYLOAD
 // =============================================================================
 
 /**
- * Construye el objeto JSON limpio listo para enviar al backend.
- * Campo solicitud_detalle solo incluido si tipo === 'beneficiario'.
- *
- * @param {{ nombre, correo, telefono, tipo, detalle }} fields
- * @returns {object}
+ * Construye el objeto JSON alineado con ContactFormSchema del backend.
+ * Campos: company_name, company_email, country_code, phone,
+ *         is_member (boolean), message, turnstile_token,
+ *         privacy_accepted (boolean), website (honeypot, siempre vacío).
  */
 function buildPayload(fields) {
-  const isBeneficiario = fields.tipo === 'beneficiario';
   return {
-    empresa_nombre:    fields.nombre,
-    empresa_correo:    fields.correo,
-    empresa_telefono:  fields.telefono,
-    tipo_solicitud:    fields.tipo,
-    solicitud_detalle: isBeneficiario ? (fields.detalle || null) : null,
-    acepta_terminos:   true,
-    origen:            'web',
+    company_name:     fields.companyName,
+    company_email:    fields.companyEmail,
+    country_code:     fields.countryCode,
+    phone:            fields.phone,
+    is_member:        fields.isMember,
+    message:          fields.message || '',
+    turnstile_token:  fields.turnstileToken,
+    privacy_accepted: true,
+    website:          '',
   };
 }
 
 // =============================================================================
-// 6. TRANSPORTE
+// 7. TRANSPORTE
 // =============================================================================
 
-/**
- * Envía el payload al backend.
- * Incluye CSRF token en cabecera X-CSRF-Token y JWT en Authorization si
- * está disponible.
- *
- * @param {object} payload
- * @param {string|null} csrfToken
- * @param {string|null} jwt
- */
-async function submitPayload(payload, csrfToken, jwt) {
+async function submitPayload(payload, csrfToken) {
   const headers = {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
   };
   if (csrfToken) headers['X-CSRF-Token'] = csrfToken;
-  if (jwt)       headers['Authorization'] = `Bearer ${jwt}`;
 
-  const res = await fetch('/api/solicitud', {
+  const res = await fetch('/api/contact', {
     method: 'POST',
     credentials: 'same-origin',
     headers,
     body: JSON.stringify(payload),
   });
 
+  let body;
+  try { body = await res.json(); } catch { body = {}; }
+
   if (!res.ok) {
-    let errMsg = `Error ${res.status}`;
-    try {
-      const errBody = await res.json();
-      if (errBody.message) errMsg = errBody.message;
-    } catch { /* noop */ }
+    const errMsg = (body.errors && body.errors[0]) || `Error ${res.status}`;
     throw new Error(errMsg);
   }
 
-  return res.json();
+  return body;
 }
 
 // =============================================================================
-// 7. INICIALIZACIÓN
+// 8. INICIALIZACIÓN
 // =============================================================================
 
 (function init() {
   const form = document.getElementById('form-solicitud');
   if (!form) return;
 
-  const conditional = document.getElementById('solicitud-mensaje');
+  const conditional  = document.getElementById('solicitud-mensaje');
+  const feedbackEl   = document.getElementById('form-feedback');
+  const submitBtn    = document.getElementById('form-submit-btn');
 
-  // ── Toggle del área condicional (beneficiario) ──────────────────────────
-  form.querySelectorAll('input[name="tipo_solicitud"]').forEach(function (radio) {
+  const inputNombre   = form.querySelector('#empresa-nombre');
+  const inputCorreo   = form.querySelector('#empresa-correo');
+  const inputTelefono = form.querySelector('#empresa-telefono');
+  const selectCountry = form.querySelector('#country-code');
+  const textareaMsg   = form.querySelector('#solicitud-detalle');
+  const checkTerminos = form.querySelector('#acepta-terminos');
+
+  // ── Toggle área condicional de mensaje (beneficiario) ──────────────────
+  form.querySelectorAll('input[name="is_member"]').forEach(function (radio) {
     radio.addEventListener('change', function () {
-      const visible = this.value === 'beneficiario';
+      const visible = this.value === 'true';
       conditional.classList.toggle('form-solicitud__conditional--visible', visible);
       conditional.setAttribute('aria-hidden', String(!visible));
     });
   });
 
-  // ── Validación en blur (feedback inmediato por campo) ───────────────────
-  const inputNombre   = form.querySelector('#empresa-nombre');
-  const inputCorreo   = form.querySelector('#empresa-correo');
-  const inputTelefono = form.querySelector('#empresa-telefono');
-
+  // ── Validación en blur ─────────────────────────────────────────────────
   inputNombre.addEventListener('blur', function () {
-    const val = sanitizeText(this.value, 200);
-    const err = validators.nombre(val);
+    const val = sanitizeText(this.value, 150);
+    const err = validators.companyName(val);
     err ? showFieldError(this, err) : clearFieldError(this);
   });
 
   inputCorreo.addEventListener('blur', function () {
     const val = sanitizeEmail(this.value);
-    const err = validators.correo(val);
+    const err = validators.companyEmail(val);
     err ? showFieldError(this, err) : clearFieldError(this);
   });
 
   inputTelefono.addEventListener('blur', function () {
     const val = sanitizePhone(this.value);
-    const err = validators.telefono(val);
+    const err = validators.phone(val);
     err ? showFieldError(this, err) : clearFieldError(this);
   });
 
-  // ── Submit ──────────────────────────────────────────────────────────────
+  // ── Submit ─────────────────────────────────────────────────────────────
   form.addEventListener('submit', async function (e) {
     e.preventDefault();
     clearAllErrors(form);
+    hideFeedback(feedbackEl);
 
     // 1 — Sanitizar
-    const nombre   = sanitizeText(inputNombre.value, 200);
-    const correo   = sanitizeEmail(inputCorreo.value);
-    const telefono = sanitizePhone(inputTelefono.value);
-    const tipoEl   = form.querySelector('input[name="tipo_solicitud"]:checked');
-    const tipoRaw  = tipoEl ? tipoEl.value : '';
-    const tipo     = whitelistEnum(tipoRaw, ['beneficiario', 'empresa']);
-    const detalle  = sanitizeTextarea(
-      form.querySelector('#solicitud-detalle')?.value ?? '', 5000
-    );
-    const terminos = form.querySelector('#acepta-terminos').checked;
+    const companyName  = sanitizeText(inputNombre.value, 150);
+    const companyEmail = sanitizeEmail(inputCorreo.value);
+    const countryCode  = whitelistEnum(selectCountry.value, [
+      'ES','MX','AR','CO','CL','PE','US','GB','FR','DE','IT','PT','BR','NL','BE','CH','AU','CA',
+    ]) || 'ES';
+    const phone        = sanitizePhone(inputTelefono.value);
 
-    // 2 — Validar (acumula todos los errores antes de mostrar)
+    const memberEl     = form.querySelector('input[name="is_member"]:checked');
+    const isMember     = memberEl ? memberEl.value === 'true' : null;
+
+    const message      = sanitizeTextarea(textareaMsg?.value ?? '', 2000);
+    const privacyOk    = checkTerminos.checked;
+
+    // Turnstile — el widget de Cloudflare rellena este input automáticamente
+    const turnstileInput = form.querySelector('[name="cf-turnstile-response"]');
+    const turnstileToken = turnstileInput?.value || '';
+
+    // 2 — Validar
     let hasErrors = false;
 
-    const errNombre = validators.nombre(nombre);
+    const errNombre = validators.companyName(companyName);
     if (errNombre) { showFieldError(inputNombre, errNombre); hasErrors = true; }
 
-    const errCorreo = validators.correo(correo);
+    const errCorreo = validators.companyEmail(companyEmail);
     if (errCorreo) { showFieldError(inputCorreo, errCorreo); hasErrors = true; }
 
-    const errTelefono = validators.telefono(telefono);
+    const errTelefono = validators.phone(phone);
     if (errTelefono) { showFieldError(inputTelefono, errTelefono); hasErrors = true; }
 
-    const errTipo = validators.tipo(tipo);
-    if (errTipo) {
+    const errMember = validators.isMember(isMember);
+    if (errMember) {
       const radioGroup = form.querySelector('[role="radiogroup"]');
-      if (radioGroup) showGroupError(radioGroup, errTipo);
+      if (radioGroup) showGroupError(radioGroup, errMember);
       hasErrors = true;
     }
 
-    const errDetalle = validators.detalle(detalle, tipo === 'beneficiario');
-    if (errDetalle) {
-      const textareaEl = form.querySelector('#solicitud-detalle');
-      if (textareaEl) showFieldError(textareaEl, errDetalle);
-      hasErrors = true;
-    }
+    const errMessage = validators.message(message, isMember === true);
+    if (errMessage && textareaMsg) { showFieldError(textareaMsg, errMessage); hasErrors = true; }
 
-    const errTerminos = validators.terminos(terminos);
-    if (errTerminos) {
-      showFieldError(form.querySelector('#acepta-terminos'), errTerminos);
+    const errPrivacy = validators.privacyAccepted(privacyOk);
+    if (errPrivacy) { showFieldError(checkTerminos, errPrivacy); hasErrors = true; }
+
+    const errTurnstile = validators.turnstile(turnstileToken);
+    if (errTurnstile) {
+      const tsWrapper = form.querySelector('.cf-turnstile');
+      if (tsWrapper) {
+        const msg = document.createElement('p');
+        msg.className = 'form-field__error';
+        msg.setAttribute('role', 'alert');
+        msg.textContent = errTurnstile;
+        tsWrapper.after(msg);
+      }
       hasErrors = true;
     }
 
     if (hasErrors) {
-      const firstErrInput = form.querySelector(
+      const firstErr = form.querySelector(
         '.form-field--error input, .form-field--error textarea, .form-group--error input'
       );
-      firstErrInput?.focus();
+      firstErr?.focus();
       return;
     }
 
-    // 3 — Obtener CSRF y JWT en paralelo
-    const [csrfToken, jwt] = await Promise.all([
-      fetchCsrfToken(),
-      Promise.resolve(getJwt()),
-    ]);
+    // 3 — CSRF
+    const csrfToken = await fetchCsrfToken();
 
-    // 4 — Construir payload
-    const payload = buildPayload({ nombre, correo, telefono, tipo, detalle });
+    // 4 — Payload
+    const payload = buildPayload({
+      companyName, companyEmail, countryCode, phone,
+      isMember, message, turnstileToken, privacyAccepted: true,
+    });
 
     // 5 — Enviar
-    const submitBtn = form.querySelector('[type="submit"]');
     submitBtn.disabled = true;
     submitBtn.textContent = 'Enviando…';
 
     try {
-      await submitPayload(payload, csrfToken, jwt);
+      await submitPayload(payload, csrfToken);
+
       form.reset();
       conditional.classList.remove('form-solicitud__conditional--visible');
       conditional.setAttribute('aria-hidden', 'true');
-      // TODO: mostrar mensaje de confirmación en lugar de alert
+      // Reinicia el widget de Turnstile si la API está disponible (global inyectado por Cloudflare)
+      if (typeof window.turnstile !== 'undefined') window.turnstile.reset();
+
+      showFeedback(
+        feedbackEl,
+        'success',
+        '¡Solicitud enviada! Nos pondremos en contacto contigo pronto.'
+      );
+
     } catch (err) {
-      // TODO: sustituir por un mensaje en UI cuando se implemente el estado global
-      console.error('[form-solicitud] Error al enviar:', err.message);
+      showFeedback(
+        feedbackEl,
+        'error',
+        err.message || 'Ha ocurrido un error al enviar el formulario. Inténtalo de nuevo.'
+      );
     } finally {
       submitBtn.disabled = false;
       submitBtn.textContent = 'Enviar formulario';
