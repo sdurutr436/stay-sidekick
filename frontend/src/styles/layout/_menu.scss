@@ -1,0 +1,49 @@
+// =============================================================================
+// LAYOUT: MENU
+// Layout de la página de menú — sidenav lateral + contenido principal
+//
+// Estructura BEM:
+//   .menu-layout
+//     .menu-layout__sidenav   (aside)
+//     .menu-layout__content   (section)
+//       .menu-layout__title   (h1)
+//       .menu-layout__desc    (p)
+// =============================================================================
+
+.menu-layout {
+  display: flex;
+  align-items: stretch;
+  min-height: calc(100vh - #{$header-height});
+
+  // -------------------------------------------------------------------------
+  // Sidenav — landmark semántico (<aside>), no ocupa espacio en el flujo
+  // El nav-sidenav interno usa position: fixed
+  // -------------------------------------------------------------------------
+  &__sidenav {
+    width: 0;
+    flex-shrink: 0;
+  }
+
+  // -------------------------------------------------------------------------
+  // Contenido principal — ocupa todo el ancho, sidenav flota encima
+  // -------------------------------------------------------------------------
+  &__content {
+    flex: 1 1 auto;
+    overflow: auto;
+    padding-block: $space-8;
+  }
+
+  // -------------------------------------------------------------------------
+  // Tipografía del área de contenido (placeholder)
+  // -------------------------------------------------------------------------
+  &__title {
+    @include text-h2;
+    color: $color-text-primary;
+    margin-bottom: $space-3;
+  }
+
+  &__desc {
+    @include text-body-md;
+    color: $color-text-secondary;
+  }
+}

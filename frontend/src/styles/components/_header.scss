@@ -28,6 +28,41 @@
   }
 
   // -------------------------------------------------------------------------
+  // Start — agrupa toggle + brand para que el logo no se desplace
+  // -------------------------------------------------------------------------
+  &__start {
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+  }
+
+  // -------------------------------------------------------------------------
+  // Nav toggle — botón hamburguesa (izquierda del logo, solo en /menu)
+  // -------------------------------------------------------------------------
+  &__nav-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: $space-10;
+    height: $space-10;
+    padding: 0;
+    background: transparent;
+    border: $border-width $border-style transparent;
+    cursor: pointer;
+    color: $color-text-primary;
+    transition: background-color var(--transition-base);
+
+    &:hover {
+      background-color: $color-gray-100;
+    }
+
+    &:focus-visible {
+      outline: 2px solid $color-gray-800;
+      outline-offset: -2px;
+    }
+  }
+
+  // -------------------------------------------------------------------------
   // Brand — logo + nombre
   // -------------------------------------------------------------------------
   &__brand {
