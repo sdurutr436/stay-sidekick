@@ -10,6 +10,19 @@
   gap: $space-6;
 
   // -------------------------------------------------------------------------
+  // Honeypot — completamente oculto para usuarios, visible para bots
+  // -------------------------------------------------------------------------
+  &__honeypot {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    pointer-events: none;
+  }
+
+  // -------------------------------------------------------------------------
   // Sección — agrupación visual de campos relacionados
   // -------------------------------------------------------------------------
   &__section {
@@ -40,6 +53,27 @@
   }
 
   // -------------------------------------------------------------------------
+  // Feedback — mensaje de éxito o error tras el envío
+  // -------------------------------------------------------------------------
+  &__feedback {
+    padding: $space-4;
+    border: $border-width $border-style $color-border;
+    @include text-body-sm;
+
+    &--success {
+      border-color: $color-gray-600;
+      background-color: $color-gray-100;
+      color: $color-text-primary;
+    }
+
+    &--error {
+      border-color: $color-gray-800;
+      background-color: $color-gray-200;
+      color: $color-text-primary;
+    }
+  }
+
+  // -------------------------------------------------------------------------
   // Acciones — botón de envío alineado a la derecha
   // -------------------------------------------------------------------------
   &__actions {
@@ -54,6 +88,7 @@
 .solicitud-page {
   max-width: 44rem;
   margin-inline: auto;
+  padding-block: $space-10;
 
   &__intro {
     margin-bottom: $space-8;

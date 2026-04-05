@@ -44,12 +44,11 @@ def _build_message(clean_data: dict) -> EmailMessage:
         f"  Empresa:   {clean_data.get('company_name', 'N/A')}\n"
         f"  Email:     {clean_data.get('company_email', 'N/A')}\n"
         f"  Teléfono:  {clean_data.get('phone', 'N/A')}\n"
-        f"  País:      {clean_data.get('country_code', 'N/A')}\n"
         f"  Miembro:   {is_member}\n"
         "─────────────────────────────────────\n"
         "\n"
         "Mensaje:\n"
-        f"{clean_data.get('message', '(sin mensaje)')}\n"
+        f"{clean_data.get('message', '') or '(sin mensaje)'}\n"
     )
     msg.set_content(body)
     return msg
