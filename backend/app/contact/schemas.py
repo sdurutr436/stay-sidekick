@@ -70,9 +70,8 @@ class ContactFormSchema(Schema):
     )
 
     message = fields.String(
-        required=True,
-        validate=validate.Length(min=1, max=2000),
-        error_messages={"required": "El mensaje es obligatorio."},
+        load_default="",
+        validate=validate.Length(max=2000),
     )
 
     turnstile_token = fields.String(
