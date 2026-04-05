@@ -1,0 +1,67 @@
+<nav
+  class="nav-sidenav"
+  [class.nav-sidenav--collapsed]="sidenavService.isCollapsed()"
+  aria-label="Menú de herramientas"
+>
+
+  <!-- Lista de herramientas -->
+  <ul class="nav-sidenav__tools" role="list">
+    @for (tool of tools; track tool.id) {
+      <li class="nav-sidenav__item">
+        <a
+          href="#"
+          class="nav-sidenav__tool-link"
+          [attr.aria-label]="sidenavService.isCollapsed() ? tool.label : null"
+        >
+          <!-- Placeholder wireframe del icono de herramienta -->
+          <span class="nav-sidenav__tool-icon" aria-hidden="true">
+            <svg
+              class="svg svg--md"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+            >
+              <rect x="2" y="2" width="20" height="20" fill="#d4d4d4"/>
+              <rect x="6" y="10" width="5" height="9" fill="#8c8c8c"/>
+              <rect x="13" y="6" width="5" height="13" fill="#8c8c8c"/>
+              <rect x="6" y="6" width="5" height="3" fill="#8c8c8c"/>
+            </svg>
+          </span>
+          <span class="nav-sidenav__tool-label">{{ tool.label }}</span>
+        </a>
+      </li>
+    }
+  </ul>
+
+  <!-- Footer: botón de colapso -->
+  <footer class="nav-sidenav__footer">
+    <button
+      class="nav-sidenav__collapse-btn"
+      type="button"
+      (click)="sidenavService.toggleCollapse()"
+      [attr.aria-label]="sidenavService.isCollapsed() ? 'Expandir menú lateral' : 'Colapsar menú lateral'"
+      [attr.aria-expanded]="!sidenavService.isCollapsed()"
+    >
+      <span class="nav-sidenav__collapse-icon" aria-hidden="true">
+        <svg
+          class="svg svg--sm"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 20 20"
+          fill="none"
+        >
+          @if (sidenavService.isCollapsed()) {
+            <!-- Doble chevron derecha — expandir -->
+            <polyline points="5,4 11,10 5,16" stroke="#4a4a4a" stroke-width="2" fill="none" stroke-linecap="square" stroke-linejoin="miter"/>
+            <polyline points="10,4 16,10 10,16" stroke="#4a4a4a" stroke-width="2" fill="none" stroke-linecap="square" stroke-linejoin="miter"/>
+          } @else {
+            <!-- Doble chevron izquierda — colapsar -->
+            <polyline points="15,4 9,10 15,16" stroke="#4a4a4a" stroke-width="2" fill="none" stroke-linecap="square" stroke-linejoin="miter"/>
+            <polyline points="10,4 4,10 10,16" stroke="#4a4a4a" stroke-width="2" fill="none" stroke-linecap="square" stroke-linejoin="miter"/>
+          }
+        </svg>
+      </span>
+      <span class="nav-sidenav__collapse-label">Colapsar menú</span>
+    </button>
+  </footer>
+
+</nav>
