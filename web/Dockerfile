@@ -10,6 +10,10 @@
 # ── Stage 1: Build ────────────────────────────────────────────────────────────
 FROM node:20-alpine AS builder
 
+# Site key de Turnstile — pública, se incrusta en el HTML generado
+ARG TURNSTILE_SITE_KEY
+ENV TURNSTILE_SITE_KEY=$TURNSTILE_SITE_KEY
+
 WORKDIR /app
 
 # Instalar dependencias de 11ty primero (capa de caché independiente)
