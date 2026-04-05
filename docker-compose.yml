@@ -48,6 +48,11 @@ services:
     build:
       context: .
       dockerfile: web/Dockerfile
+      args:
+        TURNSTILE_SITE_KEY: ${TURNSTILE_SITE_KEY}
+    env_file:
+      - path: ./web/.env
+        required: true   # crear desde web/.env.example antes de levantar
     expose:
       - "80"
     networks:
