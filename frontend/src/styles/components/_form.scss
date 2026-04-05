@@ -227,6 +227,7 @@ $_form-input-padding-y: $space-2;
 // -----------------------------------------------------------------------------
 .form-phone {
   display: flex;
+  align-items: stretch;
   gap: 0;
 
   &__prefix {
@@ -234,6 +235,7 @@ $_form-input-padding-y: $space-2;
   }
 
   &__select {
+    width: 7rem;       // ancho fijo para que no crezca/encoja
     height: $_form-input-height;
     border-right: none;
     white-space: nowrap;
@@ -243,8 +245,9 @@ $_form-input-padding-y: $space-2;
     flex: 1 1 auto;
     min-width: 0;
 
-    // El border-left se elimina para unirse visualmente al select
+    // Une visualmente select y wrapper sin borde doble
     .form-input-wrapper {
+      height: 100%;
       border-left: none;
     }
   }
