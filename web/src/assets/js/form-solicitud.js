@@ -69,11 +69,6 @@ function sanitizeTextarea(str, maxLen) {
   return stripControlChars(stripTags(str), true).trim().slice(0, maxLen);
 }
 
-/** Comprueba que el valor pertenece a la lista blanca. */
-function whitelistEnum(val, allowed) {
-  return allowed.includes(val) ? val : null;
-}
-
 // =============================================================================
 // 2. VALIDACIÓN
 // =============================================================================
@@ -278,7 +273,6 @@ async function submitPayload(payload, csrfToken) {
   const inputNombre   = form.querySelector('#empresa-nombre');
   const inputCorreo   = form.querySelector('#empresa-correo');
   const inputTelefono = form.querySelector('#empresa-telefono');
-  const selectCountry = form.querySelector('#country-code');
   const textareaMsg   = form.querySelector('#solicitud-detalle');
   const checkTerminos = form.querySelector('#acepta-terminos');
 
@@ -319,9 +313,7 @@ async function submitPayload(payload, csrfToken) {
     // 1 — Sanitizar
     const companyName  = sanitizeText(inputNombre.value, 150);
     const companyEmail = sanitizeEmail(inputCorreo.value);
-    const countryCode  = whitelistEnum(selectCountry.value, [
-      'ES','MX','AR','CO','CL','PE','US','GB','FR','DE','IT','PT','BR','NL','BE','CH','AU','CA',
-    ]) || 'ES';
+    const countryCode  = 'ES';
     const phone        = sanitizePhone(inputTelefono.value);
 
     const memberEl     = form.querySelector('input[name="is_member"]:checked');
