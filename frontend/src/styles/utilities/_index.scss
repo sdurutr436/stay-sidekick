@@ -5,9 +5,10 @@
 // =============================================================================
 
 // Visibilidad
-.u-hidden          { display: none !important; }
-.u-invisible       { visibility: hidden !important; }
-.u-sr-only         { @include visually-hidden; }
+.u-hidden           { display: none !important; }
+.u-invisible        { visibility: hidden !important; }
+.u-sr-only,
+.u-visually-hidden  { @include visually-hidden; }
 
 // Desbordamiento
 .u-overflow-hidden { overflow: hidden !important; }

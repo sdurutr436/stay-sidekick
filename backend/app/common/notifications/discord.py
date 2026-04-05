@@ -26,10 +26,9 @@ def _build_embed(clean_data: dict) -> dict:
     fields = [
         {"name": "Empresa", "value": clean_data.get("company_name", "N/A"), "inline": True},
         {"name": "Email", "value": clean_data.get("company_email", "N/A"), "inline": True},
-        {"name": "Telefono", "value": clean_data.get("phone", "N/A"), "inline": True},
-        {"name": "Pais", "value": clean_data.get("country_code", "N/A"), "inline": True},
+        {"name": "Teléfono", "value": clean_data.get("phone", "N/A"), "inline": True},
         {"name": "Miembro", "value": is_member, "inline": True},
-        {"name": "Mensaje", "value": clean_data.get("message", "(sin mensaje)")[:1024], "inline": False},
+        {"name": "Mensaje", "value": clean_data.get("message", "(sin mensaje)") or "(sin mensaje)", "inline": False},
     ]
 
     return {

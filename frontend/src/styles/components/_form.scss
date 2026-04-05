@@ -200,6 +200,29 @@ $_form-input-padding-y: $space-2;
 }
 
 // -----------------------------------------------------------------------------
+// Select — desplegable nativo
+// -----------------------------------------------------------------------------
+.form-select {
+  display: block;
+  width: 100%;
+  height: $_form-input-height;
+  padding: $_form-input-padding-y $_form-input-padding-x;
+  border: $border-width $border-style $color-border;
+  background-color: $color-surface;
+  font-family: $font-family-base;
+  @include text-body-sm;
+  color: $color-text-primary;
+  cursor: pointer;
+  appearance: none;
+  transition: border-color var(--transition-base);
+
+  &:focus {
+    outline: none;
+    border-color: $color-border-strong;
+  }
+}
+
+// -----------------------------------------------------------------------------
 // Choice — item de radio o checkbox con label en línea
 // -----------------------------------------------------------------------------
 .form-choice {
