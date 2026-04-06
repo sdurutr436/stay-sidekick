@@ -43,6 +43,9 @@ class Config:
     # Rate limiting
     RATE_LIMIT_CONTACT: str = os.environ.get("RATE_LIMIT_CONTACT", "5/hour")
 
+    # Cifrado simétrico (Fernet) para API keys en BD
+    FERNET_KEY: str = os.environ.get("FERNET_KEY", "")
+
     # PostgreSQL
     SQLALCHEMY_DATABASE_URI: str = os.environ.get(
         "DATABASE_URL",
