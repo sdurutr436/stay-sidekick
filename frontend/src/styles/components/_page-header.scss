@@ -1,0 +1,65 @@
+// =============================================================================
+// COMPONENTS: PAGE HEADER
+// Organismo — cabecera de página de herramienta con título, descripción y acciones
+//
+// Estructura BEM:
+//   .page-header
+//     .page-header__start
+//       .page-header__title  (h1)
+//       .page-header__desc   (p)
+//     .page-header__end
+//       (botones de acción)
+// =============================================================================
+
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: $space-6;
+  padding-bottom: $space-6;
+  border-bottom: $border-width $border-style $color-border;
+  margin-bottom: $space-6;
+
+  // -------------------------------------------------------------------------
+  // Bloque izquierdo — título y descripción
+  // -------------------------------------------------------------------------
+  &__start {
+    display: flex;
+    flex-direction: column;
+    gap: $space-2;
+    min-width: 0; // Evita desbordamiento en contenedores flex
+  }
+
+  &__title {
+    @include text-h2;
+    color: $color-text-primary;
+  }
+
+  &__desc {
+    @include text-body-md;
+    color: $color-text-secondary;
+    max-width: 56ch;
+  }
+
+  // -------------------------------------------------------------------------
+  // Bloque derecho — acciones (botones, controles)
+  // -------------------------------------------------------------------------
+  &__end {
+    display: flex;
+    align-items: center;
+    gap: $space-3;
+    flex-shrink: 0;
+  }
+
+  // -------------------------------------------------------------------------
+  // Responsive — en móvil apila verticalmente
+  // -------------------------------------------------------------------------
+  @include respond-until('md') {
+    flex-direction: column;
+    align-items: stretch;
+
+    &__end {
+      flex-wrap: wrap;
+    }
+  }
+}

@@ -1,0 +1,209 @@
+// =============================================================================
+// COMPONENTS: TABLA CRUD
+// Organismo — tabla de listado con búsqueda, selección múltiple y acciones
+//
+// Estructura BEM:
+//   .tabla-crud
+//     .tabla-crud__toolbar
+//       .tabla-crud__search       (form-input-wrapper > input)
+//       .tabla-crud__actions      (botones)
+//     .tabla-crud__wrapper        (overflow-x scroll)
+//       .tabla-crud__table        (table)
+//         thead > tr > .tabla-crud__th[--checkbox]
+//         tbody > .tabla-crud__row[--selected] > .tabla-crud__td
+//           .tabla-crud__td--checkbox
+//           .tabla-crud__td--nombre
+//           .tabla-crud__td--direccion
+//           .tabla-crud__td--mono
+//         .tabla-crud__empty      (td colspan — estado vacío)
+//           .tabla-crud__empty-inner
+//             .tabla-crud__empty-title
+//             .tabla-crud__empty-desc
+//     .tabla-crud__footer         (footer)
+//       .tabla-crud__count        (p — contador de resultados)
+// =============================================================================
+
+.tabla-crud {
+  display: flex;
+  flex-direction: column;
+  border: $border-width $border-style $color-border;
+
+  // -------------------------------------------------------------------------
+  // Barra de herramientas — búsqueda + acciones
+  // -------------------------------------------------------------------------
+  &__toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $space-4;
+    padding: $space-3 $space-4;
+    border-bottom: $border-width $border-style $color-border;
+    background-color: $color-surface-alt;
+
+    @include respond-until('md') {
+      flex-direction: column;
+      align-items: stretch;
+    }
+  }
+
+  &__search {
+    flex: 0 1 20rem; // máx ~320px, puede encoger
+
+    @include respond-until('md') {
+      flex: 1 1 auto;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+    flex-shrink: 0;
+
+    @include respond-until('md') {
+      justify-content: flex-end;
+    }
+  }
+
+  // -------------------------------------------------------------------------
+  // Contenedor de la tabla — permite scroll horizontal sin romper el layout
+  // -------------------------------------------------------------------------
+  &__wrapper {
+    overflow-x: auto;
+    flex: 1 1 auto;
+  }
+
+  &__table {
+    width: 100%;
+    border-collapse: collapse;
+
+    @include text-body-sm;
+  }
+
+  // -------------------------------------------------------------------------
+  // Cabecera de columna
+  // -------------------------------------------------------------------------
+  &__th {
+    padding: $space-2 $space-4;
+    text-align: left;
+    background-color: $color-surface-alt;
+    border-bottom: $border-width $border-style $color-border;
+    color: $color-text-secondary;
+    white-space: nowrap;
+
+    @include text-label-sm;
+
+    &--checkbox {
+      width: 3rem;
+      text-align: center;
+      padding-inline: $space-2;
+    }
+  }
+
+  // -------------------------------------------------------------------------
+  // Fila de datos
+  // -------------------------------------------------------------------------
+  &__row {
+    border-bottom: $border-width $border-style $color-border;
+    transition: background-color var(--transition-base);
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    &:hover {
+      background-color: $color-gray-50;
+    }
+
+    &--selected {
+      background-color: $color-gray-100;
+
+      &:hover {
+        background-color: $color-gray-100;
+      }
+    }
+  }
+
+  // -------------------------------------------------------------------------
+  // Celda de datos
+  // -------------------------------------------------------------------------
+  &__td {
+    padding: $space-2 $space-4;
+    vertical-align: middle;
+    color: $color-text-primary;
+
+    &--checkbox {
+      width: 3rem;
+      text-align: center;
+      padding-inline: $space-2;
+    }
+
+    &--nombre {
+      font-weight: $font-weight-label;
+      @include text-truncate;
+      max-width: 16rem;
+    }
+
+    &--direccion {
+      @include text-truncate;
+      max-width: 18rem;
+      color: $color-text-secondary;
+    }
+
+    &--mono {
+      font-family: monospace;
+      @include text-caption-md;
+      color: $color-text-secondary;
+    }
+  }
+
+  // -------------------------------------------------------------------------
+  // Checkbox de selección
+  // -------------------------------------------------------------------------
+  &__checkbox {
+    width: 1rem;
+    height: 1rem;
+    cursor: pointer;
+    accent-color: $color-gray-800;
+  }
+
+  // -------------------------------------------------------------------------
+  // Estado vacío — ocupa todo el ancho de la tabla
+  // -------------------------------------------------------------------------
+  &__empty {
+    text-align: center;
+    padding: $space-12 $space-8;
+  }
+
+  &__empty-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: $space-2;
+  }
+
+  &__empty-title {
+    @include text-body-md;
+    font-weight: $font-weight-label;
+    color: $color-text-primary;
+  }
+
+  &__empty-desc {
+    @include text-body-sm;
+    color: $color-text-secondary;
+  }
+
+  // -------------------------------------------------------------------------
+  // Pie de tabla — contador de resultados y selección
+  // -------------------------------------------------------------------------
+  &__footer {
+    padding: $space-2 $space-4;
+    border-top: $border-width $border-style $color-border;
+    background-color: $color-surface-alt;
+  }
+
+  &__count {
+    @include text-caption-md;
+    color: $color-text-secondary;
+  }
+}
