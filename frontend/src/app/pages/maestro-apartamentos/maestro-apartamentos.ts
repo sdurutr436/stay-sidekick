@@ -7,13 +7,20 @@ interface Apartamento {
   direccion: string | null;
   ciudad: string | null;
   pms_origen: 'smoobu' | 'manual' | 'xlsx' | null;
-  activo: boolean;
 }
+
+type ImportEstado =
+  | { status: 'idle' }
+  | { status: 'pendiente'; archivo: File }
+  | { status: 'cargando' }
+  | { status: 'exito'; creados: number; actualizados: number; advertencias: string[] }
+  | { status: 'error'; mensaje: string };
 
 // ── MOCK DATA ──────────────────────────────────────────────────────────────────
 // TODO: Eliminar este bloque completo cuando la integración con el backend esté activa.
-//       Sustituir `apartamentos` por la señal que devuelva el servicio de API:
+//       Sustituir `apartamentos` por la señal del servicio de API:
 //       readonly apartamentos = toSignal(this.apartamentosService.listar(), { initialValue: [] });
+//       Sustituir `pmsProveedor` por el proveedor devuelto por GET /api/pms/config.
 const MOCK_APARTAMENTOS: Apartamento[] = [
   {
     id: 'mock-1',
@@ -22,7 +29,6 @@ const MOCK_APARTAMENTOS: Apartamento[] = [
     direccion: 'Calle del Mar 12, 2ºA',
     ciudad: 'Málaga',
     pms_origen: 'smoobu',
-    activo: true,
   },
   {
     id: 'mock-2',
@@ -31,7 +37,6 @@ const MOCK_APARTAMENTOS: Apartamento[] = [
     direccion: 'Camino de la Fuente s/n',
     ciudad: 'Ronda',
     pms_origen: 'manual',
-    activo: true,
   },
   {
     id: 'mock-3',
@@ -40,10 +45,16 @@ const MOCK_APARTAMENTOS: Apartamento[] = [
     direccion: 'Plaza Mayor 3, 4ºB',
     ciudad: 'Sevilla',
     pms_origen: 'xlsx',
-    activo: false,
   },
 ];
 // ── FIN MOCK DATA ──────────────────────────────────────────────────────────────
+
+const PMS_LABELS: Record<string, string> = {
+  smoobu:    'Smoobu',
+  beds24:    'Beds24',
+  hostaway:  'Hostaway',
+  cloudbeds: 'Cloudbeds',
+};
 
 @Component({
   selector: 'app-maestro-apartamentos',
@@ -53,13 +64,24 @@ const MOCK_APARTAMENTOS: Apartamento[] = [
 })
 export class MaestroApartamentosPageComponent {
 
-  readonly searchQuery = signal('');
-  readonly selectedIds = signal<Set<string>>(new Set());
+  // ── MOCK PMS CONFIG ────────────────────────────────────────────────────────
+  // TODO: Reemplazar con el proveedor de GET /api/pms/config (eliminar junto al bloque anterior)
+  readonly pmsProveedor = signal<string | null>('smoobu');
+  // ── FIN MOCK PMS CONFIG ────────────────────────────────────────────────────
+
+  readonly pmsLabel = computed(() => {
+    const p = this.pmsProveedor();
+    return p ? (PMS_LABELS[p] ?? p) : null;
+  });
 
   // ── MOCK DATA BINDING ──────────────────────────────────────────────────────
   // TODO: Reemplazar con datos reales del backend (eliminar junto al bloque anterior)
   readonly apartamentos = signal<Apartamento[]>(MOCK_APARTAMENTOS);
   // ── FIN MOCK DATA BINDING ──────────────────────────────────────────────────
+
+  readonly searchQuery  = signal('');
+  readonly selectedIds  = signal<Set<string>>(new Set());
+  readonly importEstado = signal<ImportEstado>({ status: 'idle' });
 
   readonly filteredApartamentos = computed(() => {
     const q = this.searchQuery().toLowerCase().trim();
@@ -72,7 +94,7 @@ export class MaestroApartamentosPageComponent {
     );
   });
 
-  readonly selectedCount = computed(() => this.selectedIds().size);
+  readonly selectedCount  = computed(() => this.selectedIds().size);
 
   readonly isAllSelected = computed(() => {
     const filtered = this.filteredApartamentos();
@@ -82,17 +104,31 @@ export class MaestroApartamentosPageComponent {
     );
   });
 
+  // Helpers de acceso tipado para el @switch del template
+  readonly importArchivo = computed(() => {
+    const s = this.importEstado();
+    return s.status === 'pendiente' ? s.archivo : null;
+  });
+
+  readonly importResultado = computed(() => {
+    const s = this.importEstado();
+    return s.status === 'exito' ? s : null;
+  });
+
+  readonly importError = computed(() => {
+    const s = this.importEstado();
+    return s.status === 'error' ? s.mensaje : null;
+  });
+
+  // ── Selección de filas ─────────────────────────────────────────────────────
+
   isSelected(id: string): boolean {
     return this.selectedIds().has(id);
   }
 
   toggleSelect(id: string): void {
     const next = new Set(this.selectedIds());
-    if (next.has(id)) {
-      next.delete(id);
-    } else {
-      next.add(id);
-    }
+    next.has(id) ? next.delete(id) : next.add(id);
     this.selectedIds.set(next);
   }
 
@@ -100,17 +136,16 @@ export class MaestroApartamentosPageComponent {
     if (this.isAllSelected()) {
       this.selectedIds.set(new Set());
     } else {
-      this.selectedIds.set(
-        new Set(this.filteredApartamentos().map(apt => apt.id)),
-      );
+      this.selectedIds.set(new Set(this.filteredApartamentos().map(a => a.id)));
     }
   }
 
   onSearch(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    this.searchQuery.set(input.value);
-    this.selectedIds.set(new Set()); // Resetea selección al cambiar el filtro
+    this.searchQuery.set((event.target as HTMLInputElement).value);
+    this.selectedIds.set(new Set());
   }
+
+  // ── Importación XLSX ───────────────────────────────────────────────────────
 
   triggerXlsxImport(input: HTMLInputElement): void {
     input.click();
@@ -118,12 +153,40 @@ export class MaestroApartamentosPageComponent {
 
   onXlsxFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
-    const file = input.files?.[0];
+    const file  = input.files?.[0];
     if (!file) return;
-    // TODO: POST /api/apartamentos/import/xlsx con multipart/form-data
-    console.warn('[maestro-apartamentos] importar XLSX — pendiente de integrar', file.name);
-    input.value = ''; // Permite volver a seleccionar el mismo archivo
+    this.importEstado.set({ status: 'pendiente', archivo: file });
+    input.value = ''; // permite volver a seleccionar el mismo archivo
   }
+
+  confirmarImportacion(): void {
+    this.importEstado.set({ status: 'cargando' });
+
+    // TODO: POST /api/apartamentos/import/xlsx con multipart/form-data
+    //       Cuando esté integrado, sustituir el setTimeout por la llamada HTTP
+    //       y mapear la respuesta a los estados 'exito' / 'error'.
+    setTimeout(() => {
+      this.importEstado.set({
+        status: 'exito',
+        creados: 5,
+        actualizados: 2,
+        advertencias: [],
+      });
+    }, 1200);
+  }
+
+  cancelarImportacion(): void {
+    this.importEstado.set({ status: 'idle' });
+  }
+
+  // ── Sincronización con PMS ─────────────────────────────────────────────────
+
+  syncPms(): void {
+    // TODO: POST /api/apartamentos/sync/smoobu (u otro proveedor según pmsProveedor())
+    console.warn('[maestro-apartamentos] sincronizar PMS — pendiente de integrar');
+  }
+
+  // ── CRUD ───────────────────────────────────────────────────────────────────
 
   openAddDialog(): void {
     // TODO: Abrir modal/diálogo de alta manual de apartamento
@@ -136,16 +199,11 @@ export class MaestroApartamentosPageComponent {
     console.warn('[maestro-apartamentos] eliminar seleccionados — pendiente de integrar');
   }
 
-  syncSmoobu(): void {
-    // TODO: POST /api/apartamentos/sync/smoobu
-    console.warn('[maestro-apartamentos] sincronizar Smoobu — pendiente de integrar');
-  }
-
   originLabel(origen: string | null): string {
     const labels: Record<string, string> = {
       smoobu: 'Smoobu',
       manual: 'Manual',
-      xlsx: 'Excel',
+      xlsx:   'Excel',
     };
     return labels[origen ?? 'manual'] ?? 'Manual';
   }
