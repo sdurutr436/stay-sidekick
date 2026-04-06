@@ -7,31 +7,39 @@
       <h1 class="page-header__title">Maestro de apartamentos</h1>
       <p class="page-header__desc">
         Gestiona el catálogo de propiedades de tu empresa. Añádelos
-        manualmente, importa un Excel o sincroniza desde Smoobu.
+        manualmente, importa un Excel
+        @if (pmsLabel()) {
+          o sincroniza desde {{ pmsLabel() }}.
+        } @else {
+          o sincroniza desde tu PMS cuando lo configures.
+        }
       </p>
     </div>
 
     <div class="page-header__end">
-      <!-- Sincronización con Smoobu -->
-      <button
-        class="btn btn--secondary btn--md"
-        type="button"
-        (click)="syncSmoobu()"
-      >
-        <span class="btn__icon" aria-hidden="true">
-          <svg class="svg svg--sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
-            <path d="M4 10a6 6 0 1 0 6-6" stroke="#2e2e2e" stroke-width="1.5" stroke-linecap="square"/>
-            <polyline points="3,6 4,10 8,10" stroke="#2e2e2e" stroke-width="1.5" fill="none" stroke-linecap="square" stroke-linejoin="miter"/>
-          </svg>
-        </span>
-        Sincronizar Smoobu
-      </button>
+      <!-- Sincronización con el PMS configurado -->
+      @if (pmsLabel()) {
+        <button
+          class="btn btn--secondary btn--md"
+          type="button"
+          (click)="syncPms()"
+        >
+          <span class="btn__icon" aria-hidden="true">
+            <svg class="svg svg--sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
+              <path d="M4 10a6 6 0 1 0 6-6" stroke="#2e2e2e" stroke-width="1.5" stroke-linecap="square"/>
+              <polyline points="3,6 4,10 8,10" stroke="#2e2e2e" stroke-width="1.5" fill="none" stroke-linecap="square" stroke-linejoin="miter"/>
+            </svg>
+          </span>
+          Sincronizar desde {{ pmsLabel() }}
+        </button>
+      }
 
       <!-- Importación desde Excel -->
       <button
         class="btn btn--secondary btn--md"
         type="button"
         (click)="triggerXlsxImport(xlsxInput)"
+        [disabled]="importEstado().status === 'cargando'"
       >
         <span class="btn__icon" aria-hidden="true">
           <svg class="svg svg--sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
@@ -55,6 +63,118 @@
       />
     </div>
   </header>
+
+  <!-- Panel de feedback para importación XLSX -->
+  @if (importEstado().status !== 'idle') {
+    <div
+      class="import-panel"
+      role="status"
+      aria-live="polite"
+      aria-label="Estado de la importación de Excel"
+    >
+      @switch (importEstado().status) {
+
+        @case ('pendiente') {
+          <div class="import-panel__content">
+            <div class="import-panel__file">
+              <span class="import-panel__file-icon" aria-hidden="true">
+                <svg class="svg svg--md" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
+                  <rect x="4" y="2" width="16" height="20" stroke="#2e2e2e" stroke-width="1.5"/>
+                  <line x1="8" y1="8" x2="16" y2="8" stroke="#8c8c8c" stroke-width="1.5" stroke-linecap="square"/>
+                  <line x1="8" y1="12" x2="16" y2="12" stroke="#8c8c8c" stroke-width="1.5" stroke-linecap="square"/>
+                  <line x1="8" y1="16" x2="12" y2="16" stroke="#8c8c8c" stroke-width="1.5" stroke-linecap="square"/>
+                </svg>
+              </span>
+              <span class="import-panel__file-name">{{ importArchivo()?.name }}</span>
+            </div>
+            <p class="import-panel__hint">
+              Confirma para importar el archivo. Los registros existentes se actualizarán
+              y los nuevos se añadirán al catálogo.
+            </p>
+            <div class="import-panel__actions">
+              <button
+                class="btn btn--primary btn--md"
+                type="button"
+                (click)="confirmarImportacion()"
+              >
+                <span class="btn__icon" aria-hidden="true">
+                  <svg class="svg svg--sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
+                    <path d="M4 10a6 6 0 1 0 6-6" stroke="#fff" stroke-width="1.5" stroke-linecap="square"/>
+                    <polyline points="3,6 4,10 8,10" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="square" stroke-linejoin="miter"/>
+                  </svg>
+                </span>
+                Sincronizar desde Excel
+              </button>
+              <button
+                class="btn btn--secondary btn--md"
+                type="button"
+                (click)="cancelarImportacion()"
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
+        }
+
+        @case ('cargando') {
+          <div class="import-panel__content import-panel__content--loading">
+            <span class="import-panel__spinner" aria-hidden="true"></span>
+            <p class="import-panel__loading-text">Importando apartamentos…</p>
+          </div>
+        }
+
+        @case ('exito') {
+          <div class="import-panel__content">
+            <div class="import-panel__stats">
+              <div class="import-panel__stat">
+                <span class="import-panel__stat-value">{{ importResultado()?.creados }}</span>
+                <span class="import-panel__stat-label">nuevos</span>
+              </div>
+              <div class="import-panel__stat-divider" aria-hidden="true"></div>
+              <div class="import-panel__stat">
+                <span class="import-panel__stat-value">{{ importResultado()?.actualizados }}</span>
+                <span class="import-panel__stat-label">actualizados</span>
+              </div>
+            </div>
+
+            @if (importResultado()!.advertencias.length > 0) {
+              <ul class="import-panel__warnings" aria-label="Advertencias">
+                @for (w of importResultado()!.advertencias; track w) {
+                  <li class="import-panel__warning">{{ w }}</li>
+                }
+              </ul>
+            }
+
+            <div class="import-panel__actions">
+              <button
+                class="btn btn--secondary btn--md"
+                type="button"
+                (click)="cancelarImportacion()"
+              >
+                Cerrar
+              </button>
+            </div>
+          </div>
+        }
+
+        @case ('error') {
+          <div class="import-panel__content import-panel__content--error">
+            <p class="import-panel__error-msg">{{ importError() }}</p>
+            <div class="import-panel__actions">
+              <button
+                class="btn btn--secondary btn--md"
+                type="button"
+                (click)="cancelarImportacion()"
+              >
+                Cerrar
+              </button>
+            </div>
+          </div>
+        }
+
+      }
+    </div>
+  }
 
   <!-- Tabla CRUD de apartamentos -->
   <section class="tabla-crud" aria-labelledby="tabla-apartamentos-titulo">
@@ -147,7 +267,6 @@
             <th class="tabla-crud__th" scope="col">Dirección</th>
             <th class="tabla-crud__th" scope="col">Origen</th>
             <th class="tabla-crud__th" scope="col">ID externo</th>
-            <th class="tabla-crud__th" scope="col">Estado</th>
           </tr>
         </thead>
         <tbody>
@@ -179,20 +298,11 @@
                   </span>
                 </td>
                 <td class="tabla-crud__td tabla-crud__td--mono">{{ apt.id_externo ?? '—' }}</td>
-                <td class="tabla-crud__td">
-                  <span
-                    class="badge"
-                    [class.badge--solid]="apt.activo"
-                    [class.badge--outline]="!apt.activo"
-                  >
-                    {{ apt.activo ? 'Activo' : 'Inactivo' }}
-                  </span>
-                </td>
               </tr>
             }
           } @else {
             <tr>
-              <td class="tabla-crud__empty" colspan="7">
+              <td class="tabla-crud__empty" colspan="6">
                 <div class="tabla-crud__empty-inner">
                   <p class="tabla-crud__empty-title">
                     @if (searchQuery()) {
@@ -205,7 +315,7 @@
                     @if (searchQuery()) {
                       Prueba con otro término o limpia el filtro.
                     } @else {
-                      Añade uno manualmente, importa un Excel o sincroniza con Smoobu.
+                      Añade uno manualmente, importa un Excel o sincroniza con tu PMS.
                     }
                   </p>
                 </div>

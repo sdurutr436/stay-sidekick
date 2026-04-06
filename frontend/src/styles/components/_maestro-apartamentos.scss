@@ -1,9 +1,181 @@
 // =============================================================================
 // COMPONENTS: MAESTRO APARTAMENTOS (página)
-// Estilos específicos del wrapper de la página de maestro de apartamentos.
+// Wrapper de página y panel de feedback de importación XLSX.
 // Los organismos internos (page-header, tabla-crud) tienen sus propios archivos.
+//
+// Estructura BEM:
+//   .maestro-apartamentos
+//     .import-panel
+//       .import-panel__content[--loading | --error]
+//         .import-panel__file
+//           .import-panel__file-icon  (span > svg)
+//           .import-panel__file-name  (span)
+//         .import-panel__hint         (p)
+//         .import-panel__stats
+//           .import-panel__stat
+//             .import-panel__stat-value
+//             .import-panel__stat-label
+//           .import-panel__stat-divider
+//         .import-panel__warnings     (ul)
+//           .import-panel__warning    (li)
+//         .import-panel__spinner      (span — animación CSS)
+//         .import-panel__loading-text (p)
+//         .import-panel__error-msg    (p)
+//         .import-panel__actions      (div > botones)
 // =============================================================================
 
+// ── Wrapper de página ─────────────────────────────────────────────────────────
+
 .maestro-apartamentos {
+  width: 100%;
+  max-width: $container-max-width;
+  margin-inline: auto;
   padding-inline: $space-6;
+}
+
+// ── Panel de feedback de importación XLSX ─────────────────────────────────────
+
+.import-panel {
+  margin-bottom: $space-6;
+  border: $border-width $border-style $color-border;
+  background-color: $color-surface-alt;
+
+  // -------------------------------------------------------------------------
+  // Contenedor de contenido — centra los elementos internos
+  // -------------------------------------------------------------------------
+  &__content {
+    display: flex;
+    flex-direction: column;
+    gap: $space-4;
+    padding: $space-6;
+
+    &--loading {
+      align-items: center;
+      justify-content: center;
+      padding: $space-8;
+    }
+
+    &--error {
+      border-left: 3px solid $color-gray-700;
+    }
+  }
+
+  // -------------------------------------------------------------------------
+  // Archivo seleccionado — icono + nombre
+  // -------------------------------------------------------------------------
+  &__file {
+    display: flex;
+    align-items: center;
+    gap: $space-3;
+  }
+
+  &__file-icon {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    color: $color-text-secondary;
+  }
+
+  &__file-name {
+    @include text-label-md;
+    color: $color-text-primary;
+    @include text-truncate;
+  }
+
+  &__hint {
+    @include text-body-sm;
+    color: $color-text-secondary;
+    max-width: 56ch;
+  }
+
+  // -------------------------------------------------------------------------
+  // Estadísticas de resultado — creados / actualizados
+  // -------------------------------------------------------------------------
+  &__stats {
+    display: flex;
+    align-items: center;
+    gap: $space-6;
+  }
+
+  &__stat {
+    display: flex;
+    flex-direction: column;
+    gap: $space-1;
+  }
+
+  &__stat-value {
+    @include text-h3;
+    color: $color-text-primary;
+  }
+
+  &__stat-label {
+    @include text-label-sm;
+    color: $color-text-secondary;
+  }
+
+  &__stat-divider {
+    width: $border-width;
+    height: 2.5rem;
+    background-color: $color-border;
+    flex-shrink: 0;
+  }
+
+  // -------------------------------------------------------------------------
+  // Lista de advertencias
+  // -------------------------------------------------------------------------
+  &__warnings {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: $space-1;
+  }
+
+  &__warning {
+    @include text-body-sm;
+    color: $color-text-secondary;
+    padding-left: $space-4;
+    border-left: 2px solid $color-border-strong;
+  }
+
+  // -------------------------------------------------------------------------
+  // Estado de carga
+  // -------------------------------------------------------------------------
+  &__spinner {
+    display: inline-block;
+    width: 1.5rem;
+    height: 1.5rem;
+    border: 2px solid $color-gray-300;
+    border-top-color: $color-gray-800;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  &__loading-text {
+    @include text-body-sm;
+    color: $color-text-secondary;
+  }
+
+  // -------------------------------------------------------------------------
+  // Estado de error
+  // -------------------------------------------------------------------------
+  &__error-msg {
+    @include text-body-sm;
+    color: $color-gray-700;
+  }
+
+  // -------------------------------------------------------------------------
+  // Acciones — alineadas a la izquierda
+  // -------------------------------------------------------------------------
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: $space-3;
+  }
+}
+
+// Keyframe de rotación para el spinner
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
