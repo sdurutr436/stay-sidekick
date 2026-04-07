@@ -88,6 +88,23 @@ $sidenav-width-collapsed: 56px;
       outline: 2px solid $color-gray-800;
       outline-offset: -2px;
     }
+
+    // Estado activo — ruta coincide con la página actual
+    &--active {
+      background-color: $color-gray-200;
+      font-weight: $font-weight-heading;
+
+      &:hover {
+        background-color: $color-gray-200;
+      }
+    }
+
+    // Enlace deshabilitado — herramienta sin ruta asignada aún
+    &--disabled {
+      color: $color-text-disabled;
+      cursor: default;
+      pointer-events: none;
+    }
   }
 
   &__tool-icon {
