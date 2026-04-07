@@ -17,4 +17,5 @@ COPY . .
 
 EXPOSE 5000
 
-CMD ["python", "run.py"]
+# Gunicorn con dual-stack IPv4+IPv6 — necesario para la red privada de Railway
+CMD ["gunicorn", "--bind", "[::]:5000", "--workers", "2", "run:app"]
