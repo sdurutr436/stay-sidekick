@@ -49,6 +49,11 @@ def create_app(config_class: type = Config) -> Flask:
     app.register_blueprint(contact_bp)
     app.register_blueprint(auth_bp)
 
+    # ── Healthcheck (Railway) ────────────────────────────────────────────
+    @app.route("/api/health")
+    def health():
+        return jsonify({"status": "ok"}), 200
+
     # ── Error handlers ───────────────────────────────────────────────────
     @app.errorhandler(429)
     def ratelimit_handler(_e):
