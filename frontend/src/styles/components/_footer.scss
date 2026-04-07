@@ -28,6 +28,10 @@
   &__inner {
     @include container;
     padding-block: $space-8;
+
+    @include respond-from('xxl') {
+      max-width: 1500px;
+    }
   }
 
   // -------------------------------------------------------------------------
@@ -145,5 +149,9 @@
     @include text-caption-md;
     color: $color-text-secondary;
     text-align: center;
+
+    @include respond-from('xxl') {
+      max-width: 1500px;
+    }
   }
 }

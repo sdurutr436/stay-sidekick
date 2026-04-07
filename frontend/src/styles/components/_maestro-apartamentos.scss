@@ -31,6 +31,10 @@
   max-width: $container-max-width;
   margin-inline: auto;
   padding-inline: $space-6;
+
+  @include respond-from('xxl') {
+    max-width: 1500px;
+  }
 }
 
 // ── Panel de feedback de importación XLSX ─────────────────────────────────────
