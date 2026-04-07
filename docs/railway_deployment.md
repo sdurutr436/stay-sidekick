@@ -213,6 +213,8 @@ Los 5 servicios del proyecto:
 
 ### 3.3 Configurar cada servicio
 
+> **Sobre `railway.toml`**: No hay un campo "Config File Path" en el dashboard. Railway auto-detecta el `railway.toml` dentro del **Root Directory** de cada servicio. Solo hay que configurar el Root Directory correctamente y Railway se encarga del resto.
+
 Entra en cada servicio → **Settings** y configura:
 
 #### Servicio `nginx`
@@ -220,13 +222,15 @@ Entra en cada servicio → **Settings** y configura:
 |--------|-------|
 | Root Directory | `nginx` |
 | Branch | `main` |
-| Dockerfile Path | *(auto-detectado, deja vacío)* |
-| Config File Path | `nginx/railway.toml` |
+| Builder | Dockerfile *(o lo detecta automáticamente por el railway.toml)* |
 
 Variables:
 ```
 PORT=80
+RAILWAY=true
 ```
+
+> `RAILWAY=true` activa `nginx.railway.conf` (red privada Railway) en lugar del `nginx.conf` de docker-compose. Sin esta variable, el proxy no funciona en Railway.
 
 Dominio: en **Settings → Networking** → Generate Domain (o añade tu dominio personalizado).
 
@@ -235,16 +239,16 @@ Dominio: en **Settings → Networking** → Generate Domain (o añade tu dominio
 |--------|-------|
 | Root Directory | `frontend` |
 | Branch | `main` |
-| Config File Path | `frontend/railway.toml` |
+| Builder | Dockerfile |
 
-Sin dominio público (sólo acceso interno).
+Sin dominio público (sólo acceso interno vía red privada).
 
 #### Servicio `web`
 | Ajuste | Valor |
 |--------|-------|
 | Root Directory | *(vacío — raíz del repo)* |
 | Branch | `main` |
-| Config File Path | `railway.toml` |
+| Builder | Dockerfile |
 
 Variables:
 ```
@@ -253,14 +257,14 @@ TURNSTILE_SITE_KEY=tu-site-key-publica-de-cloudflare
 
 Sin dominio público.
 
-> **Importante**: Root Directory vacío es lo que permite que el Dockerfile de `web/` acceda a `frontend/src/styles/` durante el build.
+> **Importante**: Root Directory vacío es lo que permite que el Dockerfile de `web/` acceda a `frontend/src/styles/` durante el build. Railway encontrará el `railway.toml` de la raíz automáticamente.
 
 #### Servicio `backend`
 | Ajuste | Valor |
 |--------|-------|
 | Root Directory | `backend` |
 | Branch | `main` |
-| Config File Path | `backend/railway.toml` |
+| Builder | Dockerfile |
 
 Variables (todas las de `.env.example`):
 ```
@@ -436,13 +440,13 @@ git checkout main && git merge dev && git push origin main
 
 ---
 
-## 8. Nota sobre el `railway.toml` de `web` en la raíz
+## 8. Dónde vive cada `railway.toml`
 
-El archivo `railway.toml` en la raíz del repo es sólo para el servicio `web`. Los demás servicios tienen su `railway.toml` dentro de su subdirectorio. Cuando configures cada servicio en Railway Dashboard, apunta el campo "Config File Path" al `railway.toml` correcto:
+No existe un campo "Config File Path" en el dashboard de Railway. El `railway.toml` se detecta automáticamente desde el **Root Directory** de cada servicio. La tabla es informativa para saber qué fichero aplica a cada servicio:
 
-| Servicio | Config File Path |
-|----------|-----------------|
-| nginx | `nginx/railway.toml` |
-| frontend | `frontend/railway.toml` |
-| web | `railway.toml` (raíz) |
-| backend | `backend/railway.toml` |
+| Servicio | Root Directory | railway.toml aplicado |
+|----------|---------------|----------------------|
+| nginx | `nginx` | `nginx/railway.toml` |
+| frontend | `frontend` | `frontend/railway.toml` |
+| web | *(vacío)* | `railway.toml` (raíz del repo) |
+| backend | `backend` | `backend/railway.toml` |
