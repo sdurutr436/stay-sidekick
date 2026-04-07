@@ -33,7 +33,8 @@ RUN cd web && npm run build
 # ── Stage 2: Serve ────────────────────────────────────────────────────────────
 FROM nginx:alpine
 
-COPY web/nginx.conf /etc/nginx/conf.d/default.conf
+COPY web/nginx.conf /etc/nginx/templates/default.conf.template
 COPY --from=builder /app/web/_site /usr/share/nginx/html
 
+ENV PORT=80
 EXPOSE 80

@@ -1,0 +1,14 @@
+FLASK_ENV=production
+SECRET_KEY=<genera con: python -c "import secrets; print(secrets.token_urlsafe(32))">
+ALLOWED_ORIGINS=https://tu-dominio.up.railway.app
+DATABASE_URL=${{ Postgres.DATABASE_URL }}
+JWT_SECRET_KEY=<genera igual que SECRET_KEY>
+JWT_ACCESS_TOKEN_HOURS=1
+FERNET_KEY=<genera con: python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())">
+TURNSTILE_SECRET_KEY=tu-secret-key-de-cloudflare
+TURNSTILE_VERIFY_URL=https://challenges.cloudflare.com/turnstile/v0/siteverify
+GMAIL_USER=tu-correo@gmail.com
+GMAIL_APP_PASSWORD=xxxx-xxxx-xxxx-xxxx
+MAIL_RECIPIENT=destinatario@ejemplo.com
+DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/TU_ID/TU_TOKEN
+RATE_LIMIT_CONTACT=5/hour

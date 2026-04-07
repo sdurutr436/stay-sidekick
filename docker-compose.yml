@@ -26,7 +26,10 @@ services:
 
   # ── Proxy inverso ───────────────────────────────────────────────────────────
   nginx:
-    build: ./nginx
+    build:
+      context: ./nginx
+      args:
+        RAILWAY: "false"
     ports:
       - "80:80"
     depends_on:

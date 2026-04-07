@@ -28,10 +28,11 @@ RUN npm run build -- --base-href=/app/
 FROM nginx:alpine
 
 # Configuración nginx para SPA (Angular Router necesita try_files → index.html)
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY nginx.conf /etc/nginx/templates/default.conf.template
 
 # Copiar el build de Angular al directorio web de nginx
 # Angular CLI >= 17 genera en dist/<nombre>/browser/
 COPY --from=builder /app/dist/frontend/browser /usr/share/nginx/html
 
+ENV PORT=80
 EXPOSE 80
