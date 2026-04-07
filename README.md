@@ -64,6 +64,44 @@ cd backend && python run.py
 npm run install:all
 ```
 
+### Levantar con Docker (entorno completo)
+
+Docker levanta todos los servicios juntos (nginx, frontend, web, backend, PostgreSQL) en
+un único comando. Es la forma más fácil de probar el stack completo en local.
+
+**Primer uso** — preparar los `.env`:
+```bash
+cp backend/.env.example backend/.env   # completar con tus valores
+# web/.env ya está incluido con la key de prueba de Turnstile (dev)
+```
+
+**Arrancar:**
+```bash
+docker compose up --build        # construye imágenes y arranca (foreground)
+docker compose up -d --build     # igual pero en background
+```
+
+**Comandos del día a día:**
+```bash
+docker compose ps                # ver qué contenedores están corriendo
+docker compose logs -f           # seguir logs de todos los servicios
+docker compose logs -f backend   # logs solo del backend
+docker compose restart backend   # reiniciar un único servicio
+docker compose stop              # parar todos los contenedores (conserva datos)
+docker compose down              # parar y eliminar contenedores (conserva volúmenes)
+docker compose down -v           # parar, eliminar contenedores Y la base de datos
+```
+
+**URLs tras arrancar:**
+
+| URL | Servicio |
+|-----|---------|
+| http://localhost/ | Sitio estático (11ty) |
+| http://localhost/app/ | App Angular |
+| http://localhost/api/ | API Flask |
+
+> Referencia completa de comandos, troubleshooting y variables de entorno: [docs/devops/docker-local.md](docs/devops/docker-local.md)
+
 ## Estructura del proyecto
 
 ```
@@ -109,6 +147,7 @@ tfg-alberti/
 | Documento | Contenido |
 |-----------|-----------|
 | [docs/DESARROLLO.md](docs/DESARROLLO.md) | Guía completa de entorno de desarrollo |
+| [docs/devops/docker-local.md](docs/devops/docker-local.md) | Referencia Docker para desarrollo local |
 | [docs/backend/DEPENDENCIAS.md](docs/backend/DEPENDENCIAS.md) | Librerías del backend y justificación |
 | [docs/backend/VENV_SETUP.md](docs/backend/VENV_SETUP.md) | Configuración del entorno virtual Python |
 | [docs/design/decisiones_disenio.md](docs/design/decisiones_disenio.md) | Decisiones de arquitectura y diseño |
