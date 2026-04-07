@@ -41,7 +41,7 @@ def create_app(config_class: type = Config) -> Flask:
 
     # ── Modelos (registro en metadata de SQLAlchemy) ──────────────────────
     with app.app_context():
-        import app.models  # noqa: F401
+        from app import models  # noqa: F401
 
     # ── Blueprints ───────────────────────────────────────────────────────
     from app.contact.routes import contact_bp  # noqa: E402

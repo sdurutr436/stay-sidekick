@@ -6,6 +6,9 @@
 
 FROM python:3.11-slim
 
+# Evitar buffering para que los logs aparezcan inmediatamente en Railway
+ENV PYTHONUNBUFFERED=1
+
 WORKDIR /app
 
 # Instalar dependencias primero para caché de capas
@@ -18,4 +21,5 @@ COPY . .
 EXPOSE 5000
 
 # Gunicorn con dual-stack IPv4+IPv6 — necesario para la red privada de Railway
-CMD ["gunicorn", "--bind", "[::]:5000", "--workers", "2", "run:app"]
+# Shell form para expandir $PORT (inyectado por Railway; fallback a 5000)
+CMD gunicorn --bind "[::]:${PORT:-5000}" --workers 2 run:app
