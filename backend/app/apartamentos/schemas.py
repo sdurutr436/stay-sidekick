@@ -40,17 +40,19 @@ class ApartamentoCreateSchema(Schema):
 
 
 class ApartamentoUpdateSchema(Schema):
-    """Validación para actualización parcial de un apartamento."""
+    """Validación para actualización parcial de un apartamento.
+
+    Ningún campo tiene load_default para evitar que Marshmallow inyecte None
+    en updates parciales y sobreescriba datos existentes en BD.
+    """
     nombre = fields.String(
         validate=validate.Length(min=1, max=200),
     )
     direccion = fields.String(
-        load_default=None,
         validate=validate.Length(max=300),
         allow_none=True,
     )
     ciudad = fields.String(
-        load_default=None,
         validate=validate.Length(max=100),
         allow_none=True,
     )
