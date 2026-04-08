@@ -14,8 +14,9 @@
             class="nav-sidenav__tool-link"
             [routerLink]="tool.route"
             routerLinkActive="nav-sidenav__tool-link--active"
+            #rla="routerLinkActive"
             [attr.aria-label]="sidenavService.isCollapsed() ? tool.label : null"
-            [attr.aria-current]="null"
+            [attr.aria-current]="rla.isActive ? 'page' : null"
           >
             <span class="nav-sidenav__tool-icon" aria-hidden="true">
               <svg
