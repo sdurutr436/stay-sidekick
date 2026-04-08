@@ -27,8 +27,8 @@ apartamentos_bp = Blueprint("apartamentos", __name__)
 
 
 def _empresa_id() -> str:
-    """Extrae el empresa_id del JWT (claim 'user_id' del token)."""
-    return g.jwt_claims["user_id"]
+    """Extrae el empresa_id del JWT (claim 'empresa_id' del token)."""
+    return g.jwt_claims["empresa_id"]
 
 
 # ── CRUD ─────────────────────────────────────────────────────────────────
