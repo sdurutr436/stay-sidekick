@@ -46,6 +46,10 @@ class Config:
     # Cifrado simétrico (Fernet) para API keys en BD
     FERNET_KEY: str = os.environ.get("FERNET_KEY", "")
 
+    # Tamaño máximo de fichero subido (10 MB). Flask devuelve 413 automáticamente
+    # si se supera este límite antes de que el endpoint lo procese.
+    MAX_CONTENT_LENGTH: int = int(os.environ.get("MAX_UPLOAD_BYTES", str(10 * 1024 * 1024)))
+
     # PostgreSQL
     SQLALCHEMY_DATABASE_URI: str = os.environ.get(
         "DATABASE_URL",

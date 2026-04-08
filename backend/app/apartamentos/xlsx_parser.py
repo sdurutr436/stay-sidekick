@@ -61,62 +61,65 @@ def parse_xlsx(file_bytes: bytes) -> tuple[list[XlsxApartment], list[str]]:
     except Exception as exc:
         return [], [f"No se pudo abrir el archivo Excel: {exc}"]
 
-    ws = wb.active
-    if ws is None:
-        return [], ["El archivo Excel no tiene hojas de cálculo."]
+    try:
+        ws = wb.active
+        if ws is None:
+            return [], ["El archivo Excel no tiene hojas de cálculo."]
 
-    rows = list(ws.iter_rows(values_only=True))
-    if len(rows) < 2:
-        return [], ["El archivo Excel debe tener cabeceras + al menos una fila de datos."]
+        rows = list(ws.iter_rows(values_only=True))
+        if len(rows) < 2:
+            return [], ["El archivo Excel debe tener cabeceras + al menos una fila de datos."]
 
-    # Resolver cabeceras
-    raw_headers = rows[0]
-    col_map: dict[int, str] = {}  # índice de columna → campo normalizado
-    for i, header in enumerate(raw_headers):
-        if header is None:
-            continue
-        key = str(header).strip().lower()
-        field = _HEADER_MAP.get(key)
-        if field:
-            col_map[i] = field
+        # Resolver cabeceras
+        raw_headers = rows[0]
+        col_map: dict[int, str] = {}  # índice de columna → campo normalizado
+        for i, header in enumerate(raw_headers):
+            if header is None:
+                continue
+            key = str(header).strip().lower()
+            field = _HEADER_MAP.get(key)
+            if field:
+                col_map[i] = field
 
-    # Verificar columnas obligatorias
-    found_fields = set(col_map.values())
-    if "id_externo" not in found_fields:
-        errors.append("No se encontró columna de ID (id, id_externo, identificador).")
-    if "nombre" not in found_fields:
-        errors.append("No se encontró columna de nombre (nombre, name, propiedad, apartment).")
-    if errors:
-        return [], errors
+        # Verificar columnas obligatorias
+        found_fields = set(col_map.values())
+        if "id_externo" not in found_fields:
+            errors.append("No se encontró columna de ID (id, id_externo, identificador).")
+        if "nombre" not in found_fields:
+            errors.append("No se encontró columna de nombre (nombre, name, propiedad, apartment).")
+        if errors:
+            return [], errors
 
-    # Procesar filas
-    result: list[XlsxApartment] = []
-    for row_idx, row in enumerate(rows[1:], start=2):
-        record: dict[str, str | None] = {
-            "id_externo": None,
-            "nombre": None,
-            "direccion": None,
-            "ciudad": None,
-        }
+        # Procesar filas
+        result: list[XlsxApartment] = []
+        for row_idx, row in enumerate(rows[1:], start=2):
+            record: dict[str, str | None] = {
+                "id_externo": None,
+                "nombre": None,
+                "direccion": None,
+                "ciudad": None,
+            }
 
-        for col_idx, field in col_map.items():
-            if col_idx < len(row) and row[col_idx] is not None:
-                record[field] = str(row[col_idx]).strip()
+            for col_idx, field in col_map.items():
+                if col_idx < len(row) and row[col_idx] is not None:
+                    record[field] = str(row[col_idx]).strip()
 
-        # Validar campos obligatorios por fila
-        if not record["id_externo"]:
-            errors.append(f"Fila {row_idx}: falta el ID del apartamento.")
-            continue
-        if not record["nombre"]:
-            errors.append(f"Fila {row_idx}: falta el nombre del apartamento.")
-            continue
+            # Validar campos obligatorios por fila
+            if not record["id_externo"]:
+                errors.append(f"Fila {row_idx}: falta el ID del apartamento.")
+                continue
+            if not record["nombre"]:
+                errors.append(f"Fila {row_idx}: falta el nombre del apartamento.")
+                continue
 
-        result.append(XlsxApartment(
-            id_externo=record["id_externo"],
-            nombre=record["nombre"],
-            direccion=record["direccion"],
-            ciudad=record["ciudad"],
-        ))
+            result.append(XlsxApartment(
+                id_externo=record["id_externo"],
+                nombre=record["nombre"],
+                direccion=record["direccion"],
+                ciudad=record["ciudad"],
+            ))
 
-    logger.info("XLSX: %d filas parseadas, %d errores", len(result), len(errors))
-    return result, errors
+        logger.info("XLSX: %d filas parseadas, %d errores", len(result), len(errors))
+        return result, errors
+    finally:
+        wb.close()
