@@ -15,7 +15,7 @@ Rutas (todas requieren JWT):
 
 import logging
 
-from flask import Blueprint, g, jsonify, request
+from flask import Blueprint, current_app, g, jsonify, request
 
 from app.extensions import limiter
 from app.security.jwt import jwt_required
@@ -119,6 +119,11 @@ def import_xlsx():
     file = request.files["file"]
     if not file.filename or not file.filename.lower().endswith(".xlsx"):
         return jsonify({"ok": False, "errors": ["El archivo debe ser .xlsx."]}), 400
+
+    max_bytes = current_app.config.get("MAX_CONTENT_LENGTH", 10 * 1024 * 1024)
+    content_length = request.content_length
+    if content_length is not None and content_length > max_bytes:
+        return jsonify({"ok": False, "errors": ["El archivo supera el tamaño máximo permitido."]}), 413
 
     file_bytes = file.read()
     if not file_bytes:
