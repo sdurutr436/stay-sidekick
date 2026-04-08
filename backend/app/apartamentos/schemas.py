@@ -79,3 +79,10 @@ class PMSConfigSchema(Schema):
         load_default=None,
         validate=validate.Length(max=500),
     )
+
+    @pre_load
+    def sanitize(self, data, **kwargs):
+        for field in ("api_key", "endpoint"):
+            if field in data and isinstance(data[field], str):
+                data[field] = data[field].strip()
+        return data
