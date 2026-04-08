@@ -8,6 +8,7 @@ sin tocar el servicio ni las rutas.
 Estructura esperada de un usuario:
     {
         "id":            str,         # identificador único (UUID o similar)
+        "empresa_id":    str,         # UUID de la empresa a la que pertenece
         "email":         str,         # email normalizado (lowercase)
         "password_hash": str,         # hash bcrypt
         "is_active":     bool,        # cuenta habilitada
