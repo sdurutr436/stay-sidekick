@@ -23,9 +23,17 @@ def list_by_empresa(empresa_id: str, solo_activos: bool = True) -> list[Apartame
 
 
 def get_by_id(apartamento_id: str, empresa_id: str) -> Apartamento | None:
-    """Busca un apartamento por su UUID, solo si pertenece a la empresa."""
+    """Busca un apartamento por su UUID, solo si pertenece a la empresa.
+
+    Devuelve None (en lugar de propagar un error 500 de PostgreSQL) si
+    ``apartamento_id`` no tiene formato UUID válido.
+    """
+    try:
+        apartamento_uuid = uuid.UUID(apartamento_id)
+    except ValueError:
+        return None
     return Apartamento.query.filter_by(
-        id=apartamento_id,
+        id=apartamento_uuid,
         empresa_id=empresa_id,
     ).first()
 
