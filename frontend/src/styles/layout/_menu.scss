@@ -4,8 +4,8 @@
 //
 // Estructura BEM:
 //   .menu-layout
-//     .menu-layout__sidenav   (aside)
-//     .menu-layout__content   (section)
+//     .menu-layout__sidenav   (div — el <nav> interno aporta el landmark)
+//     .menu-layout__content   (div — el <main> de app.html es el landmark)
 //       .menu-layout__title   (h1)
 //       .menu-layout__desc    (p)
 // =============================================================================
@@ -16,8 +16,8 @@
   min-height: calc(100vh - #{$header-height});
 
   // -------------------------------------------------------------------------
-  // Sidenav — landmark semántico (<aside>), no ocupa espacio en el flujo
-  // El nav-sidenav interno usa position: fixed
+  // Sidenav — contenedor de layout; el <nav> interno aporta el landmark ARIA.
+  // No ocupa espacio en el flujo: el nav-sidenav usa position: fixed.
   // -------------------------------------------------------------------------
   &__sidenav {
     width: 0;
@@ -25,7 +25,7 @@
   }
 
   // -------------------------------------------------------------------------
-  // Contenido principal — ocupa todo el ancho, sidenav flota encima
+  // Contenido principal — ocupa todo el ancho, sidenav flota encima.
   // -------------------------------------------------------------------------
   &__content {
     flex: 1 1 auto;
