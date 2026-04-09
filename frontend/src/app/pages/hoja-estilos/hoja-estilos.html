@@ -1,0 +1,28 @@
+<div class="ds-layout">
+
+  <!-- Nav secundaria — secciones del design system -->
+  <nav class="ds-nav" aria-label="Secciones del sistema de diseño">
+    <p class="ds-nav__title">Sistema de diseño</p>
+    <ul class="ds-nav__list" role="list">
+      @for (section of sections; track section.id) {
+        <li>
+          <a
+            class="ds-nav__link"
+            [routerLink]="section.route"
+            routerLinkActive="ds-nav__link--active"
+            [attr.aria-current]="null"
+          >
+            <span class="ds-nav__dot" aria-hidden="true"></span>
+            {{ section.label }}
+          </a>
+        </li>
+      }
+    </ul>
+  </nav>
+
+  <!-- Contenido: renderiza la sección activa -->
+  <div class="ds-content">
+    <router-outlet />
+  </div>
+
+</div>
