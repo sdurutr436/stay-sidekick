@@ -1,0 +1,16 @@
+// =============================================================================
+// COMPONENTS: MAESTRO APARTAMENTOS (página)
+// Estilos específicos del wrapper de la página de maestro de apartamentos.
+// Los organismos internos (page-header, tabla-crud) tienen sus propios archivos.
+// =============================================================================
+
+.maestro-apartamentos {
+  padding-inline: $space-6;
+
+  // Input de archivo oculto (activado programáticamente por el botón de XLSX).
+  // Se usa display: none en lugar de u-sr-only porque el objetivo es ocultarlo
+  // de todo (visual y árbol de accesibilidad), no exponerlo solo a lectores.
+  &__xlsx-input {
+    display: none;
+  }
+}

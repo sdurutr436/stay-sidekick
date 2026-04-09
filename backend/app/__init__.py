@@ -2,13 +2,14 @@
 
 Estructura del proyecto:
     app/
-    ├── common/         → Utilidades compartidas (sanitizers, notifications)
+    ├── common/         → Utilidades compartidas (sanitizers, notifications, parsers)
     ├── security/       → CSRF, honeypot, JWT
-    ├── contact/        → Feature: formulario de contacto público
     ├── exceptions/     → Excepciones personalizadas
-    ├── models/         → Modelos de datos (futuro)
-    ├── repositories/   → Repositorios de datos (futuro)
-    └── services/       → Servicios compartidos (Turnstile, etc.)
+    ├── models/         → Modelos de datos
+    ├── repositories/   → Repositorios de datos
+    ├── routes/         → Blueprints: formulario_solicitud, contactos, apartamentos, auth
+    ├── schemas/        → Schemas Marshmallow por feature
+    └── services/       → Servicios por feature (formulario_solicitud, google_contacts, etc.)
 """
 
 import logging
@@ -44,10 +45,14 @@ def create_app(config_class: type = Config) -> Flask:
         from app import models  # noqa: F401
 
     # ── Blueprints ───────────────────────────────────────────────────────
-    from app.contact.routes import contact_bp  # noqa: E402
-    from app.auth.routes import auth_bp        # noqa: E402
-    app.register_blueprint(contact_bp)
+    from app.routes.formulario_solicitud import formulario_solicitud_bp  # noqa: E402
+    from app.auth.routes import auth_bp                                  # noqa: E402
+    from app.apartamentos.routes import apartamentos_bp                  # noqa: E402
+    from app.routes.contactos import contactos_bp                        # noqa: E402
+    app.register_blueprint(formulario_solicitud_bp)
     app.register_blueprint(auth_bp)
+    app.register_blueprint(apartamentos_bp)
+    app.register_blueprint(contactos_bp)
 
     # ── Healthcheck (Railway) ────────────────────────────────────────────
     @app.route("/api/health")

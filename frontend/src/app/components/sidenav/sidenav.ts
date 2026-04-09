@@ -1,18 +1,19 @@
 import { Component, inject } from '@angular/core';
+import { RouterLink, RouterLinkActive } from '@angular/router';
 import { SidenavService } from '../../services/sidenav.service';
 
 interface Tool {
   id: string;
   label: string;
+  route: string | null; // null = herramienta todavía sin ruta asignada
 }
 
-// Placeholder hasta que existan herramientas reales
-const PLACEHOLDER_TOOLS: Tool[] = [
-  { id: 'tool-1', label: 'Herramienta 1' },
-  { id: 'tool-2', label: 'Herramienta 2' },
-  { id: 'tool-3', label: 'Herramienta 3' },
-  { id: 'tool-4', label: 'Herramienta 4' },
-  { id: 'tool-5', label: 'Herramienta 5' },
+const TOOLS: Tool[] = [
+  { id: 'maestro-apartamentos', label: 'Maestro de apartamentos', route: '/menu/maestro-apartamentos' },
+  { id: 'sincronizador-contactos', label: 'Sincronizador de contactos', route: '/menu/sincronizador-contactos' },
+  { id: 'tool-3', label: 'Herramienta 3', route: null },
+  { id: 'tool-4', label: 'Herramienta 4', route: null },
+  { id: 'tool-5', label: 'Herramienta 5', route: null },
 ];
 
 @Component({
@@ -20,8 +21,9 @@ const PLACEHOLDER_TOOLS: Tool[] = [
   templateUrl: './sidenav.html',
   styleUrl: './sidenav.scss',
   standalone: true,
+  imports: [RouterLink, RouterLinkActive],
 })
 export class SidenavComponent {
   readonly sidenavService = inject(SidenavService);
-  readonly tools: Tool[] = PLACEHOLDER_TOOLS;
+  readonly tools: Tool[] = TOOLS;
 }
