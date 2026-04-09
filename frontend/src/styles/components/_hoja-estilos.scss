@@ -1,0 +1,268 @@
+// =============================================================================
+// COMPONENTS: HOJA DE ESTILOS (Design System)
+// Layout y estilos de la página de documentación de componentes
+//
+// BEM:
+//   .ds-layout
+//     .ds-nav              (nav secundaria)
+//       .ds-nav__title
+//       .ds-nav__list
+//       .ds-nav__item
+//       .ds-nav__link
+//       .ds-nav__dot
+//     .ds-content          (área de contenido)
+//   .ds-section            (sección principal)
+//     .ds-section__header
+//     .ds-section__title
+//     .ds-section__desc
+//   .ds-block              (subsección)
+//     .ds-block__label
+//     .ds-block__body
+//   .ds-row                (fila horizontal de specimens)
+//   .ds-specimen           (muestra individual)
+//     .ds-specimen__label
+//     .ds-specimen__preview
+//     .ds-specimen__meta
+//   .ds-type-specimen      (muestra tipográfica full-width)
+//     .ds-type-specimen__sample
+//     .ds-type-specimen__meta
+//   .ds-chip               (tag de metadatos)
+//   .ds-divider            (separador visual)
+//   .ds-organism-preview   (caja contenedora para organismos)
+// =============================================================================
+
+$_ds-nav-width: 200px;
+
+// -------------------------------------------------------------------------
+// Layout — nav secundaria + contenido
+// -------------------------------------------------------------------------
+.ds-layout {
+  display: flex;
+  min-height: calc(100vh - #{$header-height});
+}
+
+// -------------------------------------------------------------------------
+// Nav secundaria — sticky dentro del área de contenido
+// -------------------------------------------------------------------------
+.ds-nav {
+  flex-shrink: 0;
+  width: $_ds-nav-width;
+  position: sticky;
+  top: $header-height;
+  height: calc(100vh - #{$header-height});
+  overflow-y: auto;
+  border-right: $border-width $border-style $color-border;
+  background-color: $color-surface;
+  padding: $space-4 0;
+
+  &__title {
+    @include text-label-sm;
+    color: $color-text-secondary;
+    padding: 0 $space-4 $space-3;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  &__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  &__link {
+    display: flex;
+    align-items: center;
+    gap: $space-3;
+    width: 100%;
+    padding: $space-3 $space-4;
+    text-decoration: none;
+    color: $color-text-primary;
+    @include text-label-md;
+    transition: background-color var(--transition-base);
+
+    &:hover {
+      background-color: $color-gray-100;
+    }
+
+    &:focus-visible {
+      outline: 2px solid $color-gray-800;
+      outline-offset: -2px;
+    }
+
+    &--active {
+      background-color: $color-gray-200;
+      font-weight: $font-weight-heading;
+    }
+  }
+
+  &__dot {
+    width: $space-2;
+    height: $space-2;
+    border-radius: 50%;
+    background-color: $color-gray-400;
+    flex-shrink: 0;
+  }
+}
+
+// -------------------------------------------------------------------------
+// Contenido principal
+// -------------------------------------------------------------------------
+.ds-content {
+  flex: 1 1 auto;
+  overflow: auto;
+  padding: $space-8;
+  max-width: 860px;
+}
+
+// -------------------------------------------------------------------------
+// Section — grupo principal (Átomos, Moléculas…)
+// -------------------------------------------------------------------------
+.ds-section {
+  &__header {
+    margin-bottom: $space-8;
+    padding-bottom: $space-4;
+    border-bottom: 2px solid $color-gray-800;
+  }
+
+  &__title {
+    @include text-h2;
+    color: $color-text-primary;
+    margin-bottom: $space-2;
+  }
+
+  &__desc {
+    @include text-body-md;
+    color: $color-text-secondary;
+  }
+}
+
+// -------------------------------------------------------------------------
+// Block — subsección dentro de una sección
+// -------------------------------------------------------------------------
+.ds-block {
+  margin-bottom: $space-10;
+
+  &__label {
+    @include text-label-sm;
+    color: $color-text-secondary;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: $space-4;
+    padding-bottom: $space-2;
+    border-bottom: $border-width $border-style $color-border;
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    gap: $space-4;
+  }
+}
+
+// -------------------------------------------------------------------------
+// Row — fila de specimens en línea
+// -------------------------------------------------------------------------
+.ds-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: $space-6;
+}
+
+// -------------------------------------------------------------------------
+// Specimen — muestra individual con label y preview
+// -------------------------------------------------------------------------
+.ds-specimen {
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;
+
+  &__label {
+    @include text-caption-md;
+    color: $color-text-secondary;
+  }
+
+  &__preview {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+  }
+
+  &__meta {
+    @include text-caption-xs;
+    color: $color-text-disabled;
+    font-family: monospace;
+  }
+}
+
+// -------------------------------------------------------------------------
+// Type specimen — muestra tipográfica full-width con metadatos
+// -------------------------------------------------------------------------
+.ds-type-specimen {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: $space-6;
+  padding: $space-3 0;
+  border-bottom: $border-width $border-style $color-border;
+
+  &__sample {
+    flex: 1;
+    margin: 0;
+    color: $color-text-primary;
+  }
+
+  &__meta {
+    flex-shrink: 0;
+    display: flex;
+    gap: $space-2;
+    align-items: center;
+  }
+}
+
+// -------------------------------------------------------------------------
+// Chip — tag de metadatos monoespaciado
+// -------------------------------------------------------------------------
+.ds-chip {
+  display: inline-block;
+  padding: $space-1 $space-2;
+  border: $border-width $border-style $color-border;
+  background-color: $color-gray-100;
+  @include text-caption-xs;
+  color: $color-text-secondary;
+  font-family: monospace;
+  white-space: nowrap;
+}
+
+// -------------------------------------------------------------------------
+// Divider
+// -------------------------------------------------------------------------
+.ds-divider {
+  margin: $space-8 0;
+  border: none;
+  border-top: $border-width $border-style $color-border;
+}
+
+// -------------------------------------------------------------------------
+// Organism preview — caja acotada para demos de organismos
+// -------------------------------------------------------------------------
+.ds-organism-preview {
+  border: $border-width $border-style $color-border;
+  overflow: hidden;
+  background-color: $color-surface;
+  position: relative;
+
+  // Anula position:sticky/fixed de los organismos dentro de la preview
+  .header,
+  .nav-sidenav {
+    position: relative;
+    top: auto;
+    left: auto;
+    width: 100%;
+    height: auto;
+  }
+
+  .nav-sidenav {
+    height: 280px;
+  }
+}
