@@ -1,0 +1,178 @@
+// =============================================================================
+// COMPONENT: notificaciones-checkin-tardio
+// Herramienta de notificaciones para check-in tardíos.
+// Estilos wireframe (escala de grises, blocky) — ITCSS capa Components.
+// =============================================================================
+
+// ── Contenedor raíz ──────────────────────────────────────────────────────
+
+.notif-checkin {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.notif-checkin__cargando {
+  color: var(--color-text-muted, #888);
+  font-size: var(--fs-body);
+}
+
+// ── Avisos genéricos ──────────────────────────────────────────────────────
+
+.notif-checkin__aviso {
+  font-size: var(--fs-body);
+  color: var(--color-text-muted, #666);
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--color-border, #ccc);
+  background-color: var(--color-surface-alt, #f5f5f5);
+
+  &--error {
+    border-color: var(--color-error, #c00);
+    color: var(--color-error, #c00);
+    background-color: #fff0f0;
+  }
+}
+
+// ── Lista de apartamentos de referencia ──────────────────────────────────
+
+.notif-checkin__apt-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.notif-checkin__apt-item {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--color-border, #ccc);
+  background-color: var(--color-surface-alt, #f5f5f5);
+}
+
+.notif-checkin__apt-nombre {
+  font-size: var(--fs-body);
+  font-weight: 600;
+}
+
+.notif-checkin__apt-ciudad {
+  font-size: var(--fs-caption);
+  color: var(--color-text-muted, #666);
+}
+
+// ── Tabla de check-ins ────────────────────────────────────────────────────
+
+.tabla-checkins {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--fs-body);
+}
+
+.tabla-checkins__head {
+  th {
+    text-align: left;
+    padding: 0.5rem 0.75rem;
+    border-bottom: 2px solid var(--color-border, #ccc);
+    font-weight: 600;
+    white-space: nowrap;
+    background-color: var(--color-surface-alt, #f5f5f5);
+  }
+}
+
+.tabla-checkins__body {
+  tr {
+    border-bottom: 1px solid var(--color-border, #ccc);
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+
+  td {
+    padding: 0.5rem 0.75rem;
+    vertical-align: top;
+  }
+}
+
+// ── Advertencias del XLSX ─────────────────────────────────────────────────
+
+.notif-checkin__advertencias {
+  list-style: none;
+  margin: 0.5rem 0 0;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--color-border, #ccc);
+  background-color: var(--color-surface-alt, #f5f5f5);
+  font-size: var(--fs-caption);
+  color: var(--color-text-muted, #666);
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+// ── Aviso Gmail no configurado ────────────────────────────────────────────
+
+.notif-checkin__gmail-aviso {
+  margin-bottom: 1rem;
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--color-border, #ccc);
+  background-color: var(--color-surface-alt, #f5f5f5);
+  font-size: var(--fs-body);
+
+  p {
+    margin: 0;
+  }
+
+  code {
+    font-family: monospace;
+    background-color: #e8e8e8;
+    padding: 0.1em 0.3em;
+  }
+}
+
+// ── Formulario de notificación ────────────────────────────────────────────
+
+.notif-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.notif-form__plantilla-accion {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.notif-form__hint {
+  font-size: var(--fs-caption);
+  color: var(--color-text-muted, #888);
+}
+
+.notif-form__textarea {
+  min-height: 14rem;
+  resize: vertical;
+}
+
+// ── Feedback de envío ─────────────────────────────────────────────────────
+
+.notif-form__feedback {
+  font-size: var(--fs-body);
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--color-border, #ccc);
+
+  &--ok {
+    border-color: var(--color-success, #2a7a2a);
+    color: var(--color-success, #2a7a2a);
+    background-color: #f0fff0;
+  }
+
+  &--error {
+    border-color: var(--color-error, #c00);
+    color: var(--color-error, #c00);
+    background-color: #fff0f0;
+  }
+}

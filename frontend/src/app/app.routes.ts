@@ -12,6 +12,13 @@ export const routes: Routes = [
       { path: '', component: MenuDefaultPageComponent },
       { path: 'maestro-apartamentos', component: MaestroApartamentosPageComponent },
       { path: 'sincronizador-contactos', component: SincronizadorContactosPageComponent },
+      {
+        path: 'notificaciones-checkin-tardio',
+        loadComponent: () =>
+          import('./pages/notificaciones-checkin-tardio/notificaciones-checkin-tardio').then(
+            m => m.NotificacionesCheckinTardioPageComponent
+          ),
+      },
     ],
   },
 ];
