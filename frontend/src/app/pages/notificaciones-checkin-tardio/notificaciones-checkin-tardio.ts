@@ -72,6 +72,7 @@ export class NotificacionesCheckinTardioPageComponent implements OnInit {
   readonly enviando = signal(false);
   readonly estadoEnvio = signal<'idle' | 'ok' | 'error'>('idle');
   readonly errorEnvio = signal<string | null>(null);
+  readonly copiadoOk = signal(false);
 
   // ── Ciclo de vida ─────────────────────────────────────────────────────
 
@@ -187,6 +188,16 @@ export class NotificacionesCheckinTardioPageComponent implements OnInit {
       `le agradecemos que nos lo comunique lo antes posible.\n\n` +
       `Saludos cordiales.`
     );
+  }
+
+  // ── Copiar mensaje ────────────────────────────────────────────────────────
+
+  copiarMensaje(): void {
+    if (!this.mensaje) return;
+    navigator.clipboard.writeText(this.mensaje).then(() => {
+      this.copiadoOk.set(true);
+      setTimeout(() => this.copiadoOk.set(false), 2000);
+    });
   }
 
   // ── Envío de notificación ─────────────────────────────────────────────
