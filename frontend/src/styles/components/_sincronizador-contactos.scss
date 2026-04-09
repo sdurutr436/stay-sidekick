@@ -1,0 +1,222 @@
+// =============================================================================
+// COMPONENTS: SINCRONIZADOR DE CONTACTOS (pagina)
+//
+// Organismos propios de la pagina:
+//   .sincronizador-contactos  — wrapper principal
+//   .panel-seccion            — seccion con titulo, descripcion y cuerpo
+//   .conexion-estado          — indicador de estado OAuth + info ultimo sync
+//   .conexion-acciones        — fila de botones de conexion
+//   .preferencias-form        — formulario de preferencias
+//   .xlsx-import              — seccion de importacion desde Excel
+//   .sync-acciones            — contenedor de acciones de sincronizacion
+//   .sync-accion              — fila individual de accion (info + boton)
+//
+// Elementos de formulario auxiliares (pendientes de mover a _form.scss si
+// se reutilizan en otros formularios):
+//   .form-group--checkbox     — variante de form-group para checkboxes
+//   .form-group--indented     — subnivel indentado dentro de un form-group
+//   .form-checkbox            — item checkbox con label en linea
+// =============================================================================
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Wrapper de pagina
+// ─────────────────────────────────────────────────────────────────────────────
+.sincronizador-contactos {
+  padding-inline: $space-6;
+  display: flex;
+  flex-direction: column;
+  gap: $space-8;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Panel-seccion — bloque reutilizable de seccion con borde y espaciado
+// ─────────────────────────────────────────────────────────────────────────────
+.panel-seccion {
+  border: $border-width $border-style $color-border;
+  padding: $space-6;
+
+  &__titulo {
+    @include text-h3;
+    color: $color-text-primary;
+    margin-bottom: $space-2;
+  }
+
+  &__desc {
+    @include text-body-md;
+    color: $color-text-secondary;
+    max-width: 64ch;
+    margin-bottom: $space-5;
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    gap: $space-4;
+  }
+
+  &__divider {
+    border: none;
+    border-top: $border-width $border-style $color-border;
+    margin-block: $space-4;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Conexion estado — badge + info de ultimo sync
+// ─────────────────────────────────────────────────────────────────────────────
+.conexion-estado {
+  display: flex;
+  align-items: center;
+  gap: $space-4;
+  flex-wrap: wrap;
+
+  &__sync-info {
+    @include text-caption-md;
+    color: $color-text-secondary;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Preferencias form — columna de controles de formulario
+// ─────────────────────────────────────────────────────────────────────────────
+.preferencias-form {
+  display: flex;
+  flex-direction: column;
+  gap: $space-5;
+  max-width: 48rem;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// form-group variantes
+// ─────────────────────────────────────────────────────────────────────────────
+.form-group {
+  // Modificador: forma inline con checkbox
+  &--checkbox {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 0;
+  }
+
+  // Modificador: nivel indentado (subopciones dependientes)
+  &--indented {
+    padding-left: $space-6;
+    border-left: 2px solid $color-border;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// form-checkbox — item checkbox con label en linea
+// Alias BEM de form-choice orientado especificamente a checkboxes
+// ─────────────────────────────────────────────────────────────────────────────
+.form-checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: $space-3;
+  cursor: pointer;
+
+  &__input {
+    flex-shrink: 0;
+    margin-top: 0.2em; // alineacion optica con la primera linea del label
+    width: 1rem;
+    height: 1rem;
+    border: $border-width $border-style $color-border-strong;
+    accent-color: $color-gray-800;
+    cursor: pointer;
+  }
+
+  &__label {
+    @include text-body-md;
+    color: $color-text-primary;
+    cursor: pointer;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Acciones del formulario
+// ─────────────────────────────────────────────────────────────────────────────
+.form-actions {
+  display: flex;
+  gap: $space-3;
+  padding-top: $space-2;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// XLSX import — seccion de importacion manual desde Excel
+// ─────────────────────────────────────────────────────────────────────────────
+.xlsx-import {
+  display: flex;
+  flex-direction: column;
+  gap: $space-4;
+
+  // El input[type=file] queda oculto; el boton actua como label
+  &__input {
+    display: none;
+  }
+
+  &__selector {
+    display: flex;
+    align-items: center;
+    gap: $space-4;
+    flex-wrap: wrap;
+  }
+
+  &__filename {
+    @include text-body-sm;
+    color: $color-text-secondary;
+    font-style: italic;
+    word-break: break-all;
+  }
+
+  &__acciones {
+    display: flex;
+    gap: $space-3;
+    flex-wrap: wrap;
+  }
+
+  &__aviso {
+    @include text-body-sm;
+    color: $color-text-secondary;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Sync acciones — contenedor de filas de accion de sincronizacion
+// ─────────────────────────────────────────────────────────────────────────────
+.sync-acciones {
+  display: flex;
+  flex-direction: column;
+  gap: 0; // el divider de panel-seccion separa las secciones
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Sync accion — fila individual: info a la izquierda, boton a la derecha
+// ─────────────────────────────────────────────────────────────────────────────
+.sync-accion {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $space-6;
+
+  &__info {
+    display: flex;
+    flex-direction: column;
+    gap: $space-1;
+    min-width: 0;
+  }
+
+  &__titulo {
+    @include text-label-lg;
+    color: $color-text-primary;
+  }
+
+  &__desc {
+    @include text-body-sm;
+    color: $color-text-secondary;
+    max-width: 52ch;
+  }
+
+  @include respond-until('md') {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

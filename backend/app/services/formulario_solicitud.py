@@ -1,4 +1,4 @@
-"""Servicio de procesamiento del formulario de contacto."""
+"""Servicio de procesamiento del formulario público de solicitud de acceso."""
 
 import logging
 
@@ -7,29 +7,28 @@ from marshmallow import ValidationError
 
 from app.common.notifications.discord import send_discord_notification
 from app.common.notifications.gmail import send_contact_email
-from app.contact.schemas import ContactFormSchema
+from app.schemas.formulario_solicitud import FormularioSolicitudSchema
 from app.services.turnstile import verify_turnstile
 
 logger = logging.getLogger(__name__)
 
-_schema = ContactFormSchema()
+_schema = FormularioSolicitudSchema()
 
 
-def process_contact_form(json_data: dict) -> tuple[dict, list[str]]:
-    """Valida, sanitiza y procesa los datos del formulario.
+def process_solicitud(json_data: dict) -> tuple[dict, list[str]]:
+    """Valida, sanitiza y procesa los datos del formulario de solicitud.
 
     Returns
     -------
     tuple[dict, list[str]]
         (datos_limpios, errores). Si ``errores`` está vacío, los datos
-        son seguros para persistir o reenviar.
+        son seguros para notificar.
     """
     # 1. Validación y sanitización con Marshmallow (incluye honeypot)
     try:
         clean_data: dict = _schema.load(json_data)
     except ValidationError as exc:
-        flat_errors = _flatten_errors(exc.messages)
-        return {}, flat_errors
+        return {}, _flatten_errors(exc.messages)
 
     # 2. Verificar Turnstile
     turnstile_token = clean_data.pop("turnstile_token")
@@ -45,7 +44,7 @@ def process_contact_form(json_data: dict) -> tuple[dict, list[str]]:
     _dispatch_notifications(clean_data)
 
     logger.info(
-        "Formulario de contacto procesado correctamente para: %s",
+        "Formulario de solicitud procesado para: %s",
         clean_data.get("company_email"),
     )
 
@@ -53,11 +52,7 @@ def process_contact_form(json_data: dict) -> tuple[dict, list[str]]:
 
 
 def _dispatch_notifications(clean_data: dict) -> None:
-    """Envía las notificaciones de email y Discord.
-
-    Los fallos se registran en log pero no impiden devolver 200 al
-    usuario — la solicitud ya fue validada y sanitizada.
-    """
+    """Envía las notificaciones de email y Discord."""
     email_ok = send_contact_email(clean_data)
     discord_ok = send_discord_notification(clean_data)
 
@@ -68,7 +63,6 @@ def _dispatch_notifications(clean_data: dict) -> None:
 
 
 def _flatten_errors(messages: dict) -> list[str]:
-    """Convierte los errores anidados de Marshmallow en una lista plana."""
     errors: list[str] = []
     for field, msgs in messages.items():
         if isinstance(msgs, list):
