@@ -282,20 +282,40 @@
           />
         </div>
 
-        <!-- Mensaje (editable) -->
+        <!-- Mensaje (editable) con botón de copiar -->
         <div class="form-group">
           <label class="form-label" for="notif-mensaje">
             Mensaje
           </label>
-          <textarea
-            id="notif-mensaje"
-            class="form-textarea notif-form__textarea"
-            rows="12"
-            placeholder="Escribe o genera el mensaje de notificación aquí…"
-            [disabled]="!gmailConfigurado()"
-            [(ngModel)]="mensaje"
-            name="mensaje"
-          ></textarea>
+          <div class="form-editor">
+            <div class="form-editor__header">
+              <div class="form-editor__tabs"></div>
+              <div class="form-editor__toolbar">
+                <button
+                  class="form-editor__tool"
+                  type="button"
+                  [disabled]="!mensaje"
+                  (click)="copiarMensaje()"
+                >
+                  @if (copiadoOk()) {
+                    Copiado
+                  } @else {
+                    Copiar
+                  }
+                </button>
+              </div>
+            </div>
+            <div class="form-editor__body">
+              <textarea
+                id="notif-mensaje"
+                class="form-textarea notif-form__textarea"
+                placeholder="Escribe o genera el mensaje de notificación aquí…"
+                [attr.disabled]="!gmailConfigurado() ? '' : null"
+                [(ngModel)]="mensaje"
+                name="mensaje"
+              ></textarea>
+            </div>
+          </div>
         </div>
 
         <!-- Acciones envío -->
