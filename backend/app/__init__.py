@@ -14,9 +14,12 @@ Estructura del proyecto:
 import logging
 
 from flask import Flask, jsonify
+from sqlalchemy import text
 
 from app.config import Config
 from app.extensions import cors, db, limiter
+
+logger = logging.getLogger(__name__)
 
 
 def create_app(config_class: type = Config) -> Flask:
@@ -39,9 +42,21 @@ def create_app(config_class: type = Config) -> Flask:
     limiter.init_app(app)
     db.init_app(app)
 
-    # ── Modelos (registro en metadata de SQLAlchemy) ──────────────────────
+    # ── Base de datos ─────────────────────────────────────────────────────
     with app.app_context():
-        from app import models  # noqa: F401
+        from app import models  # noqa: F401  — registra modelos en metadata
+
+        # Crea todas las tablas si no existen (idempotente en producción)
+        db.create_all()
+        logger.info("Database tables created or verified successfully.")
+
+        # Verifica que la conexión a la BD funciona antes de arrancar
+        try:
+            db.session.execute(text("SELECT 1"))
+            logger.info("Database connection check passed.")
+        except Exception as exc:  # noqa: BLE001
+            logger.error("Database connection check FAILED: %s", exc)
+            raise
 
     # ── Blueprints ───────────────────────────────────────────────────────
     from app.contact.routes import contact_bp  # noqa: E402
