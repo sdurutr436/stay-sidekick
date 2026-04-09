@@ -1,0 +1,235 @@
+<!-- Página: Maestro de apartamentos -->
+<div class="maestro-apartamentos">
+
+  <!-- Cabecera de la herramienta -->
+  <header class="page-header">
+    <div class="page-header__start">
+      <h1 class="page-header__title">Maestro de apartamentos</h1>
+      <p class="page-header__desc">
+        Gestiona el catálogo de propiedades de tu empresa. Añádelos
+        manualmente, importa un Excel o sincroniza desde Smoobu.
+      </p>
+    </div>
+
+    <div class="page-header__end">
+      <!-- Sincronización con Smoobu -->
+      <button
+        class="btn btn--secondary btn--md"
+        type="button"
+        (click)="syncSmoobu()"
+      >
+        <span class="btn__icon" aria-hidden="true">
+          <svg class="svg svg--sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
+            <path d="M4 10a6 6 0 1 0 6-6" stroke="#2e2e2e" stroke-width="1.5" stroke-linecap="square"/>
+            <polyline points="3,6 4,10 8,10" stroke="#2e2e2e" stroke-width="1.5" fill="none" stroke-linecap="square" stroke-linejoin="miter"/>
+          </svg>
+        </span>
+        Sincronizar Smoobu
+      </button>
+
+      <!-- Importación desde Excel -->
+      <button
+        class="btn btn--secondary btn--md"
+        type="button"
+        (click)="triggerXlsxImport(xlsxInput)"
+      >
+        <span class="btn__icon" aria-hidden="true">
+          <svg class="svg svg--sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
+            <rect x="4" y="2" width="12" height="16" stroke="#2e2e2e" stroke-width="1.5"/>
+            <polyline points="7,10 10,7 13,10" stroke="#2e2e2e" stroke-width="1.5" fill="none" stroke-linecap="square" stroke-linejoin="miter"/>
+            <line x1="10" y1="7" x2="10" y2="14" stroke="#2e2e2e" stroke-width="1.5" stroke-linecap="square"/>
+          </svg>
+        </span>
+        Importar XLSX
+      </button>
+
+      <!-- Input de archivo oculto — activado por el botón de arriba -->
+      <input
+        #xlsxInput
+        type="file"
+        accept=".xlsx"
+        class="maestro-apartamentos__xlsx-input"
+        aria-hidden="true"
+        tabindex="-1"
+        (change)="onXlsxFileSelected($event)"
+      />
+    </div>
+  </header>
+
+  <!-- Tabla CRUD de apartamentos -->
+  <section class="tabla-crud" aria-labelledby="tabla-apartamentos-titulo">
+    <h2 class="u-sr-only" id="tabla-apartamentos-titulo">Listado de apartamentos</h2>
+
+    <!-- Barra de herramientas: búsqueda y acciones -->
+    <div class="tabla-crud__toolbar">
+
+      <div class="tabla-crud__search">
+        <div class="form-input-wrapper">
+          <span class="form-input-wrapper__icon" aria-hidden="true">
+            <svg class="svg svg--sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
+              <circle cx="9" cy="9" r="5" stroke="#8c8c8c" stroke-width="1.5"/>
+              <line x1="13" y1="13" x2="17" y2="17" stroke="#8c8c8c" stroke-width="1.5" stroke-linecap="square"/>
+            </svg>
+          </span>
+          <input
+            class="form-input"
+            type="search"
+            placeholder="Buscar por nombre, ciudad o dirección…"
+            [value]="searchQuery()"
+            (input)="onSearch($event)"
+            aria-label="Buscar apartamentos"
+          />
+        </div>
+      </div>
+
+      <div class="tabla-crud__actions">
+        <button
+          class="btn btn--primary btn--md"
+          type="button"
+          (click)="openAddDialog()"
+        >
+          <span class="btn__icon" aria-hidden="true">
+            <svg class="svg svg--sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
+              <line x1="10" y1="3" x2="10" y2="17" stroke="#fff" stroke-width="2" stroke-linecap="square"/>
+              <line x1="3" y1="10" x2="17" y2="10" stroke="#fff" stroke-width="2" stroke-linecap="square"/>
+            </svg>
+          </span>
+          Añadir apartamento
+        </button>
+
+        <button
+          class="btn btn--secondary btn--md"
+          type="button"
+          [disabled]="selectedCount() === 0"
+          (click)="deleteSelected()"
+        >
+          <span class="btn__icon" aria-hidden="true">
+            <svg class="svg svg--sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
+              <polyline points="4,6 6,6 16,6" stroke="#2e2e2e" stroke-width="1.5" fill="none" stroke-linecap="square" stroke-linejoin="miter"/>
+              <path d="M8 6V4h4v2" stroke="#2e2e2e" stroke-width="1.5" stroke-linecap="square"/>
+              <rect x="5" y="6" width="10" height="11" stroke="#2e2e2e" stroke-width="1.5"/>
+              <line x1="8" y1="9" x2="8" y2="14" stroke="#2e2e2e" stroke-width="1.5" stroke-linecap="square"/>
+              <line x1="12" y1="9" x2="12" y2="14" stroke="#2e2e2e" stroke-width="1.5" stroke-linecap="square"/>
+            </svg>
+          </span>
+          @if (selectedCount() > 0) {
+            Eliminar ({{ selectedCount() }})
+          } @else {
+            Eliminar
+          }
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Tabla de datos -->
+    <div
+      class="tabla-crud__wrapper"
+      role="region"
+      aria-label="Tabla de apartamentos"
+      tabindex="0"
+    >
+      <table class="tabla-crud__table">
+        <thead>
+          <tr>
+            <th class="tabla-crud__th tabla-crud__th--checkbox" scope="col">
+              <input
+                type="checkbox"
+                class="tabla-crud__checkbox"
+                [checked]="isAllSelected()"
+                [indeterminate]="selectedCount() > 0 && !isAllSelected()"
+                (change)="toggleSelectAll()"
+                aria-label="Seleccionar todos los apartamentos visibles"
+              />
+            </th>
+            <th class="tabla-crud__th" scope="col">Nombre</th>
+            <th class="tabla-crud__th" scope="col">Ciudad</th>
+            <th class="tabla-crud__th" scope="col">Dirección</th>
+            <th class="tabla-crud__th" scope="col">Origen</th>
+            <th class="tabla-crud__th" scope="col">ID externo</th>
+            <th class="tabla-crud__th" scope="col">Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (filteredApartamentos().length > 0) {
+            @for (apt of filteredApartamentos(); track apt.id) {
+              <tr
+                class="tabla-crud__row"
+                [class.tabla-crud__row--selected]="isSelected(apt.id)"
+              >
+                <td class="tabla-crud__td tabla-crud__td--checkbox">
+                  <input
+                    type="checkbox"
+                    class="tabla-crud__checkbox"
+                    [checked]="isSelected(apt.id)"
+                    (change)="toggleSelect(apt.id)"
+                    [attr.aria-label]="'Seleccionar ' + apt.nombre"
+                  />
+                </td>
+                <td class="tabla-crud__td tabla-crud__td--nombre">{{ apt.nombre }}</td>
+                <td class="tabla-crud__td">{{ apt.ciudad ?? '—' }}</td>
+                <td class="tabla-crud__td tabla-crud__td--direccion">{{ apt.direccion ?? '—' }}</td>
+                <td class="tabla-crud__td">
+                  <span
+                    class="badge"
+                    [class.badge--solid]="apt.pms_origen === 'smoobu'"
+                    [class.badge--outline]="apt.pms_origen === 'xlsx'"
+                  >
+                    {{ originLabel(apt.pms_origen) }}
+                  </span>
+                </td>
+                <td class="tabla-crud__td tabla-crud__td--mono">{{ apt.id_externo ?? '—' }}</td>
+                <td class="tabla-crud__td">
+                  <span
+                    class="badge"
+                    [class.badge--solid]="apt.activo"
+                    [class.badge--outline]="!apt.activo"
+                  >
+                    {{ apt.activo ? 'Activo' : 'Inactivo' }}
+                  </span>
+                </td>
+              </tr>
+            }
+          } @else {
+            <tr>
+              <td class="tabla-crud__empty" colspan="7">
+                <div class="tabla-crud__empty-inner">
+                  <p class="tabla-crud__empty-title">
+                    @if (searchQuery()) {
+                      Sin resultados para "{{ searchQuery() }}"
+                    } @else {
+                      No hay apartamentos registrados todavía
+                    }
+                  </p>
+                  <p class="tabla-crud__empty-desc">
+                    @if (searchQuery()) {
+                      Prueba con otro término o limpia el filtro.
+                    } @else {
+                      Añade uno manualmente, importa un Excel o sincroniza con Smoobu.
+                    }
+                  </p>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pie de tabla: contadores -->
+    <footer class="tabla-crud__footer">
+      <p class="tabla-crud__count">
+        {{ filteredApartamentos().length }}
+        apartamento{{ filteredApartamentos().length !== 1 ? 's' : '' }}
+        @if (searchQuery()) {
+          encontrado{{ filteredApartamentos().length !== 1 ? 's' : '' }}
+        }
+        @if (selectedCount() > 0) {
+          · {{ selectedCount() }} seleccionado{{ selectedCount() !== 1 ? 's' : '' }}
+        }
+      </p>
+    </footer>
+
+  </section>
+
+</div>

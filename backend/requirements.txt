@@ -35,3 +35,9 @@ psycopg2-binary==2.9.10
 
 # Servidor WSGI de producción
 gunicorn==21.2.0
+
+# Cifrado simétrico (Fernet — API keys en BD)
+cryptography==44.0.3
+
+# Parsing de Excel (.xlsx)
+openpyxl==3.1.5

@@ -2,35 +2,42 @@
 // UTILITIES
 // Clases de ayuda de alta especificidad — sobreescriben componentes
 // Prefijo: u-
+//
+// No se usa !important: el orden de importación en styles.scss garantiza que
+// las utilities (layer 7) lleguen siempre después de components (layer 6), por
+// lo que ganan la cascada con igual especificidad sin necesitar !important.
 // =============================================================================
 
 // Visibilidad
-.u-hidden           { display: none !important; }
-.u-invisible        { visibility: hidden !important; }
+.u-hidden           { display: none; }
+.u-invisible        { visibility: hidden; }
 .u-sr-only,
 .u-visually-hidden  { @include visually-hidden; }
 
 // Desbordamiento
-.u-overflow-hidden { overflow: hidden !important; }
-.u-nowrap          { white-space: nowrap !important; }
+.u-overflow-hidden { overflow: hidden; }
+.u-nowrap          { white-space: nowrap; }
 .u-truncate        { @include text-truncate; }
 
 // Espaciado rápido (margen)
-.u-mt-0  { margin-top: 0 !important; }
-.u-mt-4  { margin-top: $space-4 !important; }
-.u-mt-8  { margin-top: $space-8 !important; }
-.u-mb-0  { margin-bottom: 0 !important; }
-.u-mb-4  { margin-bottom: $space-4 !important; }
-.u-mb-8  { margin-bottom: $space-8 !important; }
+.u-mt-0  { margin-top: 0; }
+.u-mt-4  { margin-top: $space-4; }
+.u-mt-8  { margin-top: $space-8; }
+.u-mb-0  { margin-bottom: 0; }
+.u-mb-4  { margin-bottom: $space-4; }
+.u-mb-8  { margin-bottom: $space-8; }
 
 // Texto
-.u-text-left    { text-align: left !important; }
-.u-text-center  { text-align: center !important; }
-.u-text-right   { text-align: right !important; }
+.u-text-left    { text-align: left; }
+.u-text-center  { text-align: center; }
+.u-text-right   { text-align: right; }
 
-.u-text-primary   { color: $color-text-primary !important; }
-.u-text-secondary { color: $color-text-secondary !important; }
-.u-text-inverse   { color: $color-text-inverse !important; }
+.u-text-primary   { color: $color-text-primary; }
+.u-text-secondary { color: $color-text-secondary; }
+.u-text-inverse   { color: $color-text-inverse; }
 
 // Ancho completo
-.u-w-full { width: 100% !important; }
+.u-w-full { width: 100%; }
+
+// Tipografia monoespaciada
+.u-mono { font-family: monospace; }
