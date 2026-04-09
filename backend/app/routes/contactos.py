@@ -7,8 +7,10 @@ Rutas (todas requieren JWT excepto el callback OAuth):
 - DELETE /api/contactos/google/disconnect    → desconecta la cuenta Google
 - GET    /api/contactos/preferencias         → obtiene preferencias de sincronización
 - PUT    /api/contactos/preferencias         → guarda preferencias de sincronización
-- POST   /api/contactos/sync                 → lanza sincronización PMS → Google Contacts
-- POST   /api/contactos/export/csv           → exporta CSV fallback para importación manual
+- POST   /api/contactos/sync                 → lanza sincronización PMS API → Google Contacts
+- POST   /api/contactos/export/csv           → exporta CSV fallback (fuente: PMS API)
+- POST   /api/contactos/xlsx/sync            → sincroniza desde XLSX subido (multipart)
+- POST   /api/contactos/xlsx/export/csv      → exporta CSV desde XLSX subido (multipart)
 """
 
 import logging
@@ -144,9 +146,65 @@ def sync_contacts():
 @limiter.limit("20/hour")
 @jwt_required
 def export_csv():
-    """Exporta contactos en formato CSV de Google para importación manual."""
+    """Exporta contactos en formato CSV de Google para importación manual (fuente: PMS API)."""
     json_data = request.get_json(silent=True) or {}
     csv_bytes, error = service.export_csv(_empresa_id(), json_data)
+    if error:
+        return jsonify({"ok": False, "errors": [error]}), 400
+
+    from flask import Response
+    return Response(
+        csv_bytes,
+        status=200,
+        mimetype="text/csv; charset=utf-8",
+        headers={"Content-Disposition": "attachment; filename=contactos_google.csv"},
+    )
+
+
+# ── XLSX upload ───────────────────────────────────────────────────────────
+
+
+@contactos_bp.route("/api/contactos/xlsx/sync", methods=["POST"])
+@limiter.limit("10/hour")
+@jwt_required
+def xlsx_sync():
+    """Sincroniza contactos a Google desde un XLSX subido (multipart/form-data).
+
+    Espera el campo ``file`` con el archivo .xlsx. Los datos se procesan
+    en memoria y no se persisten (cumplimiento RGPD).
+    """
+    if "file" not in request.files:
+        return jsonify({"ok": False, "errors": ["Se esperaba un campo 'file' con el archivo."]}), 400
+
+    f = request.files["file"]
+    if not f.filename or not f.filename.lower().endswith(".xlsx"):
+        return jsonify({"ok": False, "errors": ["El archivo debe tener extensión .xlsx."]}), 400
+
+    file_bytes = f.read()
+    data, error = service.sync_from_xlsx(_empresa_id(), file_bytes)
+    if error:
+        return jsonify({"ok": False, "errors": [error]}), 400
+    return jsonify({"ok": True, "resultado": data}), 200
+
+
+@contactos_bp.route("/api/contactos/xlsx/export/csv", methods=["POST"])
+@limiter.limit("20/hour")
+@jwt_required
+def xlsx_export_csv():
+    """Exporta CSV de Google Contacts desde un XLSX subido (multipart/form-data).
+
+    Espera el campo ``file`` con el archivo .xlsx. No requiere cuenta Google
+    conectada. Los datos se procesan en memoria y no se persisten (RGPD).
+    """
+    if "file" not in request.files:
+        return jsonify({"ok": False, "errors": ["Se esperaba un campo 'file' con el archivo."]}), 400
+
+    f = request.files["file"]
+    if not f.filename or not f.filename.lower().endswith(".xlsx"):
+        return jsonify({"ok": False, "errors": ["El archivo debe tener extensión .xlsx."]}), 400
+
+    file_bytes = f.read()
+    csv_bytes, error = service.export_csv_from_xlsx(_empresa_id(), file_bytes)
     if error:
         return jsonify({"ok": False, "errors": [error]}), 400
 

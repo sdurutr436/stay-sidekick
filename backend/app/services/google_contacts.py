@@ -17,6 +17,7 @@ from flask import current_app
 from marshmallow import ValidationError
 
 from app.common.crypto import decrypt, encrypt
+from app.common.xlsx_reservas import parse_xlsx_reservas
 from app.extensions import db
 from app.models.integraciones import IntegracionGoogle
 from app.models.logs import ORIGEN_GOOGLE_CONTACTS, ESTADO_EXITO, ESTADO_ERROR, ESTADO_PARCIAL
@@ -306,6 +307,109 @@ def export_csv(empresa_id: str, json_data: dict) -> tuple[bytes | None, str | No
         )
     except (requests.RequestException, NotImplementedError) as exc:
         return None, f"Error al obtener reservas del PMS: {exc}"
+
+    prefs = repo.get_preferencias_contactos(empresa_id)
+    csv_bytes = build_csv(reservas, prefs)
+    return csv_bytes, None
+
+
+# ── XLSX ─────────────────────────────────────────────────────────────────
+
+
+def sync_from_xlsx(empresa_id: str, file_bytes: bytes) -> tuple[dict | None, str | None]:
+    """Sincroniza contactos con Google People API desde un XLSX subido.
+
+    Los datos se procesan en memoria y no se persisten (RGPD).
+
+    Returns
+    -------
+    tuple[dict | None, str | None]
+        (resumen, error).
+    """
+    # Verificar integración Google activa
+    integracion = repo.get_google_integration(empresa_id)
+    if not integracion or not integracion.activo:
+        return None, "No hay cuenta Google conectada. Conéctala primero desde el panel."
+
+    refresh_token = decrypt(integracion.refresh_token_cifrado)
+    access_token = (
+        decrypt(integracion.access_token_cifrado)
+        if integracion.access_token_cifrado
+        else None
+    )
+    if refresh_token is None:
+        return None, "No se pudo descifrar el refresh_token de Google."
+
+    reservas, parse_errors = parse_xlsx_reservas(file_bytes)
+    if not reservas and parse_errors:
+        return None, parse_errors[0]
+
+    prefs = repo.get_preferencias_contactos(empresa_id)
+    client_id = current_app.config["GOOGLE_CLIENT_ID"]
+    client_secret = current_app.config["GOOGLE_CLIENT_SECRET"]
+
+    google_client = GooglePeopleClient(
+        client_id=client_id,
+        client_secret=client_secret,
+        access_token=access_token,
+        refresh_token=refresh_token,
+        token_expiry=integracion.token_expiry,
+    )
+
+    nuevos = 0
+    actualizados = 0
+    errores: list[str] = list(parse_errors)  # avisos de filas omitidas
+
+    for reserva in reservas:
+        try:
+            payload = _build_contact_payload(reserva, prefs, google_client)
+            _, es_nuevo = google_client.upsert_contact(payload, reserva.email)
+            if es_nuevo:
+                nuevos += 1
+            else:
+                actualizados += 1
+        except requests.RequestException as exc:
+            logger.warning("Error al subir contacto '%s': %s", reserva.nombre_raw, exc)
+            errores.append(f"{reserva.nombre_raw}: {exc}")
+
+    if google_client.token_refreshed:
+        new_at = google_client.current_access_token
+        new_expiry = google_client.current_token_expiry
+        if new_at:
+            repo.update_access_token(integracion, encrypt(new_at), new_expiry)
+
+    estado = ESTADO_PARCIAL if errores else ESTADO_EXITO
+    _log_sync(
+        empresa_id, estado, nuevos + actualizados,
+        f"XLSX — Nuevos: {nuevos}, actualizados: {actualizados}"
+        + (f", errores: {len(errores)}" if errores else ""),
+    )
+    db.session.commit()
+
+    result: dict = {
+        "total": len(reservas),
+        "nuevos": nuevos,
+        "actualizados": actualizados,
+    }
+    if errores:
+        result["advertencias"] = errores
+    return result, None
+
+
+def export_csv_from_xlsx(empresa_id: str, file_bytes: bytes) -> tuple[bytes | None, str | None]:
+    """Genera el CSV de Google Contacts desde un XLSX subido.
+
+    No requiere cuenta Google conectada. Los datos se procesan en memoria
+    y no se persisten (RGPD).
+
+    Returns
+    -------
+    tuple[bytes | None, str | None]
+        (contenido_csv, error).
+    """
+    reservas, parse_errors = parse_xlsx_reservas(file_bytes)
+    if not reservas and parse_errors:
+        return None, parse_errors[0]
 
     prefs = repo.get_preferencias_contactos(empresa_id)
     csv_bytes = build_csv(reservas, prefs)
