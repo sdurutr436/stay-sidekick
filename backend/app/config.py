@@ -50,6 +50,19 @@ class Config:
     # si se supera este límite antes de que el endpoint lo procese.
     MAX_CONTENT_LENGTH: int = int(os.environ.get("MAX_UPLOAD_BYTES", str(10 * 1024 * 1024)))
 
+    # Google OAuth 2.0 (sincronización de contactos)
+    GOOGLE_CLIENT_ID: str = os.environ.get("GOOGLE_CLIENT_ID", "")
+    GOOGLE_CLIENT_SECRET: str = os.environ.get("GOOGLE_CLIENT_SECRET", "")
+    # URI de callback registrada en Google Cloud Console.
+    # Debe apuntar al endpoint del backend: /api/contactos/google/callback
+    GOOGLE_REDIRECT_URI: str = os.environ.get(
+        "GOOGLE_REDIRECT_URI",
+        "http://localhost:5000/api/contactos/google/callback",
+    )
+
+    # URL base del frontend (para los redirects post-OAuth)
+    FRONTEND_BASE_URL: str = os.environ.get("FRONTEND_BASE_URL", "http://localhost:4200")
+
     # PostgreSQL
     SQLALCHEMY_DATABASE_URI: str = os.environ.get(
         "DATABASE_URL",

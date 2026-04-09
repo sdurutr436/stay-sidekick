@@ -1,0 +1,323 @@
+<!-- Pagina: Sincronizador de Google Contacts -->
+<div class="sincronizador-contactos">
+
+  <!-- Cabecera de la herramienta -->
+  <header class="page-header">
+    <div class="page-header__start">
+      <h1 class="page-header__title">Sincronizador de contactos</h1>
+      <p class="page-header__desc">
+        Conecta tu cuenta de Google y sincroniza los huéspedes de tus
+        reservas directamente en Google Contacts. También puedes exportar
+        un CSV para importación manual.
+      </p>
+    </div>
+  </header>
+
+  <!-- Seccion 1: Conexion con Google -->
+  <section class="panel-seccion" aria-labelledby="titulo-conexion">
+    <h2 class="panel-seccion__titulo" id="titulo-conexion">
+      Cuenta de Google
+    </h2>
+
+    <div class="panel-seccion__body">
+
+      <!-- Estado de conexion -->
+      <div class="conexion-estado">
+        <span
+          class="badge"
+          [class.badge--solid]="googleConectado()"
+          [class.badge--outline]="!googleConectado()"
+          aria-live="polite"
+        >
+          {{ googleConectado() ? 'Conectado' : 'Sin conectar' }}
+        </span>
+
+        @if (googleConectado() && ultimoSync()) {
+          <p class="conexion-estado__sync-info">
+            Ultima sincronizacion: {{ ultimoSync() }}
+          </p>
+        }
+      </div>
+
+      <!-- Acciones de conexion -->
+      <div class="conexion-acciones">
+        @if (!googleConectado()) {
+          <button
+            class="btn btn--primary btn--md"
+            type="button"
+            (click)="connectarGoogle()"
+          >
+            <span class="btn__icon" aria-hidden="true">
+              <svg class="svg svg--sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
+                <circle cx="10" cy="10" r="8" stroke="#fff" stroke-width="1.5"/>
+                <path d="M10 6v4l3 3" stroke="#fff" stroke-width="1.5" stroke-linecap="square"/>
+              </svg>
+            </span>
+            Conectar con Google
+          </button>
+        } @else {
+          <button
+            class="btn btn--secondary btn--md"
+            type="button"
+            (click)="desconectarGoogle()"
+          >
+            Desconectar cuenta
+          </button>
+        }
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Seccion 2: Preferencias de formato -->
+  <section
+    class="panel-seccion"
+    aria-labelledby="titulo-preferencias"
+  >
+    <h2 class="panel-seccion__titulo" id="titulo-preferencias">
+      Preferencias de formato
+    </h2>
+    <p class="panel-seccion__desc">
+      Configura cómo se guardarán los datos del huésped en el contacto de Google.
+    </p>
+
+    <form class="panel-seccion__body preferencias-form" (ngSubmit)="guardarPreferencias()">
+
+      <!-- Formato del nombre -->
+      <div class="form-group">
+        <label class="form-label" for="formato-nombre">
+          Formato del nombre
+        </label>
+        <select
+          id="formato-nombre"
+          class="form-select"
+          [value]="preferencias().formato_nombre_contacto"
+          (change)="onFormatoNombreChange($any($event.target).value)"
+        >
+          @for (opcion of formatoNombreOpciones; track opcion.valor) {
+            <option [value]="opcion.valor">{{ opcion.label }}</option>
+          }
+        </select>
+      </div>
+
+      <!-- Incluir fecha de checkin -->
+      <div class="form-group form-group--checkbox">
+        <label class="form-checkbox">
+          <input
+            type="checkbox"
+            class="form-checkbox__input"
+            [checked]="preferencias().incluir_checkin_contacto"
+            (change)="onIncluirCheckinChange($any($event.target).checked)"
+          />
+          <span class="form-checkbox__label">
+            Incluir fecha de entrada (checkin) en las notas del contacto
+          </span>
+        </label>
+      </div>
+
+      <!-- Incluir apartamento -->
+      <div class="form-group form-group--checkbox">
+        <label class="form-checkbox">
+          <input
+            type="checkbox"
+            class="form-checkbox__input"
+            [checked]="preferencias().incluir_apartamento_contacto"
+            (change)="onIncluirApartamentoChange($any($event.target).checked)"
+          />
+          <span class="form-checkbox__label">
+            Incluir el nombre del apartamento
+          </span>
+        </label>
+      </div>
+
+      <!-- Formato del apartamento (visible solo si incluir_apartamento) -->
+      @if (mostrarFormatoApartamento()) {
+        <div class="form-group form-group--indented">
+          <label class="form-label" for="formato-apartamento">
+            Como incluir el apartamento
+          </label>
+          <select
+            id="formato-apartamento"
+            class="form-select"
+            [value]="preferencias().formato_apartamento_contacto"
+            (change)="onFormatoApartamentoChange($any($event.target).value)"
+          >
+            @for (opcion of formatoApartamentoOpciones; track opcion.valor) {
+              <option [value]="opcion.valor">{{ opcion.label }}</option>
+            }
+          </select>
+        </div>
+      }
+
+      <!-- Guardar preferencias -->
+      <div class="form-actions">
+        <button
+          class="btn btn--primary btn--md"
+          type="submit"
+        >
+          Guardar preferencias
+        </button>
+      </div>
+
+    </form>
+  </section>
+
+  <!-- Seccion 3: Importacion desde XLSX -->
+  <section class="panel-seccion" aria-labelledby="titulo-xlsx">
+    <h2 class="panel-seccion__titulo" id="titulo-xlsx">
+      Importar desde Excel
+    </h2>
+    <p class="panel-seccion__desc">
+      Si tu PMS no tiene conexión API, exporta tus reservas a Excel y
+      súbelas aquí. Las columnas reconocidas son: <code>nombre</code>,
+      <code>email</code>, <code>telefono</code>, <code>checkin</code>,
+      <code>checkout</code> y <code>apartamento</code>.
+      Los datos se procesan en servidor sin almacenarse (RGPD).
+    </p>
+
+    <div class="panel-seccion__body xlsx-import">
+
+      <!-- Selector de archivo -->
+      <div class="xlsx-import__selector">
+        <input
+          #xlsxInput
+          type="file"
+          accept=".xlsx"
+          class="xlsx-import__input"
+          aria-label="Seleccionar archivo Excel de reservas"
+          (change)="onXlsxSeleccionado($event)"
+        />
+        <button
+          class="btn btn--secondary btn--md"
+          type="button"
+          (click)="xlsxInput.click()"
+        >
+          <span class="btn__icon" aria-hidden="true">
+            <svg class="svg svg--sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
+              <rect x="4" y="2" width="12" height="16" stroke="currentColor" stroke-width="1.5"/>
+              <polyline points="7,9 10,6 13,9" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="square" stroke-linejoin="miter"/>
+              <line x1="10" y1="6" x2="10" y2="14" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
+            </svg>
+          </span>
+          Seleccionar archivo .xlsx
+        </button>
+
+        @if (xlsxArchivo()) {
+          <span class="xlsx-import__filename">
+            {{ xlsxArchivo()!.name }}
+          </span>
+        }
+      </div>
+
+      <!-- Acciones sobre el XLSX (visibles solo con archivo seleccionado) -->
+      @if (xlsxArchivo()) {
+        <div class="xlsx-import__acciones">
+          <button
+            class="btn btn--primary btn--md"
+            type="button"
+            [disabled]="!googleConectado() || xlsxEnCurso()"
+            [attr.aria-busy]="xlsxEnCurso()"
+            (click)="lanzarXlsxSync()"
+          >
+            @if (xlsxEnCurso()) {
+              Procesando…
+            } @else {
+              Sincronizar con Google
+            }
+          </button>
+
+          <button
+            class="btn btn--secondary btn--md"
+            type="button"
+            [disabled]="xlsxEnCurso()"
+            (click)="exportarXlsxCsv()"
+          >
+            <span class="btn__icon" aria-hidden="true">
+              <svg class="svg svg--sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
+                <rect x="4" y="2" width="12" height="16" stroke="currentColor" stroke-width="1.5"/>
+                <polyline points="7,10 10,13 13,10" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="square" stroke-linejoin="miter"/>
+                <line x1="10" y1="6" x2="10" y2="13" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
+              </svg>
+            </span>
+            Exportar CSV
+          </button>
+        </div>
+
+        @if (!googleConectado()) {
+          <p class="xlsx-import__aviso" role="note">
+            Para sincronizar con Google necesitas conectar la cuenta. La exportación a CSV no la requiere.
+          </p>
+        }
+      }
+
+    </div>
+  </section>
+
+  <!-- Seccion 4: Sincronizacion y exportacion (fuente: API del PMS) -->
+  <section class="panel-seccion" aria-labelledby="titulo-sync">
+    <h2 class="panel-seccion__titulo" id="titulo-sync">
+      Sincronizacion
+    </h2>
+    <p class="panel-seccion__desc">
+      Sube los contactos al Google Contacts de tu empresa, o exporta un
+      CSV para importarlos manualmente desde
+      <code>contacts.google.com</code>.
+    </p>
+
+    <div class="panel-seccion__body sync-acciones">
+
+      <!-- Sincronizacion directa con Google -->
+      <div class="sync-accion">
+        <div class="sync-accion__info">
+          <h3 class="sync-accion__titulo">Sincronizacion automatica</h3>
+          <p class="sync-accion__desc">
+            Requiere cuenta Google conectada. Crea o actualiza los contactos
+            directamente en tu Google Contacts.
+          </p>
+        </div>
+        <button
+          class="btn btn--primary btn--md"
+          type="button"
+          [disabled]="!googleConectado() || syncEnCurso()"
+          (click)="lanzarSync()"
+          [attr.aria-busy]="syncEnCurso()"
+        >
+          @if (syncEnCurso()) {
+            Sincronizando…
+          } @else {
+            Sincronizar ahora
+          }
+        </button>
+      </div>
+
+      <hr class="panel-seccion__divider" aria-hidden="true" />
+
+      <!-- Exportacion CSV fallback -->
+      <div class="sync-accion">
+        <div class="sync-accion__info">
+          <h3 class="sync-accion__titulo">Exportar CSV (importacion manual)</h3>
+          <p class="sync-accion__desc">
+            Descarga un CSV con las cabeceras exactas de Google Contacts.
+            No requiere cuenta conectada.
+          </p>
+        </div>
+        <button
+          class="btn btn--secondary btn--md"
+          type="button"
+          (click)="exportarCsv()"
+        >
+          <span class="btn__icon" aria-hidden="true">
+            <svg class="svg svg--sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
+              <rect x="4" y="2" width="12" height="16" stroke="#2e2e2e" stroke-width="1.5"/>
+              <polyline points="7,10 10,13 13,10" stroke="#2e2e2e" stroke-width="1.5" fill="none" stroke-linecap="square" stroke-linejoin="miter"/>
+              <line x1="10" y1="6" x2="10" y2="13" stroke="#2e2e2e" stroke-width="1.5" stroke-linecap="square"/>
+            </svg>
+          </span>
+          Descargar CSV
+        </button>
+      </div>
+
+    </div>
+  </section>
+
+</div>
