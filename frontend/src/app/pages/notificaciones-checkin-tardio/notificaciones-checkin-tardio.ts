@@ -1,4 +1,4 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 
@@ -26,6 +26,8 @@ interface StatusResponse {
   reservas_pms: CheckinHoy[];
 }
 
+type EstadoEnvio = 'idle' | 'ok' | 'error';
+
 @Component({
   selector: 'app-notificaciones-checkin-tardio',
   templateUrl: './notificaciones-checkin-tardio.html',
@@ -33,7 +35,7 @@ interface StatusResponse {
   standalone: true,
   imports: [FormsModule],
 })
-export class NotificacionesCheckinTardioPageComponent implements OnInit {
+export class NotificacionesCheckinTardioPageComponent implements OnInit, OnDestroy {
 
   private readonly http = inject(HttpClient);
 
@@ -70,14 +72,19 @@ export class NotificacionesCheckinTardioPageComponent implements OnInit {
   mensaje = '';
 
   readonly enviando = signal(false);
-  readonly estadoEnvio = signal<'idle' | 'ok' | 'error'>('idle');
+  readonly estadoEnvio = signal<EstadoEnvio>('idle');
   readonly errorEnvio = signal<string | null>(null);
   readonly copiadoOk = signal(false);
+  private _copiadoTimer: ReturnType<typeof setTimeout> | null = null;
 
   // ── Ciclo de vida ─────────────────────────────────────────────────────
 
   ngOnInit(): void {
     this.cargarStatus();
+  }
+
+  ngOnDestroy(): void {
+    if (this._copiadoTimer) clearTimeout(this._copiadoTimer);
   }
 
   // ── Carga de estado ───────────────────────────────────────────────────
@@ -195,8 +202,9 @@ export class NotificacionesCheckinTardioPageComponent implements OnInit {
   copiarMensaje(): void {
     if (!this.mensaje) return;
     navigator.clipboard.writeText(this.mensaje).then(() => {
+      if (this._copiadoTimer) clearTimeout(this._copiadoTimer);
       this.copiadoOk.set(true);
-      setTimeout(() => this.copiadoOk.set(false), 2000);
+      this._copiadoTimer = setTimeout(() => this.copiadoOk.set(false), 2000);
     });
   }
 
@@ -214,7 +222,7 @@ export class NotificacionesCheckinTardioPageComponent implements OnInit {
       '/api/notificaciones/checkin-tardio/enviar',
       {
         destinatario: this.destinatario.trim(),
-        asunto: this.asunto.trim() || 'Recordatorio de check-in',
+        asunto: this.asunto.trim(),
         mensaje: this.mensaje.trim(),
       },
     ).subscribe({
