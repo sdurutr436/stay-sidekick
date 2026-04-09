@@ -1,0 +1,217 @@
+<div class="ds-section">
+
+  <div class="ds-section__header">
+    <h2 class="ds-section__title">Moléculas</h2>
+    <p class="ds-section__desc">
+      Combinaciones de átomos que forman componentes de formulario reutilizables.
+      Todos los estados: normal, foco y error.
+    </p>
+  </div>
+
+  <!-- =========================================================
+       INPUT
+  ========================================================== -->
+  <div class="ds-block">
+    <p class="ds-block__label">Input</p>
+    <div class="ds-block__body">
+
+      <div class="ds-row">
+        <div class="ds-specimen" style="min-width:260px">
+          <span class="ds-specimen__label">normal</span>
+          <div class="ds-specimen__preview" style="width:100%">
+            <div class="form-field" style="width:100%">
+              <label class="form-label" for="ds-input-normal">Nombre</label>
+              <input class="form-input" id="ds-input-normal" type="text" placeholder="Ej. María García">
+            </div>
+          </div>
+          <span class="ds-specimen__meta">.form-field > .form-label + .form-input</span>
+        </div>
+
+        <div class="ds-specimen" style="min-width:260px">
+          <span class="ds-specimen__label">con icono</span>
+          <div class="ds-specimen__preview" style="width:100%">
+            <div class="form-field" style="width:100%">
+              <label class="form-label" for="ds-input-icon">Correo</label>
+              <div class="form-input-wrapper">
+                <span class="form-input-wrapper__icon" aria-hidden="true">
+                  <svg class="svg svg--sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
+                    <rect x="2" y="5" width="16" height="12" rx="1" stroke="currentColor" stroke-width="1.5"/>
+                    <polyline points="2,6 10,12 18,6" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                  </svg>
+                </span>
+                <input class="form-input" id="ds-input-icon" type="email" placeholder="nombre@empresa.com">
+              </div>
+            </div>
+          </div>
+          <span class="ds-specimen__meta">.form-input-wrapper > __icon + .form-input</span>
+        </div>
+
+        <div class="ds-specimen" style="min-width:260px">
+          <span class="ds-specimen__label">error</span>
+          <div class="ds-specimen__preview" style="width:100%">
+            <div class="form-field form-field--error" style="width:100%">
+              <label class="form-label" for="ds-input-error">Teléfono</label>
+              <input class="form-input" id="ds-input-error" type="tel" value="123abc" aria-describedby="ds-input-error-msg">
+              <span class="form-field__error" id="ds-input-error-msg">Formato de teléfono no válido.</span>
+            </div>
+          </div>
+          <span class="ds-specimen__meta">.form-field--error + .form-field__error</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- =========================================================
+       SELECT
+  ========================================================== -->
+  <div class="ds-block">
+    <p class="ds-block__label">Select</p>
+    <div class="ds-block__body">
+      <div class="ds-row">
+        <div class="ds-specimen" style="min-width:260px">
+          <span class="ds-specimen__label">normal</span>
+          <div class="ds-specimen__preview" style="width:100%">
+            <div class="form-field" style="width:100%">
+              <label class="form-label" for="ds-select">Tipo de solicitud</label>
+              <select class="form-select" id="ds-select">
+                <option value="">Selecciona una opción</option>
+                <option value="beneficiario">Beneficiario</option>
+                <option value="empresa">Empresa interesada</option>
+              </select>
+            </div>
+          </div>
+          <span class="ds-specimen__meta">.form-select</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       TEXTAREA
+  ========================================================== -->
+  <div class="ds-block">
+    <p class="ds-block__label">Textarea</p>
+    <div class="ds-block__body">
+      <div class="ds-row">
+        <div class="ds-specimen" style="min-width:360px">
+          <span class="ds-specimen__label">normal</span>
+          <div class="ds-specimen__preview" style="width:100%">
+            <div class="form-field" style="width:100%">
+              <label class="form-label" for="ds-textarea">Mensaje</label>
+              <textarea class="form-textarea" id="ds-textarea" placeholder="Escribe aquí tu mensaje..."></textarea>
+            </div>
+          </div>
+          <span class="ds-specimen__meta">.form-textarea</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       EDITOR ESTILO GITHUB
+  ========================================================== -->
+  <div class="ds-block">
+    <p class="ds-block__label">Editor enriquecido (estilo GitHub)</p>
+    <div class="ds-block__body">
+      <div class="ds-row">
+        <div class="ds-specimen" style="min-width:420px">
+          <span class="ds-specimen__label">con tabs y toolbar</span>
+          <div class="ds-specimen__preview" style="width:100%">
+            <div class="form-field" style="width:100%">
+              <label class="form-label" for="ds-editor">Descripción de la solicitud</label>
+              <div class="form-editor">
+                <div class="form-editor__header">
+                  <div class="form-editor__tabs" role="tablist">
+                    <button class="form-editor__tab form-editor__tab--active" role="tab" aria-selected="true">Escribir</button>
+                    <button class="form-editor__tab" role="tab" aria-selected="false">Vista previa</button>
+                  </div>
+                  <div class="form-editor__toolbar" aria-label="Formato">
+                    <button class="form-editor__tool" type="button" title="Negrita"><strong>B</strong></button>
+                    <button class="form-editor__tool" type="button" title="Cursiva"><em>I</em></button>
+                    <span class="form-editor__tool form-editor__tool--separator" aria-hidden="true"></span>
+                    <button class="form-editor__tool" type="button" title="Lista">≡</button>
+                  </div>
+                </div>
+                <div class="form-editor__body">
+                  <textarea class="form-textarea" id="ds-editor" placeholder="Describe tu solicitud con detalle..."></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+          <span class="ds-specimen__meta">.form-editor > __header (__tabs + __toolbar) + __body</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       RADIO Y CHECKBOX
+  ========================================================== -->
+  <div class="ds-block">
+    <p class="ds-block__label">Radio y Checkbox</p>
+    <div class="ds-block__body">
+
+      <div class="ds-row">
+        <div class="ds-specimen">
+          <span class="ds-specimen__label">radio group</span>
+          <div class="ds-specimen__preview">
+            <div class="form-group" role="radiogroup" aria-labelledby="ds-radio-legend">
+              <p id="ds-radio-legend" class="form-label">Tipo de usuario</p>
+              <label class="form-choice">
+                <input class="form-choice__input" type="radio" name="ds-tipo" value="beneficiario">
+                <span class="form-choice__label">Beneficiario actual</span>
+              </label>
+              <label class="form-choice">
+                <input class="form-choice__input" type="radio" name="ds-tipo" value="empresa">
+                <span class="form-choice__label">Empresa interesada</span>
+              </label>
+            </div>
+          </div>
+          <span class="ds-specimen__meta">.form-group[radiogroup] > .form-choice</span>
+        </div>
+
+        <div class="ds-specimen">
+          <span class="ds-specimen__label">checkbox group</span>
+          <div class="ds-specimen__preview">
+            <div class="form-group">
+              <label class="form-choice">
+                <input class="form-choice__input" type="checkbox">
+                <span class="form-choice__label">
+                  Acepto los <a href="#">términos y condiciones</a>
+                </span>
+              </label>
+              <label class="form-choice">
+                <input class="form-choice__input" type="checkbox">
+                <span class="form-choice__label">
+                  Acepto la <a href="#">política de privacidad</a>
+                </span>
+              </label>
+            </div>
+          </div>
+          <span class="ds-specimen__meta">.form-group > .form-choice[checkbox]</span>
+        </div>
+
+        <div class="ds-specimen">
+          <span class="ds-specimen__label">radio group — error</span>
+          <div class="ds-specimen__preview">
+            <div class="form-group form-group--error" role="radiogroup">
+              <label class="form-choice">
+                <input class="form-choice__input" type="radio" name="ds-tipo-err" value="a">
+                <span class="form-choice__label">Opción A</span>
+              </label>
+              <label class="form-choice">
+                <input class="form-choice__input" type="radio" name="ds-tipo-err" value="b">
+                <span class="form-choice__label">Opción B</span>
+              </label>
+              <span class="form-group__error">Debes seleccionar una opción.</span>
+            </div>
+          </div>
+          <span class="ds-specimen__meta">.form-group--error + .form-group__error</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
