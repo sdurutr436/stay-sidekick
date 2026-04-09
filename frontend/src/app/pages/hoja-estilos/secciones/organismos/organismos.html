@@ -1,0 +1,204 @@
+<div class="ds-section">
+
+  <div class="ds-section__header">
+    <h2 class="ds-section__title">Organismos</h2>
+    <p class="ds-section__desc">
+      Componentes de alto nivel compuestos por átomos y moléculas.
+      Se muestran en previsualizaciones acotadas que anulan el posicionamiento fijo/sticky.
+    </p>
+  </div>
+
+  <!-- =========================================================
+       HEADER
+  ========================================================== -->
+  <div class="ds-block">
+    <p class="ds-block__label">Header — barra de navegación principal</p>
+    <div class="ds-block__body">
+
+      <p style="font-size:0.75rem;color:#6b6b6b;margin-bottom:0.5rem">
+        BEM: <code>.header > .header__inner > .header__start (.header__brand) + .header__actions</code>
+      </p>
+
+      <!-- Preview acotada — .header pierde position:sticky dentro del contenedor overflow:hidden -->
+      <div class="ds-organism-preview">
+        <header class="header" role="banner">
+          <div class="header__inner">
+            <div class="header__start">
+
+              <!-- Botón hamburguesa (placeholder) -->
+              <button class="header__nav-toggle" type="button" aria-label="Abrir menú lateral" aria-expanded="false">
+                <svg class="svg svg--sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
+                  <line x1="3" y1="5"  x2="17" y2="5"  stroke="currentColor" stroke-width="1.5"/>
+                  <line x1="3" y1="10" x2="17" y2="10" stroke="currentColor" stroke-width="1.5"/>
+                  <line x1="3" y1="15" x2="17" y2="15" stroke="currentColor" stroke-width="1.5"/>
+                </svg>
+              </button>
+
+              <!-- Logo -->
+              <a href="#" class="logo header__brand" aria-label="Stay Sidekick — inicio">
+                <span class="logo__icon" aria-hidden="true">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+                    <rect width="32" height="32" fill="#2e2e2e"/>
+                    <rect x="8" y="14" width="7" height="10" fill="#fff"/>
+                    <rect x="17" y="8" width="7" height="16" fill="#fff"/>
+                    <rect x="8" y="8" width="7" height="4" fill="#fff"/>
+                  </svg>
+                </span>
+                <span class="logo__name">Stay Sidekick</span>
+              </a>
+
+            </div>
+
+            <!-- Acciones -->
+            <div class="header__actions">
+              <button class="btn btn--secondary btn--sm" type="button">Iniciar sesión</button>
+              <button class="btn btn--primary btn--sm" type="button">Presentar solicitud</button>
+            </div>
+          </div>
+        </header>
+      </div>
+
+      <!-- Variante: header sin toggle (web pública) -->
+      <p class="ds-specimen__label" style="margin-top:1rem">Sin toggle (web estática)</p>
+      <div class="ds-organism-preview">
+        <header class="header" role="banner">
+          <div class="header__inner">
+            <div class="header__start">
+              <a href="#" class="logo header__brand" aria-label="Stay Sidekick — inicio">
+                <span class="logo__icon" aria-hidden="true">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+                    <rect width="32" height="32" fill="#2e2e2e"/>
+                    <rect x="8" y="14" width="7" height="10" fill="#fff"/>
+                    <rect x="17" y="8" width="7" height="16" fill="#fff"/>
+                    <rect x="8" y="8" width="7" height="4" fill="#fff"/>
+                  </svg>
+                </span>
+                <span class="logo__name">Stay Sidekick</span>
+              </a>
+            </div>
+            <div class="header__actions">
+              <button class="btn btn--secondary btn--sm" type="button">Iniciar sesión</button>
+              <button class="btn btn--primary btn--sm" type="button">Presentar solicitud</button>
+            </div>
+          </div>
+        </header>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- =========================================================
+       NAV SIDENAV
+  ========================================================== -->
+  <div class="ds-block">
+    <p class="ds-block__label">Nav sidenav — menú lateral de herramientas</p>
+    <div class="ds-block__body">
+
+      <p style="font-size:0.75rem;color:#6b6b6b;margin-bottom:0.5rem">
+        BEM: <code>.nav-sidenav > .nav-sidenav__tools (ul > li > a) + .nav-sidenav__footer (button)</code>
+      </p>
+
+      <!-- Estado expandido -->
+      <p class="ds-specimen__label">Expandido</p>
+      <div class="ds-organism-preview" style="display:flex">
+        <nav class="nav-sidenav" aria-label="Menú de herramientas — preview">
+          <ul class="nav-sidenav__tools" role="list">
+            <li class="nav-sidenav__item">
+              <a href="#" class="nav-sidenav__tool-link nav-sidenav__tool-link--active" aria-current="page">
+                <span class="nav-sidenav__tool-icon" aria-hidden="true">
+                  <svg class="svg svg--md" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
+                    <rect x="2" y="2" width="20" height="20" fill="#d4d4d4"/>
+                    <rect x="6" y="10" width="5" height="9" fill="#8c8c8c"/>
+                    <rect x="13" y="6" width="5" height="13" fill="#8c8c8c"/>
+                  </svg>
+                </span>
+                <span class="nav-sidenav__tool-label">Maestro de apartamentos</span>
+              </a>
+            </li>
+            <li class="nav-sidenav__item">
+              <a href="#" class="nav-sidenav__tool-link">
+                <span class="nav-sidenav__tool-icon" aria-hidden="true">
+                  <svg class="svg svg--md" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
+                    <rect x="2" y="2" width="20" height="20" fill="#d4d4d4"/>
+                    <rect x="6" y="10" width="5" height="9" fill="#8c8c8c"/>
+                    <rect x="13" y="6" width="5" height="13" fill="#8c8c8c"/>
+                  </svg>
+                </span>
+                <span class="nav-sidenav__tool-label">Sincronizador de contactos</span>
+              </a>
+            </li>
+            <li class="nav-sidenav__item">
+              <a href="#" class="nav-sidenav__tool-link nav-sidenav__tool-link--disabled" aria-disabled="true">
+                <span class="nav-sidenav__tool-icon" aria-hidden="true">
+                  <svg class="svg svg--md" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
+                    <rect x="2" y="2" width="20" height="20" fill="#d4d4d4"/>
+                    <rect x="6" y="10" width="5" height="9" fill="#8c8c8c"/>
+                    <rect x="13" y="6" width="5" height="13" fill="#8c8c8c"/>
+                  </svg>
+                </span>
+                <span class="nav-sidenav__tool-label">Herramienta 3 (próximamente)</span>
+              </a>
+            </li>
+          </ul>
+          <footer class="nav-sidenav__footer">
+            <button class="nav-sidenav__collapse-btn" type="button" aria-label="Colapsar menú lateral" aria-expanded="true">
+              <span class="nav-sidenav__collapse-icon" aria-hidden="true">
+                <svg class="svg svg--sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
+                  <polyline points="15,4 9,10 15,16" stroke="#4a4a4a" stroke-width="2" stroke-linecap="square"/>
+                  <polyline points="10,4 4,10 10,16"  stroke="#4a4a4a" stroke-width="2" stroke-linecap="square"/>
+                </svg>
+              </span>
+              <span class="nav-sidenav__collapse-label">Colapsar menú</span>
+            </button>
+          </footer>
+        </nav>
+      </div>
+
+      <!-- Estado colapsado -->
+      <p class="ds-specimen__label" style="margin-top:1rem">Colapsado — solo iconos</p>
+      <div class="ds-organism-preview" style="display:flex;width:fit-content">
+        <nav class="nav-sidenav nav-sidenav--collapsed" aria-label="Menú de herramientas — colapsado">
+          <ul class="nav-sidenav__tools" role="list">
+            <li class="nav-sidenav__item">
+              <a href="#" class="nav-sidenav__tool-link nav-sidenav__tool-link--active" aria-current="page" aria-label="Maestro de apartamentos">
+                <span class="nav-sidenav__tool-icon" aria-hidden="true">
+                  <svg class="svg svg--md" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
+                    <rect x="2" y="2" width="20" height="20" fill="#d4d4d4"/>
+                    <rect x="6" y="10" width="5" height="9" fill="#8c8c8c"/>
+                    <rect x="13" y="6" width="5" height="13" fill="#8c8c8c"/>
+                  </svg>
+                </span>
+                <span class="nav-sidenav__tool-label">Maestro de apartamentos</span>
+              </a>
+            </li>
+            <li class="nav-sidenav__item">
+              <a href="#" class="nav-sidenav__tool-link" aria-label="Sincronizador de contactos">
+                <span class="nav-sidenav__tool-icon" aria-hidden="true">
+                  <svg class="svg svg--md" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
+                    <rect x="2" y="2" width="20" height="20" fill="#d4d4d4"/>
+                    <rect x="6" y="10" width="5" height="9" fill="#8c8c8c"/>
+                    <rect x="13" y="6" width="5" height="13" fill="#8c8c8c"/>
+                  </svg>
+                </span>
+                <span class="nav-sidenav__tool-label">Sincronizador de contactos</span>
+              </a>
+            </li>
+          </ul>
+          <footer class="nav-sidenav__footer">
+            <button class="nav-sidenav__collapse-btn" type="button" aria-label="Expandir menú lateral" aria-expanded="false">
+              <span class="nav-sidenav__collapse-icon" aria-hidden="true">
+                <svg class="svg svg--sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
+                  <polyline points="5,4 11,10 5,16"  stroke="#4a4a4a" stroke-width="2" stroke-linecap="square"/>
+                  <polyline points="10,4 16,10 10,16" stroke="#4a4a4a" stroke-width="2" stroke-linecap="square"/>
+                </svg>
+              </span>
+              <span class="nav-sidenav__collapse-label">Colapsar menú</span>
+            </button>
+          </footer>
+        </nav>
+      </div>
+
+    </div>
+  </div>
+
+</div>
