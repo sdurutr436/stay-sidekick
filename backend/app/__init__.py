@@ -44,12 +44,14 @@ def create_app(config_class: type = Config) -> Flask:
         import app.models  # noqa: F401
 
     # ── Blueprints ───────────────────────────────────────────────────────
-    from app.contact.routes import contact_bp        # noqa: E402
-    from app.auth.routes import auth_bp              # noqa: E402
-    from app.apartamentos.routes import apartamentos_bp  # noqa: E402
+    from app.contact.routes import contact_bp              # noqa: E402
+    from app.auth.routes import auth_bp                    # noqa: E402
+    from app.apartamentos.routes import apartamentos_bp    # noqa: E402
+    from app.routes.contactos import contactos_bp          # noqa: E402
     app.register_blueprint(contact_bp)
     app.register_blueprint(auth_bp)
     app.register_blueprint(apartamentos_bp)
+    app.register_blueprint(contactos_bp)
 
     # ── Error handlers ───────────────────────────────────────────────────
     @app.errorhandler(429)
