@@ -8,23 +8,17 @@ Orquesta:
 """
 
 import logging
-import smtplib
 from datetime import date
-from email.message import EmailMessage
 
 from flask import current_app
 
 from app.apartamentos import repository as apt_repo
 from app.common.crypto import decrypt
+from app.common.notifications.gmail import send_via_smtp
 from app.common.xlsx_reservas import parse_xlsx_reservas
-from app.pms.smoobu import SmoobuReservationClient
-from app.pms.beds24 import Beds24ReservationClient
+from app.pms.factory import build_pms_client
 
 logger = logging.getLogger(__name__)
-
-_SMTP_HOST = "smtp.gmail.com"
-_SMTP_PORT = 587
-_SMTP_TIMEOUT = 10
 
 
 # ── Status ────────────────────────────────────────────────────────────────
@@ -43,14 +37,12 @@ def get_status(empresa_id: str) -> dict:
         and current_app.config.get("GMAIL_APP_PASSWORD")
     )
 
-    # Apartamentos activos del maestro
     apts = apt_repo.list_by_empresa(empresa_id)
     apartamentos = [
         {"id": str(a.id), "nombre": a.nombre, "ciudad": a.ciudad}
         for a in apts
     ]
 
-    # Reservas de hoy del PMS (si está configurado)
     reservas_pms: list[dict] = []
     pms_configurado = False
     pms_error: str | None = None
@@ -61,7 +53,7 @@ def get_status(empresa_id: str) -> dict:
         if api_key:
             pms_configurado = True
             try:
-                client = _build_pms_client(
+                client = build_pms_client(
                     pms_config.proveedor, api_key, pms_config.endpoint
                 )
                 hoy = date.today().isoformat()
@@ -71,7 +63,7 @@ def get_status(empresa_id: str) -> dict:
                 logger.warning(
                     "Error al obtener reservas PMS para notificaciones: %s", exc
                 )
-                pms_error = f"No se pudieron cargar las reservas del PMS: {exc}"
+                pms_error = "No se pudieron cargar las reservas del PMS."
 
     return {
         "gmail_configurado": gmail_ok,
@@ -93,7 +85,7 @@ def parse_checkins_xlsx(file_bytes: bytes) -> tuple[list[dict], list[str]]:
     Los datos se procesan en memoria y no se persisten (cumplimiento RGPD).
     """
     reservas, errores = parse_xlsx_reservas(file_bytes)
-    hoy = date.today().isoformat()  # YYYY-MM-DD
+    hoy = date.today().isoformat()
 
     tiene_fechas = any(r.checkin for r in reservas)
     if tiene_fechas:
@@ -113,50 +105,21 @@ def parse_checkins_xlsx(file_bytes: bytes) -> tuple[list[dict], list[str]]:
 def enviar_notificacion(
     destinatario: str, asunto: str, mensaje: str
 ) -> tuple[bool, str | None]:
-    """Envía un email de notificación vía Gmail SMTP.
-
-    Returns
-    -------
-    tuple[bool, str | None]
-        (exito, mensaje_error). Si exito es True, mensaje_error es None.
-    """
-    user = current_app.config.get("GMAIL_USER", "")
-    password = current_app.config.get("GMAIL_APP_PASSWORD", "")
-
-    if not user or not password:
-        return False, "Gmail SMTP no está configurado (GMAIL_USER / GMAIL_APP_PASSWORD)."
-
-    msg = EmailMessage()
-    msg["Subject"] = asunto
-    msg["From"] = user
-    msg["To"] = destinatario
-    msg.set_content(mensaje)
-
-    try:
-        with smtplib.SMTP(_SMTP_HOST, _SMTP_PORT, timeout=_SMTP_TIMEOUT) as server:
-            server.ehlo()
-            server.starttls()
-            server.ehlo()
-            server.login(user, password)
-            server.send_message(msg)
-
+    """Envía un email de notificación vía Gmail SMTP."""
+    ok, error = send_via_smtp(destinatario, asunto, mensaje)
+    if ok:
         logger.info(
             "Notificación check-in tardío enviada a '%s' (asunto: '%s')",
             destinatario,
             asunto,
         )
-        return True, None
-
-    except smtplib.SMTPException as exc:
-        logger.exception("Error al enviar notificación de check-in tardío")
-        return False, f"Error al enviar el email: {exc}"
+    return ok, error
 
 
 # ── Helpers privados ──────────────────────────────────────────────────────
 
 
 def _reserva_a_dict(r) -> dict:
-    """Serializa una ReservaEstandar a dict JSON-serializable."""
     return {
         "nombre": r.nombre_raw,
         "apartamento": r.nombre_apartamento,
@@ -165,12 +128,3 @@ def _reserva_a_dict(r) -> dict:
         "checkin": r.checkin,
         "checkout": r.checkout,
     }
-
-
-def _build_pms_client(proveedor: str, api_key: str, endpoint: str | None):
-    """Instancia el adaptador PMS correcto según el proveedor configurado."""
-    if proveedor == "smoobu":
-        return SmoobuReservationClient(api_key)
-    if proveedor == "beds24":
-        return Beds24ReservationClient(api_key, endpoint)
-    raise ValueError(f"Proveedor PMS no soportado para reservas: {proveedor!r}")

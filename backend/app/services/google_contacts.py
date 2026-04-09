@@ -21,8 +21,7 @@ from app.common.xlsx_reservas import parse_xlsx_reservas
 from app.extensions import db
 from app.models.integraciones import IntegracionGoogle
 from app.models.logs import ORIGEN_GOOGLE_CONTACTS, ESTADO_EXITO, ESTADO_ERROR, ESTADO_PARCIAL
-from app.pms.smoobu import SmoobuReservationClient
-from app.pms.beds24 import Beds24ReservationClient
+from app.pms.factory import build_pms_client
 from app.repositories import google_integration as repo
 from app.schemas.google_contacts import PreferenciasContactosSchema, SyncRangoSchema
 from app.services.csv_contacts import build_csv, _split_nombre, _format_display_name, _build_notas, _build_grupo
@@ -207,7 +206,7 @@ def sync_contacts(empresa_id: str, json_data: dict) -> tuple[dict | None, str | 
 
     # 3. Obtener reservas del PMS
     try:
-        pms_client = _build_pms_client(pms_config.proveedor, api_key_pms, pms_config.endpoint)
+        pms_client = build_pms_client(pms_config.proveedor, api_key_pms, pms_config.endpoint)
         desde_str = json_data.get("desde")
         hasta_str = json_data.get("hasta")
         reservas = pms_client.fetch_reservations(
@@ -298,7 +297,7 @@ def export_csv(empresa_id: str, json_data: dict) -> tuple[bytes | None, str | No
         return None, "No se pudo descifrar la API key del PMS."
 
     try:
-        pms_client = _build_pms_client(pms_config.proveedor, api_key_pms, pms_config.endpoint)
+        pms_client = build_pms_client(pms_config.proveedor, api_key_pms, pms_config.endpoint)
         desde_str = json_data.get("desde")
         hasta_str = json_data.get("hasta")
         reservas = pms_client.fetch_reservations(
@@ -417,15 +416,6 @@ def export_csv_from_xlsx(empresa_id: str, file_bytes: bytes) -> tuple[bytes | No
 
 
 # ── Helpers ───────────────────────────────────────────────────────────────
-
-
-def _build_pms_client(proveedor: str, api_key: str, endpoint: str | None):
-    """Instancia el adaptador PMS correcto según el proveedor configurado."""
-    if proveedor == "smoobu":
-        return SmoobuReservationClient(api_key)
-    if proveedor == "beds24":
-        return Beds24ReservationClient(api_key, endpoint)
-    raise ValueError(f"Proveedor PMS no soportado para reservas: {proveedor!r}")
 
 
 def _build_contact_payload(reserva, prefs: dict, google_client: GooglePeopleClient) -> dict:
