@@ -10,8 +10,8 @@ interface Tool {
 
 const TOOLS: Tool[] = [
   { id: 'maestro-apartamentos', label: 'Maestro de apartamentos', route: '/menu/maestro-apartamentos' },
-  { id: 'sincronizador-contactos', label: 'Sincronizador de contactos', route: '/menu/sincronizador-contactos' },
-  { id: 'tool-3', label: 'Herramienta 3', route: null },
+  { id: 'sincronizador-contactos',       label: 'Sincronizador de contactos', route: '/menu/sincronizador-contactos'       },
+  { id: 'notificaciones-checkin-tardio', label: 'Notificaciones check-in',    route: '/menu/notificaciones-checkin-tardio' },
   { id: 'tool-4', label: 'Herramienta 4', route: null },
   { id: 'tool-5', label: 'Herramienta 5', route: null },
 ];
