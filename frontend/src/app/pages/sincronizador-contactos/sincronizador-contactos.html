@@ -162,7 +162,98 @@
     </form>
   </section>
 
-  <!-- Seccion 3: Sincronizacion y exportacion -->
+  <!-- Seccion 3: Importacion desde XLSX -->
+  <section class="panel-seccion" aria-labelledby="titulo-xlsx">
+    <h2 class="panel-seccion__titulo" id="titulo-xlsx">
+      Importar desde Excel
+    </h2>
+    <p class="panel-seccion__desc">
+      Si tu PMS no tiene conexión API, exporta tus reservas a Excel y
+      súbelas aquí. Las columnas reconocidas son: <code>nombre</code>,
+      <code>email</code>, <code>telefono</code>, <code>checkin</code>,
+      <code>checkout</code> y <code>apartamento</code>.
+      Los datos se procesan en servidor sin almacenarse (RGPD).
+    </p>
+
+    <div class="panel-seccion__body xlsx-import">
+
+      <!-- Selector de archivo -->
+      <div class="xlsx-import__selector">
+        <input
+          #xlsxInput
+          type="file"
+          accept=".xlsx"
+          class="xlsx-import__input"
+          aria-label="Seleccionar archivo Excel de reservas"
+          (change)="onXlsxSeleccionado($event)"
+        />
+        <button
+          class="btn btn--secondary btn--md"
+          type="button"
+          (click)="xlsxInput.click()"
+        >
+          <span class="btn__icon" aria-hidden="true">
+            <svg class="svg svg--sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
+              <rect x="4" y="2" width="12" height="16" stroke="currentColor" stroke-width="1.5"/>
+              <polyline points="7,9 10,6 13,9" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="square" stroke-linejoin="miter"/>
+              <line x1="10" y1="6" x2="10" y2="14" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
+            </svg>
+          </span>
+          Seleccionar archivo .xlsx
+        </button>
+
+        @if (xlsxArchivo()) {
+          <span class="xlsx-import__filename">
+            {{ xlsxArchivo()!.name }}
+          </span>
+        }
+      </div>
+
+      <!-- Acciones sobre el XLSX (visibles solo con archivo seleccionado) -->
+      @if (xlsxArchivo()) {
+        <div class="xlsx-import__acciones">
+          <button
+            class="btn btn--primary btn--md"
+            type="button"
+            [disabled]="!googleConectado() || xlsxEnCurso()"
+            [attr.aria-busy]="xlsxEnCurso()"
+            (click)="lanzarXlsxSync()"
+          >
+            @if (xlsxEnCurso()) {
+              Procesando…
+            } @else {
+              Sincronizar con Google
+            }
+          </button>
+
+          <button
+            class="btn btn--secondary btn--md"
+            type="button"
+            [disabled]="xlsxEnCurso()"
+            (click)="exportarXlsxCsv()"
+          >
+            <span class="btn__icon" aria-hidden="true">
+              <svg class="svg svg--sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
+                <rect x="4" y="2" width="12" height="16" stroke="currentColor" stroke-width="1.5"/>
+                <polyline points="7,10 10,13 13,10" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="square" stroke-linejoin="miter"/>
+                <line x1="10" y1="6" x2="10" y2="13" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
+              </svg>
+            </span>
+            Exportar CSV
+          </button>
+        </div>
+
+        @if (!googleConectado()) {
+          <p class="xlsx-import__aviso" role="note">
+            Para sincronizar con Google necesitas conectar la cuenta. La exportación a CSV no la requiere.
+          </p>
+        }
+      }
+
+    </div>
+  </section>
+
+  <!-- Seccion 4: Sincronizacion y exportacion (fuente: API del PMS) -->
   <section class="panel-seccion" aria-labelledby="titulo-sync">
     <h2 class="panel-seccion__titulo" id="titulo-sync">
       Sincronizacion

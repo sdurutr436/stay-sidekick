@@ -1,7 +1,8 @@
-import { Component, computed, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
+import { ActivatedRoute } from '@angular/router';
 
-// Formatos disponibles para las preferencias
 type FormatoNombre = 'nombre_apellidos' | 'apellidos_nombre' | 'nombre_solo';
 type FormatoApartamento = 'nota' | 'etiqueta' | 'ninguno';
 
@@ -12,25 +13,19 @@ interface PreferenciasContactos {
   incluir_checkin_contacto: boolean;
 }
 
-// ── MOCK STATE ─────────────────────────────────────────────────────────────────
-// TODO: Eliminar este bloque y sustituir por llamadas reales al backend:
-//   - GET /api/contactos/google/status       → googleConectado, ultimoSync
-//   - GET /api/contactos/preferencias         → preferencias
-//   - POST /api/contactos/sync                → lanzar sincronizacion
-//   - DELETE /api/contactos/google/disconnect → desconectar
-//   - POST /api/contactos/export/csv          → descargar CSV
-const MOCK_GOOGLE_ESTADO = {
-  conectado: false,
-  ultimoSync: null as string | null,
-};
+interface SyncResultado {
+  total: number;
+  nuevos: number;
+  actualizados: number;
+  advertencias?: string[];
+}
 
-const MOCK_PREFERENCIAS: PreferenciasContactos = {
+const _PREFS_DEFECTO: PreferenciasContactos = {
   formato_nombre_contacto: 'nombre_apellidos',
   incluir_apartamento_contacto: true,
   formato_apartamento_contacto: 'nota',
   incluir_checkin_contacto: true,
 };
-// ── FIN MOCK STATE ─────────────────────────────────────────────────────────────
 
 @Component({
   selector: 'app-sincronizador-contactos',
@@ -39,21 +34,28 @@ const MOCK_PREFERENCIAS: PreferenciasContactos = {
   standalone: true,
   imports: [FormsModule],
 })
-export class SincronizadorContactosPageComponent {
+export class SincronizadorContactosPageComponent implements OnInit {
 
-  // Estado de conexion con Google
-  readonly googleConectado = signal(MOCK_GOOGLE_ESTADO.conectado);
-  readonly ultimoSync = signal<string | null>(MOCK_GOOGLE_ESTADO.ultimoSync);
+  private readonly http = inject(HttpClient);
+  private readonly route = inject(ActivatedRoute);
+
+  // ── Estado Google ─────────────────────────────────────────────────────────
+  readonly googleConectado = signal(false);
+  readonly ultimoSync = signal<string | null>(null);
   readonly syncEnCurso = signal(false);
 
-  // Preferencias del formulario
-  readonly preferencias = signal<PreferenciasContactos>({ ...MOCK_PREFERENCIAS });
+  // ── Preferencias ──────────────────────────────────────────────────────────
+  readonly preferencias = signal<PreferenciasContactos>({ ..._PREFS_DEFECTO });
 
-  // Computed para saber si el formulario de apartamento es relevante
   readonly mostrarFormatoApartamento = computed(
     () => this.preferencias().incluir_apartamento_contacto,
   );
 
+  // ── XLSX ──────────────────────────────────────────────────────────────────
+  readonly xlsxArchivo = signal<File | null>(null);
+  readonly xlsxEnCurso = signal(false);
+
+  // ── Opciones de formulario ────────────────────────────────────────────────
   readonly formatoNombreOpciones: { valor: FormatoNombre; label: string }[] = [
     { valor: 'nombre_apellidos', label: 'Nombre Apellidos (ej. Juan García)' },
     { valor: 'apellidos_nombre', label: 'Apellidos, Nombre (ej. García, Juan)' },
@@ -66,19 +68,70 @@ export class SincronizadorContactosPageComponent {
     { valor: 'ninguno', label: 'No incluir' },
   ];
 
-  // ── Conexion Google ──────────────────────────────────────────────────────────
+  // ── Ciclo de vida ─────────────────────────────────────────────────────────
+
+  ngOnInit(): void {
+    // Leer parámetros de query del callback OAuth de Google
+    this.route.queryParams.subscribe(params => {
+      if (params['google_conectado'] === 'true') {
+        this.cargarEstadoGoogle();
+      }
+      if (params['google_error']) {
+        console.error('[sincronizador-contactos] Error OAuth Google:', params['google_error']);
+      }
+    });
+
+    this.cargarEstadoGoogle();
+    this.cargarPreferencias();
+  }
+
+  // ── Carga inicial ─────────────────────────────────────────────────────────
+
+  private cargarEstadoGoogle(): void {
+    this.http.get<{ ok: boolean; google: { conectado: boolean; ultimo_sync?: string } }>(
+      '/api/contactos/google/status'
+    ).subscribe({
+      next: res => {
+        this.googleConectado.set(res.google.conectado);
+        this.ultimoSync.set(res.google.ultimo_sync ?? null);
+      },
+      error: err => console.error('[sincronizador-contactos] Error al obtener estado Google:', err),
+    });
+  }
+
+  private cargarPreferencias(): void {
+    this.http.get<{ ok: boolean; preferencias: PreferenciasContactos }>(
+      '/api/contactos/preferencias'
+    ).subscribe({
+      next: res => this.preferencias.set(res.preferencias),
+      error: err => console.error('[sincronizador-contactos] Error al obtener preferencias:', err),
+    });
+  }
+
+  // ── Conexión Google ───────────────────────────────────────────────────────
 
   connectarGoogle(): void {
-    // TODO: GET /api/contactos/google/auth → obtener URL → window.location.href = url
-    console.warn('[sincronizador-contactos] conectar Google — pendiente de integrar');
+    this.http.get<{ ok: boolean; url: string }>('/api/contactos/google/auth').subscribe({
+      next: res => {
+        if (res.url) {
+          window.location.href = res.url;
+        }
+      },
+      error: err => console.error('[sincronizador-contactos] Error al obtener URL OAuth:', err),
+    });
   }
 
   desconectarGoogle(): void {
-    // TODO: DELETE /api/contactos/google/disconnect → googleConectado.set(false)
-    console.warn('[sincronizador-contactos] desconectar Google — pendiente de integrar');
+    this.http.delete<{ ok: boolean }>('/api/contactos/google/disconnect').subscribe({
+      next: () => {
+        this.googleConectado.set(false);
+        this.ultimoSync.set(null);
+      },
+      error: err => console.error('[sincronizador-contactos] Error al desconectar Google:', err),
+    });
   }
 
-  // ── Preferencias ─────────────────────────────────────────────────────────────
+  // ── Preferencias ──────────────────────────────────────────────────────────
 
   onFormatoNombreChange(valor: string): void {
     this.preferencias.update(p => ({
@@ -103,26 +156,102 @@ export class SincronizadorContactosPageComponent {
   }
 
   guardarPreferencias(): void {
-    // TODO: PUT /api/contactos/preferencias con preferencias()
-    console.warn('[sincronizador-contactos] guardar preferencias — pendiente de integrar', this.preferencias());
+    this.http.put<{ ok: boolean; preferencias: PreferenciasContactos }>(
+      '/api/contactos/preferencias',
+      this.preferencias(),
+    ).subscribe({
+      next: res => this.preferencias.set(res.preferencias),
+      error: err => console.error('[sincronizador-contactos] Error al guardar preferencias:', err),
+    });
   }
 
-  // ── Sincronizacion ────────────────────────────────────────────────────────────
+  // ── Sincronización (fuente: PMS API) ──────────────────────────────────────
 
   lanzarSync(): void {
     if (this.syncEnCurso()) return;
-    // TODO: POST /api/contactos/sync → actualizar ultimoSync tras respuesta
     this.syncEnCurso.set(true);
-    console.warn('[sincronizador-contactos] lanzar sync — pendiente de integrar');
-    // Mock: simula fin de operacion
-    setTimeout(() => {
-      this.syncEnCurso.set(false);
-      this.ultimoSync.set(new Date().toISOString());
-    }, 1500);
+
+    this.http.post<{ ok: boolean; resultado: SyncResultado }>(
+      '/api/contactos/sync',
+      {},
+    ).subscribe({
+      next: res => {
+        this.syncEnCurso.set(false);
+        this.ultimoSync.set(new Date().toISOString());
+        if (res.resultado.advertencias?.length) {
+          console.warn('[sincronizador-contactos] Sync con advertencias:', res.resultado.advertencias);
+        }
+      },
+      error: err => {
+        this.syncEnCurso.set(false);
+        console.error('[sincronizador-contactos] Error en sync:', err);
+      },
+    });
   }
 
   exportarCsv(): void {
-    // TODO: POST /api/contactos/export/csv → descargar fichero CSV de la respuesta
-    console.warn('[sincronizador-contactos] exportar CSV — pendiente de integrar');
+    this.http.post('/api/contactos/export/csv', {}, { responseType: 'blob' }).subscribe({
+      next: blob => this._descargarBlob(blob, 'contactos_google.csv'),
+      error: err => console.error('[sincronizador-contactos] Error al exportar CSV:', err),
+    });
+  }
+
+  // ── XLSX ──────────────────────────────────────────────────────────────────
+
+  onXlsxSeleccionado(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0] ?? null;
+    this.xlsxArchivo.set(file);
+    input.value = ''; // permite volver a seleccionar el mismo archivo
+  }
+
+  lanzarXlsxSync(): void {
+    const archivo = this.xlsxArchivo();
+    if (!archivo || this.xlsxEnCurso()) return;
+
+    this.xlsxEnCurso.set(true);
+    const form = new FormData();
+    form.append('file', archivo);
+
+    this.http.post<{ ok: boolean; resultado: SyncResultado }>(
+      '/api/contactos/xlsx/sync',
+      form,
+    ).subscribe({
+      next: res => {
+        this.xlsxEnCurso.set(false);
+        this.ultimoSync.set(new Date().toISOString());
+        if (res.resultado.advertencias?.length) {
+          console.warn('[sincronizador-contactos] XLSX sync con advertencias:', res.resultado.advertencias);
+        }
+      },
+      error: err => {
+        this.xlsxEnCurso.set(false);
+        console.error('[sincronizador-contactos] Error en XLSX sync:', err);
+      },
+    });
+  }
+
+  exportarXlsxCsv(): void {
+    const archivo = this.xlsxArchivo();
+    if (!archivo) return;
+
+    const form = new FormData();
+    form.append('file', archivo);
+
+    this.http.post('/api/contactos/xlsx/export/csv', form, { responseType: 'blob' }).subscribe({
+      next: blob => this._descargarBlob(blob, 'contactos_google.csv'),
+      error: err => console.error('[sincronizador-contactos] Error al exportar CSV desde XLSX:', err),
+    });
+  }
+
+  // ── Utilidades ────────────────────────────────────────────────────────────
+
+  private _descargarBlob(blob: Blob, nombreFichero: string): void {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = nombreFichero;
+    a.click();
+    URL.revokeObjectURL(url);
   }
 }
