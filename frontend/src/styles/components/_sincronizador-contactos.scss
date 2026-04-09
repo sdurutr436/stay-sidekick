@@ -7,6 +7,7 @@
 //   .conexion-estado          — indicador de estado OAuth + info ultimo sync
 //   .conexion-acciones        — fila de botones de conexion
 //   .preferencias-form        — formulario de preferencias
+//   .xlsx-import              — seccion de importacion desde Excel
 //   .sync-acciones            — contenedor de acciones de sincronizacion
 //   .sync-accion              — fila individual de accion (info + boton)
 //
@@ -137,6 +138,45 @@
   display: flex;
   gap: $space-3;
   padding-top: $space-2;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// XLSX import — seccion de importacion manual desde Excel
+// ─────────────────────────────────────────────────────────────────────────────
+.xlsx-import {
+  display: flex;
+  flex-direction: column;
+  gap: $space-4;
+
+  // El input[type=file] queda oculto; el boton actua como label
+  &__input {
+    display: none;
+  }
+
+  &__selector {
+    display: flex;
+    align-items: center;
+    gap: $space-4;
+    flex-wrap: wrap;
+  }
+
+  &__filename {
+    @include text-body-sm;
+    color: $color-text-secondary;
+    font-style: italic;
+    word-break: break-all;
+  }
+
+  &__acciones {
+    display: flex;
+    gap: $space-3;
+    flex-wrap: wrap;
+  }
+
+  &__aviso {
+    @include text-body-sm;
+    color: $color-text-secondary;
+  }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
