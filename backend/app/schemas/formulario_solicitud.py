@@ -1,7 +1,19 @@
-"""DEPRECATED: usa app.contact.schemas en su lugar."""
-from app.contact.schemas import ContactFormSchema  # noqa: F401
+"""Esquema Marshmallow para el formulario público de solicitud de acceso a Stay Sidekick."""
 
-__all__ = ["ContactFormSchema"]
+from marshmallow import (
+    EXCLUDE,
+    Schema,
+    fields,
+    validate,
+    validates,
+    validates_schema,
+    ValidationError,
+    pre_load,
+)
+
+from app.common.sanitizers.text import sanitize_name, sanitize_text
+from app.common.sanitizers.phone import sanitize_phone
+from app.common.sanitizers.email import sanitize_email
 
 
 # Códigos ISO 3166-1 alpha-2 más habituales; ampliar según necesidades.
@@ -14,8 +26,8 @@ _VALID_COUNTRY_CODES = {
 }
 
 
-class ContactFormSchema(Schema):
-    """Valida y sanitiza los datos del formulario de contacto.
+class FormularioSolicitudSchema(Schema):
+    """Valida y sanitiza los datos del formulario público de solicitud.
 
     Campos esperados del frontend:
     - company_name: nombre de la empresa
@@ -26,6 +38,7 @@ class ContactFormSchema(Schema):
     - message: texto libre del usuario
     - turnstile_token: token del captcha Turnstile
     - privacy_accepted: aceptación de política de privacidad
+    - website: campo honeypot (debe llegar vacío o ausente)
     """
 
     company_name = fields.String(
@@ -57,9 +70,8 @@ class ContactFormSchema(Schema):
     )
 
     message = fields.String(
-        required=True,
-        validate=validate.Length(min=1, max=2000),
-        error_messages={"required": "El mensaje es obligatorio."},
+        load_default="",
+        validate=validate.Length(max=2000),
     )
 
     turnstile_token = fields.String(
@@ -72,6 +84,16 @@ class ContactFormSchema(Schema):
         required=True,
         error_messages={"required": "Debes aceptar la política de privacidad."},
     )
+
+    # Campo honeypot: los bots lo rellenan, los usuarios no (está oculto en el frontend)
+    website = fields.String(
+        load_default="",
+        validate=validate.Length(max=0),
+        error_messages={"validator_failed": "Campo inesperado."},
+    )
+
+    class Meta:
+        unknown = EXCLUDE
 
     # ── Pre-load: sanitización antes de la validación ───────────────────────
 
@@ -130,7 +152,6 @@ class ContactFormSchema(Schema):
                     "El número de teléfono no es válido para el país seleccionado.",
                     field_name="phone",
                 )
-            # Reemplaza por el formato normalizado E.164
             data["phone"] = normalized
 
     @validates_schema
