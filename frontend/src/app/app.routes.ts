@@ -3,11 +3,6 @@ import { MenuPageComponent } from './pages/menu/menu';
 import { MenuDefaultPageComponent } from './pages/menu-default/menu-default';
 import { MaestroApartamentosPageComponent } from './pages/maestro-apartamentos/maestro-apartamentos';
 import { SincronizadorContactosPageComponent } from './pages/sincronizador-contactos/sincronizador-contactos';
-import { HojaEstilosPageComponent } from './pages/hoja-estilos/hoja-estilos';
-import { DsTipografiaComponent } from './pages/hoja-estilos/secciones/tipografia/tipografia';
-import { DsAtomosComponent } from './pages/hoja-estilos/secciones/atomos/atomos';
-import { DsMoleculasComponent } from './pages/hoja-estilos/secciones/moleculas/moleculas';
-import { DsOrganismosComponent } from './pages/hoja-estilos/secciones/organismos/organismos';
 
 export const routes: Routes = [
   {
@@ -19,13 +14,13 @@ export const routes: Routes = [
       { path: 'sincronizador-contactos', component: SincronizadorContactosPageComponent },
       {
         path: 'hoja-estilos',
-        component: HojaEstilosPageComponent,
+        loadComponent: () => import('./pages/hoja-estilos/hoja-estilos').then(m => m.HojaEstilosPageComponent),
         children: [
           { path: '', redirectTo: 'tipografia', pathMatch: 'full' },
-          { path: 'tipografia', component: DsTipografiaComponent },
-          { path: 'atomos',     component: DsAtomosComponent     },
-          { path: 'moleculas',  component: DsMoleculasComponent  },
-          { path: 'organismos', component: DsOrganismosComponent },
+          { path: 'tipografia', loadComponent: () => import('./pages/hoja-estilos/secciones/tipografia/tipografia').then(m => m.DsTipografiaComponent) },
+          { path: 'atomos',     loadComponent: () => import('./pages/hoja-estilos/secciones/atomos/atomos').then(m => m.DsAtomosComponent)             },
+          { path: 'moleculas',  loadComponent: () => import('./pages/hoja-estilos/secciones/moleculas/moleculas').then(m => m.DsMoleculasComponent)     },
+          { path: 'organismos', loadComponent: () => import('./pages/hoja-estilos/secciones/organismos/organismos').then(m => m.DsOrganismosComponent)  },
         ],
       },
     ],

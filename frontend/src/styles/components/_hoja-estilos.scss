@@ -235,6 +235,24 @@ $_ds-nav-width: 200px;
 }
 
 // -------------------------------------------------------------------------
+// Specimen modificador para campos de formulario — ancho mínimo contenido
+// -------------------------------------------------------------------------
+// Modificadores de ancho para specimens de formulario
+// El mixin centraliza la regla repetida
+@mixin _ds-specimen-form($min-width) {
+  min-width: $min-width;
+
+  .ds-specimen__preview,
+  .form-field {
+    width: 100%;
+  }
+}
+
+.ds-specimen--form      { @include _ds-specimen-form(260px); }
+.ds-specimen--form-wide { @include _ds-specimen-form(360px); }
+.ds-specimen--form-xl   { @include _ds-specimen-form(420px); }
+
+// -------------------------------------------------------------------------
 // Divider
 // -------------------------------------------------------------------------
 .ds-divider {
@@ -262,7 +280,6 @@ $_ds-nav-width: 200px;
     height: auto;
   }
 
-  .nav-sidenav {
-    height: 280px;
-  }
+  // Altura explícita para que el sidenav sea visible en la preview
+  .nav-sidenav { height: 280px; }
 }

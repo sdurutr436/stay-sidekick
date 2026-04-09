@@ -10,7 +10,8 @@
             class="ds-nav__link"
             [routerLink]="section.route"
             routerLinkActive="ds-nav__link--active"
-            [attr.aria-current]="null"
+            #rla="routerLinkActive"
+            [attr.aria-current]="rla.isActive ? 'page' : null"
           >
             <span class="ds-nav__dot" aria-hidden="true"></span>
             {{ section.label }}
