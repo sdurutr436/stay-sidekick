@@ -31,6 +31,7 @@ bcrypt==5.0.0
 
 # ORM y base de datos
 flask-sqlalchemy==3.1.1
+flask-migrate==4.1.0
 psycopg2-binary==2.9.10
 
 # Servidor WSGI de producción
