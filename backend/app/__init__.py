@@ -17,7 +17,7 @@ import logging
 from flask import Flask, jsonify
 
 from app.config import Config
-from app.extensions import cors, db, limiter
+from app.extensions import cors, db, limiter, migrate
 
 
 def create_app(config_class: type = Config) -> Flask:
@@ -42,7 +42,10 @@ def create_app(config_class: type = Config) -> Flask:
 
     # ── Modelos (registro en metadata de SQLAlchemy) ──────────────────────
     with app.app_context():
-        from app import models  # noqa: F401
+        from app import models  # noqa: F401  # pylint: disable=unused-import
+
+    # ── Migraciones (Alembic vía Flask-Migrate) ───────────────────────────
+    migrate.init_app(app, db)
 
     # ── Blueprints ───────────────────────────────────────────────────────
     from app.routes.formulario_solicitud import formulario_solicitud_bp  # noqa: E402
