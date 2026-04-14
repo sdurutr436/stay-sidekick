@@ -1,0 +1,16 @@
+<div class="form-input-wrapper">
+  <span class="form-input-wrapper__icon" aria-hidden="true">
+    <svg class="svg svg--sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
+      <circle cx="9" cy="9" r="5" stroke="#8c8c8c" stroke-width="1.5"/>
+      <line x1="13" y1="13" x2="17" y2="17" stroke="#8c8c8c" stroke-width="1.5" stroke-linecap="square"/>
+    </svg>
+  </span>
+  <input
+    class="form-input"
+    type="search"
+    [placeholder]="placeholder"
+    [value]="value"
+    [attr.aria-label]="ariaLabel"
+    (input)="onInput($event)"
+  />
+</div>
