@@ -1,0 +1,9 @@
+<textarea
+  class="form-textarea"
+  [id]="id"
+  [placeholder]="placeholder"
+  [value]="value"
+  [disabled]="disabled"
+  [attr.aria-label]="ariaLabel || null"
+  (input)="onInput($event)"
+></textarea>
