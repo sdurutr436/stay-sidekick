@@ -1,0 +1,355 @@
+<!-- Página: Notificaciones de check-in tardíos -->
+<div class="notif-checkin">
+
+  <!-- Cabecera -->
+  <header class="page-header">
+    <div class="page-header__start">
+      <h1 class="page-header__title">Notificaciones de check-in tardíos</h1>
+      <p class="page-header__desc">
+        Consulta los check-ins de hoy, importa el listado desde Excel y envía
+        un recordatorio personalizado por email a quien necesites.
+      </p>
+    </div>
+  </header>
+
+  @if (cargando()) {
+    <p class="notif-checkin__cargando" aria-live="polite">Cargando datos…</p>
+  } @else {
+
+    <!-- ── Sección 1: Estado del día (PMS) ───────────────────────────── -->
+    <section class="panel-seccion" aria-labelledby="titulo-estado-dia">
+      <h2 class="panel-seccion__titulo" id="titulo-estado-dia">
+        Check-ins de hoy
+      </h2>
+      <p class="panel-seccion__desc">
+        Reservas con entrada programada para hoy obtenidas desde tu PMS.
+      </p>
+
+      <div class="panel-seccion__body">
+
+        @if (!pmsConfigurado()) {
+          <p class="notif-checkin__aviso" role="note">
+            No hay PMS configurado. Configura tu API key en el apartado de
+            ajustes para obtener las reservas automáticamente.
+          </p>
+        } @else if (pmsError()) {
+          <p class="notif-checkin__aviso notif-checkin__aviso--error" role="alert">
+            {{ pmsError() }}
+          </p>
+        } @else if (reservasPms().length === 0) {
+          <p class="notif-checkin__aviso" role="note">
+            No hay check-ins registrados para hoy en el PMS.
+          </p>
+        } @else {
+          <table class="tabla-checkins" aria-label="Check-ins de hoy (PMS)">
+            <thead class="tabla-checkins__head">
+              <tr>
+                <th scope="col">Huésped</th>
+                <th scope="col">Apartamento</th>
+                <th scope="col">Email</th>
+                <th scope="col">Teléfono</th>
+                <th scope="col">Checkout</th>
+              </tr>
+            </thead>
+            <tbody class="tabla-checkins__body">
+              @for (r of reservasPms(); track r.nombre) {
+                <tr>
+                  <td>{{ r.nombre }}</td>
+                  <td>{{ r.apartamento ?? '—' }}</td>
+                  <td>{{ r.email ?? '—' }}</td>
+                  <td>{{ r.telefono ?? '—' }}</td>
+                  <td>{{ r.checkout ?? '—' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+
+      </div>
+    </section>
+
+    <!-- ── Sección 2: Importar desde XLSX ────────────────────────────── -->
+    <section class="panel-seccion" aria-labelledby="titulo-xlsx">
+      <h2 class="panel-seccion__titulo" id="titulo-xlsx">
+        Importar reservas del día (XLSX)
+      </h2>
+      <p class="panel-seccion__desc">
+        Si tu PMS no tiene API, exporta el listado de reservas de hoy a Excel
+        y súbelo aquí. Los datos se procesan en servidor sin almacenarse (RGPD).
+        Columnas reconocidas: <code>nombre</code>, <code>email</code>,
+        <code>telefono</code>, <code>checkin</code>, <code>checkout</code>,
+        <code>apartamento</code>.
+      </p>
+
+      <div class="panel-seccion__body xlsx-import">
+
+        <!-- Selector de archivo -->
+        <div class="xlsx-import__selector">
+          <input
+            #xlsxInput
+            type="file"
+            accept=".xlsx"
+            class="xlsx-import__input"
+            aria-label="Seleccionar archivo Excel de reservas del día"
+            (change)="onXlsxSeleccionado($event)"
+          />
+          <button
+            class="btn btn--secondary btn--md"
+            type="button"
+            (click)="xlsxInput.click()"
+          >
+            <span class="btn__icon" aria-hidden="true">
+              <svg class="svg svg--sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
+                <rect x="4" y="2" width="12" height="16" stroke="currentColor" stroke-width="1.5"/>
+                <polyline points="7,9 10,6 13,9" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="square" stroke-linejoin="miter"/>
+                <line x1="10" y1="6" x2="10" y2="14" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
+              </svg>
+            </span>
+            Seleccionar archivo .xlsx
+          </button>
+
+          @if (xlsxArchivo()) {
+            <span class="xlsx-import__filename">{{ xlsxArchivo()!.name }}</span>
+          }
+        </div>
+
+        <!-- Botón procesar -->
+        @if (xlsxArchivo()) {
+          <div class="xlsx-import__acciones">
+            <button
+              class="btn btn--primary btn--md"
+              type="button"
+              [disabled]="xlsxEnCurso()"
+              [attr.aria-busy]="xlsxEnCurso()"
+              (click)="procesarXlsx()"
+            >
+              @if (xlsxEnCurso()) {
+                Procesando…
+              } @else {
+                Procesar XLSX
+              }
+            </button>
+          </div>
+        }
+
+        <!-- Advertencias del XLSX -->
+        @if (xlsxAdvertencias().length > 0) {
+          <ul class="notif-checkin__advertencias" role="note" aria-label="Advertencias del archivo">
+            @for (w of xlsxAdvertencias(); track w) {
+              <li>{{ w }}</li>
+            }
+          </ul>
+        }
+
+        <!-- Tabla de check-ins del XLSX -->
+        @if (xlsxCheckins().length > 0) {
+          <table class="tabla-checkins" aria-label="Check-ins del XLSX">
+            <thead class="tabla-checkins__head">
+              <tr>
+                <th scope="col">Huésped</th>
+                <th scope="col">Apartamento</th>
+                <th scope="col">Email</th>
+                <th scope="col">Teléfono</th>
+                <th scope="col">Checkout</th>
+              </tr>
+            </thead>
+            <tbody class="tabla-checkins__body">
+              @for (r of xlsxCheckins(); track r.nombre) {
+                <tr>
+                  <td>{{ r.nombre }}</td>
+                  <td>{{ r.apartamento ?? '—' }}</td>
+                  <td>{{ r.email ?? '—' }}</td>
+                  <td>{{ r.telefono ?? '—' }}</td>
+                  <td>{{ r.checkout ?? '—' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+
+      </div>
+    </section>
+
+    <!-- ── Sección 3: Maestro de apartamentos (referencia) ───────────── -->
+    <section class="panel-seccion" aria-labelledby="titulo-maestro">
+      <h2 class="panel-seccion__titulo" id="titulo-maestro">
+        Maestro de apartamentos
+      </h2>
+      <p class="panel-seccion__desc">
+        Propiedades activas registradas en tu cuenta.
+      </p>
+
+      <div class="panel-seccion__body">
+
+        @if (apartamentos().length === 0) {
+          <p class="notif-checkin__aviso" role="note">
+            No hay apartamentos registrados. Añádelos desde el Maestro de apartamentos.
+          </p>
+        } @else {
+          <ul class="notif-checkin__apt-list">
+            @for (apt of apartamentos(); track apt.id) {
+              <li class="notif-checkin__apt-item">
+                <span class="notif-checkin__apt-nombre">{{ apt.nombre }}</span>
+                @if (apt.ciudad) {
+                  <span class="notif-checkin__apt-ciudad">{{ apt.ciudad }}</span>
+                }
+              </li>
+            }
+          </ul>
+        }
+
+      </div>
+    </section>
+
+    <!-- ── Sección 4: Enviar notificación ────────────────────────────── -->
+    <section class="panel-seccion" aria-labelledby="titulo-notificacion">
+      <h2 class="panel-seccion__titulo" id="titulo-notificacion">
+        Enviar notificación
+      </h2>
+      <p class="panel-seccion__desc">
+        Personaliza el mensaje y envíalo por email. Puedes generar una
+        plantilla automática a partir de los check-ins cargados o escribir
+        el tuyo propio.
+      </p>
+
+      <!-- Bloque de aviso si Gmail no está configurado -->
+      @if (!gmailConfigurado()) {
+        <div class="notif-checkin__gmail-aviso" role="alert">
+          <p>
+            <strong>Gmail SMTP no configurado.</strong>
+            Para habilitar el envío de emails, añade
+            <code>GMAIL_USER</code> y <code>GMAIL_APP_PASSWORD</code>
+            en las variables de entorno del servidor.
+          </p>
+        </div>
+      }
+
+      <div class="panel-seccion__body notif-form">
+
+        <!-- Botón generar plantilla -->
+        <div class="notif-form__plantilla-accion">
+          <button
+            class="btn btn--secondary btn--md"
+            type="button"
+            [disabled]="!hayCheckins()"
+            (click)="generarPlantilla()"
+          >
+            <span class="btn__icon" aria-hidden="true">
+              <svg class="svg svg--sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
+                <rect x="3" y="3" width="14" height="14" stroke="currentColor" stroke-width="1.5"/>
+                <line x1="6" y1="7" x2="14" y2="7" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
+                <line x1="6" y1="10" x2="14" y2="10" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
+                <line x1="6" y1="13" x2="11" y2="13" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
+              </svg>
+            </span>
+            Generar plantilla
+          </button>
+          @if (!hayCheckins()) {
+            <span class="notif-form__hint">
+              Carga check-ins desde el PMS o XLSX para generar la plantilla.
+            </span>
+          }
+        </div>
+
+        <!-- Destinatario -->
+        <div class="form-group">
+          <label class="form-label" for="notif-destinatario">
+            Enviar a
+          </label>
+          <input
+            id="notif-destinatario"
+            type="email"
+            class="form-input"
+            placeholder="correo@ejemplo.com"
+            [disabled]="!gmailConfigurado()"
+            [(ngModel)]="destinatario"
+            name="destinatario"
+          />
+        </div>
+
+        <!-- Asunto -->
+        <div class="form-group">
+          <label class="form-label" for="notif-asunto">
+            Asunto
+          </label>
+          <input
+            id="notif-asunto"
+            type="text"
+            class="form-input"
+            [disabled]="!gmailConfigurado()"
+            [(ngModel)]="asunto"
+            name="asunto"
+          />
+        </div>
+
+        <!-- Mensaje (editable) con botón de copiar -->
+        <div class="form-group">
+          <label class="form-label" for="notif-mensaje">
+            Mensaje
+          </label>
+          <div class="form-editor">
+            <div class="form-editor__header">
+              <div class="form-editor__tabs"></div>
+              <div class="form-editor__toolbar">
+                <button
+                  class="form-editor__tool"
+                  type="button"
+                  [disabled]="!mensaje"
+                  (click)="copiarMensaje()"
+                >
+                  @if (copiadoOk()) {
+                    Copiado
+                  } @else {
+                    Copiar
+                  }
+                </button>
+              </div>
+            </div>
+            <div class="form-editor__body">
+              <textarea
+                id="notif-mensaje"
+                class="form-textarea notif-form__textarea"
+                placeholder="Escribe o genera el mensaje de notificación aquí…"
+                [attr.disabled]="!gmailConfigurado() ? '' : null"
+                [(ngModel)]="mensaje"
+                name="mensaje"
+              ></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Acciones envío -->
+        <div class="form-actions">
+          <button
+            class="btn btn--primary btn--md"
+            type="button"
+            [disabled]="!gmailConfigurado() || enviando() || !destinatario.trim() || !mensaje.trim()"
+            [attr.aria-busy]="enviando()"
+            (click)="enviarNotificacion()"
+          >
+            @if (enviando()) {
+              Enviando…
+            } @else {
+              Enviar notificación
+            }
+          </button>
+        </div>
+
+        <!-- Feedback de envío -->
+        @if (estadoEnvio() === 'ok') {
+          <p class="notif-form__feedback notif-form__feedback--ok" role="status" aria-live="polite">
+            Email enviado correctamente.
+          </p>
+        }
+        @if (estadoEnvio() === 'error') {
+          <p class="notif-form__feedback notif-form__feedback--error" role="alert" aria-live="assertive">
+            {{ errorEnvio() }}
+          </p>
+        }
+
+      </div>
+    </section>
+
+  }
+
+</div>

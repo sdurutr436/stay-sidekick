@@ -13,6 +13,13 @@ export const routes: Routes = [
       { path: 'maestro-apartamentos', component: MaestroApartamentosPageComponent },
       { path: 'sincronizador-contactos', component: SincronizadorContactosPageComponent },
       {
+        path: 'notificaciones-checkin-tardio',
+        loadComponent: () =>
+          import('./pages/notificaciones-checkin-tardio/notificaciones-checkin-tardio').then(
+            m => m.NotificacionesCheckinTardioPageComponent
+          ),
+      },
+      {
         path: 'hoja-estilos',
         loadComponent: () => import('./pages/hoja-estilos/hoja-estilos').then(m => m.HojaEstilosPageComponent),
         children: [

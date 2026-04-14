@@ -23,20 +23,56 @@ _SMTP_PORT = 587
 _TIMEOUT = 10
 
 
-def _build_message(clean_data: dict) -> EmailMessage:
-    """Construye el EmailMessage con los datos sanitizados del formulario."""
-    sender = current_app.config["GMAIL_USER"]
-    recipient = current_app.config["MAIL_RECIPIENT"]
+def send_via_smtp(to: str, subject: str, body: str) -> tuple[bool, str | None]:
+    """Envía un email de texto plano vía Gmail SMTP.
+
+    Función de bajo nivel reutilizable por cualquier módulo que necesite
+    enviar emails. Devuelve ``(True, None)`` si el envío fue exitoso o
+    ``(False, mensaje_error)`` si falló.
+    """
+    user = current_app.config.get("GMAIL_USER", "")
+    password = current_app.config.get("GMAIL_APP_PASSWORD", "")
+
+    if not user or not password:
+        return False, "Gmail SMTP no configurado (GMAIL_USER / GMAIL_APP_PASSWORD)."
 
     msg = EmailMessage()
-    msg["Subject"] = (
-        f"[Stay Sidekick] Nueva solicitud de {clean_data.get('company_name', 'N/A')}"
-    )
-    msg["From"] = sender
-    msg["To"] = recipient
+    msg["Subject"] = subject
+    msg["From"] = user
+    msg["To"] = to
+    msg.set_content(body)
 
+    try:
+        with smtplib.SMTP(_SMTP_HOST, _SMTP_PORT, timeout=_TIMEOUT) as server:
+            server.ehlo()
+            server.starttls()
+            server.ehlo()
+            server.login(user, password)
+            server.send_message(msg)
+        return True, None
+
+    except smtplib.SMTPException as exc:
+        logger.exception("Error al enviar email vía Gmail SMTP")
+        return False, f"Error al enviar el email: {exc}"
+
+
+def send_contact_email(clean_data: dict) -> bool:
+    """Envía el email de notificación de solicitud de contacto por Gmail SMTP.
+
+    Returns
+    -------
+    bool
+        ``True`` si el email se envió correctamente.
+    """
+    if not current_app.config.get("GMAIL_USER") or not current_app.config.get("GMAIL_APP_PASSWORD"):
+        logger.warning(
+            "Gmail SMTP no configurado (GMAIL_USER / GMAIL_APP_PASSWORD vacíos). "
+            "El email de notificación no se enviará."
+        )
+        return False
+
+    subject = f"[Stay Sidekick] Nueva solicitud de {clean_data.get('company_name', 'N/A')}"
     is_member = "Sí" if clean_data.get("is_member") else "No"
-
     body = (
         "Se ha recibido una nueva solicitud desde el formulario de contacto.\n"
         "\n"
@@ -50,45 +86,16 @@ def _build_message(clean_data: dict) -> EmailMessage:
         "Mensaje:\n"
         f"{clean_data.get('message', '') or '(sin mensaje)'}\n"
     )
-    msg.set_content(body)
-    return msg
 
-
-def send_contact_email(clean_data: dict) -> bool:
-    """Envía el email de notificación por Gmail SMTP.
-
-    Returns
-    -------
-    bool
-        ``True`` si el email se envió correctamente.
-    """
-    user = current_app.config.get("GMAIL_USER", "")
-    password = current_app.config.get("GMAIL_APP_PASSWORD", "")
-
-    if not user or not password:
-        logger.warning(
-            "Gmail SMTP no configurado (GMAIL_USER / GMAIL_APP_PASSWORD vacíos). "
-            "El email de notificación no se enviará."
-        )
-        return False
-
-    msg = _build_message(clean_data)
-
-    try:
-        with smtplib.SMTP(_SMTP_HOST, _SMTP_PORT, timeout=_TIMEOUT) as server:
-            server.ehlo()
-            server.starttls()
-            server.ehlo()
-            server.login(user, password)
-            server.send_message(msg)
-
+    ok, _ = send_via_smtp(
+        to=current_app.config["MAIL_RECIPIENT"],
+        subject=subject,
+        body=body,
+    )
+    if ok:
         logger.info(
             "Email enviado a %s para solicitud de %s",
             current_app.config["MAIL_RECIPIENT"],
             clean_data.get("company_name"),
         )
-        return True
-
-    except smtplib.SMTPException:
-        logger.exception("Error al enviar email vía Gmail SMTP")
-        return False
+    return ok
