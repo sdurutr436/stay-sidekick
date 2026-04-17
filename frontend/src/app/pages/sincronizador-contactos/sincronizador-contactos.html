@@ -1,36 +1,28 @@
 <!-- Pagina: Sincronizador de contactos -->
 <div class="sincronizador-contactos">
 
-  <!-- Cabecera de la herramienta -->
-  <header class="page-header">
-    <div class="page-header__start">
-      <h1 class="page-header__title">Sincronizador de contactos</h1>
-      <p class="page-header__desc">
-        Exporta o sincroniza los datos de los huéspedes con tus herramientas
-        externas.
-      </p>
-    </div>
-  </header>
+  <app-page-header
+    title="Sincronizador de contactos"
+    description="Exporta o sincroniza los datos de los huéspedes con tus herramientas externas."
+  />
 
   <!-- Cuerpo: instrucciones + monitorización + acciones -->
   <div class="sincro-layout">
 
     <!-- Columna izquierda: instrucciones de uso -->
-    <section class="panel-seccion sincro-layout__instrucciones" aria-labelledby="titulo-instrucciones">
-      <h2 class="panel-seccion__titulo" id="titulo-instrucciones">
-        <span class="panel-seccion__titulo-icon" aria-hidden="true">
-          <svg class="svg svg--sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
-            <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/>
-            <line x1="10" y1="9" x2="10" y2="14" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
-            <circle cx="10" cy="6.5" r="0.75" fill="currentColor"/>
-          </svg>
-        </span>
-        Cómo usarlo
-      </h2>
+    <app-panel-seccion
+      title="Cómo usarlo"
+      class="sincro-layout__instrucciones"
+      [hasIcon]="true"
+      [divider]="true"
+    >
+      <svg title-icon class="svg svg--sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+        <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/>
+        <line x1="10" y1="9" x2="10" y2="14" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
+        <circle cx="10" cy="6.5" r="0.75" fill="currentColor"/>
+      </svg>
 
-      <hr class="panel-seccion__divider" aria-hidden="true" />
-
-      <div class="panel-seccion__body instrucciones-body">
+      <div class="instrucciones-body">
         <p class="instrucciones-body__intro">
           El <strong>Sincronizador de Contactos</strong> te permite unificar la
           información de los huéspedes. Las opciones cambian dinámicamente según
@@ -40,7 +32,7 @@
         <ol class="instrucciones-pasos">
           @if (pmsConectado()) {
             <li class="instrucciones-pasos__item">
-              <span class="instrucciones-pasos__num">1</span>
+              <span class="instrucciones-pasos__num" aria-hidden="true">1</span>
               <div class="instrucciones-pasos__content">
                 <strong>Elige el rango de fechas:</strong> Selecciona de cuándo
                 a cuándo quieres extraer los contactos directamente desde tu PMS.
@@ -48,7 +40,7 @@
             </li>
             @if (googleConectado()) {
               <li class="instrucciones-pasos__item">
-                <span class="instrucciones-pasos__num">2</span>
+                <span class="instrucciones-pasos__num" aria-hidden="true">2</span>
                 <div class="instrucciones-pasos__content">
                   <strong>Sincroniza con Google:</strong> Haz clic en el botón
                   de sincronización para enviar los contactos directamente a
@@ -57,7 +49,7 @@
               </li>
             } @else {
               <li class="instrucciones-pasos__item">
-                <span class="instrucciones-pasos__num">2</span>
+                <span class="instrucciones-pasos__num" aria-hidden="true">2</span>
                 <div class="instrucciones-pasos__content">
                   <strong>Descarga en CSV:</strong> Haz clic en el botón de
                   descarga para exportar un CSV con el formato estandarizado
@@ -67,7 +59,7 @@
             }
           } @else {
             <li class="instrucciones-pasos__item">
-              <span class="instrucciones-pasos__num">1</span>
+              <span class="instrucciones-pasos__num" aria-hidden="true">1</span>
               <div class="instrucciones-pasos__content">
                 <strong>Sube tu archivo XLSX:</strong> Exporta las reservas desde
                 tu PMS a Excel y súbelas aquí.
@@ -75,7 +67,7 @@
             </li>
             @if (googleConectado()) {
               <li class="instrucciones-pasos__item">
-                <span class="instrucciones-pasos__num">2</span>
+                <span class="instrucciones-pasos__num" aria-hidden="true">2</span>
                 <div class="instrucciones-pasos__content">
                   <strong>Sincroniza con Google:</strong> Los contactos del
                   archivo se enviarán directamente a Google Contacts.
@@ -83,7 +75,7 @@
               </li>
             } @else {
               <li class="instrucciones-pasos__item">
-                <span class="instrucciones-pasos__num">2</span>
+                <span class="instrucciones-pasos__num" aria-hidden="true">2</span>
                 <div class="instrucciones-pasos__content">
                   <strong>Descarga en CSV:</strong> Exporta un CSV con el
                   formato estandarizado listo para importar donde quieras.
@@ -92,7 +84,7 @@
             }
           }
           <li class="instrucciones-pasos__item">
-            <span class="instrucciones-pasos__num">3</span>
+            <span class="instrucciones-pasos__num" aria-hidden="true">3</span>
             <div class="instrucciones-pasos__content">
               <strong>Verifica los nuevos contactos:</strong> Comprueba el
               indicador a la derecha para ver cuántos contactos nuevos se
@@ -101,7 +93,7 @@
           </li>
         </ol>
       </div>
-    </section>
+    </app-panel-seccion>
 
     <!-- Columna derecha: monitorización + acciones -->
     <div class="sincro-layout__derecha">
@@ -110,108 +102,92 @@
       <div class="tarjetas-estado">
 
         <!-- Estado PMS -->
-        <div class="tarjeta-estado">
-          <div class="tarjeta-estado__header">
-            <span class="tarjeta-estado__label">Estado PMS</span>
-            <span class="tarjeta-estado__icon" aria-hidden="true">
-              <svg class="svg svg--xs" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none">
-                @if (pmsConectado()) {
-                  <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/>
-                  <polyline points="5,8 7,10 11,6" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="square"/>
-                } @else {
-                  <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/>
-                  <line x1="8" y1="5" x2="8" y2="9" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
-                  <circle cx="8" cy="11.5" r="0.75" fill="currentColor"/>
-                }
-              </svg>
-            </span>
-          </div>
-          <p class="tarjeta-estado__valor">Cloudbeds</p>
-          <p class="tarjeta-estado__sub">
+        <app-tarjeta-estado label="Estado PMS" valor="Cloudbeds">
+          <svg icon class="svg svg--xs" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" aria-hidden="true">
             @if (pmsConectado()) {
-              <span class="badge badge--solid">Conectado</span>
+              <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/>
+              <polyline points="5,8 7,10 11,6" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="square"/>
             } @else {
-              <span class="badge badge--outline">Desconectado</span>
+              <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/>
+              <line x1="8" y1="5" x2="8" y2="9" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
+              <circle cx="8" cy="11.5" r="0.75" fill="currentColor"/>
             }
-          </p>
-        </div>
+          </svg>
+          <ng-container actions>
+            @if (pmsConectado()) {
+              <app-badge variant="solid">Conectado</app-badge>
+            } @else {
+              <app-badge variant="outline">Desconectado</app-badge>
+            }
+          </ng-container>
+        </app-tarjeta-estado>
 
         <!-- Estado Google -->
-        <div class="tarjeta-estado">
-          <div class="tarjeta-estado__header">
-            <span class="tarjeta-estado__label">Estado Google</span>
-            <span class="tarjeta-estado__icon" aria-hidden="true">
-              <svg class="svg svg--xs" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none">
-                @if (googleConectado()) {
-                  <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/>
-                  <polyline points="5,8 7,10 11,6" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="square"/>
-                } @else {
-                  <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/>
-                  <line x1="8" y1="5" x2="8" y2="9" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
-                  <circle cx="8" cy="11.5" r="0.75" fill="currentColor"/>
-                }
-              </svg>
-            </span>
-          </div>
-          <p class="tarjeta-estado__valor">Contacts</p>
-          <p class="tarjeta-estado__sub">
+        <app-tarjeta-estado label="Estado Google" valor="Contacts">
+          <svg icon class="svg svg--xs" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" aria-hidden="true">
             @if (googleConectado()) {
-              <span class="badge badge--solid">Conectado</span>
+              <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/>
+              <polyline points="5,8 7,10 11,6" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="square"/>
+            } @else {
+              <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/>
+              <line x1="8" y1="5" x2="8" y2="9" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
+              <circle cx="8" cy="11.5" r="0.75" fill="currentColor"/>
+            }
+          </svg>
+          <ng-container actions>
+            @if (googleConectado()) {
+              <app-badge variant="solid">Conectado</app-badge>
               <button
                 class="tarjeta-estado__action-link"
                 type="button"
+                aria-label="Desconectar Google Contacts"
                 (click)="desconectarGoogle()"
               >(Clic para cambiar)</button>
             } @else {
-              <span class="badge badge--outline">Desconectado</span>
+              <app-badge variant="outline">Desconectado</app-badge>
               <button
                 class="tarjeta-estado__action-link"
                 type="button"
+                aria-label="Conectar Google Contacts"
                 (click)="connectarGoogle()"
               >(Clic)</button>
             }
-          </p>
-        </div>
+          </ng-container>
+        </app-tarjeta-estado>
 
         <!-- Nuevos contactos -->
-        <div class="tarjeta-estado tarjeta-estado--destacada">
-          <div class="tarjeta-estado__header">
-            <span class="tarjeta-estado__label">Nuevos contactos</span>
-            <span class="tarjeta-estado__icon" aria-hidden="true">
-              <svg class="svg svg--xs" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none">
-                <circle cx="6" cy="6" r="3" stroke="currentColor" stroke-width="1.5"/>
-                <path d="M1 14c0-2.5 2-4.5 5-4.5s5 2 5 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
-                <line x1="13" y1="5" x2="13" y2="11" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
-                <line x1="10" y1="8" x2="16" y2="8" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
-              </svg>
-            </span>
-          </div>
-          <p class="tarjeta-estado__valor tarjeta-estado__valor--grande">
-            +{{ nuevosContactos() }}
-          </p>
-          <p class="tarjeta-estado__sub">En cola</p>
-        </div>
+        <app-tarjeta-estado
+          label="Nuevos contactos"
+          [valor]="'+' + nuevosContactos()"
+          sub="En cola"
+          [destacada]="true"
+        >
+          <svg icon class="svg svg--xs" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <circle cx="6" cy="6" r="3" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M1 14c0-2.5 2-4.5 5-4.5s5 2 5 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
+            <line x1="13" y1="5" x2="13" y2="11" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
+            <line x1="10" y1="8" x2="16" y2="8" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
+          </svg>
+        </app-tarjeta-estado>
 
       </div>
 
       <!-- Bloque de acciones -->
-      <section class="panel-seccion sincro-layout__acciones" aria-labelledby="titulo-acciones">
-        <h2 class="panel-seccion__titulo" id="titulo-acciones">
-          Acciones
-        </h2>
+      <app-panel-seccion title="Acciones" class="sincro-layout__acciones">
 
-        <div class="panel-seccion__body acciones-body">
+        <div class="acciones-body">
 
           <!-- Caso: PMS no conectado → subir XLSX -->
           @if (!pmsConectado()) {
             <div class="acciones-body__upload">
-              <p class="acciones-body__label">
+              <p class="acciones-body__label" id="label-xlsx">
                 Sube tu archivo de reservas (.xlsx):
               </p>
               <div class="acciones-body__upload-row">
-                <button
-                  class="btn btn--secondary btn--md"
-                  type="button"
+                <app-button
+                  variant="secondary"
+                  size="md"
+                  aria-describedby="label-xlsx"
                   (click)="xlsxInput.click()"
                 >
                   <span class="btn__icon" aria-hidden="true">
@@ -222,9 +198,9 @@
                     </svg>
                   </span>
                   Seleccionar XLSX
-                </button>
+                </app-button>
                 @if (xlsxArchivo()) {
-                  <span class="acciones-body__filename">
+                  <span class="acciones-body__filename" aria-live="polite">
                     {{ xlsxArchivo()!.name }}
                   </span>
                 }
@@ -250,46 +226,38 @@
               <div class="acciones-body__fechas-row">
                 <div class="form-group acciones-body__fecha-field">
                   <label class="form-label" for="fecha-desde">Desde (DD/MM/AAAA)</label>
-                  <div class="form-input-wrapper">
-                    <span class="form-input-wrapper__icon" aria-hidden="true">
-                      <svg class="svg svg--sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
-                        <rect x="3" y="4" width="14" height="13" stroke="currentColor" stroke-width="1.5"/>
-                        <line x1="3" y1="8" x2="17" y2="8" stroke="currentColor" stroke-width="1.5"/>
-                        <line x1="7" y1="2" x2="7" y2="5" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
-                        <line x1="13" y1="2" x2="13" y2="5" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
-                      </svg>
-                    </span>
-                    <input
-                      id="fecha-desde"
-                      class="form-input"
-                      type="text"
-                      placeholder="Ej. 01/01/2026"
-                      [value]="fechaDesde()"
-                      (input)="onFechaDesdeChange($any($event.target).value)"
-                    />
-                  </div>
+                  <app-form-input-icon
+                    id="fecha-desde"
+                    type="text"
+                    placeholder="Ej. 01/01/2026"
+                    [value]="fechaDesde()"
+                    (valueChange)="onFechaDesdeChange($event)"
+                  >
+                    <svg class="svg svg--sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
+                      <rect x="3" y="4" width="14" height="13" stroke="currentColor" stroke-width="1.5"/>
+                      <line x1="3" y1="8" x2="17" y2="8" stroke="currentColor" stroke-width="1.5"/>
+                      <line x1="7" y1="2" x2="7" y2="5" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
+                      <line x1="13" y1="2" x2="13" y2="5" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
+                    </svg>
+                  </app-form-input-icon>
                 </div>
 
                 <div class="form-group acciones-body__fecha-field">
                   <label class="form-label" for="fecha-hasta">Hasta (DD/MM/AAAA)</label>
-                  <div class="form-input-wrapper">
-                    <span class="form-input-wrapper__icon" aria-hidden="true">
-                      <svg class="svg svg--sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
-                        <rect x="3" y="4" width="14" height="13" stroke="currentColor" stroke-width="1.5"/>
-                        <line x1="3" y1="8" x2="17" y2="8" stroke="currentColor" stroke-width="1.5"/>
-                        <line x1="7" y1="2" x2="7" y2="5" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
-                        <line x1="13" y1="2" x2="13" y2="5" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
-                      </svg>
-                    </span>
-                    <input
-                      id="fecha-hasta"
-                      class="form-input"
-                      type="text"
-                      placeholder="Ej. 31/01/2026"
-                      [value]="fechaHasta()"
-                      (input)="onFechaHastaChange($any($event.target).value)"
-                    />
-                  </div>
+                  <app-form-input-icon
+                    id="fecha-hasta"
+                    type="text"
+                    placeholder="Ej. 31/01/2026"
+                    [value]="fechaHasta()"
+                    (valueChange)="onFechaHastaChange($event)"
+                  >
+                    <svg class="svg svg--sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
+                      <rect x="3" y="4" width="14" height="13" stroke="currentColor" stroke-width="1.5"/>
+                      <line x1="3" y1="8" x2="17" y2="8" stroke="currentColor" stroke-width="1.5"/>
+                      <line x1="7" y1="2" x2="7" y2="5" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
+                      <line x1="13" y1="2" x2="13" y2="5" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
+                    </svg>
+                  </app-form-input-icon>
                 </div>
               </div>
             </div>
@@ -303,12 +271,11 @@
           <!-- Botón de acción principal (cambia según conexiones) -->
           <div class="acciones-body__ejecutar">
             @if (pmsConectado() && googleConectado()) {
-              <!-- PMS + Google → Sincronizar PMS con Google -->
-              <button
-                class="btn btn--primary btn--lg acciones-body__btn-principal"
-                type="button"
+              <app-button
+                class="acciones-body__btn-principal"
+                variant="primary"
+                size="lg"
                 [disabled]="syncEnCurso() || !fechasValidas()"
-                [attr.aria-busy]="syncEnCurso()"
                 (click)="lanzarSync()"
               >
                 <span class="btn__icon" aria-hidden="true">
@@ -317,17 +284,13 @@
                     <polyline points="3,6 4,10 8,10" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="square" stroke-linejoin="miter"/>
                   </svg>
                 </span>
-                @if (syncEnCurso()) {
-                  Sincronizando…
-                } @else {
-                  Sincronizar PMS con Google
-                }
-              </button>
+                @if (syncEnCurso()) { Sincronizando… } @else { Sincronizar PMS con Google }
+              </app-button>
             } @else if (pmsConectado() && !googleConectado()) {
-              <!-- PMS sí + Google no → Descargar CSV -->
-              <button
-                class="btn btn--primary btn--lg acciones-body__btn-principal"
-                type="button"
+              <app-button
+                class="acciones-body__btn-principal"
+                variant="primary"
+                size="lg"
                 [disabled]="!fechasValidas()"
                 (click)="exportarCsv()"
               >
@@ -339,14 +302,13 @@
                   </svg>
                 </span>
                 Descargar CSV
-              </button>
+              </app-button>
             } @else if (!pmsConectado() && googleConectado()) {
-              <!-- PMS no + Google sí → Sincronizar XLSX con Google -->
-              <button
-                class="btn btn--primary btn--lg acciones-body__btn-principal"
-                type="button"
+              <app-button
+                class="acciones-body__btn-principal"
+                variant="primary"
+                size="lg"
                 [disabled]="!xlsxArchivo() || xlsxEnCurso()"
-                [attr.aria-busy]="xlsxEnCurso()"
                 (click)="lanzarXlsxSync()"
               >
                 <span class="btn__icon" aria-hidden="true">
@@ -355,17 +317,13 @@
                     <polyline points="3,6 4,10 8,10" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="square" stroke-linejoin="miter"/>
                   </svg>
                 </span>
-                @if (xlsxEnCurso()) {
-                  Procesando…
-                } @else {
-                  Sincronizar con Google
-                }
-              </button>
+                @if (xlsxEnCurso()) { Procesando… } @else { Sincronizar con Google }
+              </app-button>
             } @else {
-              <!-- PMS no + Google no → Descargar CSV desde XLSX -->
-              <button
-                class="btn btn--primary btn--lg acciones-body__btn-principal"
-                type="button"
+              <app-button
+                class="acciones-body__btn-principal"
+                variant="primary"
+                size="lg"
                 [disabled]="!xlsxArchivo() || xlsxEnCurso()"
                 (click)="exportarXlsxCsv()"
               >
@@ -377,11 +335,11 @@
                   </svg>
                 </span>
                 Descargar CSV
-              </button>
+              </app-button>
             }
           </div>
 
-          <p class="acciones-body__hint">
+          <p class="acciones-body__hint" aria-live="polite">
             @if (!pmsConectado() && !googleConectado()) {
               Puedes hacer clic en las tarjetas de arriba para conectar tus
               servicios y desbloquear más opciones.
@@ -394,7 +352,7 @@
           </p>
 
         </div>
-      </section>
+      </app-panel-seccion>
 
     </div>
 
