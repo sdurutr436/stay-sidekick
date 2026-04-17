@@ -1,4 +1,8 @@
 import { Component, computed, signal } from '@angular/core';
+import { BadgeComponent } from '../../components/atoms/badge/badge';
+import { ButtonComponent } from '../../components/atoms/button/button';
+import { PageHeaderComponent } from '../../components/organisms/page-header/page-header';
+import { TablaCrudComponent } from '../../components/organisms/tabla-crud/tabla-crud';
 
 interface Apartamento {
   id: string;
@@ -50,6 +54,7 @@ const MOCK_APARTAMENTOS: Apartamento[] = [
   templateUrl: './maestro-apartamentos.html',
   styleUrl: './maestro-apartamentos.scss',
   standalone: true,
+  imports: [PageHeaderComponent, ButtonComponent, BadgeComponent, TablaCrudComponent],
 })
 export class MaestroApartamentosPageComponent {
 
@@ -106,10 +111,9 @@ export class MaestroApartamentosPageComponent {
     }
   }
 
-  onSearch(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    this.searchQuery.set(input.value);
-    this.selectedIds.set(new Set()); // Resetea selección al cambiar el filtro
+  onSearch(value: string): void {
+    this.searchQuery.set(value);
+    this.selectedIds.set(new Set());
   }
 
   triggerXlsxImport(input: HTMLInputElement): void {
