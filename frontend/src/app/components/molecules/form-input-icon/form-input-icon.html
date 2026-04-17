@@ -1,0 +1,13 @@
+<div class="form-input-wrapper">
+  <span class="form-input-wrapper__icon" aria-hidden="true">
+    <ng-content />
+  </span>
+  <input
+    class="form-input"
+    [id]="id"
+    [type]="type"
+    [placeholder]="placeholder"
+    [value]="value"
+    (input)="onInput($event)"
+  />
+</div>

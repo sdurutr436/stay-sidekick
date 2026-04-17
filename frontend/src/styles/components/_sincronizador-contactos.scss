@@ -52,47 +52,6 @@
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Panel-seccion — bloque reutilizable de seccion con borde y espaciado
-// ─────────────────────────────────────────────────────────────────────────────
-.panel-seccion {
-  border: $border-width $border-style $color-border;
-  padding: $space-6;
-
-  &__titulo {
-    @include text-h3;
-    color: $color-text-primary;
-    margin-bottom: $space-2;
-    display: flex;
-    align-items: center;
-    gap: $space-2;
-  }
-
-  &__titulo-icon {
-    display: flex;
-    color: $color-text-secondary;
-  }
-
-  &__desc {
-    @include text-body-md;
-    color: $color-text-secondary;
-    max-width: 64ch;
-    margin-bottom: $space-5;
-  }
-
-  &__body {
-    display: flex;
-    flex-direction: column;
-    gap: $space-4;
-  }
-
-  &__divider {
-    border: none;
-    border-top: $border-width $border-style $color-border;
-    margin-block: $space-4;
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
 // Instrucciones de uso
 // ─────────────────────────────────────────────────────────────────────────────
 .instrucciones-body {
@@ -274,7 +233,12 @@
 
   &__btn-principal {
     width: 100%;
-    justify-content: center;
+    display: flex; // host de app-button es inline por defecto; forzar bloque
+
+    .btn {
+      width: 100%;
+      justify-content: center;
+    }
   }
 
   &__hint {

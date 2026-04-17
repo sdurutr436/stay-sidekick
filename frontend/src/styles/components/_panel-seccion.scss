@@ -1,0 +1,57 @@
+// =============================================================================
+// COMPONENTS: PANEL SECCION
+// Organismo — bloque de sección con borde, título y cuerpo
+//
+// Estructura BEM:
+//   .panel-seccion
+//     .panel-seccion__titulo        (h2, con icono opcional)
+//       .panel-seccion__titulo-icon (span > svg, decorativo)
+//     .panel-seccion__desc          (p, descripción opcional)
+//     .panel-seccion__divider       (hr, separador opcional)
+//     .panel-seccion__body          (div, contenido)
+//
+// app-panel-seccion es inline por defecto como custom element;
+// display: block permite que actúe como ítem de grid/flex en layouts.
+// =============================================================================
+
+app-panel-seccion {
+  display: block;
+}
+
+.panel-seccion {
+  border: $border-width $border-style $color-border;
+  padding: $space-6;
+
+  &__titulo {
+    @include text-h3;
+    color: $color-text-primary;
+    margin-bottom: $space-2;
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+  }
+
+  &__titulo-icon {
+    display: flex;
+    color: $color-text-secondary;
+  }
+
+  &__desc {
+    @include text-body-md;
+    color: $color-text-secondary;
+    max-width: 64ch;
+    margin-bottom: $space-5;
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    gap: $space-4;
+  }
+
+  &__divider {
+    border: none;
+    border-top: $border-width $border-style $color-border;
+    margin-block: $space-4;
+  }
+}
