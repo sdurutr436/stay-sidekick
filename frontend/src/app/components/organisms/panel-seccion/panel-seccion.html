@@ -10,6 +10,7 @@
   @if (description) {
     <p class="panel-seccion__desc">{{ description }}</p>
   }
+  <ng-content select="[pre-body]" />
   @if (divider) {
     <hr class="panel-seccion__divider" aria-hidden="true" />
   }
