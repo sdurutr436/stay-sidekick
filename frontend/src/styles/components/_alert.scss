@@ -1,0 +1,60 @@
+// =============================================================================
+// COMPONENTS: ALERT
+// Molécula — mensajes de feedback (success, error, warning, info)
+// Estructura BEM: .alert.alert--{tipo}
+// =============================================================================
+
+.alert {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: $space-3;
+  padding: $space-3 $space-4;
+  border: $border-width $border-style $color-border;
+  @include text-body-sm;
+
+  &__content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 1.5rem;
+    height: 1.5rem;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: $color-text-secondary;
+    cursor: pointer;
+    transition: color var(--transition-base);
+
+    &:hover {
+      color: $color-text-primary;
+    }
+  }
+
+  // Variantes wireframe — se distinguen por borde
+  &--success {
+    border-color: $color-gray-800;
+    border-left-width: 3px;
+  }
+
+  &--error {
+    border-color: $color-gray-700;
+    border-left-width: 3px;
+  }
+
+  &--warning {
+    border-color: $color-gray-500;
+    border-left-width: 3px;
+  }
+
+  &--info {
+    border-color: $color-gray-400;
+    border-left-width: 3px;
+  }
+}

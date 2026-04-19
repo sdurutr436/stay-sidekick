@@ -33,17 +33,4 @@
     padding-block: $space-8;
   }
 
-  // -------------------------------------------------------------------------
-  // Tipografía del área de contenido (placeholder)
-  // -------------------------------------------------------------------------
-  &__title {
-    @include text-h2;
-    color: $color-text-primary;
-    margin-bottom: $space-3;
-  }
-
-  &__desc {
-    @include text-body-md;
-    color: $color-text-secondary;
-  }
 }

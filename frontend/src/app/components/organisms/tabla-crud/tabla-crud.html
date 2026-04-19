@@ -1,0 +1,35 @@
+<section class="tabla-crud" aria-labelledby="tabla-crud-titulo">
+  <h2 class="u-sr-only" id="tabla-crud-titulo">
+    <ng-content select="[title]" />
+  </h2>
+
+  <!-- Barra de herramientas -->
+  <div class="tabla-crud__toolbar">
+    <div class="tabla-crud__search">
+      <app-search-bar
+        [placeholder]="searchPlaceholder"
+        [value]="searchValue"
+        [ariaLabel]="searchLabel"
+        (valueChange)="onSearchInput($event)"
+      />
+    </div>
+    <div class="tabla-crud__actions">
+      <ng-content select="[toolbar-actions]" />
+    </div>
+  </div>
+
+  <!-- Tabla -->
+  <div class="tabla-crud__wrapper" role="region" tabindex="0">
+    <ng-content select="table" />
+  </div>
+
+  <!-- Pie de tabla -->
+  <footer class="tabla-crud__footer">
+    <p class="tabla-crud__count">
+      {{ resultCount }} resultado{{ resultCount !== 1 ? 's' : '' }}
+      @if (selectedCount > 0) {
+        · {{ selectedCount }} seleccionado{{ selectedCount !== 1 ? 's' : '' }}
+      }
+    </p>
+  </footer>
+</section>

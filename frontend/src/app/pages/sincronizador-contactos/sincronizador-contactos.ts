@@ -2,6 +2,12 @@ import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
+import { BadgeComponent } from '../../components/atoms/badge/badge';
+import { ButtonComponent } from '../../components/atoms/button/button';
+import { FormInputIconComponent } from '../../components/molecules/form-input-icon/form-input-icon';
+import { PageHeaderComponent } from '../../components/organisms/page-header/page-header';
+import { PanelSeccionComponent } from '../../components/organisms/panel-seccion/panel-seccion';
+import { TarjetaEstadoComponent } from '../../components/molecules/tarjeta-estado/tarjeta-estado';
 
 type FormatoNombre = 'nombre_apellidos' | 'apellidos_nombre' | 'nombre_solo';
 type FormatoApartamento = 'nota' | 'etiqueta' | 'ninguno';
@@ -32,12 +38,15 @@ const _PREFS_DEFECTO: PreferenciasContactos = {
   templateUrl: './sincronizador-contactos.html',
   styleUrl: './sincronizador-contactos.scss',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, PageHeaderComponent, ButtonComponent, BadgeComponent, TarjetaEstadoComponent, PanelSeccionComponent, FormInputIconComponent],
 })
 export class SincronizadorContactosPageComponent implements OnInit {
 
   private readonly http = inject(HttpClient);
   private readonly route = inject(ActivatedRoute);
+
+  // ── Estado PMS ──────────────────────────────────────────────────────────
+  readonly pmsConectado = signal(false);
 
   // ── Estado Google ─────────────────────────────────────────────────────────
   readonly googleConectado = signal(false);
@@ -47,13 +56,24 @@ export class SincronizadorContactosPageComponent implements OnInit {
   // ── Preferencias ──────────────────────────────────────────────────────────
   readonly preferencias = signal<PreferenciasContactos>({ ..._PREFS_DEFECTO });
 
-  readonly mostrarFormatoApartamento = computed(
-    () => this.preferencias().incluir_apartamento_contacto,
-  );
-
   // ── XLSX ──────────────────────────────────────────────────────────────────
   readonly xlsxArchivo = signal<File | null>(null);
   readonly xlsxEnCurso = signal(false);
+
+  // ── Fechas ────────────────────────────────────────────────────────────────
+  readonly fechaDesde = signal('');
+  readonly fechaHasta = signal('');
+
+  readonly fechasValidas = computed(() => {
+    const desde = this.fechaDesde();
+    const hasta = this.fechaHasta();
+    if (!desde || !hasta) return false;
+    const re = /^\d{2}\/\d{2}\/\d{4}$/;
+    return re.test(desde) && re.test(hasta);
+  });
+
+  // ── Nuevos contactos (resultado de última operación) ─────────────────────
+  readonly nuevosContactos = signal(0);
 
   // ── Opciones de formulario ────────────────────────────────────────────────
   readonly formatoNombreOpciones: { valor: FormatoNombre; label: string }[] = [
@@ -71,7 +91,6 @@ export class SincronizadorContactosPageComponent implements OnInit {
   // ── Ciclo de vida ─────────────────────────────────────────────────────────
 
   ngOnInit(): void {
-    // Leer parámetros de query del callback OAuth de Google
     this.route.queryParams.subscribe(params => {
       if (params['google_conectado'] === 'true') {
         this.cargarEstadoGoogle();
@@ -83,6 +102,7 @@ export class SincronizadorContactosPageComponent implements OnInit {
 
     this.cargarEstadoGoogle();
     this.cargarPreferencias();
+    this.cargarEstadoPms();
   }
 
   // ── Carga inicial ─────────────────────────────────────────────────────────
@@ -96,6 +116,15 @@ export class SincronizadorContactosPageComponent implements OnInit {
         this.ultimoSync.set(res.google.ultimo_sync ?? null);
       },
       error: err => console.error('[sincronizador-contactos] Error al obtener estado Google:', err),
+    });
+  }
+
+  private cargarEstadoPms(): void {
+    this.http.get<{ ok: boolean; config: { proveedor: string } | null }>(
+      '/api/pms/config'
+    ).subscribe({
+      next: res => this.pmsConectado.set(res.config !== null),
+      error: () => this.pmsConectado.set(false),
     });
   }
 
@@ -131,38 +160,29 @@ export class SincronizadorContactosPageComponent implements OnInit {
     });
   }
 
-  // ── Preferencias ──────────────────────────────────────────────────────────
+  // ── Fechas ────────────────────────────────────────────────────────────────
 
-  onFormatoNombreChange(valor: string): void {
-    this.preferencias.update(p => ({
-      ...p,
-      formato_nombre_contacto: valor as FormatoNombre,
-    }));
+  onFechaDesdeChange(valor: string): void {
+    this.fechaDesde.set(valor);
   }
 
-  onIncluirApartamentoChange(checked: boolean): void {
-    this.preferencias.update(p => ({ ...p, incluir_apartamento_contacto: checked }));
+  onFechaHastaChange(valor: string): void {
+    this.fechaHasta.set(valor);
   }
 
-  onFormatoApartamentoChange(valor: string): void {
-    this.preferencias.update(p => ({
-      ...p,
-      formato_apartamento_contacto: valor as FormatoApartamento,
-    }));
-  }
-
-  onIncluirCheckinChange(checked: boolean): void {
-    this.preferencias.update(p => ({ ...p, incluir_checkin_contacto: checked }));
-  }
-
-  guardarPreferencias(): void {
-    this.http.put<{ ok: boolean; preferencias: PreferenciasContactos }>(
-      '/api/contactos/preferencias',
-      this.preferencias(),
-    ).subscribe({
-      next: res => this.preferencias.set(res.preferencias),
-      error: err => console.error('[sincronizador-contactos] Error al guardar preferencias:', err),
-    });
+  private _parseFechasPayload(): { desde?: string; hasta?: string } {
+    const desde = this.fechaDesde();
+    const hasta = this.fechaHasta();
+    const payload: { desde?: string; hasta?: string } = {};
+    if (desde) {
+      const [d, m, y] = desde.split('/');
+      payload.desde = `${y}-${m}-${d}`;
+    }
+    if (hasta) {
+      const [d, m, y] = hasta.split('/');
+      payload.hasta = `${y}-${m}-${d}`;
+    }
+    return payload;
   }
 
   // ── Sincronización (fuente: PMS API) ──────────────────────────────────────
@@ -173,11 +193,12 @@ export class SincronizadorContactosPageComponent implements OnInit {
 
     this.http.post<{ ok: boolean; resultado: SyncResultado }>(
       '/api/contactos/sync',
-      {},
+      this._parseFechasPayload(),
     ).subscribe({
       next: res => {
         this.syncEnCurso.set(false);
         this.ultimoSync.set(new Date().toISOString());
+        this.nuevosContactos.set(res.resultado.nuevos);
         if (res.resultado.advertencias?.length) {
           console.warn('[sincronizador-contactos] Sync con advertencias:', res.resultado.advertencias);
         }
@@ -190,7 +211,7 @@ export class SincronizadorContactosPageComponent implements OnInit {
   }
 
   exportarCsv(): void {
-    this.http.post('/api/contactos/export/csv', {}, { responseType: 'blob' }).subscribe({
+    this.http.post('/api/contactos/export/csv', this._parseFechasPayload(), { responseType: 'blob' }).subscribe({
       next: blob => this._descargarBlob(blob, 'contactos_google.csv'),
       error: err => console.error('[sincronizador-contactos] Error al exportar CSV:', err),
     });
@@ -202,7 +223,7 @@ export class SincronizadorContactosPageComponent implements OnInit {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0] ?? null;
     this.xlsxArchivo.set(file);
-    input.value = ''; // permite volver a seleccionar el mismo archivo
+    input.value = '';
   }
 
   lanzarXlsxSync(): void {
@@ -220,6 +241,7 @@ export class SincronizadorContactosPageComponent implements OnInit {
       next: res => {
         this.xlsxEnCurso.set(false);
         this.ultimoSync.set(new Date().toISOString());
+        this.nuevosContactos.set(res.resultado.nuevos);
         if (res.resultado.advertencias?.length) {
           console.warn('[sincronizador-contactos] XLSX sync con advertencias:', res.resultado.advertencias);
         }
