@@ -18,10 +18,13 @@
 // Wrapper de página
 // ─────────────────────────────────────────────────────────────────────────────
 .vault-comunicaciones {
-  padding-inline: $space-6;
+  // Mismos límites de ancho que el header (__inner usa @include container):
+  // max-width: 1200px centrado + padding-inline: $space-6
+  @include container;
   display: flex;
   flex-direction: column;
   gap: $space-8;
+  padding-block: 0; // El padding vertical lo gestiona menu-layout__content
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -201,6 +204,14 @@
     display: flex;
     align-items: center;
     gap: $space-3;
+  }
+
+  // Wrapper columna: botón copiar arriba, texto de confirmación debajo
+  &__copiar-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: $space-1;
   }
 
   // Texto de confirmación de copiado (aparece brevemente)

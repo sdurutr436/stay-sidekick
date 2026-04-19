@@ -158,30 +158,32 @@
           </app-button>
         </div>
 
-        <!-- Lado derecho: copiar mensaje + confirmación -->
+        <!-- Lado derecho: copiar mensaje + confirmación + guardar -->
         <div class="vault-editor__acciones-der">
-          <app-button
-            variant="secondary"
-            size="md"
-            [disabled]="!mensajeActual().trim()"
-            title="Copiar el mensaje al portapapeles"
-            (click)="copiarMensaje()"
-          >
-            <span class="btn__icon" aria-hidden="true">
-              <svg class="svg svg--sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
-                <rect x="7" y="3" width="10" height="13" stroke="currentColor" stroke-width="1.5"/>
-                <rect x="3" y="6" width="10" height="13" stroke="currentColor" stroke-width="1.5" fill="white"/>
-              </svg>
-            </span>
-            Copiar mensaje
-          </app-button>
 
-          <!-- Confirmación de copiado: varios textos posibles para dar variedad -->
-          @if (mensajeCopiadoVisible()) {
-            <span class="vault-editor__copiado" aria-live="polite" role="status">
-              {{ mensajeCopiadoTexto() }}
-            </span>
-          }
+          <!-- Copiar: botón y confirmación apilados en columna -->
+          <div class="vault-editor__copiar-wrap">
+            <app-button
+              variant="secondary"
+              size="md"
+              [disabled]="!mensajeActual().trim()"
+              title="Copiar el mensaje al portapapeles"
+              (click)="copiarMensaje()"
+            >
+              <span class="btn__icon" aria-hidden="true">
+                <svg class="svg svg--sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
+                  <rect x="7" y="3" width="10" height="13" stroke="currentColor" stroke-width="1.5"/>
+                  <rect x="3" y="6" width="10" height="13" stroke="currentColor" stroke-width="1.5" fill="white"/>
+                </svg>
+              </span>
+              Copiar mensaje
+            </app-button>
+            @if (mensajeCopiadoVisible()) {
+              <span class="vault-editor__copiado" aria-live="polite" role="status">
+                {{ mensajeCopiadoTexto() }}
+              </span>
+            }
+          </div>
 
           <!-- Guardar / Crear plantilla -->
           <app-button
