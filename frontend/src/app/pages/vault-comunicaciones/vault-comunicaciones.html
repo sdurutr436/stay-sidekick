@@ -82,10 +82,10 @@
         </div>
       }
 
-      <!-- Barra de variables: dropdown buscable + botón insertar -->
+      <!-- Barra de variables: dropdown buscable + botón insertar + añadir variable -->
       <div class="vault-editor__toolbar">
         <app-dropdown-buscador
-          [options]="placeholderOpciones"
+          [options]="placeholderOpciones()"
           placeholder="Seleccionar variable…"
           searchPlaceholder="Buscar variable…"
           emptyMessage="Sin variables que coincidan"
@@ -100,7 +100,67 @@
         >
           Insertar
         </app-button>
+        <app-button
+          variant="ghost"
+          size="sm"
+          [title]="panelNuevaVariable() ? 'Cerrar panel de nueva variable' : 'Añadir una nueva variable personalizada'"
+          (click)="togglePanelNuevaVariable()"
+        >
+          @if (panelNuevaVariable()) {
+            <span aria-hidden="true">✕</span> Cancelar
+          } @else {
+            + Variable
+          }
+        </app-button>
       </div>
+
+      <!-- Panel de nueva variable (colapsa entre toolbar y textarea) -->
+      @if (panelNuevaVariable()) {
+        <div class="vault-nueva-variable" role="region" aria-label="Añadir variable personalizada">
+          <div class="vault-nueva-variable__inner">
+            <div class="vault-nueva-variable__field">
+              <span class="vault-nueva-variable__prefix" aria-hidden="true">{{ '{' }}</span>
+              <input
+                type="text"
+                class="form-input vault-nueva-variable__input"
+                placeholder="NOMBRE_VARIABLE"
+                [value]="nuevaVariableNombre()"
+                (input)="onNuevaVariableNombre($event)"
+                maxlength="40"
+                aria-label="Nombre de la nueva variable (sin llaves)"
+                autofocus
+              />
+              <span class="vault-nueva-variable__suffix" aria-hidden="true">{{ '}' }}</span>
+            </div>
+            @if (nuevaVariableNombre()) {
+              <span class="vault-nueva-variable__preview">
+                Se insertará como <strong>{{ '{' + nuevaVariableNombre() + '}' }}</strong>
+              </span>
+            }
+          </div>
+          <div class="vault-nueva-variable__acciones">
+            <app-button
+              variant="secondary"
+              size="sm"
+              [disabled]="!nuevaVariableNombre().trim() || guardandoVariable()"
+              (click)="guardarNuevaVariable()"
+            >
+              @if (guardandoVariable()) { Guardando… } @else { Guardar variable }
+            </app-button>
+            <button
+              type="button"
+              class="vault-nueva-variable__cerrar"
+              aria-label="Cerrar panel de nueva variable"
+              (click)="cerrarPanelNuevaVariable()"
+            >
+              <svg class="svg svg--xs" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <line x1="4" y1="4" x2="12" y2="12" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
+                <line x1="12" y1="4" x2="4" y2="12" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      }
 
       <!-- Área de texto — usa form-editor para mantener el borde y estilo consistentes -->
       <div class="vault-editor__textarea-wrap form-editor">

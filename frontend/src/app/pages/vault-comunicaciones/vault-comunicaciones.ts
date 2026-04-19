@@ -102,8 +102,13 @@ export class VaultComunicacionesPageComponent implements OnDestroy {
   readonly searchPlantillas      = signal('');
   readonly plantillaSeleccionada = signal<Plantilla | null>(null);
   readonly mensajeActual         = signal('');
-  readonly placeholderSeleccionado = signal<DropdownOption | null>(null);
-  readonly placeholderOpciones: DropdownOption[] = PLACEHOLDERS;
+  readonly placeholderSeleccionado  = signal<DropdownOption | null>(null);
+  // Signal mutable: se actualiza cuando el usuario añade una variable nueva
+  readonly placeholderOpciones      = signal<DropdownOption[]>(PLACEHOLDERS);
+
+  readonly panelNuevaVariable   = signal(false);
+  readonly nuevaVariableNombre  = signal('');
+  readonly guardandoVariable    = signal(false);
 
   readonly nombreActual          = signal('');
   readonly isNueva               = signal(false);
@@ -258,6 +263,73 @@ export class VaultComunicacionesPageComponent implements OnDestroy {
 
   onPlaceholderSeleccionado(option: DropdownOption): void {
     this.placeholderSeleccionado.set(option);
+  }
+
+  togglePanelNuevaVariable(): void {
+    this.panelNuevaVariable.update(v => !v);
+    if (!this.panelNuevaVariable()) this.nuevaVariableNombre.set('');
+  }
+
+  cerrarPanelNuevaVariable(): void {
+    this.panelNuevaVariable.set(false);
+    this.nuevaVariableNombre.set('');
+  }
+
+  onNuevaVariableNombre(event: Event): void {
+    // Forzar mayúsculas y solo letras/números/guión bajo (formato de placeholder)
+    const raw = (event.target as HTMLInputElement).value.toUpperCase().replace(/[^A-Z0-9_]/g, '');
+    this.nuevaVariableNombre.set(raw);
+    (event.target as HTMLInputElement).value = raw;
+  }
+
+  guardarNuevaVariable(): void {
+    const clave = this.nuevaVariableNombre().trim();
+    if (!clave) return;
+
+    const valor = `{${clave}}`;
+
+    // Evitar duplicados
+    if (this.placeholderOpciones().some(o => o.value === valor)) {
+      this.cerrarPanelNuevaVariable();
+      return;
+    }
+
+    this.guardandoVariable.set(true);
+
+    // TODO: Integrar con POST /api/vault/variables cuando el backend esté listo.
+    //   Guarda la variable personalizada de la empresa en la configuración.
+    //   Body:  { nombre: string }        → e.g. { nombre: "APELLIDO" }
+    //   Resp:  { ok: boolean, variable: { value: string, label: string } }
+    //          → e.g. { ok: true, variable: { value: "{APELLIDO}", label: "{APELLIDO} — Variable personalizada" } }
+    //
+    //   Al iniciar la página, cargar variables con:
+    //   GET /api/vault/variables  → { ok: boolean, variables: DropdownOption[] }
+    //   y hacer: this.placeholderOpciones.set([...PLACEHOLDERS, ...res.variables])
+    //
+    // this.http.post<{ ok: boolean; variable: DropdownOption }>(
+    //   '/api/vault/variables',
+    //   { nombre: clave }
+    // ).subscribe({
+    //   next: res => {
+    //     this.placeholderOpciones.update(list => [...list, res.variable]);
+    //     this.guardandoVariable.set(false);
+    //     this.cerrarPanelNuevaVariable();
+    //   },
+    //   error: () => {
+    //     this.guardandoVariable.set(false);
+    //     this.mostrarToast('Error al guardar la variable. Inténtalo de nuevo.');
+    //   },
+    // });
+
+    // ── INICIO DATOS MOCK ──────────────────────────────────────────────────
+    // TODO: Eliminar este bloque al integrar POST /api/vault/variables
+    setTimeout(() => {
+      const nueva: DropdownOption = { value: valor, label: `${valor} — Variable personalizada` };
+      this.placeholderOpciones.update(list => [...list, nueva]);
+      this.guardandoVariable.set(false);
+      this.cerrarPanelNuevaVariable();
+    }, 300);
+    // ── FIN DATOS MOCK ────────────────────────────────────────────────────
   }
 
   // Inserta el placeholder seleccionado en la posición donde estaba el cursor

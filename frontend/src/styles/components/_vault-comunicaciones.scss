@@ -48,6 +48,9 @@
   border: $border-width $border-style $color-border;
   display: flex;
   flex-direction: column;
+  // Limita la altura del sidebar para que la lista tenga scroll interno
+  // en vez de crecer indefinidamente cuando hay muchas plantillas
+  max-height: calc(100vh - #{$header-height} - #{$space-16} * 2);
   overflow: hidden;
 
   &__search-wrap {
@@ -59,8 +62,10 @@
     list-style: none;
     margin: 0;
     padding: $space-2 0;
+    // flex: 1 + min-height: 0 permiten que el scroll funcione dentro del sidebar flex
+    flex: 1 1 0;
+    min-height: 0;
     overflow-y: auto;
-    max-height: 60vh;
   }
 
   &__item {
@@ -206,19 +211,108 @@
     gap: $space-3;
   }
 
-  // Wrapper columna: botón copiar arriba, texto de confirmación debajo
+  // Wrapper del botón copiar: position relative para anclar el span
   &__copiar-wrap {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: $space-1;
+    position: relative;
   }
 
-  // Texto de confirmación de copiado (aparece brevemente)
+  // Confirmación de copiado: posición absoluta bajo el botón, fuera del flujo
+  // No desplaza el flex/grid porque no ocupa espacio en el layout.
+  // Hay espacio suficiente debajo de la fila de acciones (es el último elemento).
   &__copiado {
+    position: absolute;
+    top: calc(100% + #{$space-1});
+    right: 0;
+    white-space: nowrap;
     @include text-body-sm;
     color: $color-text-secondary;
     font-style: italic;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Panel de nueva variable (aparece entre toolbar y textarea)
+// ─────────────────────────────────────────────────────────────────────────────
+.vault-nueva-variable {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $space-4;
+  padding: $space-3 $space-4;
+  border: $border-width $border-style $color-border;
+  background-color: $color-surface-alt;
+
+  &__inner {
+    display: flex;
+    align-items: center;
+    gap: $space-4;
+    flex: 1;
+    min-width: 0;
+  }
+
+  // Fila: "{" + input + "}"
+  &__field {
+    display: flex;
+    align-items: center;
+    gap: $space-1;
+    flex-shrink: 0;
+  }
+
+  &__prefix,
+  &__suffix {
+    @include text-body-md;
+    font-weight: $font-weight-heading;
+    color: $color-text-secondary;
+    user-select: none;
+  }
+
+  &__input {
+    width: 16rem;
+    font-family: monospace;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  // Preview "{MI_VARIABLE}" debajo del campo
+  &__preview {
+    @include text-body-sm;
+    color: $color-text-secondary;
+
+    strong {
+      font-family: monospace;
+      color: $color-text-primary;
+    }
+  }
+
+  &__acciones {
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+    flex-shrink: 0;
+  }
+
+  // Botón X de cierre (sin estilos de .btn)
+  &__cerrar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: $color-text-secondary;
+    cursor: pointer;
+    transition: color var(--transition-base);
+
+    &:hover {
+      color: $color-text-primary;
+    }
+
+    &:focus-visible {
+      outline: 2px solid $color-gray-800;
+      outline-offset: 2px;
+    }
   }
 }
 
