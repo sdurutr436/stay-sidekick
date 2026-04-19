@@ -1,6 +1,9 @@
 import { Component, computed, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+import { ButtonComponent } from '../../components/atoms/button/button';
+import { PageHeaderComponent } from '../../components/organisms/page-header/page-header';
+import { PanelSeccionComponent } from '../../components/organisms/panel-seccion/panel-seccion';
 
 interface CheckinHoy {
   nombre: string;
@@ -33,7 +36,7 @@ type EstadoEnvio = 'idle' | 'ok' | 'error';
   templateUrl: './notificaciones-checkin-tardio.html',
   styleUrl: './notificaciones-checkin-tardio.scss',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, PageHeaderComponent, PanelSeccionComponent, ButtonComponent],
 })
 export class NotificacionesCheckinTardioPageComponent implements OnInit, OnDestroy {
 

@@ -1,0 +1,9 @@
+<div [class]="fieldClasses">
+  @if (label) {
+    <app-form-label [for]="for">{{ label }}</app-form-label>
+  }
+  <ng-content />
+  @if (hasError && error) {
+    <p class="form-field__error">{{ error }}</p>
+  }
+</div>

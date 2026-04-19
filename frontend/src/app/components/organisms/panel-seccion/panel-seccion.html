@@ -1,0 +1,20 @@
+<section class="panel-seccion" [attr.aria-label]="title">
+  <h2 class="panel-seccion__titulo">
+    @if (hasIcon) {
+      <span class="panel-seccion__titulo-icon" aria-hidden="true">
+        <ng-content select="[title-icon]" />
+      </span>
+    }
+    {{ title }}
+  </h2>
+  @if (description) {
+    <p class="panel-seccion__desc">{{ description }}</p>
+  }
+  <ng-content select="[pre-body]" />
+  @if (divider) {
+    <hr class="panel-seccion__divider" aria-hidden="true" />
+  }
+  <div class="panel-seccion__body">
+    <ng-content />
+  </div>
+</section>

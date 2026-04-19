@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
-import { SidenavService } from '../../services/sidenav.service';
+import { SidenavService } from '../../../services/sidenav.service';
 
 interface Tool {
   id: string;

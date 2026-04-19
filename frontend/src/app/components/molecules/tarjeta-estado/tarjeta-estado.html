@@ -1,0 +1,17 @@
+<div [class]="hostClasses">
+  <div class="tarjeta-estado__header">
+    <span class="tarjeta-estado__label">{{ label }}</span>
+    <span class="tarjeta-estado__icon" aria-hidden="true">
+      <ng-content select="[icon]" />
+    </span>
+  </div>
+  <p class="tarjeta-estado__valor" [class.tarjeta-estado__valor--grande]="destacada">
+    {{ valor }}
+  </p>
+  <div class="tarjeta-estado__sub">
+    @if (sub) {
+      {{ sub }}
+    }
+    <ng-content select="[actions]" />
+  </div>
+</div>

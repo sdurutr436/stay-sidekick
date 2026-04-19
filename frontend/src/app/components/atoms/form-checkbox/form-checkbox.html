@@ -1,0 +1,13 @@
+<label class="form-choice">
+  <input
+    class="form-choice__input"
+    type="checkbox"
+    [checked]="checked"
+    [disabled]="disabled"
+    [attr.aria-label]="ariaLabel || null"
+    (change)="onChange($event)"
+  />
+  <span class="form-choice__label">
+    <ng-content />
+  </span>
+</label>

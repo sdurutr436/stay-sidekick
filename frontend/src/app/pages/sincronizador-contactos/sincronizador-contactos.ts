@@ -2,6 +2,12 @@ import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
+import { BadgeComponent } from '../../components/atoms/badge/badge';
+import { ButtonComponent } from '../../components/atoms/button/button';
+import { FormInputIconComponent } from '../../components/molecules/form-input-icon/form-input-icon';
+import { PageHeaderComponent } from '../../components/organisms/page-header/page-header';
+import { PanelSeccionComponent } from '../../components/organisms/panel-seccion/panel-seccion';
+import { TarjetaEstadoComponent } from '../../components/molecules/tarjeta-estado/tarjeta-estado';
 
 type FormatoNombre = 'nombre_apellidos' | 'apellidos_nombre' | 'nombre_solo';
 type FormatoApartamento = 'nota' | 'etiqueta' | 'ninguno';
@@ -32,7 +38,7 @@ const _PREFS_DEFECTO: PreferenciasContactos = {
   templateUrl: './sincronizador-contactos.html',
   styleUrl: './sincronizador-contactos.scss',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, PageHeaderComponent, ButtonComponent, BadgeComponent, TarjetaEstadoComponent, PanelSeccionComponent, FormInputIconComponent],
 })
 export class SincronizadorContactosPageComponent implements OnInit {
 
