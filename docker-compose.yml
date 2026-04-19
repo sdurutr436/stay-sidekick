@@ -6,22 +6,30 @@
 #   frontend  → Angular SPA  (nginx interno, puerto 80)
 #   web       → 11ty estático (nginx interno, puerto 80)
 #   backend   → Flask API     (Python, puerto 5000)
+#   postgres  → PostgreSQL 16 con volumen persistente
 #
 # Primer uso:
 #   cp backend/.env.example backend/.env   # rellenar variables reales
+#   cp web/.env.example web/.env           # rellenar TURNSTILE_SITE_KEY
 #   docker compose up --build
 #
 # URLs tras levantar:
 #   http://localhost/          → sitio estático 11ty
 #   http://localhost/app/      → app Angular
 #   http://localhost/api/      → API Flask
+#
+# Los datos de PostgreSQL se persisten en el volumen `postgres_data`.
+# Para borrar la BD: docker compose down -v
 # =============================================================================
 
 services:
 
   # ── Proxy inverso ───────────────────────────────────────────────────────────
   nginx:
-    build: ./nginx
+    build:
+      context: ./nginx
+      args:
+        RAILWAY: "false"
     ports:
       - "80:80"
     depends_on:
@@ -69,8 +77,36 @@ services:
       - path: ./backend/.env
         required: true   # crear desde backend/.env.example antes de levantar
     environment:
+      # DATABASE_URL apunta al servicio postgres de este compose.
+      # Sobreescribe el valor de backend/.env para despliegue local.
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/stay_sidekick
       # En Docker todos los servicios pasan por nginx (:80) → mismo origen
       ALLOWED_ORIGINS: "http://localhost"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - app-net
+
+  # ── PostgreSQL ───────────────────────────────────────────────────────────────
+  # Los datos persisten en el volumen `postgres_data` entre reinicios.
+  # El schema se aplica automáticamente en el primer arranque (init script).
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: stay_sidekick
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/db/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d stay_sidekick"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    expose:
+      - "5432"
     networks:
       - app-net
 
@@ -78,3 +114,7 @@ services:
 networks:
   app-net:
     driver: bridge
+
+# ── Volúmenes ────────────────────────────────────────────────────────────────
+volumes:
+  postgres_data:

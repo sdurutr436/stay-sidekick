@@ -6,6 +6,9 @@
 
 FROM python:3.11-slim
 
+# Evitar buffering para que los logs aparezcan inmediatamente en Railway
+ENV PYTHONUNBUFFERED=1
+
 WORKDIR /app
 
 # Instalar dependencias primero para caché de capas
@@ -17,4 +20,10 @@ COPY . .
 
 EXPOSE 5000
 
-CMD ["python", "run.py"]
+# FLASK_APP necesario para que `flask db upgrade` encuentre la app
+ENV FLASK_APP=run.py
+
+# 1. Aplica las migraciones pendientes (idempotente — seguro en cada arranque)
+# 2. Arranca Gunicorn con dual-stack IPv4+IPv6 (necesario en la red privada de Railway)
+# Shell form para expandir $PORT (inyectado por Railway; fallback a 5000)
+CMD flask db upgrade && gunicorn --bind "[::]:${PORT:-5000}" --workers 2 run:app

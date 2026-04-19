@@ -8,6 +8,7 @@
 # =============================================================================
 
 # ── Stage 1: Build ────────────────────────────────────────────────────────────
+# node:20-slim (Debian) — sólo etapa de build, se descarta en el stage final
 FROM node:20-alpine AS builder
 
 WORKDIR /app
@@ -23,13 +24,15 @@ COPY . .
 RUN npm run build -- --base-href=/app/
 
 # ── Stage 2: Serve ────────────────────────────────────────────────────────────
+# nginx:alpine — imagen final (Alpine minimiza la superficie de ataque; rebuild periódico para parches)
 FROM nginx:alpine
 
 # Configuración nginx para SPA (Angular Router necesita try_files → index.html)
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY nginx.conf /etc/nginx/templates/default.conf.template
 
 # Copiar el build de Angular al directorio web de nginx
 # Angular CLI >= 17 genera en dist/<nombre>/browser/
 COPY --from=builder /app/dist/frontend/browser /usr/share/nginx/html
 
+ENV PORT=80
 EXPOSE 80
