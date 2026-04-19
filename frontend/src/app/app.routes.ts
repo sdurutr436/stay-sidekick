@@ -19,6 +19,13 @@ export const routes: Routes = [
             m => m.NotificacionesCheckinTardioPageComponent
           ),
       },
+      {
+        path: 'vault-comunicaciones',
+        loadComponent: () =>
+          import('./pages/vault-comunicaciones/vault-comunicaciones').then(
+            m => m.VaultComunicacionesPageComponent
+          ),
+      },
     ],
   },
 ];
