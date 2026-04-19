@@ -105,6 +105,10 @@ export class VaultComunicacionesPageComponent implements OnDestroy {
   readonly placeholderSeleccionado = signal<DropdownOption | null>(null);
   readonly placeholderOpciones: DropdownOption[] = PLACEHOLDERS;
 
+  readonly nombreActual          = signal('');
+  readonly isNueva               = signal(false);
+  readonly guardando             = signal(false);
+
   readonly cargandoIA           = signal(false);
   readonly cooldownActivo        = signal(false);
   readonly cooldownRestante      = signal(0);
@@ -112,6 +116,9 @@ export class VaultComunicacionesPageComponent implements OnDestroy {
   readonly mensajeCopiadoTexto   = signal('');
   readonly toastVisible          = signal(false);
   readonly toastMensaje          = signal('');
+
+  // True cuando el editor debe mostrarse: plantilla seleccionada O modo nueva
+  readonly isEditing = computed(() => !!this.plantillaSeleccionada() || this.isNueva());
 
   // Posición del cursor en el textarea (se actualiza en blur/click/keyup)
   private cursorPos = 0;
@@ -135,8 +142,102 @@ export class VaultComunicacionesPageComponent implements OnDestroy {
 
   seleccionarPlantilla(plantilla: Plantilla): void {
     this.plantillaSeleccionada.set(plantilla);
+    this.nombreActual.set(plantilla.nombre);
     this.mensajeActual.set(plantilla.contenido);
     this.cursorPos = plantilla.contenido.length;
+    this.isNueva.set(false);
+  }
+
+  nuevaPlantilla(): void {
+    this.plantillaSeleccionada.set(null);
+    this.nombreActual.set('');
+    this.mensajeActual.set('');
+    this.cursorPos = 0;
+    this.isNueva.set(true);
+  }
+
+  onNombreInput(event: Event): void {
+    this.nombreActual.set((event.target as HTMLInputElement).value);
+  }
+
+  guardarPlantilla(): void {
+    const nombre    = this.nombreActual().trim();
+    const contenido = this.mensajeActual();
+    if (!nombre) return;
+
+    this.guardando.set(true);
+
+    if (this.isNueva()) {
+      // TODO: Integrar con POST /api/vault/plantillas cuando el backend esté listo.
+      //   Body:  { nombre, contenido, idioma: 'es', categoria: null }
+      //   Resp:  { ok: boolean, plantilla: Plantilla }
+      //
+      // this.http.post<{ ok: boolean; plantilla: Plantilla }>(
+      //   '/api/vault/plantillas',
+      //   { nombre, contenido, idioma: 'es', categoria: null }
+      // ).subscribe({
+      //   next: res => {
+      //     this.plantillas.update(list => [res.plantilla, ...list]);
+      //     this.seleccionarPlantilla(res.plantilla);
+      //     this.guardando.set(false);
+      //   },
+      //   error: () => {
+      //     this.guardando.set(false);
+      //     this.mostrarToast('Error al crear la plantilla. Inténtalo de nuevo.');
+      //   },
+      // });
+
+      // ── INICIO DATOS MOCK ──────────────────────────────────────────────────
+      // TODO: Eliminar este bloque al integrar POST /api/vault/plantillas
+      setTimeout(() => {
+        const creada: Plantilla = {
+          id: `mock-nueva-${Date.now()}`,
+          nombre,
+          contenido,
+          idioma: 'es',
+          categoria: null,
+          activa: true,
+        };
+        this.plantillas.update(list => [creada, ...list]);
+        this.seleccionarPlantilla(creada);
+        this.guardando.set(false);
+      }, 500);
+      // ── FIN DATOS MOCK ────────────────────────────────────────────────────
+
+    } else {
+      const id = this.plantillaSeleccionada()!.id;
+
+      // TODO: Integrar con PUT /api/vault/plantillas/<id> cuando el backend esté listo.
+      //   Body:  { nombre, contenido }
+      //   Resp:  { ok: boolean, plantilla: Plantilla }
+      //
+      // this.http.put<{ ok: boolean; plantilla: Plantilla }>(
+      //   `/api/vault/plantillas/${id}`,
+      //   { nombre, contenido }
+      // ).subscribe({
+      //   next: res => {
+      //     this.plantillas.update(list => list.map(p => p.id === id ? res.plantilla : p));
+      //     this.plantillaSeleccionada.set(res.plantilla);
+      //     this.nombreActual.set(res.plantilla.nombre);
+      //     this.guardando.set(false);
+      //   },
+      //   error: () => {
+      //     this.guardando.set(false);
+      //     this.mostrarToast('Error al guardar los cambios. Inténtalo de nuevo.');
+      //   },
+      // });
+
+      // ── INICIO DATOS MOCK ──────────────────────────────────────────────────
+      // TODO: Eliminar este bloque al integrar PUT /api/vault/plantillas/<id>
+      setTimeout(() => {
+        const actualizada: Plantilla = { ...this.plantillaSeleccionada()!, nombre, contenido };
+        this.plantillas.update(list => list.map(p => p.id === id ? actualizada : p));
+        this.plantillaSeleccionada.set(actualizada);
+        this.nombreActual.set(actualizada.nombre);
+        this.guardando.set(false);
+      }, 500);
+      // ── FIN DATOS MOCK ────────────────────────────────────────────────────
+    }
   }
 
   onSearchPlantillas(event: Event): void {
