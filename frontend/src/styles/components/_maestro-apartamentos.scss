@@ -5,7 +5,8 @@
 // =============================================================================
 
 .maestro-apartamentos {
-  padding-inline: $space-6;
+  @include container;
+  padding-block: 0;
 
   // Input de archivo oculto (activado programáticamente por el botón de XLSX).
   // Se usa display: none en lugar de u-sr-only porque el objetivo es ocultarlo
