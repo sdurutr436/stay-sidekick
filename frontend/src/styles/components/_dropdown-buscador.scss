@@ -1,0 +1,124 @@
+// =============================================================================
+// COMPONENTS: DROPDOWN BUSCADOR
+// Molécula — select con búsqueda integrada
+//
+// Estructura BEM:
+//   .dropdown-buscador                  (contenedor relativo)
+//   .dropdown-buscador--open            (modificador: desplegado)
+//     .dropdown-buscador__trigger       (botón que abre/cierra)
+//       .dropdown-buscador__trigger-label   (texto del trigger)
+//       .dropdown-buscador__trigger-arrow   (icono chevron, rota al abrir)
+//     .dropdown-buscador__panel         (panel flotante)
+//       .dropdown-buscador__search      (input de filtro)
+//       .dropdown-buscador__list        (ul de opciones)
+//         .dropdown-buscador__item      (li de opción)
+//         .dropdown-buscador__item--selected
+//         .dropdown-buscador__empty     (li cuando no hay resultados)
+// =============================================================================
+
+.dropdown-buscador {
+  position: relative;
+
+  // Dentro del toolbar del vault crece para ocupar el espacio disponible
+  flex: 1;
+  min-width: 0;
+
+  // ── Trigger ────────────────────────────────────────────────────────────────
+  &__trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $space-2;
+    width: 100%;
+    height: 2.75rem; // Igual que .form-input
+    padding: $space-2 $space-4;
+    border: $border-width $border-style $color-border;
+    background-color: $color-surface;
+    font-family: $font-family-base;
+    @include text-body-sm;
+    color: $color-text-placeholder;
+    cursor: pointer;
+    transition: border-color var(--transition-base);
+    text-align: left;
+
+    &:hover {
+      border-color: $color-border-strong;
+    }
+
+    &:focus-visible {
+      outline: none;
+      border-color: $color-border-strong;
+    }
+
+    // Con valor seleccionado: texto en color primario
+    &--has-value {
+      color: $color-text-primary;
+    }
+  }
+
+  &__trigger-label {
+    @include text-truncate;
+    flex: 1;
+  }
+
+  &__trigger-arrow {
+    display: flex;
+    flex-shrink: 0;
+    color: $color-text-secondary;
+    transition: transform var(--transition-base);
+
+    .dropdown-buscador--open & {
+      transform: rotate(180deg);
+    }
+  }
+
+  // ── Panel flotante ─────────────────────────────────────────────────────────
+  &__panel {
+    position: absolute;
+    top: calc(100% + 2px);
+    left: 0;
+    right: 0;
+    z-index: $z-raised;
+    border: $border-width $border-style $color-border-strong;
+    background-color: $color-surface;
+    box-shadow: $shadow-md;
+  }
+
+  &__search {
+    padding: $space-2;
+    border-bottom: $border-width $border-style $color-border;
+  }
+
+  // ── Lista de opciones ───────────────────────────────────────────────────────
+  &__list {
+    list-style: none;
+    margin: 0;
+    padding: $space-1 0;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+
+  &__item {
+    padding: $space-2 $space-4;
+    @include text-body-sm;
+    color: $color-text-primary;
+    cursor: pointer;
+    transition: background-color var(--transition-base);
+
+    &:hover {
+      background-color: $color-gray-100;
+    }
+
+    &--selected {
+      background-color: $color-gray-200;
+      font-weight: $font-weight-label;
+    }
+  }
+
+  &__empty {
+    padding: $space-3 $space-4;
+    @include text-body-sm;
+    color: $color-text-secondary;
+    text-align: center;
+  }
+}
