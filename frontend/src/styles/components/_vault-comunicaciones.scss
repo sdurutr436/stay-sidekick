@@ -1,0 +1,181 @@
+// =============================================================================
+// COMPONENTS: VAULT DE COMUNICACIONES (página)
+// Herramienta 5 — Vault de plantillas + generador de mensajes asistido por IA
+//
+// Layout tipo wireframe:
+//   .vault-comunicaciones   — wrapper principal
+//   .vault-layout           — grid 2 columnas (sidebar | editor)
+//   .vault-sidebar          — panel izquierdo: lista de plantillas
+//   .vault-editor           — panel derecho: composer del mensaje
+//   .vault-toast            — toast de notificación (posición fixed)
+//
+// Reutiliza:
+//   .form-editor, .form-textarea, .form-input, .btn, .page-header
+//   .dropdown-buscador, .alert
+// =============================================================================
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Wrapper de página
+// ─────────────────────────────────────────────────────────────────────────────
+.vault-comunicaciones {
+  padding-inline: $space-6;
+  display: flex;
+  flex-direction: column;
+  gap: $space-8;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Layout principal: sidebar de plantillas + editor
+// ─────────────────────────────────────────────────────────────────────────────
+.vault-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: $space-6;
+  align-items: start;
+
+  @include respond-until('md') {
+    grid-template-columns: 1fr;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Sidebar de plantillas (estilo análogo al nav-sidenav)
+// ─────────────────────────────────────────────────────────────────────────────
+.vault-sidebar {
+  border: $border-width $border-style $color-border;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  &__search-wrap {
+    padding: $space-3;
+    border-bottom: $border-width $border-style $color-border;
+  }
+
+  &__list {
+    list-style: none;
+    margin: 0;
+    padding: $space-2 0;
+    overflow-y: auto;
+    max-height: 60vh;
+  }
+
+  &__item {
+    padding: $space-3 $space-4;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: $space-1;
+    transition: background-color var(--transition-base);
+
+    &:hover {
+      background-color: $color-gray-100;
+    }
+
+    // Estado activo: plantilla seleccionada
+    &--activo {
+      background-color: $color-gray-200;
+
+      &:hover {
+        background-color: $color-gray-200;
+      }
+
+      .vault-sidebar__item-nombre {
+        font-weight: $font-weight-heading;
+      }
+    }
+  }
+
+  &__item-nombre {
+    @include text-body-sm;
+    color: $color-text-primary;
+    @include text-truncate;
+  }
+
+  &__item-meta {
+    @include text-caption-sm;
+    color: $color-text-secondary;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  &__empty {
+    padding: $space-4;
+    @include text-body-sm;
+    color: $color-text-secondary;
+    text-align: center;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Panel editor
+// ─────────────────────────────────────────────────────────────────────────────
+.vault-editor {
+  display: flex;
+  flex-direction: column;
+  gap: $space-4;
+
+  // Barra de variables: dropdown buscable + botón insertar
+  &__toolbar {
+    display: flex;
+    align-items: center;
+    gap: $space-3;
+  }
+
+  // Textarea envuelta en .form-editor para hereder su borde y fondo
+  &__textarea-wrap {
+    // Los estilos base provienen de .form-editor (ver _form.scss)
+  }
+
+  // Estado vacío cuando no hay plantilla seleccionada
+  &__empty-state {
+    padding: $space-10 $space-6;
+    text-align: center;
+
+    p {
+      @include text-body-md;
+      color: $color-text-secondary;
+    }
+  }
+
+  // Fila de botones inferior
+  &__acciones {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: $space-3;
+  }
+
+  &__acciones-izq,
+  &__acciones-der {
+    display: flex;
+    align-items: center;
+    gap: $space-3;
+  }
+
+  // Texto de confirmación de copiado (aparece brevemente)
+  &__copiado {
+    @include text-body-sm;
+    color: $color-text-secondary;
+    font-style: italic;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Toast de notificación (posición fixed esquina inferior derecha)
+// ─────────────────────────────────────────────────────────────────────────────
+.vault-toast {
+  position: fixed;
+  bottom: $space-8;
+  right: $space-8;
+  z-index: $z-tooltip;
+  max-width: 24rem;
+  width: calc(100% - #{$space-16});
+
+  @include respond-until('sm') {
+    right: $space-4;
+    bottom: $space-4;
+    width: calc(100% - #{$space-8});
+  }
+}
