@@ -1,0 +1,52 @@
+<div class="dropdown-buscador" [class.dropdown-buscador--open]="isOpen()">
+
+  <button
+    type="button"
+    class="dropdown-buscador__trigger"
+    [class.dropdown-buscador__trigger--has-value]="selectedOption() !== null"
+    [attr.aria-expanded]="isOpen()"
+    aria-haspopup="listbox"
+    (click)="toggle()"
+  >
+    <span class="dropdown-buscador__trigger-label">{{ triggerLabel }}</span>
+    <span class="dropdown-buscador__trigger-arrow" aria-hidden="true">
+      <svg class="svg svg--xs" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none">
+        <polyline points="4,6 8,10 12,6" stroke="currentColor" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter"/>
+      </svg>
+    </span>
+  </button>
+
+  @if (isOpen()) {
+    <div class="dropdown-buscador__panel" role="dialog" aria-label="Seleccionar opción">
+      <div class="dropdown-buscador__search">
+        <input
+          type="text"
+          class="form-input"
+          [placeholder]="searchPlaceholder"
+          [value]="searchQuery()"
+          (input)="onSearchInput($event)"
+          autofocus
+          aria-label="Buscar en opciones"
+        />
+      </div>
+      <ul class="dropdown-buscador__list" role="listbox">
+        @if (filteredOptions.length > 0) {
+          @for (option of filteredOptions; track option.value) {
+            <li
+              class="dropdown-buscador__item"
+              [class.dropdown-buscador__item--selected]="selectedOption()?.value === option.value"
+              role="option"
+              [attr.aria-selected]="selectedOption()?.value === option.value"
+              (click)="select(option)"
+            >
+              {{ option.label }}
+            </li>
+          }
+        } @else {
+          <li class="dropdown-buscador__empty">{{ emptyMessage }}</li>
+        }
+      </ul>
+    </div>
+  }
+
+</div>

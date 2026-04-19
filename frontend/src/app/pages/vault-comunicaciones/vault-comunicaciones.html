@@ -1,0 +1,287 @@
+<!-- Página: Vault de comunicaciones -->
+<div class="vault-comunicaciones">
+
+  <app-page-header
+    title="Vault de comunicaciones"
+    description="Biblioteca centralizada de plantillas de mensajes. Selecciona una plantilla, rellena las variables y refínala con IA antes de enviar."
+  />
+
+  <div class="vault-layout">
+
+    <!-- ── Sidebar: lista de plantillas (estilo nav-sidenav) ── -->
+    <aside class="vault-sidebar" aria-label="Plantillas disponibles">
+
+      <div class="vault-sidebar__search-wrap">
+        <input
+          type="search"
+          class="form-input"
+          placeholder="Buscar plantilla…"
+          [value]="searchPlantillas()"
+          (input)="onSearchPlantillas($event)"
+          aria-label="Buscar plantilla por nombre o categoría"
+        />
+      </div>
+
+      <!-- Botón para crear una plantilla nueva -->
+      <div class="vault-sidebar__nueva-wrap">
+        <button
+          type="button"
+          class="vault-sidebar__nueva-btn"
+          [class.vault-sidebar__nueva-btn--activo]="isNueva()"
+          (click)="nuevaPlantilla()"
+        >
+          <svg class="svg svg--xs" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <line x1="8" y1="2" x2="8" y2="14" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
+            <line x1="2" y1="8" x2="14" y2="8" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
+          </svg>
+          Nueva plantilla
+        </button>
+      </div>
+
+      <ul class="vault-sidebar__list" role="listbox" aria-label="Listado de plantillas">
+
+        @if (plantillasFiltradas().length > 0) {
+          @for (p of plantillasFiltradas(); track p.id) {
+            <li
+              class="vault-sidebar__item"
+              [class.vault-sidebar__item--activo]="plantillaSeleccionada()?.id === p.id"
+              role="option"
+              [attr.aria-selected]="plantillaSeleccionada()?.id === p.id"
+              (click)="seleccionarPlantilla(p)"
+            >
+              <span class="vault-sidebar__item-nombre">{{ p.nombre }}</span>
+              @if (p.categoria) {
+                <span class="vault-sidebar__item-meta">{{ p.categoria }}</span>
+              }
+            </li>
+          }
+        } @else {
+          <li class="vault-sidebar__empty" role="option" aria-selected="false">
+            Sin resultados para "{{ searchPlantillas() }}"
+          </li>
+        }
+
+      </ul>
+    </aside>
+
+    <!-- ── Editor: composer de mensaje ── -->
+    <section class="vault-editor" aria-label="Editor de mensaje">
+
+      @if (isEditing()) {
+        <!-- Nombre de la plantilla (editable) -->
+        <div class="vault-editor__nombre-wrap">
+          <input
+            type="text"
+            class="form-input vault-editor__nombre-input"
+            placeholder="Nombre de la plantilla…"
+            [value]="nombreActual()"
+            (input)="onNombreInput($event)"
+            aria-label="Nombre de la plantilla"
+            maxlength="200"
+          />
+        </div>
+      }
+
+      <!-- Barra de variables: dropdown buscable + botón insertar + añadir variable -->
+      <div class="vault-editor__toolbar">
+        <app-dropdown-buscador
+          [options]="placeholderOpciones()"
+          placeholder="Seleccionar variable…"
+          searchPlaceholder="Buscar variable…"
+          emptyMessage="Sin variables que coincidan"
+          (optionSelected)="onPlaceholderSeleccionado($event)"
+        />
+        <app-button
+          variant="secondary"
+          size="sm"
+          [disabled]="!placeholderSeleccionado() || !isEditing()"
+          title="Inserta la variable en la posición actual del cursor"
+          (click)="insertarPlaceholder()"
+        >
+          Insertar
+        </app-button>
+        <app-button
+          variant="ghost"
+          size="sm"
+          [title]="panelNuevaVariable() ? 'Cerrar panel de nueva variable' : 'Añadir una nueva variable personalizada'"
+          (click)="togglePanelNuevaVariable()"
+        >
+          @if (panelNuevaVariable()) {
+            <span aria-hidden="true">✕</span> Cancelar
+          } @else {
+            + Variable
+          }
+        </app-button>
+      </div>
+
+      <!-- Panel de nueva variable (colapsa entre toolbar y textarea) -->
+      @if (panelNuevaVariable()) {
+        <div class="vault-nueva-variable" role="region" aria-label="Añadir variable personalizada">
+          <div class="vault-nueva-variable__inner">
+            <div class="vault-nueva-variable__field">
+              <span class="vault-nueva-variable__prefix" aria-hidden="true">{{ '{' }}</span>
+              <input
+                type="text"
+                class="form-input vault-nueva-variable__input"
+                placeholder="NOMBRE_VARIABLE"
+                [value]="nuevaVariableNombre()"
+                (input)="onNuevaVariableNombre($event)"
+                maxlength="40"
+                aria-label="Nombre de la nueva variable (sin llaves)"
+                autofocus
+              />
+              <span class="vault-nueva-variable__suffix" aria-hidden="true">{{ '}' }}</span>
+            </div>
+            @if (nuevaVariableNombre()) {
+              <span class="vault-nueva-variable__preview">
+                Se insertará como <strong>{{ '{' + nuevaVariableNombre() + '}' }}</strong>
+              </span>
+            }
+          </div>
+          <div class="vault-nueva-variable__acciones">
+            <app-button
+              variant="secondary"
+              size="sm"
+              [disabled]="!nuevaVariableNombre().trim() || guardandoVariable()"
+              (click)="guardarNuevaVariable()"
+            >
+              @if (guardandoVariable()) { Guardando… } @else { Guardar variable }
+            </app-button>
+            <button
+              type="button"
+              class="vault-nueva-variable__cerrar"
+              aria-label="Cerrar panel de nueva variable"
+              (click)="cerrarPanelNuevaVariable()"
+            >
+              <svg class="svg svg--xs" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <line x1="4" y1="4" x2="12" y2="12" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
+                <line x1="12" y1="4" x2="4" y2="12" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      }
+
+      <!-- Área de texto — usa form-editor para mantener el borde y estilo consistentes -->
+      <div class="vault-editor__textarea-wrap form-editor">
+        @if (!isEditing()) {
+          <div class="vault-editor__empty-state">
+            <p>Selecciona una plantilla del panel izquierdo o crea una nueva para empezar a editar.</p>
+          </div>
+        } @else {
+          <div class="form-editor__body">
+            <textarea
+              #mensajeTextarea
+              class="form-textarea"
+              [value]="mensajeActual()"
+              placeholder="El contenido de la plantilla aparecerá aquí…"
+              rows="12"
+              aria-label="Texto del mensaje"
+              (input)="onMensajeInput($event)"
+              (click)="onMensajeCursorChange($event)"
+              (keyup)="onMensajeCursorChange($event)"
+              (blur)="onMensajeCursorChange($event)"
+            ></textarea>
+          </div>
+        }
+      </div>
+
+      <!-- Acciones: refinar con IA + copiar mensaje -->
+      <div class="vault-editor__acciones">
+
+        <!-- Lado izquierdo: refinar con IA (con cooldown de 1 min) -->
+        <div class="vault-editor__acciones-izq">
+          <app-button
+            [variant]="cooldownActivo() ? 'secondary' : 'primary'"
+            size="md"
+            [disabled]="cargandoIA() || !isEditing()"
+            [title]="cooldownActivo()
+              ? 'Espera ' + cooldownRestante() + 's antes de refinar de nuevo'
+              : 'Ajusta el tono, traduce o genera una variación del mensaje usando IA'"
+            (click)="refinarConIA()"
+          >
+            <span class="btn__icon" aria-hidden="true">
+              <!-- Icono: estrella/destellos IA -->
+              <svg class="svg svg--sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
+                <path d="M10 2l1.5 4.5L16 8l-4.5 1.5L10 14l-1.5-4.5L4 8l4.5-1.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+                <line x1="16" y1="14" x2="18" y2="16" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
+                <circle cx="16" cy="14" r="1.5" stroke="currentColor" stroke-width="1"/>
+              </svg>
+            </span>
+            @if (cargandoIA()) {
+              Refinando…
+            } @else if (cooldownActivo()) {
+              Refinar ({{ cooldownRestante() }}s)
+            } @else {
+              Refinar con IA
+            }
+          </app-button>
+        </div>
+
+        <!-- Lado derecho: copiar mensaje + confirmación + guardar -->
+        <div class="vault-editor__acciones-der">
+
+          <!-- Copiar: botón y confirmación apilados en columna -->
+          <div class="vault-editor__copiar-wrap">
+            <app-button
+              variant="secondary"
+              size="md"
+              [disabled]="!mensajeActual().trim()"
+              title="Copiar el mensaje al portapapeles"
+              (click)="copiarMensaje()"
+            >
+              <span class="btn__icon" aria-hidden="true">
+                <svg class="svg svg--sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
+                  <rect x="7" y="3" width="10" height="13" stroke="currentColor" stroke-width="1.5"/>
+                  <rect x="3" y="6" width="10" height="13" stroke="currentColor" stroke-width="1.5" fill="white"/>
+                </svg>
+              </span>
+              Copiar mensaje
+            </app-button>
+            @if (mensajeCopiadoVisible()) {
+              <span class="vault-editor__copiado" aria-live="polite" role="status">
+                {{ mensajeCopiadoTexto() }}
+              </span>
+            }
+          </div>
+
+          <!-- Guardar / Crear plantilla -->
+          <app-button
+            variant="primary"
+            size="md"
+            [disabled]="guardando() || !nombreActual().trim()"
+            [title]="isNueva() ? 'Crear la nueva plantilla en tu biblioteca' : 'Guardar los cambios de esta plantilla'"
+            (click)="guardarPlantilla()"
+          >
+            <span class="btn__icon" aria-hidden="true">
+              <svg class="svg svg--sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
+                <rect x="4" y="2" width="12" height="16" stroke="currentColor" stroke-width="1.5"/>
+                <rect x="7" y="2" width="6" height="5" stroke="currentColor" stroke-width="1.5"/>
+                <rect x="5" y="11" width="10" height="5" stroke="currentColor" stroke-width="1.5"/>
+              </svg>
+            </span>
+            @if (guardando()) {
+              Guardando…
+            } @else if (isNueva()) {
+              Crear plantilla
+            } @else {
+              Guardar cambios
+            }
+          </app-button>
+        </div>
+
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Toast de notificación (cooldown IA + errores) — posicionado fijo -->
+  @if (toastVisible()) {
+    <div class="vault-toast" role="status" aria-live="assertive">
+      <app-alert type="warning" [dismissible]="true" (dismissed)="toastVisible.set(false)">
+        {{ toastMensaje() }}
+      </app-alert>
+    </div>
+  }
+
+</div>

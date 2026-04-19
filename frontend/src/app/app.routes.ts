@@ -30,6 +30,13 @@ export const routes: Routes = [
           { path: 'organismos', loadComponent: () => import('./pages/hoja-estilos/secciones/organismos/organismos').then(m => m.DsOrganismosComponent)  },
         ],
       },
+      {
+        path: 'vault-comunicaciones',
+        loadComponent: () =>
+          import('./pages/vault-comunicaciones/vault-comunicaciones').then(
+            m => m.VaultComunicacionesPageComponent
+          ),
+      },
     ],
   },
 ];

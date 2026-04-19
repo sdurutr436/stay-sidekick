@@ -1,0 +1,331 @@
+// =============================================================================
+// COMPONENTS: VAULT DE COMUNICACIONES (página)
+// Herramienta 5 — Vault de plantillas + generador de mensajes asistido por IA
+//
+// Layout tipo wireframe:
+//   .vault-comunicaciones   — wrapper principal
+//   .vault-layout           — grid 2 columnas (sidebar | editor)
+//   .vault-sidebar          — panel izquierdo: lista de plantillas
+//   .vault-editor           — panel derecho: composer del mensaje
+//   .vault-toast            — toast de notificación (posición fixed)
+//
+// Reutiliza:
+//   .form-editor, .form-textarea, .form-input, .btn, .page-header
+//   .dropdown-buscador, .alert
+// =============================================================================
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Wrapper de página
+// ─────────────────────────────────────────────────────────────────────────────
+.vault-comunicaciones {
+  // Mismos límites de ancho que el header (__inner usa @include container):
+  // max-width: 1200px centrado + padding-inline: $space-6
+  @include container;
+  display: flex;
+  flex-direction: column;
+  gap: $space-8;
+  padding-block: 0; // El padding vertical lo gestiona menu-layout__content
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Layout principal: sidebar de plantillas + editor
+// ─────────────────────────────────────────────────────────────────────────────
+.vault-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: $space-6;
+  align-items: start;
+
+  @include respond-until('md') {
+    grid-template-columns: 1fr;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Sidebar de plantillas (estilo análogo al nav-sidenav)
+// ─────────────────────────────────────────────────────────────────────────────
+.vault-sidebar {
+  border: $border-width $border-style $color-border;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  &__search-wrap {
+    padding: $space-3;
+    border-bottom: $border-width $border-style $color-border;
+  }
+
+  &__list {
+    list-style: none;
+    margin: 0;
+    padding: $space-2 0;
+    // max-height fija: ~10 plantillas visibles antes de activar scroll
+    max-height: 480px;
+    overflow-y: auto;
+  }
+
+  &__item {
+    padding: $space-3 $space-4;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: $space-1;
+    transition: background-color var(--transition-base);
+
+    &:hover {
+      background-color: $color-gray-100;
+    }
+
+    // Estado activo: plantilla seleccionada
+    &--activo {
+      background-color: $color-gray-200;
+
+      &:hover {
+        background-color: $color-gray-200;
+      }
+
+      .vault-sidebar__item-nombre {
+        font-weight: $font-weight-heading;
+      }
+    }
+  }
+
+  &__item-nombre {
+    @include text-body-sm;
+    color: $color-text-primary;
+    @include text-truncate;
+  }
+
+  &__item-meta {
+    @include text-caption-sm;
+    color: $color-text-secondary;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  &__empty {
+    padding: $space-4;
+    @include text-body-sm;
+    color: $color-text-secondary;
+    text-align: center;
+  }
+
+  // Botón "Nueva plantilla" (ancho completo, debajo del buscador)
+  &__nueva-wrap {
+    padding: $space-3;
+    border-bottom: $border-width $border-style $color-border;
+  }
+
+  &__nueva-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: $space-2;
+    width: 100%;
+    padding: $space-2 $space-3;
+    border: $border-width $border-style $color-border;
+    background-color: $color-surface;
+    font-family: $font-family-base;
+    @include text-label-md;
+    color: $color-text-primary;
+    cursor: pointer;
+    transition: background-color var(--transition-base),
+                border-color var(--transition-base);
+
+    &:hover {
+      background-color: $color-gray-100;
+      border-color: $color-border-strong;
+    }
+
+    &:focus-visible {
+      outline: none;
+      border-color: $color-border-strong;
+    }
+
+    // Estado activo: modo "nueva plantilla" en curso
+    &--activo {
+      background-color: $color-gray-200;
+      border-color: $color-border-strong;
+    }
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Panel editor
+// ─────────────────────────────────────────────────────────────────────────────
+.vault-editor {
+  display: flex;
+  flex-direction: column;
+  gap: $space-4;
+
+  // Input del nombre de la plantilla (prominente, encima del toolbar)
+  &__nombre-wrap {
+    // El form-input hereda el estilo base; aquí solo ajustamos la fuente del input
+  }
+
+  &__nombre-input {
+    @include text-body-md;
+    font-weight: $font-weight-heading;
+  }
+
+  // Barra de variables: dropdown buscable + botón insertar
+  &__toolbar {
+    display: flex;
+    align-items: center;
+    gap: $space-3;
+  }
+
+  // Textarea envuelta en .form-editor para hereder su borde y fondo
+  &__textarea-wrap {
+    // Los estilos base provienen de .form-editor (ver _form.scss)
+  }
+
+  // Estado vacío cuando no hay plantilla seleccionada
+  &__empty-state {
+    padding: $space-10 $space-6;
+    text-align: center;
+
+    p {
+      @include text-body-md;
+      color: $color-text-secondary;
+    }
+  }
+
+  // Fila de botones inferior
+  &__acciones {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: $space-3;
+  }
+
+  &__acciones-izq,
+  &__acciones-der {
+    display: flex;
+    align-items: center;
+    gap: $space-3;
+  }
+
+  // Wrapper del botón copiar: position relative para anclar el span
+  &__copiar-wrap {
+    position: relative;
+  }
+
+  // Confirmación de copiado: posición absoluta bajo el botón, fuera del flujo
+  // No desplaza el flex/grid porque no ocupa espacio en el layout.
+  // Hay espacio suficiente debajo de la fila de acciones (es el último elemento).
+  &__copiado {
+    position: absolute;
+    top: calc(100% + #{$space-1});
+    right: 0;
+    white-space: nowrap;
+    @include text-body-sm;
+    color: $color-text-secondary;
+    font-style: italic;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Panel de nueva variable (aparece entre toolbar y textarea)
+// ─────────────────────────────────────────────────────────────────────────────
+.vault-nueva-variable {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $space-4;
+  padding: $space-3 $space-4;
+  border: $border-width $border-style $color-border;
+  background-color: $color-surface-alt;
+
+  &__inner {
+    display: flex;
+    align-items: center;
+    gap: $space-4;
+    flex: 1;
+    min-width: 0;
+  }
+
+  // Fila: "{" + input + "}"
+  &__field {
+    display: flex;
+    align-items: center;
+    gap: $space-1;
+    flex-shrink: 0;
+  }
+
+  &__prefix,
+  &__suffix {
+    @include text-body-md;
+    font-weight: $font-weight-heading;
+    color: $color-text-secondary;
+    user-select: none;
+  }
+
+  &__input {
+    width: 16rem;
+    font-family: monospace;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  // Preview "{MI_VARIABLE}" debajo del campo
+  &__preview {
+    @include text-body-sm;
+    color: $color-text-secondary;
+
+    strong {
+      font-family: monospace;
+      color: $color-text-primary;
+    }
+  }
+
+  &__acciones {
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+    flex-shrink: 0;
+  }
+
+  // Botón X de cierre (sin estilos de .btn)
+  &__cerrar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: $color-text-secondary;
+    cursor: pointer;
+    transition: color var(--transition-base);
+
+    &:hover {
+      color: $color-text-primary;
+    }
+
+    &:focus-visible {
+      outline: 2px solid $color-gray-800;
+      outline-offset: 2px;
+    }
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Toast de notificación (posición fixed esquina inferior derecha)
+// ─────────────────────────────────────────────────────────────────────────────
+.vault-toast {
+  position: fixed;
+  bottom: $space-8;
+  right: $space-8;
+  z-index: $z-tooltip;
+  max-width: 24rem;
+  width: calc(100% - #{$space-16});
+
+  @include respond-until('sm') {
+    right: $space-4;
+    bottom: $space-4;
+    width: calc(100% - #{$space-8});
+  }
+}
