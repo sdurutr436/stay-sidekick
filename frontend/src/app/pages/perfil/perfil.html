@@ -149,12 +149,42 @@
     <!-- Google -->
     <section class="u-mt-8" aria-labelledby="integ-google-titulo">
       <h3 id="integ-google-titulo" class="perfil-page__subseccion-titulo">Google People</h3>
-      <p class="u-text-secondary">
+
+      @if (googleAlerta()) {
+        <app-alert
+          [type]="googleAlerta()!.tipo"
+          [dismissible]="true"
+          (dismissed)="googleAlerta.set(null)"
+        >
+          {{ googleAlerta()!.mensaje }}
+        </app-alert>
+      }
+
+      <p class="u-text-secondary u-mb-8">
         Estado: <strong>{{ integraciones()?.google?.configurado ? 'Conectado' : 'No conectado' }}</strong>
       </p>
-      <p class="u-text-secondary u-mt-4">
-        La conexión con Google se gestiona a través del flujo OAuth en el Sincronizador de Contactos.
-      </p>
+
+      @if (isAdmin()) {
+        @if (integraciones()?.google?.configurado) {
+          <app-button
+            variant="danger"
+            size="md"
+            [disabled]="googleGuardando()"
+            (click)="desconectarGoogle()"
+          >
+            {{ googleGuardando() ? 'Desconectando…' : 'Desconectar Google' }}
+          </app-button>
+        } @else {
+          <app-button
+            variant="secondary"
+            size="md"
+            [disabled]="googleGuardando()"
+            (click)="conectarGoogle()"
+          >
+            {{ googleGuardando() ? 'Redirigiendo…' : 'Conectar Google Contacts' }}
+          </app-button>
+        }
+      }
     </section>
 
     <!-- IA -->

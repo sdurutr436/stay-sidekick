@@ -1,4 +1,6 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { PerfilService, IntegracionesData } from '../../services/perfil.service';
 import { PageHeaderComponent } from '../../components/organisms/page-header/page-header';
@@ -31,6 +33,8 @@ interface Alerta {
 export class PerfilPageComponent implements OnInit {
   readonly auth    = inject(AuthService);
   readonly service = inject(PerfilService);
+  private  readonly http  = inject(HttpClient);
+  private  readonly route = inject(ActivatedRoute);
 
   readonly email             = signal('');
   readonly passwordChangedAt = signal<string | null>(null);
@@ -57,6 +61,10 @@ export class PerfilPageComponent implements OnInit {
   readonly iaGuardando  = signal(false);
   readonly iaAlerta     = signal<Alerta | null>(null);
 
+  // Google
+  readonly googleGuardando = signal(false);
+  readonly googleAlerta    = signal<Alerta | null>(null);
+
   readonly pmsOpciones = [
     { value: 'smoobu',    label: 'Smoobu'    },
     { value: 'beds24',    label: 'Beds24'    },
@@ -82,6 +90,23 @@ export class PerfilPageComponent implements OnInit {
     });
 
     this.cargarIntegraciones();
+
+    this.route.queryParamMap.subscribe(params => {
+      if (params.get('google_conectado') === 'true') {
+        this.googleAlerta.set({ tipo: 'success', mensaje: 'Google Contacts conectado correctamente.' });
+        this.cargarIntegraciones();
+      }
+      const err = params.get('google_error');
+      if (err) {
+        const mensajes: Record<string, string> = {
+          acceso_denegado: 'Acceso denegado por Google.',
+          estado_invalido: 'Error de seguridad en el proceso OAuth. Inténtalo de nuevo.',
+          codigo_invalido: 'Código OAuth inválido.',
+          token_fallido:   'No se pudieron obtener los tokens de Google.',
+        };
+        this.googleAlerta.set({ tipo: 'error', mensaje: mensajes[err] ?? 'Error al conectar con Google.' });
+      }
+    });
   }
 
   diasDesdeUltimoCambio(): number | null {
@@ -158,6 +183,39 @@ export class PerfilPageComponent implements OnInit {
       error: err => {
         this.iaAlerta.set({ tipo: 'error', mensaje: err?.error?.errors?.[0] ?? 'Error al guardar la IA.' });
         this.iaGuardando.set(false);
+      },
+    });
+  }
+
+  conectarGoogle(): void {
+    this.googleAlerta.set(null);
+    this.googleGuardando.set(true);
+    const headers = { Authorization: `Bearer ${this.auth.getToken() ?? ''}` };
+    this.http.get<{ ok: boolean; url: string }>('/api/contactos/google/auth', { headers }).subscribe({
+      next: res => {
+        if (res.url) window.location.href = res.url;
+        else this.googleGuardando.set(false);
+      },
+      error: err => {
+        this.googleAlerta.set({ tipo: 'error', mensaje: err?.error?.errors?.[0] ?? 'Error al iniciar la conexión con Google.' });
+        this.googleGuardando.set(false);
+      },
+    });
+  }
+
+  desconectarGoogle(): void {
+    this.googleAlerta.set(null);
+    this.googleGuardando.set(true);
+    const headers = { Authorization: `Bearer ${this.auth.getToken() ?? ''}` };
+    this.http.delete<{ ok: boolean }>('/api/contactos/google/disconnect', { headers }).subscribe({
+      next: () => {
+        this.googleAlerta.set({ tipo: 'success', mensaje: 'Google Contacts desconectado.' });
+        this.cargarIntegraciones();
+        this.googleGuardando.set(false);
+      },
+      error: err => {
+        this.googleAlerta.set({ tipo: 'error', mensaje: err?.error?.errors?.[0] ?? 'Error al desconectar Google.' });
+        this.googleGuardando.set(false);
       },
     });
   }
