@@ -137,29 +137,6 @@ export class SincronizadorContactosPageComponent implements OnInit {
     });
   }
 
-  // ── Conexión Google ───────────────────────────────────────────────────────
-
-  connectarGoogle(): void {
-    this.http.get<{ ok: boolean; url: string }>('/api/contactos/google/auth').subscribe({
-      next: res => {
-        if (res.url) {
-          window.location.href = res.url;
-        }
-      },
-      error: err => console.error('[sincronizador-contactos] Error al obtener URL OAuth:', err),
-    });
-  }
-
-  desconectarGoogle(): void {
-    this.http.delete<{ ok: boolean }>('/api/contactos/google/disconnect').subscribe({
-      next: () => {
-        this.googleConectado.set(false);
-        this.ultimoSync.set(null);
-      },
-      error: err => console.error('[sincronizador-contactos] Error al desconectar Google:', err),
-    });
-  }
-
   // ── Fechas ────────────────────────────────────────────────────────────────
 
   onFechaDesdeChange(valor: string): void {
