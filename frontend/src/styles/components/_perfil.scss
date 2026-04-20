@@ -1,0 +1,46 @@
+// =============================================================================
+// COMPONENTS: PERFIL DE USUARIO (página)
+//
+// Organismos propios:
+//   .perfil-page                    — wrapper principal de página
+//   .perfil-form                    — grupo de campos de formulario
+//   .perfil-page__subseccion-titulo — h3 de subsección dentro de integraciones
+//   .perfil-page__sesion            — sección de cierre de sesión
+//
+// Reutiliza:
+//   .panel-seccion, .page-header, .btn, .form-*, .alert
+// =============================================================================
+
+// ── Wrapper de página ─────────────────────────────────────────────────────
+
+.perfil-page {
+  @include container;
+  padding-block: 0;
+  display: flex;
+  flex-direction: column;
+  gap: $space-8;
+
+  // ── Títulos de subsección (PMS, Google, IA) ───────────────────────────
+  &__subseccion-titulo {
+    @include text-h3;
+    margin-block: $space-6 $space-4;
+
+    &:first-child {
+      margin-block-start: 0;
+    }
+  }
+
+  // ── Sección de cierre de sesión ───────────────────────────────────────
+  &__sesion {
+    padding-block-end: $space-8;
+  }
+}
+
+// ── Grupo de campos del formulario ────────────────────────────────────────
+
+.perfil-form {
+  display: flex;
+  flex-direction: column;
+  gap: $space-4;
+  margin-block-end: $space-6;
+}
