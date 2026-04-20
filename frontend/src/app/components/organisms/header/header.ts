@@ -17,12 +17,13 @@ export class HeaderComponent {
   readonly sidenavService = inject(SidenavService);
   readonly auth = inject(AuthService);
 
+  // Toda la SPA vive bajo /menu/ — el hamburger es siempre visible.
   readonly isMenuPage = toSignal(
     this.router.events.pipe(
       filter(e => e instanceof NavigationEnd),
-      map(() => this.router.url.startsWith('/menu')),
-      startWith(this.router.url.startsWith('/menu')),
+      map(() => true),
+      startWith(true),
     ),
-    { initialValue: this.router.url.startsWith('/menu') },
+    { initialValue: true },
   );
 }

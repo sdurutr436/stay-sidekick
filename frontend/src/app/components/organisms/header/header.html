@@ -34,7 +34,7 @@
       }
 
       <!-- Brand: ícono + nombre app -->
-      <a routerLink="/menu" class="header__brand logo" aria-label="Stay Sidekick — Menú">
+      <a routerLink="/" class="header__brand logo" aria-label="Stay Sidekick — Menú">
         <div class="logo__icon">
           <svg
             class="svg svg--lg"
@@ -56,7 +56,7 @@
     <!-- Acciones: sesión + CTA -->
     <nav class="header__actions" aria-label="Acciones de usuario">
       @if (auth.isLoggedIn()) {
-        <a routerLink="/menu/perfil" class="btn btn--secondary btn--md">
+        <a routerLink="/perfil" class="btn btn--secondary btn--md">
           Perfil
         </a>
       } @else {

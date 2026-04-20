@@ -6,7 +6,7 @@ import { SincronizadorContactosPageComponent } from './pages/sincronizador-conta
 
 export const routes: Routes = [
   {
-    path: 'menu',
+    path: '',
     component: MenuPageComponent,
     children: [
       { path: '', component: MenuDefaultPageComponent },
