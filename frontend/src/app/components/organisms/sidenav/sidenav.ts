@@ -9,13 +9,13 @@ interface Tool {
 }
 
 const TOOLS: Tool[] = [
-  { id: 'maestro-apartamentos',          label: 'Maestro de apartamentos',    route: '/menu/maestro-apartamentos'          },
-  { id: 'sincronizador-contactos',       label: 'Sincronizador de contactos', route: '/menu/sincronizador-contactos'       },
-  { id: 'notificaciones-checkin-tardio', label: 'Notificaciones check-in',    route: '/menu/notificaciones-checkin-tardio' },
+  { id: 'maestro-apartamentos',          label: 'Maestro de apartamentos',    route: '/maestro-apartamentos'          },
+  { id: 'sincronizador-contactos',       label: 'Sincronizador de contactos', route: '/sincronizador-contactos'       },
+  { id: 'notificaciones-checkin-tardio', label: 'Notificaciones check-in',    route: '/notificaciones-checkin-tardio' },
   { id: 'tool-4',               label: 'Herramienta 4',           route: null                          },
-  { id: 'vault-comunicaciones', label: 'Vault de comunicaciones', route: '/menu/vault-comunicaciones' },
+  { id: 'vault-comunicaciones', label: 'Vault de comunicaciones', route: '/vault-comunicaciones' },
   // Hoja de estilos: herramienta interna de desarrollo, fuera de las 5 del panel
-  { id: 'hoja-estilos',         label: 'Hoja de estilos',         route: '/menu/hoja-estilos'         },
+  { id: 'hoja-estilos',         label: 'Hoja de estilos',         route: '/hoja-estilos'         },
 ];
 
 @Component({

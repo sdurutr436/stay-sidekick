@@ -21,7 +21,7 @@ RUN npm ci
 COPY . .
 
 # Compilar en modo producción con base-href para el prefijo /app/
-RUN npm run build -- --base-href=/app/
+RUN npm run build -- --base-href=/menu/
 
 # ── Stage 2: Serve ────────────────────────────────────────────────────────────
 # nginx:alpine — imagen final (Alpine minimiza la superficie de ataque; rebuild periódico para parches)
