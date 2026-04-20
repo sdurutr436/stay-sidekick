@@ -249,7 +249,7 @@ async function submitPayload(payload, csrfToken) {
       if (data.token) {
         // Guarda el JWT para que la SPA Angular lo use
         localStorage.setItem('ss_token', data.token);
-        window.location.href = '/app';
+        window.location.href = '/menu';
       }
     } catch (err) {
       // Muestra el error del backend en el campo email (es el punto de entrada)
