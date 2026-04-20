@@ -76,8 +76,9 @@ def authenticate_user(clean_data: dict) -> tuple[str | None, list[str]]:
     token = create_access_token(
         identity=email,
         extra_claims={
-            "user_id": user["id"],
+            "user_id":   user["id"],
             "empresa_id": user["empresa_id"],
+            "rol":        user["rol"],
         },
     )
 

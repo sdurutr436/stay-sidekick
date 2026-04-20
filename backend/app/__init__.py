@@ -53,11 +53,13 @@ def create_app(config_class: type = Config) -> Flask:
     from app.apartamentos.routes import apartamentos_bp                      # noqa: E402
     from app.routes.contactos import contactos_bp                            # noqa: E402
     from app.notificaciones.routes import notificaciones_bp                  # noqa: E402
+    from app.routes.perfil import perfil_bp                                  # noqa: E402
     app.register_blueprint(formulario_solicitud_bp)
     app.register_blueprint(auth_bp)
     app.register_blueprint(apartamentos_bp)
     app.register_blueprint(contactos_bp)
     app.register_blueprint(notificaciones_bp)
+    app.register_blueprint(perfil_bp)
 
     # ── Healthcheck (Railway) ────────────────────────────────────────────
     @app.route("/api/health")
