@@ -137,20 +137,8 @@
           <ng-container actions>
             @if (googleConectado()) {
               <app-badge variant="solid">Conectado</app-badge>
-              <button
-                class="tarjeta-estado__action-link"
-                type="button"
-                aria-label="Desconectar Google Contacts"
-                (click)="desconectarGoogle()"
-              >(Clic para cambiar)</button>
             } @else {
               <app-badge variant="outline">Desconectado</app-badge>
-              <button
-                class="tarjeta-estado__action-link"
-                type="button"
-                aria-label="Conectar Google Contacts"
-                (click)="connectarGoogle()"
-              >(Clic)</button>
             }
           </ng-container>
         </app-tarjeta-estado>
