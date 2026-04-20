@@ -37,6 +37,10 @@ export const routes: Routes = [
             m => m.VaultComunicacionesPageComponent
           ),
       },
+      {
+        path: 'perfil',
+        loadComponent: () => import('./pages/perfil/perfil').then(m => m.PerfilPageComponent),
+      },
     ],
   },
 ];

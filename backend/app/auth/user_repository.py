@@ -27,5 +27,6 @@ def find_user_by_email(email: str) -> dict | None:
         "empresa_id":    str(user.empresa_id),
         "email":         user.email,
         "password_hash": user.password_hash,
+        "rol":           user.rol,
         "is_active":     user.activo,
     }

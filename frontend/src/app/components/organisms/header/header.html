@@ -55,9 +55,15 @@
 
     <!-- Acciones: sesión + CTA -->
     <nav class="header__actions" aria-label="Acciones de usuario">
-      <button class="btn btn--secondary btn--md" type="button">
-        Iniciar sesión
-      </button>
+      @if (auth.isLoggedIn()) {
+        <a routerLink="/menu/perfil" class="btn btn--secondary btn--md">
+          Perfil
+        </a>
+      } @else {
+        <a href="/login" class="btn btn--secondary btn--md">
+          Iniciar sesión
+        </a>
+      }
       <a href="/solicitud" class="btn btn--primary btn--md">
         Presentar solicitud
       </a>

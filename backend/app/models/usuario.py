@@ -32,6 +32,7 @@ class Usuario(db.Model):
     password_hash = db.Column(db.String(255), nullable=False)  # bcrypt
     rol = db.Column(db.String(20), nullable=False, default=ROL_OPERATIVO)
     activo = db.Column(db.Boolean, nullable=False, default=True)
+    password_changed_at = db.Column(db.DateTime(timezone=True), nullable=True)
     created_at = db.Column(
         db.DateTime(timezone=True),
         nullable=False,
