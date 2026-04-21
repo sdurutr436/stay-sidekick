@@ -13,12 +13,14 @@ Seguridad aplicada:
 """
 
 import logging
+import time
 
 from flask import Blueprint, jsonify, request
 
 from app.extensions import limiter
 from app.security.csrf import csrf_protect
 from app.auth.service import authenticate_user, sanitize_login_payload
+from app.security.jwt import decode_token
 
 logger = logging.getLogger(__name__)
 
@@ -60,3 +62,29 @@ def login():
         return jsonify({"ok": False, "errors": errors}), 401
 
     return jsonify({"ok": True, "token": token}), 200
+
+
+@auth_bp.route("/api/auth/verify", methods=["GET"])
+def verify_token():
+    """Endpoint interno para auth_request de Nginx. No invocar desde el cliente.
+
+    Devuelve 200 si el JWT es válido, 401 en cualquier otro caso.
+    No expone información sobre el motivo del rechazo.
+    """
+    auth_header = request.headers.get("Authorization", "")
+    if not auth_header.startswith("Bearer "):
+        return "", 401
+
+    token = auth_header[7:]
+    claims = decode_token(token)
+
+    if claims is None:
+        return "", 401
+
+    # Validación explícita de iat: debe estar presente y no en el futuro
+    # (tolerancia de 5s para desfase de reloj entre contenedores)
+    iat = claims.get("iat")
+    if iat is None or iat > time.time() + 5:
+        return "", 401
+
+    return "", 200
