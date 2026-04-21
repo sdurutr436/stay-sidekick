@@ -3,6 +3,7 @@ import { MenuPageComponent } from './pages/menu/menu';
 import { MenuDefaultPageComponent } from './pages/menu-default/menu-default';
 import { MaestroApartamentosPageComponent } from './pages/maestro-apartamentos/maestro-apartamentos';
 import { SincronizadorContactosPageComponent } from './pages/sincronizador-contactos/sincronizador-contactos';
+import { NotFoundComponent } from './not-found/not-found';
 
 export const routes: Routes = [
   {
@@ -43,4 +44,5 @@ export const routes: Routes = [
       },
     ],
   },
+  { path: '**', component: NotFoundComponent },
 ];

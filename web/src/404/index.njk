@@ -1,0 +1,44 @@
+---
+layout: base.njk
+title: Página no encontrada
+description: La página que buscas no existe en Stay Sidekick.
+---
+
+<section class="l-container u-text-center">
+  <div class="not-found">
+
+    {# Código de error — bloque BEM nuevo, estilos pendientes en ITCSS #}
+    <p class="not-found__code" aria-hidden="true">404</p>
+    <h1 class="not-found__title">Página no encontrada</h1>
+    <p class="not-found__description u-text-secondary">
+      La URL que has introducido no existe o ha sido movida de lugar.
+    </p>
+
+    {# CTA: destino por defecto '/' — el JS lo cambia si hay sesión válida #}
+    <a href="/" id="js-404-cta" class="not-found__cta btn btn--primary btn--md">
+      Volver al inicio
+    </a>
+
+  </div>
+</section>
+
+{% block scripts %}
+<script>
+  (function () {
+    'use strict';
+    var token = localStorage.getItem('ss_token');
+    if (!token) return;
+    try {
+      var parts = token.split('.');
+      if (parts.length !== 3) return;
+      var payload = JSON.parse(atob(parts[1]));
+      if (payload && payload.exp > Date.now() / 1000) {
+        /* Sesión válida: redirigir al panel sin bloquear el render */
+        setTimeout(function () {
+          window.location.replace('/menu');
+        }, 0);
+      }
+    } catch (_) { /* token malformado, sin acción */ }
+  })();
+</script>
+{% endblock %}
