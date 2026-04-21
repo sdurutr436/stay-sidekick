@@ -190,6 +190,20 @@ async function submitPayload(payload, csrfToken) {
 // 7. INICIALIZACIÓN
 // =============================================================================
 
+(function initAccesoAlert() {
+  if (new URLSearchParams(window.location.search).get('acceso') !== 'requerido') return;
+
+  const alert  = document.getElementById('acceso-alert');
+  const close  = document.getElementById('acceso-alert-close');
+  if (!alert) return;
+
+  alert.removeAttribute('hidden');
+
+  const hide = () => alert.setAttribute('hidden', '');
+  close?.addEventListener('click', hide);
+  setTimeout(hide, 6000);
+}());
+
 (function init() {
   const form = document.getElementById('form-login');
   if (!form) return;
