@@ -15,6 +15,16 @@ section: login
       </p>
     </header>
 
+    <div class="alert alert--warning" id="acceso-alert" role="alert" hidden>
+      <div class="alert__content">Para acceder a esta sección debes iniciar sesión.</div>
+      <button class="alert__close" type="button" id="acceso-alert-close" aria-label="Cerrar aviso">
+        <svg class="svg svg--xs" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <line x1="4" y1="4" x2="12" y2="12" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
+          <line x1="12" y1="4" x2="4" y2="12" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
+        </svg>
+      </button>
+    </div>
+
     <form class="form-login" id="form-login" novalidate>
 
       {# ── Correo electrónico ──────────────────────────────────────────── #}
