@@ -3,7 +3,7 @@ import { MenuPageComponent } from './pages/menu/menu';
 import { MenuDefaultPageComponent } from './pages/menu-default/menu-default';
 import { MaestroApartamentosPageComponent } from './pages/maestro-apartamentos/maestro-apartamentos';
 import { SincronizadorContactosPageComponent } from './pages/sincronizador-contactos/sincronizador-contactos';
-import { NotFoundComponent } from './not-found/not-found';
+import { NotFoundComponent } from './pages/not-found/not-found';
 import { authGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
