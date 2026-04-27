@@ -1,0 +1,68 @@
+// =============================================================================
+// COMPONENTS: NOT-FOUND
+// Página de error 404 — compartida entre 11ty y Angular
+// Bloque BEM: not-found
+// =============================================================================
+
+// Nota: añadir la clase .a-fade-in en el bloque .not-found desde el HTML/template.
+// Ejemplo: <main class="not-found a-fade-in">
+
+.not-found {
+  @include flex-center;
+  flex: 1 1 auto;
+  flex-direction: column;
+  text-align: center;
+  padding: $space-8 $space-6;
+
+  // -------------------------------------------------------------------------
+  // Código de error
+  // HTML: <p role="img" aria-label="Error 404" class="not-found__code">404</p>
+  // -------------------------------------------------------------------------
+  &__code {
+    @include text-display-2xl; // 64px, weight 800, line-height 1.1
+    color: $color-text-primary;
+    margin-top: 0;
+    margin-bottom: $space-4;
+
+    @include respond-until('md') {
+      font-size: $font-size-display-xl; // 48px — mantiene weight y line-height del mixin
+    }
+  }
+
+  // -------------------------------------------------------------------------
+  // Título
+  // HTML: <h1 class="not-found__title"> — es el único heading de la página.
+  // Aunque semánticamente sea <h1>, usa estilos de h2 por la jerarquía visual.
+  // -------------------------------------------------------------------------
+  &__title {
+    @include text-h2; // 32px, weight 700
+    color: $color-text-primary;
+    margin-bottom: $space-3;
+  }
+
+  // -------------------------------------------------------------------------
+  // Descripción
+  // -------------------------------------------------------------------------
+  &__description {
+    @include text-body-md; // 14px, weight 500
+    color: $color-text-secondary;
+    max-width: 40ch; // sin token ch en el sistema — valor semántico de longitud de lectura
+    text-align: center;
+    margin-bottom: $space-8;
+  }
+
+  // -------------------------------------------------------------------------
+  // Acciones
+  // Usar variante primaria del componente btn existente: .btn.btn--primary
+  // -------------------------------------------------------------------------
+  &__actions {
+    display: flex;
+    gap: $space-4;
+    justify-content: center;
+
+    @include respond-until('sm') {
+      flex-direction: column;
+      align-items: stretch;
+    }
+  }
+}

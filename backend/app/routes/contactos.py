@@ -32,6 +32,10 @@ def _empresa_id() -> str:
     return g.jwt_claims["empresa_id"]
 
 
+def _is_admin() -> bool:
+    return g.jwt_claims.get("rol") == "admin"
+
+
 def _frontend_url(path: str) -> str:
     from flask import current_app
     base = current_app.config.get("FRONTEND_BASE_URL", _FRONTEND_BASE)
@@ -44,7 +48,10 @@ def _frontend_url(path: str) -> str:
 @contactos_bp.route("/api/contactos/google/auth", methods=["GET"])
 @jwt_required
 def google_auth():
-    """Genera la URL de autorización OAuth y la devuelve en JSON."""
+    """Genera la URL de autorización OAuth y la devuelve en JSON. Solo admin."""
+    if not _is_admin():
+        return jsonify({"ok": False, "errors": ["Solo el administrador puede conectar Google."]}), 403
+
     url, state = service.build_oauth_url(_empresa_id())
     session["google_oauth_state"] = state
     session["google_oauth_empresa_id"] = _empresa_id()
@@ -60,7 +67,7 @@ def google_callback():
 
     if error:
         logger.warning("OAuth Google denegado por el usuario: %s", error)
-        return redirect(_frontend_url("/menu/sincronizador-contactos?google_error=acceso_denegado"))
+        return redirect(_frontend_url("/menu/perfil?google_error=acceso_denegado"))
 
     # Verificar state anti-CSRF
     expected_state = session.pop("google_oauth_state", None)
@@ -68,17 +75,17 @@ def google_callback():
 
     if not state or state != expected_state:
         logger.warning("OAuth Google: state inválido (posible CSRF)")
-        return redirect(_frontend_url("/menu/sincronizador-contactos?google_error=estado_invalido"))
+        return redirect(_frontend_url("/menu/perfil?google_error=estado_invalido"))
 
     if not code or not empresa_id:
-        return redirect(_frontend_url("/menu/sincronizador-contactos?google_error=codigo_invalido"))
+        return redirect(_frontend_url("/menu/perfil?google_error=codigo_invalido"))
 
     exito, error_msg = service.exchange_code_for_tokens(code, empresa_id)
     if not exito:
         logger.error("Error intercambiando tokens OAuth: %s", error_msg)
-        return redirect(_frontend_url("/menu/sincronizador-contactos?google_error=token_fallido"))
+        return redirect(_frontend_url("/menu/perfil?google_error=token_fallido"))
 
-    return redirect(_frontend_url("/menu/sincronizador-contactos?google_conectado=true"))
+    return redirect(_frontend_url("/menu/perfil?google_conectado=true"))
 
 
 @contactos_bp.route("/api/contactos/google/status", methods=["GET"])
@@ -92,7 +99,10 @@ def google_status():
 @contactos_bp.route("/api/contactos/google/disconnect", methods=["DELETE"])
 @jwt_required
 def google_disconnect():
-    """Desconecta la cuenta Google (elimina los tokens almacenados)."""
+    """Desconecta la cuenta Google (elimina los tokens almacenados). Solo admin."""
+    if not _is_admin():
+        return jsonify({"ok": False, "errors": ["Solo el administrador puede desconectar Google."]}), 403
+
     error = service.disconnect_google(_empresa_id())
     if error:
         return jsonify({"ok": False, "errors": [error]}), 404

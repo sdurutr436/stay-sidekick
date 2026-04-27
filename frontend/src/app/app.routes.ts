@@ -3,11 +3,14 @@ import { MenuPageComponent } from './pages/menu/menu';
 import { MenuDefaultPageComponent } from './pages/menu-default/menu-default';
 import { MaestroApartamentosPageComponent } from './pages/maestro-apartamentos/maestro-apartamentos';
 import { SincronizadorContactosPageComponent } from './pages/sincronizador-contactos/sincronizador-contactos';
+import { NotFoundComponent } from './pages/not-found/not-found';
+import { authGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
   {
-    path: 'menu',
+    path: '',
     component: MenuPageComponent,
+    canActivate: [authGuard],
     children: [
       { path: '', component: MenuDefaultPageComponent },
       { path: 'maestro-apartamentos', component: MaestroApartamentosPageComponent },
@@ -37,6 +40,11 @@ export const routes: Routes = [
             m => m.VaultComunicacionesPageComponent
           ),
       },
+      {
+        path: 'perfil',
+        loadComponent: () => import('./pages/perfil/perfil').then(m => m.PerfilPageComponent),
+      },
     ],
   },
+  { path: '**', component: NotFoundComponent },
 ];

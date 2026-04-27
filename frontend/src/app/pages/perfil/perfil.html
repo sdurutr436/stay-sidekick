@@ -1,0 +1,280 @@
+<!-- Página: Perfil de usuario -->
+<div class="perfil-page">
+
+  <app-page-header
+    title="Mi perfil"
+    description="Gestiona tu contraseña, integraciones y sesión."
+  />
+
+  <!-- ── Contraseña ──────────────────────────────────────────────────────── -->
+  <app-panel-seccion title="Contraseña" [divider]="true">
+
+    @if (diasDesdeUltimoCambio() !== null) {
+      <p class="u-text-secondary u-mb-8">
+        Última actualización: hace {{ diasDesdeUltimoCambio() }} días.
+      </p>
+    }
+
+    @if (passwordAlerta()) {
+      <app-alert
+        [type]="passwordAlerta()!.tipo"
+        [dismissible]="true"
+        (dismissed)="passwordAlerta.set(null)"
+      >
+        {{ passwordAlerta()!.mensaje }}
+      </app-alert>
+    }
+
+    <form class="perfil-form" (submit)="$event.preventDefault(); guardarPassword()">
+
+      <app-form-field label="Contraseña actual" for="pwd-actual">
+        <app-form-input
+          id="pwd-actual"
+          type="password"
+          placeholder="Contraseña actual"
+          [value]="passwordActual()"
+          (valueChange)="passwordActual.set($event)"
+        />
+      </app-form-field>
+
+      <app-form-field label="Nueva contraseña" for="pwd-nueva">
+        <app-form-input
+          id="pwd-nueva"
+          type="password"
+          placeholder="Mínimo 8 caracteres"
+          [value]="passwordNueva()"
+          (valueChange)="passwordNueva.set($event)"
+        />
+      </app-form-field>
+
+      <app-form-field label="Confirmar contraseña" for="pwd-confirm">
+        <app-form-input
+          id="pwd-confirm"
+          type="password"
+          placeholder="Repite la nueva contraseña"
+          [value]="passwordConfirm()"
+          (valueChange)="passwordConfirm.set($event)"
+        />
+      </app-form-field>
+
+      <app-button
+        type="submit"
+        variant="primary"
+        size="md"
+        [disabled]="passwordGuardando() || !passwordActual() || !passwordNueva() || !passwordConfirm()"
+      >
+        {{ passwordGuardando() ? 'Guardando…' : 'Cambiar contraseña' }}
+      </app-button>
+
+    </form>
+
+  </app-panel-seccion>
+
+  <!-- ── Integraciones ───────────────────────────────────────────────────── -->
+  <app-panel-seccion title="Integraciones" [divider]="true">
+
+    @if (!isAdmin()) {
+      <p class="u-text-secondary u-mb-8">
+        Solo el administrador de la empresa puede modificar las integraciones.
+      </p>
+    }
+
+    <!-- PMS -->
+    <section aria-labelledby="integ-pms-titulo">
+      <h3 id="integ-pms-titulo" class="perfil-page__subseccion-titulo">PMS</h3>
+
+      @if (pmsAlerta()) {
+        <app-alert
+          [type]="pmsAlerta()!.tipo"
+          [dismissible]="true"
+          (dismissed)="pmsAlerta.set(null)"
+        >
+          {{ pmsAlerta()!.mensaje }}
+        </app-alert>
+      }
+
+      @if (integraciones()?.pms?.configurado) {
+        <p class="u-text-secondary u-mb-8">
+          Conectado: <strong>{{ integraciones()!.pms.proveedor }}</strong>
+        </p>
+      }
+
+      <form class="perfil-form" (submit)="$event.preventDefault(); guardarPMS()">
+
+        <app-form-field label="Proveedor" for="pms-proveedor">
+          <app-form-select
+            id="pms-proveedor"
+            [options]="pmsOpciones"
+            [value]="pmsProveedor()"
+            [disabled]="!isAdmin()"
+            (valueChange)="pmsProveedor.set($event)"
+          />
+        </app-form-field>
+
+        <app-form-field label="API Key" for="pms-apikey">
+          @if (isAdmin()) {
+            <app-form-input
+              id="pms-apikey"
+              type="password"
+              placeholder="Introduce la API Key del PMS"
+              [value]="pmsApiKey()"
+              (valueChange)="pmsApiKey.set($event)"
+            />
+          } @else {
+            <input
+              class="form-input"
+              type="text"
+              id="pms-apikey"
+              [value]="integraciones()?.pms?.configurado ? '••••••••••••••••' : 'Sin configurar'"
+              disabled
+              aria-label="API Key del PMS — solo visible para el administrador"
+            />
+          }
+        </app-form-field>
+
+        @if (isAdmin()) {
+          <app-button
+            type="submit"
+            variant="secondary"
+            size="md"
+            [disabled]="pmsGuardando() || !pmsProveedor() || !pmsApiKey()"
+          >
+            {{ pmsGuardando() ? 'Guardando…' : 'Guardar PMS' }}
+          </app-button>
+        }
+
+      </form>
+    </section>
+
+    <!-- Google -->
+    <section class="u-mt-8" aria-labelledby="integ-google-titulo">
+      <h3 id="integ-google-titulo" class="perfil-page__subseccion-titulo">Google People</h3>
+
+      @if (googleAlerta()) {
+        <app-alert
+          [type]="googleAlerta()!.tipo"
+          [dismissible]="true"
+          (dismissed)="googleAlerta.set(null)"
+        >
+          {{ googleAlerta()!.mensaje }}
+        </app-alert>
+      }
+
+      <p class="u-text-secondary u-mb-8">
+        Estado: <strong>{{ integraciones()?.google?.configurado ? 'Conectado' : 'No conectado' }}</strong>
+      </p>
+
+      @if (isAdmin()) {
+        @if (integraciones()?.google?.configurado) {
+          <app-button
+            variant="danger"
+            size="md"
+            [disabled]="googleGuardando()"
+            (click)="desconectarGoogle()"
+          >
+            {{ googleGuardando() ? 'Desconectando…' : 'Desconectar Google' }}
+          </app-button>
+        } @else {
+          <app-button
+            variant="secondary"
+            size="md"
+            [disabled]="googleGuardando()"
+            (click)="conectarGoogle()"
+          >
+            {{ googleGuardando() ? 'Redirigiendo…' : 'Conectar Google Contacts' }}
+          </app-button>
+        }
+      }
+    </section>
+
+    <!-- IA -->
+    <section class="u-mt-8" aria-labelledby="integ-ia-titulo">
+      <h3 id="integ-ia-titulo" class="perfil-page__subseccion-titulo">IA propia (BYOK)</h3>
+
+      @if (iaAlerta()) {
+        <app-alert
+          [type]="iaAlerta()!.tipo"
+          [dismissible]="true"
+          (dismissed)="iaAlerta.set(null)"
+        >
+          {{ iaAlerta()!.mensaje }}
+        </app-alert>
+      }
+
+      @if (integraciones()?.ia?.configurado) {
+        <p class="u-text-secondary u-mb-8">
+          Proveedor activo: <strong>{{ integraciones()!.ia.proveedor }}</strong>
+          @if (integraciones()!.ia.modelo) {
+            · Modelo: <strong>{{ integraciones()!.ia.modelo }}</strong>
+          }
+        </p>
+      }
+
+      <form class="perfil-form" (submit)="$event.preventDefault(); guardarIA()">
+
+        <app-form-field label="Proveedor IA" for="ia-proveedor">
+          <app-form-select
+            id="ia-proveedor"
+            [options]="iaOpciones"
+            [value]="iaProveedor()"
+            [disabled]="!isAdmin()"
+            (valueChange)="iaProveedor.set($event)"
+          />
+        </app-form-field>
+
+        <app-form-field label="Modelo" for="ia-modelo">
+          <app-form-input
+            id="ia-modelo"
+            type="text"
+            placeholder="ej. gemini-2.0-flash, gpt-4o…"
+            [value]="iaModelo()"
+            [disabled]="!isAdmin()"
+            (valueChange)="iaModelo.set($event)"
+          />
+        </app-form-field>
+
+        <app-form-field label="API Key (opcional si usas el sistema)" for="ia-apikey">
+          @if (isAdmin()) {
+            <app-form-input
+              id="ia-apikey"
+              type="password"
+              placeholder="Deja vacío para usar el sistema"
+              [value]="iaApiKey()"
+              (valueChange)="iaApiKey.set($event)"
+            />
+          } @else {
+            <input
+              class="form-input"
+              type="text"
+              id="ia-apikey"
+              [value]="integraciones()?.ia?.configurado ? '••••••••••••••••' : 'Sin configurar'"
+              disabled
+              aria-label="API Key de IA — solo visible para el administrador"
+            />
+          }
+        </app-form-field>
+
+        @if (isAdmin()) {
+          <app-button
+            type="submit"
+            variant="secondary"
+            size="md"
+            [disabled]="iaGuardando() || !iaProveedor()"
+          >
+            {{ iaGuardando() ? 'Guardando…' : 'Guardar configuración IA' }}
+          </app-button>
+        }
+
+      </form>
+    </section>
+
+  </app-panel-seccion>
+
+  <!-- ── Cerrar sesión ───────────────────────────────────────────────────── -->
+  <section class="perfil-page__sesion" aria-label="Gestión de sesión">
+    <app-button variant="danger" size="md" (click)="cerrarSesion()">
+      Cerrar sesión
+    </app-button>
+  </section>
+
+</div>

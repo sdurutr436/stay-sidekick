@@ -11,6 +11,7 @@ Los datos de huéspedes se procesan en memoria y NO se persisten en BD
 
 import logging
 import secrets
+from urllib.parse import urlencode
 
 import requests
 from flask import current_app
@@ -63,7 +64,7 @@ def build_oauth_url(empresa_id: str) -> tuple[str, str]:
         "prompt": "consent",            # fuerza obtener refresh_token siempre
         "state": state,
     }
-    query = "&".join(f"{k}={v}" for k, v in params.items())
+    query = urlencode(params)
     return f"{_GOOGLE_AUTH_URL}?{query}", state
 
 
