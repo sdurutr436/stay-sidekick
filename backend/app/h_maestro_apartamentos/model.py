@@ -29,7 +29,9 @@ class Apartamento(db.Model):
         nullable=False,
         index=True,
     )
-    # ID del alojamiento en el PMS externo (nulo si se creó manualmente)
+    # ID único del apartamento en el PMS externo (columna 1 del XLSX; nulo si manual)
+    id_pms = db.Column(db.String(100), nullable=True)
+    # Código de tipología: puede ser compartido por varios apartamentos del mismo tipo
     id_externo = db.Column(db.String(100), nullable=True)
     nombre = db.Column(db.String(200), nullable=False)
     direccion = db.Column(db.String(300), nullable=True)
@@ -50,11 +52,14 @@ class Apartamento(db.Model):
     )
 
     __table_args__ = (
-        # Una empresa no puede tener dos alojamientos con el mismo ID externo
-        db.UniqueConstraint(
+        # Índice parcial único: un id_pms solo puede existir una vez por empresa
+        # (solo aplica cuando id_pms no es NULL; los manuales sin id_pms no se limitan)
+        db.Index(
+            "uq_apartamento_empresa_id_pms",
             "empresa_id",
-            "id_externo",
-            name="uq_apartamento_empresa_id_externo",
+            "id_pms",
+            unique=True,
+            postgresql_where=db.text("id_pms IS NOT NULL"),
         ),
     )
 

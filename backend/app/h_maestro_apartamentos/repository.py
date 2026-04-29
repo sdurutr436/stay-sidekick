@@ -39,10 +39,18 @@ def get_by_id(apartamento_id: str, empresa_id: str) -> Apartamento | None:
 
 
 def get_by_id_externo(empresa_id: str, id_externo: str) -> Apartamento | None:
-    """Busca un apartamento por empresa + id_externo (PMS / Excel)."""
+    """Busca un apartamento por empresa + id_externo (código de tipología)."""
     return Apartamento.query.filter_by(
         empresa_id=empresa_id,
         id_externo=id_externo,
+    ).first()
+
+
+def get_by_id_pms(empresa_id: str, id_pms: str) -> Apartamento | None:
+    """Busca un apartamento por empresa + id_pms (ID único en el PMS)."""
+    return Apartamento.query.filter_by(
+        empresa_id=empresa_id,
+        id_pms=id_pms,
     ).first()
 
 
@@ -73,22 +81,27 @@ def soft_delete(apt: Apartamento) -> None:
 
 def upsert_from_external(
     empresa_id: str,
+    id_pms: str,
     id_externo: str,
     nombre: str,
     direccion: str | None,
     ciudad: str | None,
     pms_origen: str,
 ) -> tuple[Apartamento, bool]:
-    """Inserta o actualiza un apartamento por empresa + id_externo.
+    """Inserta o actualiza un apartamento por empresa + id_pms.
+
+    id_pms es el ID único del apartamento en el PMS (clave de upsert).
+    id_externo es el código de tipología y puede ser compartido.
 
     Returns
     -------
     tuple[Apartamento, bool]
         (apartamento, es_nuevo).
     """
-    existing = get_by_id_externo(empresa_id, id_externo)
+    existing = get_by_id_pms(empresa_id, id_pms)
 
     if existing:
+        existing.id_externo = id_externo
         existing.nombre = nombre
         existing.direccion = direccion or existing.direccion
         existing.ciudad = ciudad or existing.ciudad
@@ -99,6 +112,7 @@ def upsert_from_external(
 
     apt = Apartamento(
         empresa_id=empresa_id,
+        id_pms=id_pms,
         id_externo=id_externo,
         nombre=nombre,
         direccion=direccion,

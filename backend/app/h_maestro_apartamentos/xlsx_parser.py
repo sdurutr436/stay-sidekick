@@ -41,7 +41,8 @@ _HEADER_MAP: dict[str, str] = {
 @dataclass
 class XlsxApartment:
     """Fila normalizada de un archivo Excel."""
-    id_externo: str
+    id_pms: str | None      # siempre columna 1; None si la celda está vacía
+    id_externo: str         # código de tipología (columna configurada o detectada)
     nombre: str
     direccion: str | None
     ciudad: str | None
@@ -113,6 +114,13 @@ def parse_xlsx(
         # ── Procesar filas ──────────────────────────────────────────────────
         result: list[XlsxApartment] = []
         for row_idx, row in enumerate(data_rows, start=row_offset):
+            # id_pms: SIEMPRE columna 1 (índice 0), independientemente de la config
+            id_pms_val: str | None = None
+            if len(row) > 0 and row[0] is not None:
+                raw = str(row[0]).strip()
+                if raw:
+                    id_pms_val = raw
+
             record: dict[str, str | None] = {
                 "id_externo": None,
                 "nombre": None,
@@ -132,6 +140,7 @@ def parse_xlsx(
                 continue
 
             result.append(XlsxApartment(
+                id_pms=id_pms_val,
                 id_externo=record["id_externo"],
                 nombre=record["nombre"],
                 direccion=record["direccion"],

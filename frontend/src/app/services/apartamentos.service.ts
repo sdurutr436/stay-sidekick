@@ -4,6 +4,7 @@ import { Observable, map } from 'rxjs';
 
 export interface Apartamento {
   id: string;
+  id_pms: string | null;
   id_externo: string | null;
   nombre: string;
   direccion: string | null;
