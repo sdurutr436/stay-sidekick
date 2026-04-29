@@ -220,11 +220,8 @@ def import_from_xlsx(empresa_id: str, file_bytes: bytes) -> tuple[dict | None, l
 # ── Preview importación XLSX ─────────────────────────────────────────────
 
 
-def preview_import_xlsx(empresa_id: str, file_bytes: bytes) -> tuple[dict | None, list[str]]:
+def preview_import_xlsx(empresa_id: str, file_bytes: bytes) -> tuple[dict, list[str]]:
     apartments, parse_errors = parse_xlsx(file_bytes)
-
-    if not apartments and parse_errors:
-        return None, parse_errors
 
     nuevos = []
     actualizados = []
