@@ -39,13 +39,5 @@ class PMSClient(Protocol):
         desde: str | None = None,
         hasta: str | None = None,
     ) -> list[ReservaEstandar]:
-        """Obtiene reservas normalizadas del PMS.
-
-        Parameters
-        ----------
-        desde:
-            Fecha de inicio YYYY-MM-DD. Si es None, el adaptador usa hoy.
-        hasta:
-            Fecha de fin YYYY-MM-DD. Si es None, el adaptador elige el rango.
-        """
+        """Obtiene reservas normalizadas del PMS."""
         ...

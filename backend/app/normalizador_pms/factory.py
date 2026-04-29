@@ -5,8 +5,8 @@ configurado. Importado por cualquier módulo que necesite obtener reservas
 del PMS (google_contacts, notificaciones, etc.).
 """
 
-from app.pms.beds24 import Beds24ReservationClient
-from app.pms.smoobu import SmoobuReservationClient
+from app.normalizador_pms.beds24 import Beds24ReservationClient
+from app.normalizador_pms.smoobu import SmoobuReservationClient
 
 
 def build_pms_client(proveedor: str, api_key: str, endpoint: str | None):

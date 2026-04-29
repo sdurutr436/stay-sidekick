@@ -12,7 +12,7 @@ import csv
 import io
 import logging
 
-from app.pms.base import ReservaEstandar
+from app.normalizador_pms.base import ReservaEstandar
 
 logger = logging.getLogger(__name__)
 

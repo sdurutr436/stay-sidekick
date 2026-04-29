@@ -16,7 +16,7 @@ from app.apartamentos import repository as apt_repo
 from app.common.crypto import decrypt
 from app.common.notifications.gmail import send_via_smtp
 from app.common.xlsx_reservas import parse_xlsx_reservas
-from app.pms.factory import build_pms_client
+from app.normalizador_pms.factory import build_pms_client
 
 logger = logging.getLogger(__name__)
 

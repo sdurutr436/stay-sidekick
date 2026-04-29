@@ -6,7 +6,7 @@ Endpoints usados:
 - GET /api/reservations  → listado de reservas con datos del huésped
 
 Nota: Este módulo maneja *reservas* (guests). Para sincronización de
-propiedades (apartamentos), ver app/apartamentos/smoobu_client.py.
+propiedades (apartamentos), ver app/h_maestro_apartamentos/.
 """
 
 import logging
@@ -14,7 +14,7 @@ from datetime import date, timedelta
 
 import requests
 
-from app.pms.base import ReservaEstandar
+from app.normalizador_pms.base import ReservaEstandar
 
 logger = logging.getLogger(__name__)
 
@@ -81,12 +81,7 @@ class SmoobuReservationClient:
 
     @staticmethod
     def _normalize(booking: dict) -> ReservaEstandar | None:
-        """Convierte un booking de Smoobu en ReservaEstandar.
-
-        Smoobu devuelve el nombre del huésped en 'guest-name' (nombre completo
-        en un único campo) o en campos separados 'firstName'/'lastName'.
-        Se prioriza la forma separada para construir "Apellido, Nombre".
-        """
+        """Convierte un booking de Smoobu en ReservaEstandar."""
         nombre = booking.get("firstName", "").strip()
         apellido = booking.get("lastName", "").strip()
 
@@ -97,7 +92,6 @@ class SmoobuReservationClient:
         elif nombre:
             nombre_raw = nombre
         else:
-            # Fallback al campo compuesto si los separados están vacíos
             nombre_raw = (booking.get("guest-name") or "").strip()
 
         if not nombre_raw:

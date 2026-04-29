@@ -25,7 +25,7 @@ from io import BytesIO
 
 from openpyxl import load_workbook
 
-from app.pms.base import ReservaEstandar
+from app.normalizador_pms.base import ReservaEstandar
 
 logger = logging.getLogger(__name__)
 
