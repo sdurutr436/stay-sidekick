@@ -35,3 +35,4 @@ services:
       - postgres_data:/var/lib/postgresql/data
       - ./backend/db/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro,Z
       - ./backend/seed.sql:/docker-entrypoint-initdb.d/seed.sql:ro,Z
+      - ./backend/db/stamp_alembic.sql:/docker-entrypoint-initdb.d/stamp_alembic.sql:ro,Z
