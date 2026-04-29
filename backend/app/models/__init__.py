@@ -8,7 +8,8 @@ from app.empresas.model import Empresa
 from app.usuarios.model import Usuario
 from app.models.apartamento import Apartamento
 from app.models.vault import PlantillaVault, MensajeGenerado
-from app.models.integraciones import ConfiguracionPMS, IntegracionGoogle, ConfiguracionIA
+from app.perfil.model import ConfiguracionPMS, ConfiguracionIA
+from app.models.integraciones import IntegracionGoogle
 from app.models.logs import LogSincronizacion
 
 __all__ = [

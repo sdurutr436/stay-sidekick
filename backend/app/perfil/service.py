@@ -7,9 +7,9 @@ import logging
 from marshmallow import ValidationError
 
 from app.auth.passwords import hash_password, verify_password
-from app.common.crypto import encrypt, decrypt
-from app.repositories import perfil as repo
-from app.schemas.perfil import CambiarPasswordSchema, ActualizarPMSSchema, ActualizarIASchema
+from app.common.crypto import encrypt
+from app.perfil import repository as repo
+from app.perfil.schemas import CambiarPasswordSchema, ActualizarPMSSchema, ActualizarIASchema
 
 logger = logging.getLogger(__name__)
 
