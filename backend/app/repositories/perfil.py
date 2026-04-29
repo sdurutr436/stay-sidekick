@@ -5,7 +5,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 
 from app.extensions import db
-from app.models.usuario import Usuario
+from app.usuarios.model import Usuario
 from app.models.integraciones import ConfiguracionPMS, ConfiguracionIA, IntegracionGoogle
 
 
