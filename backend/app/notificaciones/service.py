@@ -12,7 +12,7 @@ from datetime import date
 
 from flask import current_app
 
-from app.apartamentos import repository as apt_repo
+from app.h_maestro_apartamentos import repository as apt_repo
 from app.common.crypto import decrypt
 from app.common.notifications.gmail import send_via_smtp
 from app.common.xlsx_reservas import parse_xlsx_reservas
