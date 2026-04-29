@@ -80,7 +80,7 @@ export class PerfilPageComponent implements OnInit {
   ];
 
   ngOnInit(): void {
-    this.isAdmin.set(this.auth.isAdmin());
+    this.isAdmin.set(this.auth.isAdmin);
 
     this.service.getPerfil().subscribe({
       next: res => {
