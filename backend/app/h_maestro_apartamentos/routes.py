@@ -132,6 +132,31 @@ def import_xlsx():
     return jsonify(result), 200
 
 
+# ── Preview importación XLSX ─────────────────────────────────────────────
+
+
+@apartamentos_bp.route("/api/apartamentos/importacion/preview", methods=["POST"])
+@limiter.limit("30/hour")
+@jwt_required
+def preview_import_xlsx():
+    if "file" not in request.files:
+        return jsonify({"ok": False, "errors": ["Se esperaba un archivo 'file'."]}), 400
+
+    file = request.files["file"]
+    if not file.filename or not file.filename.lower().endswith(".xlsx"):
+        return jsonify({"ok": False, "errors": ["El archivo debe ser .xlsx."]}), 400
+
+    file_bytes = file.read()
+    if not file_bytes:
+        return jsonify({"ok": False, "errors": ["El archivo está vacío."]}), 400
+
+    data, errors = service.preview_import_xlsx(_empresa_id(), file_bytes)
+    if data is None:
+        return jsonify({"ok": False, "errors": errors}), 422
+
+    return jsonify({"ok": True, "preview": data}), 200
+
+
 # ── Configuración PMS ────────────────────────────────────────────────────
 
 
