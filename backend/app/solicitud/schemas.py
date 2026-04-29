@@ -27,19 +27,7 @@ _VALID_COUNTRY_CODES = {
 
 
 class FormularioSolicitudSchema(Schema):
-    """Valida y sanitiza los datos del formulario público de solicitud.
-
-    Campos esperados del frontend:
-    - company_name: nombre de la empresa
-    - company_email: correo corporativo
-    - country_code: ISO alpha-2 del país (selector de prefijo)
-    - phone: número de teléfono (sin o con prefijo)
-    - is_member: si ya es miembro (boolean)
-    - message: texto libre del usuario
-    - turnstile_token: token del captcha Turnstile
-    - privacy_accepted: aceptación de política de privacidad
-    - website: campo honeypot (debe llegar vacío o ausente)
-    """
+    """Valida y sanitiza los datos del formulario público de solicitud."""
 
     company_name = fields.String(
         required=True,
@@ -95,32 +83,21 @@ class FormularioSolicitudSchema(Schema):
     class Meta:
         unknown = EXCLUDE
 
-    # ── Pre-load: sanitización antes de la validación ───────────────────────
-
     @pre_load
     def sanitize_fields(self, data: dict, **_kwargs) -> dict:
-        """Sanitiza los campos de texto antes de que Marshmallow valide."""
         if "company_name" in data:
             data["company_name"] = sanitize_name(str(data["company_name"]))
-
         if "company_email" in data:
             data["company_email"] = str(data["company_email"]).strip()
-
         if "country_code" in data:
             data["country_code"] = str(data["country_code"]).strip().upper()
-
         if "phone" in data:
             data["phone"] = str(data["phone"]).strip()
-
         if "message" in data:
             data["message"] = sanitize_text(str(data["message"]))
-
         if "turnstile_token" in data:
             data["turnstile_token"] = str(data["turnstile_token"]).strip()
-
         return data
-
-    # ── Validaciones individuales ───────────────────────────────────────────
 
     @validates("company_email")
     def validate_email(self, value: str, **_kwargs) -> None:
@@ -138,11 +115,8 @@ class FormularioSolicitudSchema(Schema):
         if value is not True:
             raise ValidationError("Debes aceptar la política de privacidad.")
 
-    # ── Validación cruzada ──────────────────────────────────────────────────
-
     @validates_schema
     def validate_phone_with_country(self, data: dict, **_kwargs) -> None:
-        """Valida el teléfono usando el country_code como contexto."""
         phone = data.get("phone")
         country = data.get("country_code", "ES")
         if phone:
@@ -156,7 +130,6 @@ class FormularioSolicitudSchema(Schema):
 
     @validates_schema
     def normalize_email_output(self, data: dict, **_kwargs) -> None:
-        """Sustituye el email por su versión normalizada."""
         email = data.get("company_email")
         if email:
             data["company_email"] = sanitize_email(email)

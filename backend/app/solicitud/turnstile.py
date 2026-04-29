@@ -13,17 +13,7 @@ _TIMEOUT_SECONDS = 5
 def verify_turnstile(token: str, remote_ip: str | None = None) -> bool:
     """Envía el token al endpoint de verificación de Turnstile.
 
-    Parameters
-    ----------
-    token:
-        Token generado por el widget Turnstile en el navegador.
-    remote_ip:
-        IP del cliente (opcional, mejora la verificación).
-
-    Returns
-    -------
-    bool
-        ``True`` si Cloudflare confirma que el captcha es válido.
+    Returns True si Cloudflare confirma que el captcha es válido.
     """
     secret = current_app.config["TURNSTILE_SECRET_KEY"]
     url = current_app.config["TURNSTILE_VERIFY_URL"]

@@ -15,39 +15,28 @@ from flask import Blueprint, jsonify, request
 
 from app.extensions import limiter
 from app.security.csrf import csrf_protect, generate_csrf_token, set_csrf_cookie
-from app.services.formulario_solicitud import process_solicitud
+from app.solicitud.service import process_solicitud
 
 logger = logging.getLogger(__name__)
 
-formulario_solicitud_bp = Blueprint("formulario_solicitud", __name__)
+solicitud_bp = Blueprint("formulario_solicitud", __name__)
 
 
-@formulario_solicitud_bp.route("/api/csrf-token", methods=["GET"])
+@solicitud_bp.route("/api/csrf-token", methods=["GET"])
 @limiter.limit("30/hour")
 def get_csrf_token():
-    """Emite un token CSRF como cookie + respuesta JSON.
-
-    El frontend debe:
-    1. Llamar a GET /api/csrf-token antes de enviar el formulario.
-    2. Leer la cookie ``csrf_token``.
-    3. Incluir el valor en la cabecera ``X-CSRF-Token`` del POST.
-    """
+    """Emite un token CSRF como cookie + respuesta JSON."""
     token = generate_csrf_token()
     response = jsonify({"ok": True, "csrf_token": token})
     set_csrf_cookie(response, token)
     return response
 
 
-@formulario_solicitud_bp.route("/api/solicitud", methods=["POST"])
+@solicitud_bp.route("/api/solicitud", methods=["POST"])
 @limiter.limit(lambda: __import__("flask").current_app.config["RATE_LIMIT_CONTACT"])
 @csrf_protect
 def solicitud():
-    """Recibe y procesa el formulario público de solicitud.
-
-    Espera un JSON con los campos definidos en ``FormularioSolicitudSchema``.
-    Devuelve 200 si todo es correcto, 422 si hay errores de validación,
-    o 403 si el captcha falla.
-    """
+    """Recibe y procesa el formulario público de solicitud."""
     json_data = request.get_json(silent=True)
     if not json_data:
         return jsonify({"ok": False, "errors": ["Se esperaba un cuerpo JSON."]}), 400
