@@ -1,0 +1,23 @@
+@if (visible) {
+  <div class="confirm-inline" role="group">
+    <span class="confirm-inline__mensaje">{{ mensaje }}</span>
+    <div class="confirm-inline__acciones">
+      <app-button
+        variant="danger"
+        size="sm"
+        [disabled]="cargando"
+        (click)="confirmado.emit()"
+      >
+        {{ cargando ? 'Eliminando…' : 'Confirmar' }}
+      </app-button>
+      <app-button
+        variant="ghost"
+        size="sm"
+        [disabled]="cargando"
+        (click)="cancelado.emit()"
+      >
+        Cancelar
+      </app-button>
+    </div>
+  </div>
+}

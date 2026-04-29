@@ -1,0 +1,67 @@
+// =============================================================================
+// COMPONENTS: ACCORDION ITEM (molecule)
+// =============================================================================
+
+.accordion-item {
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+
+  & + & {
+    margin-top: 0.5rem;
+  }
+
+  &__summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    list-style: none;
+    gap: 0.75rem;
+
+    &::-webkit-details-marker {
+      display: none;
+    }
+
+    &::before {
+      content: '';
+      display: inline-block;
+      width: 0.5rem;
+      height: 0.5rem;
+      border-right: 1.5px solid var(--color-text-muted);
+      border-bottom: 1.5px solid var(--color-text-muted);
+      transform: rotate(-45deg);
+      flex-shrink: 0;
+      transition: transform 0.15s ease;
+    }
+  }
+
+  &[open] > &__summary::before {
+    transform: rotate(45deg);
+  }
+
+  &__titulo {
+    flex: 1;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-text);
+  }
+
+  &__count {
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: var(--color-bg-subtle);
+    color: var(--color-text-muted);
+    border-radius: 999px;
+    padding: 0.1rem 0.55rem;
+    min-width: 1.5rem;
+    text-align: center;
+  }
+
+  &__body {
+    padding: 0.75rem 1rem 1rem;
+    border-top: 1px solid var(--color-border);
+    font-size: 0.8125rem;
+    color: var(--color-text);
+  }
+}

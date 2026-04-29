@@ -1,0 +1,11 @@
+<details class="accordion-item" [attr.open]="abierto || null">
+  <summary class="accordion-item__summary">
+    <span class="accordion-item__titulo">{{ titulo }}</span>
+    @if (count > 0) {
+      <span class="accordion-item__count">{{ count }}</span>
+    }
+  </summary>
+  <div class="accordion-item__body">
+    <ng-content />
+  </div>
+</details>
