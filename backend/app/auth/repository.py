@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from app.extensions import db
-from app.models.usuario import Usuario
+from app.usuarios.model import Usuario
 
 
 def find_user_by_email(email: str) -> dict | None:
