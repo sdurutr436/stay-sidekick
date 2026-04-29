@@ -3,21 +3,20 @@
 // =============================================================================
 
 .accordion-item {
-  border: 1px solid var(--color-border);
-  border-radius: 6px;
+  border: $border-width $border-style $color-border;
 
   & + & {
-    margin-top: 0.5rem;
+    margin-top: $space-2;
   }
 
   &__summary {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0.75rem 1rem;
+    padding: $space-3 $space-4;
     cursor: pointer;
     list-style: none;
-    gap: 0.75rem;
+    gap: $space-3;
 
     &::-webkit-details-marker {
       display: none;
@@ -26,13 +25,13 @@
     &::before {
       content: '';
       display: inline-block;
-      width: 0.5rem;
-      height: 0.5rem;
-      border-right: 1.5px solid var(--color-text-muted);
-      border-bottom: 1.5px solid var(--color-text-muted);
+      width: 0.4375rem;
+      height: 0.4375rem;
+      border-right: 1.5px solid $color-text-secondary;
+      border-bottom: 1.5px solid $color-text-secondary;
       transform: rotate(-45deg);
       flex-shrink: 0;
-      transition: transform 0.15s ease;
+      transition: transform var(--transition-base);
     }
   }
 
@@ -42,26 +41,26 @@
 
   &__titulo {
     flex: 1;
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: var(--color-text);
+    @include text-body-sm;
+    font-weight: $font-weight-label;
+    color: $color-text-primary;
   }
 
   &__count {
-    font-size: 0.75rem;
-    font-weight: 600;
-    background: var(--color-bg-subtle);
-    color: var(--color-text-muted);
+    @include text-caption-md;
+    font-weight: $font-weight-label;
+    background: $color-gray-200;
+    color: $color-text-secondary;
     border-radius: 999px;
-    padding: 0.1rem 0.55rem;
+    padding: 0.1rem 0.5rem;
     min-width: 1.5rem;
     text-align: center;
   }
 
   &__body {
-    padding: 0.75rem 1rem 1rem;
-    border-top: 1px solid var(--color-border);
-    font-size: 0.8125rem;
-    color: var(--color-text);
+    padding: $space-3 $space-4 $space-4;
+    border-top: $border-width $border-style $color-border;
+    @include text-body-sm;
+    color: $color-text-primary;
   }
 }
