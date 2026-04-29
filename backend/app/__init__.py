@@ -55,6 +55,7 @@ def create_app(config_class: type = Config) -> Flask:
     from app.h_maestro_apartamentos.routes import apartamentos_bp             # noqa: E402
     from app.h_sincronizador_contactos.routes import contactos_bp             # noqa: E402
     from app.h_notificaciones_tardias.routes import notificaciones_bp         # noqa: E402
+    from app.h_vault_comunicaciones.routes import h_vault_comunicaciones_bp   # noqa: E402
     from app.perfil.routes import perfil_bp                                  # noqa: E402
     app.register_blueprint(solicitud_bp)
     app.register_blueprint(auth_bp)
@@ -63,6 +64,7 @@ def create_app(config_class: type = Config) -> Flask:
     app.register_blueprint(apartamentos_bp)
     app.register_blueprint(contactos_bp)
     app.register_blueprint(notificaciones_bp)
+    app.register_blueprint(h_vault_comunicaciones_bp)
     app.register_blueprint(perfil_bp)
 
     # ── Healthcheck (Railway) ────────────────────────────────────────────
