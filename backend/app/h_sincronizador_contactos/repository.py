@@ -11,7 +11,7 @@ from datetime import datetime, timezone
 
 from app.extensions import db
 from app.empresas.model import Empresa
-from app.models.integraciones import IntegracionGoogle
+from app.h_sincronizador_contactos.model import IntegracionGoogle
 
 
 # ── IntegracionGoogle ─────────────────────────────────────────────────────
@@ -73,13 +73,11 @@ def delete_google_integration(integracion: IntegracionGoogle) -> None:
 
 # ── Preferencias de sincronización (empresas.configuracion JSONB) ─────────
 
-# Claves dentro del JSONB empresas.configuracion
 _KEY_FORMATO_NOMBRE = "formato_nombre_contacto"
 _KEY_INCLUIR_APARTAMENTO = "incluir_apartamento_contacto"
 _KEY_FORMATO_APARTAMENTO = "formato_apartamento_contacto"
 _KEY_INCLUIR_CHECKIN = "incluir_checkin_contacto"
 
-# Valores por defecto (se usan si la empresa no ha configurado todavía)
 DEFAULTS_PREFERENCIAS = {
     _KEY_FORMATO_NOMBRE: "nombre_apellidos",
     _KEY_INCLUIR_APARTAMENTO: True,
@@ -89,33 +87,19 @@ DEFAULTS_PREFERENCIAS = {
 
 
 def get_preferencias_contactos(empresa_id: str) -> dict:
-    """Lee las preferencias de contactos del JSONB empresas.configuracion.
-
-    Devuelve siempre un dict completo, rellenando con defaults lo que falte.
-    """
+    """Lee las preferencias de contactos del JSONB empresas.configuracion."""
     empresa = Empresa.query.filter_by(id=empresa_id).first()
     config = empresa.configuracion or {} if empresa else {}
     return {
-        _KEY_FORMATO_NOMBRE: config.get(
-            _KEY_FORMATO_NOMBRE, DEFAULTS_PREFERENCIAS[_KEY_FORMATO_NOMBRE]
-        ),
-        _KEY_INCLUIR_APARTAMENTO: config.get(
-            _KEY_INCLUIR_APARTAMENTO, DEFAULTS_PREFERENCIAS[_KEY_INCLUIR_APARTAMENTO]
-        ),
-        _KEY_FORMATO_APARTAMENTO: config.get(
-            _KEY_FORMATO_APARTAMENTO, DEFAULTS_PREFERENCIAS[_KEY_FORMATO_APARTAMENTO]
-        ),
-        _KEY_INCLUIR_CHECKIN: config.get(
-            _KEY_INCLUIR_CHECKIN, DEFAULTS_PREFERENCIAS[_KEY_INCLUIR_CHECKIN]
-        ),
+        _KEY_FORMATO_NOMBRE: config.get(_KEY_FORMATO_NOMBRE, DEFAULTS_PREFERENCIAS[_KEY_FORMATO_NOMBRE]),
+        _KEY_INCLUIR_APARTAMENTO: config.get(_KEY_INCLUIR_APARTAMENTO, DEFAULTS_PREFERENCIAS[_KEY_INCLUIR_APARTAMENTO]),
+        _KEY_FORMATO_APARTAMENTO: config.get(_KEY_FORMATO_APARTAMENTO, DEFAULTS_PREFERENCIAS[_KEY_FORMATO_APARTAMENTO]),
+        _KEY_INCLUIR_CHECKIN: config.get(_KEY_INCLUIR_CHECKIN, DEFAULTS_PREFERENCIAS[_KEY_INCLUIR_CHECKIN]),
     }
 
 
 def save_preferencias_contactos(empresa_id: str, preferencias: dict) -> dict:
-    """Persiste las preferencias de contactos en empresas.configuracion.
-
-    Solo sobreescribe las claves de contactos; el resto del JSONB se preserva.
-    """
+    """Persiste las preferencias de contactos en empresas.configuracion."""
     empresa = Empresa.query.filter_by(id=empresa_id).first()
     if empresa is None:
         return {}

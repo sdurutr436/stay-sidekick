@@ -20,13 +20,24 @@ from marshmallow import ValidationError
 from app.common.crypto import decrypt, encrypt
 from app.common.xlsx_reservas import parse_xlsx_reservas
 from app.extensions import db
-from app.models.integraciones import IntegracionGoogle
-from app.models.logs import ORIGEN_GOOGLE_CONTACTS, ESTADO_EXITO, ESTADO_ERROR, ESTADO_PARCIAL
+from app.h_sincronizador_contactos.model import (
+    IntegracionGoogle,
+    ORIGEN_GOOGLE_CONTACTS,
+    ESTADO_EXITO,
+    ESTADO_ERROR,
+    ESTADO_PARCIAL,
+)
+from app.h_sincronizador_contactos import repository as repo
+from app.h_sincronizador_contactos.schemas import PreferenciasContactosSchema, SyncRangoSchema
+from app.h_sincronizador_contactos.csv_export import (
+    build_csv,
+    _split_nombre,
+    _format_display_name,
+    _build_notas,
+    _build_grupo,
+)
+from app.h_sincronizador_contactos.google_people_client import GooglePeopleClient
 from app.normalizador_pms.factory import build_pms_client
-from app.repositories import google_integration as repo
-from app.schemas.google_contacts import PreferenciasContactosSchema, SyncRangoSchema
-from app.services.csv_contacts import build_csv, _split_nombre, _format_display_name, _build_notas, _build_grupo
-from app.services.google_people_client import GooglePeopleClient
 from app.h_maestro_apartamentos import repository as apt_repo
 
 logger = logging.getLogger(__name__)
@@ -43,14 +54,7 @@ _sync_schema = SyncRangoSchema()
 
 
 def build_oauth_url(empresa_id: str) -> tuple[str, str]:
-    """Genera la URL de autorización de Google OAuth 2.0.
-
-    Returns
-    -------
-    tuple[str, str]
-        (url_autorizacion, state). El state debe guardarse en sesión
-        para verificarlo en el callback.
-    """
+    """Genera la URL de autorización de Google OAuth 2.0."""
     client_id = current_app.config["GOOGLE_CLIENT_ID"]
     redirect_uri = current_app.config["GOOGLE_REDIRECT_URI"]
     state = secrets.token_urlsafe(32)
@@ -61,7 +65,7 @@ def build_oauth_url(empresa_id: str) -> tuple[str, str]:
         "response_type": "code",
         "scope": _SCOPES,
         "access_type": "offline",
-        "prompt": "consent",            # fuerza obtener refresh_token siempre
+        "prompt": "consent",
         "state": state,
     }
     query = urlencode(params)
@@ -69,13 +73,7 @@ def build_oauth_url(empresa_id: str) -> tuple[str, str]:
 
 
 def exchange_code_for_tokens(code: str, empresa_id: str) -> tuple[bool, str | None]:
-    """Intercambia el código OAuth por tokens y los persiste cifrados.
-
-    Returns
-    -------
-    tuple[bool, str | None]
-        (exito, mensaje_error).
-    """
+    """Intercambia el código OAuth por tokens y los persiste cifrados."""
     client_id = current_app.config["GOOGLE_CLIENT_ID"]
     client_secret = current_app.config["GOOGLE_CLIENT_SECRET"]
     redirect_uri = current_app.config["GOOGLE_REDIRECT_URI"]
@@ -150,7 +148,6 @@ def get_preferencias(empresa_id: str) -> dict:
 
 
 def save_preferencias(empresa_id: str, json_data: dict) -> tuple[dict | None, list[str]]:
-    """Valida y persiste las preferencias de sincronización."""
     try:
         clean = _pref_schema.load(json_data)
     except ValidationError as exc:
@@ -165,28 +162,11 @@ def save_preferencias(empresa_id: str, json_data: dict) -> tuple[dict | None, li
 
 
 def sync_contacts(empresa_id: str, json_data: dict) -> tuple[dict | None, str | None]:
-    """Sincroniza contactos desde el PMS hacia Google Contacts.
-
-    Flujo:
-    1. Verifica que hay integración Google activa.
-    2. Obtiene config PMS y descifra API key.
-    3. Llama al adaptador PMS para obtener reservas (in-memory, no se persiste).
-    4. Normaliza cada reserva según preferencias de la empresa.
-    5. Crea/actualiza contactos en Google People API.
-    6. Actualiza access_token si fue renovado durante la sesión.
-    7. Registra log de auditoría.
-
-    Returns
-    -------
-    tuple[dict | None, str | None]
-        (resumen, error).
-    """
-    # 1. Verificar integración Google
+    """Sincroniza contactos desde el PMS hacia Google Contacts."""
     integracion = repo.get_google_integration(empresa_id)
     if not integracion or not integracion.activo:
         return None, "No hay cuenta Google conectada. Conéctala primero desde el panel."
 
-    # 2. Obtener config PMS y API key descifrada
     pms_config = apt_repo.get_pms_config(empresa_id)
     if not pms_config or not pms_config.api_key_cifrada:
         return None, "No hay configuración de PMS. Configura tu API key primero."
@@ -195,7 +175,6 @@ def sync_contacts(empresa_id: str, json_data: dict) -> tuple[dict | None, str | 
     if api_key_pms is None:
         return None, "No se pudo descifrar la API key del PMS."
 
-    # Obtener tokens Google descifrados
     refresh_token = decrypt(integracion.refresh_token_cifrado)
     access_token = (
         decrypt(integracion.access_token_cifrado)
@@ -205,7 +184,6 @@ def sync_contacts(empresa_id: str, json_data: dict) -> tuple[dict | None, str | 
     if refresh_token is None:
         return None, "No se pudo descifrar el refresh_token de Google."
 
-    # 3. Obtener reservas del PMS
     try:
         pms_client = build_pms_client(pms_config.proveedor, api_key_pms, pms_config.endpoint)
         desde_str = json_data.get("desde")
@@ -220,10 +198,8 @@ def sync_contacts(empresa_id: str, json_data: dict) -> tuple[dict | None, str | 
         db.session.commit()
         return None, f"Error al obtener reservas del PMS: {exc}"
 
-    # 4. Preferencias de la empresa
     prefs = repo.get_preferencias_contactos(empresa_id)
 
-    # 5. Sincronizar con Google People API
     client_id = current_app.config["GOOGLE_CLIENT_ID"]
     client_secret = current_app.config["GOOGLE_CLIENT_SECRET"]
 
@@ -251,15 +227,12 @@ def sync_contacts(empresa_id: str, json_data: dict) -> tuple[dict | None, str | 
             logger.warning("Error al subir contacto '%s': %s", reserva.nombre_raw, exc)
             errores.append(f"{reserva.nombre_raw}: {exc}")
 
-    # 6. Si el access_token fue renovado, persistirlo cifrado
     if google_client.token_refreshed:
-        from cryptography.fernet import InvalidToken
         new_at = google_client.current_access_token
         new_expiry = google_client.current_token_expiry
         if new_at:
             repo.update_access_token(integracion, encrypt(new_at), new_expiry)
 
-    # 7. Log de auditoría
     estado = ESTADO_PARCIAL if errores else ESTADO_EXITO
     _log_sync(
         empresa_id, estado, nuevos + actualizados,
@@ -282,13 +255,7 @@ def sync_contacts(empresa_id: str, json_data: dict) -> tuple[dict | None, str | 
 
 
 def export_csv(empresa_id: str, json_data: dict) -> tuple[bytes | None, str | None]:
-    """Genera el CSV de contactos en formato Google para importación manual.
-
-    Returns
-    -------
-    tuple[bytes | None, str | None]
-        (contenido_csv, error).
-    """
+    """Genera el CSV de contactos en formato Google para importación manual."""
     pms_config = apt_repo.get_pms_config(empresa_id)
     if not pms_config or not pms_config.api_key_cifrada:
         return None, "No hay configuración de PMS."
@@ -317,16 +284,7 @@ def export_csv(empresa_id: str, json_data: dict) -> tuple[bytes | None, str | No
 
 
 def sync_from_xlsx(empresa_id: str, file_bytes: bytes) -> tuple[dict | None, str | None]:
-    """Sincroniza contactos con Google People API desde un XLSX subido.
-
-    Los datos se procesan en memoria y no se persisten (RGPD).
-
-    Returns
-    -------
-    tuple[dict | None, str | None]
-        (resumen, error).
-    """
-    # Verificar integración Google activa
+    """Sincroniza contactos con Google People API desde un XLSX subido."""
     integracion = repo.get_google_integration(empresa_id)
     if not integracion or not integracion.activo:
         return None, "No hay cuenta Google conectada. Conéctala primero desde el panel."
@@ -358,7 +316,7 @@ def sync_from_xlsx(empresa_id: str, file_bytes: bytes) -> tuple[dict | None, str
 
     nuevos = 0
     actualizados = 0
-    errores: list[str] = list(parse_errors)  # avisos de filas omitidas
+    errores: list[str] = list(parse_errors)
 
     for reserva in reservas:
         try:
@@ -397,16 +355,7 @@ def sync_from_xlsx(empresa_id: str, file_bytes: bytes) -> tuple[dict | None, str
 
 
 def export_csv_from_xlsx(empresa_id: str, file_bytes: bytes) -> tuple[bytes | None, str | None]:
-    """Genera el CSV de Google Contacts desde un XLSX subido.
-
-    No requiere cuenta Google conectada. Los datos se procesan en memoria
-    y no se persisten (RGPD).
-
-    Returns
-    -------
-    tuple[bytes | None, str | None]
-        (contenido_csv, error).
-    """
+    """Genera el CSV de Google Contacts desde un XLSX subido."""
     reservas, parse_errors = parse_xlsx_reservas(file_bytes)
     if not reservas and parse_errors:
         return None, parse_errors[0]
@@ -420,7 +369,6 @@ def export_csv_from_xlsx(empresa_id: str, file_bytes: bytes) -> tuple[bytes | No
 
 
 def _build_contact_payload(reserva, prefs: dict, google_client: GooglePeopleClient) -> dict:
-    """Construye el payload JSON para crear/actualizar un contacto en Google."""
     given_name, family_name = _split_nombre(reserva.nombre_raw)
 
     payload: dict = {
@@ -437,15 +385,12 @@ def _build_contact_payload(reserva, prefs: dict, google_client: GooglePeopleClie
     if notas:
         payload["biographies"] = [{"value": notas, "contentType": "TEXT_PLAIN"}]
 
-    # Etiqueta de grupo si aplica
     if (
         prefs.get("incluir_apartamento_contacto", True)
         and prefs.get("formato_apartamento_contacto") == "etiqueta"
         and reserva.nombre_apartamento
     ):
-        group_resource = google_client.get_or_create_contact_group(
-            reserva.nombre_apartamento
-        )
+        group_resource = google_client.get_or_create_contact_group(reserva.nombre_apartamento)
         payload["memberships"] = [
             {"contactGroupMembership": {"contactGroupResourceName": group_resource}}
         ]
@@ -465,7 +410,7 @@ def _log_sync(empresa_id: str, estado: str, num: int, detalle: str) -> None:
 
 
 def _ultimo_sync(empresa_id: str) -> str | None:
-    from app.models.logs import LogSincronizacion
+    from app.h_sincronizador_contactos.model import LogSincronizacion
     log = (
         LogSincronizacion.query
         .filter_by(empresa_id=empresa_id, origen=ORIGEN_GOOGLE_CONTACTS)

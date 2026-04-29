@@ -19,13 +19,13 @@ from flask import Blueprint, g, jsonify, redirect, request, session
 
 from app.extensions import limiter
 from app.security.jwt import jwt_required
-from app.services import google_contacts as service
+from app.h_sincronizador_contactos import service
 
 logger = logging.getLogger(__name__)
 
 contactos_bp = Blueprint("contactos", __name__)
 
-_FRONTEND_BASE = "http://localhost:4200"       # sobreescrito por FRONTEND_BASE_URL en config
+_FRONTEND_BASE = "http://localhost:4200"
 
 
 def _empresa_id() -> str:
@@ -48,7 +48,6 @@ def _frontend_url(path: str) -> str:
 @contactos_bp.route("/api/contactos/google/auth", methods=["GET"])
 @jwt_required
 def google_auth():
-    """Genera la URL de autorización OAuth y la devuelve en JSON. Solo admin."""
     if not _is_admin():
         return jsonify({"ok": False, "errors": ["Solo el administrador puede conectar Google."]}), 403
 
@@ -60,7 +59,6 @@ def google_auth():
 
 @contactos_bp.route("/api/contactos/google/callback", methods=["GET"])
 def google_callback():
-    """Recibe el código OAuth de Google, intercambia por tokens y redirige al frontend."""
     code = request.args.get("code")
     state = request.args.get("state")
     error = request.args.get("error")
@@ -69,7 +67,6 @@ def google_callback():
         logger.warning("OAuth Google denegado por el usuario: %s", error)
         return redirect(_frontend_url("/menu/perfil?google_error=acceso_denegado"))
 
-    # Verificar state anti-CSRF
     expected_state = session.pop("google_oauth_state", None)
     empresa_id = session.pop("google_oauth_empresa_id", None)
 
@@ -91,7 +88,6 @@ def google_callback():
 @contactos_bp.route("/api/contactos/google/status", methods=["GET"])
 @jwt_required
 def google_status():
-    """Devuelve el estado de la integración Google de la empresa."""
     data = service.get_google_status(_empresa_id())
     return jsonify({"ok": True, "google": data}), 200
 
@@ -99,7 +95,6 @@ def google_status():
 @contactos_bp.route("/api/contactos/google/disconnect", methods=["DELETE"])
 @jwt_required
 def google_disconnect():
-    """Desconecta la cuenta Google (elimina los tokens almacenados). Solo admin."""
     if not _is_admin():
         return jsonify({"ok": False, "errors": ["Solo el administrador puede desconectar Google."]}), 403
 
@@ -115,7 +110,6 @@ def google_disconnect():
 @contactos_bp.route("/api/contactos/preferencias", methods=["GET"])
 @jwt_required
 def get_preferencias():
-    """Devuelve las preferencias de sincronización de contactos."""
     data = service.get_preferencias(_empresa_id())
     return jsonify({"ok": True, "preferencias": data}), 200
 
@@ -123,7 +117,6 @@ def get_preferencias():
 @contactos_bp.route("/api/contactos/preferencias", methods=["PUT"])
 @jwt_required
 def save_preferencias():
-    """Guarda las preferencias de sincronización de contactos."""
     json_data = request.get_json(silent=True)
     if not json_data:
         return jsonify({"ok": False, "errors": ["Se esperaba un cuerpo JSON."]}), 400
@@ -141,7 +134,6 @@ def save_preferencias():
 @limiter.limit("10/hour")
 @jwt_required
 def sync_contacts():
-    """Lanza la sincronización de reservas del PMS hacia Google Contacts."""
     json_data = request.get_json(silent=True) or {}
     data, error = service.sync_contacts(_empresa_id(), json_data)
     if error:
@@ -156,7 +148,6 @@ def sync_contacts():
 @limiter.limit("20/hour")
 @jwt_required
 def export_csv():
-    """Exporta contactos en formato CSV de Google para importación manual (fuente: PMS API)."""
     json_data = request.get_json(silent=True) or {}
     csv_bytes, error = service.export_csv(_empresa_id(), json_data)
     if error:
@@ -178,11 +169,6 @@ def export_csv():
 @limiter.limit("10/hour")
 @jwt_required
 def xlsx_sync():
-    """Sincroniza contactos a Google desde un XLSX subido (multipart/form-data).
-
-    Espera el campo ``file`` con el archivo .xlsx. Los datos se procesan
-    en memoria y no se persisten (cumplimiento RGPD).
-    """
     if "file" not in request.files:
         return jsonify({"ok": False, "errors": ["Se esperaba un campo 'file' con el archivo."]}), 400
 
@@ -201,11 +187,6 @@ def xlsx_sync():
 @limiter.limit("20/hour")
 @jwt_required
 def xlsx_export_csv():
-    """Exporta CSV de Google Contacts desde un XLSX subido (multipart/form-data).
-
-    Espera el campo ``file`` con el archivo .xlsx. No requiere cuenta Google
-    conectada. Los datos se procesan en memoria y no se persisten (RGPD).
-    """
     if "file" not in request.files:
         return jsonify({"ok": False, "errors": ["Se esperaba un campo 'file' con el archivo."]}), 400
 
