@@ -207,7 +207,7 @@ export class PerfilPageComponent implements OnInit {
     this.googleAlerta.set(null);
     this.googleGuardando.set(true);
     const headers = { Authorization: `Bearer ${this.auth.getToken() ?? ''}` };
-    this.http.delete<{ ok: boolean }>('/api/contactos/google/disconnect', { headers }).subscribe({
+    this.http.delete<{ ok: boolean }>('/api/contactos/google/conexion', { headers }).subscribe({
       next: () => {
         this.googleAlerta.set({ tipo: 'success', mensaje: 'Google Contacts desconectado.' });
         this.cargarIntegraciones();

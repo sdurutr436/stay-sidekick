@@ -48,17 +48,23 @@ def create_app(config_class: type = Config) -> Flask:
     migrate.init_app(app, db)
 
     # ── Blueprints ───────────────────────────────────────────────────────
-    from app.routes.formulario_solicitud import formulario_solicitud_bp      # noqa: E402
+    from app.solicitud.routes import solicitud_bp                             # noqa: E402
     from app.auth.routes import auth_bp                                      # noqa: E402
-    from app.apartamentos.routes import apartamentos_bp                      # noqa: E402
-    from app.routes.contactos import contactos_bp                            # noqa: E402
-    from app.notificaciones.routes import notificaciones_bp                  # noqa: E402
-    from app.routes.perfil import perfil_bp                                  # noqa: E402
-    app.register_blueprint(formulario_solicitud_bp)
+    from app.empresas.routes import empresas_bp                              # noqa: E402
+    from app.usuarios.routes import usuarios_bp                              # noqa: E402
+    from app.h_maestro_apartamentos.routes import apartamentos_bp             # noqa: E402
+    from app.h_sincronizador_contactos.routes import contactos_bp             # noqa: E402
+    from app.h_notificaciones_tardias.routes import notificaciones_bp         # noqa: E402
+    from app.h_vault_comunicaciones.routes import h_vault_comunicaciones_bp   # noqa: E402
+    from app.perfil.routes import perfil_bp                                  # noqa: E402
+    app.register_blueprint(solicitud_bp)
     app.register_blueprint(auth_bp)
+    app.register_blueprint(empresas_bp)
+    app.register_blueprint(usuarios_bp)
     app.register_blueprint(apartamentos_bp)
     app.register_blueprint(contactos_bp)
     app.register_blueprint(notificaciones_bp)
+    app.register_blueprint(h_vault_comunicaciones_bp)
     app.register_blueprint(perfil_bp)
 
     # ── Healthcheck (Railway) ────────────────────────────────────────────

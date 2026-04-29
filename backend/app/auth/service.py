@@ -6,7 +6,7 @@ from marshmallow import ValidationError
 
 from app.auth.schemas import LoginSchema
 from app.auth.passwords import verify_password
-from app.auth.user_repository import find_user_by_email
+from app.auth.repository import find_user_by_email
 from app.common.sanitizers.email import sanitize_email
 from app.security.jwt import create_access_token
 
