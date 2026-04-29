@@ -7,8 +7,8 @@ from marshmallow import ValidationError
 
 from app.common.notifications.discord import send_discord_notification
 from app.common.notifications.gmail import send_contact_email
-from app.schemas.formulario_solicitud import FormularioSolicitudSchema
-from app.services.turnstile import verify_turnstile
+from app.solicitud.schemas import FormularioSolicitudSchema
+from app.solicitud.turnstile import verify_turnstile
 
 logger = logging.getLogger(__name__)
 
@@ -18,29 +18,22 @@ _schema = FormularioSolicitudSchema()
 def process_solicitud(json_data: dict) -> tuple[dict, list[str]]:
     """Valida, sanitiza y procesa los datos del formulario de solicitud.
 
-    Returns
-    -------
-    tuple[dict, list[str]]
-        (datos_limpios, errores). Si ``errores`` está vacío, los datos
-        son seguros para notificar.
+    Returns (datos_limpios, errores). Si errores está vacío, los datos
+    son seguros para notificar.
     """
-    # 1. Validación y sanitización con Marshmallow (incluye honeypot)
     try:
         clean_data: dict = _schema.load(json_data)
     except ValidationError as exc:
         return {}, _flatten_errors(exc.messages)
 
-    # 2. Verificar Turnstile
     turnstile_token = clean_data.pop("turnstile_token")
     client_ip = request.remote_addr
     if not verify_turnstile(turnstile_token, client_ip):
         return {}, ["La verificación del captcha ha fallado."]
 
-    # 3. Eliminar campos internos (ya validados, no se almacenan)
     clean_data.pop("privacy_accepted", None)
-    clean_data.pop("website", None)  # honeypot
+    clean_data.pop("website", None)
 
-    # 4. Despachar notificaciones (no bloquean la respuesta al usuario)
     _dispatch_notifications(clean_data)
 
     logger.info(
@@ -52,7 +45,6 @@ def process_solicitud(json_data: dict) -> tuple[dict, list[str]]:
 
 
 def _dispatch_notifications(clean_data: dict) -> None:
-    """Envía las notificaciones de email y Discord."""
     email_ok = send_contact_email(clean_data)
     discord_ok = send_discord_notification(clean_data)
 
