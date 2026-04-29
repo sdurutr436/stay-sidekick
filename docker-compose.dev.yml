@@ -1,0 +1,38 @@
+# =============================================================================
+# DOCKER COMPOSE — Override de desarrollo local
+#
+# Extiende docker-compose.yml con configuración específica para dev:
+#   · Usa backend/.env.dev en lugar de backend/.env (no requiere credenciales reales)
+#   · Aplica el seed de datos (empresa demo + 2 usuarios admin) al crear la BD
+#
+# Uso:
+#   docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d --build
+#
+# Primera vez (BD limpia):
+#   docker compose -f docker-compose.yml -f docker-compose.dev.yml down -v
+#   docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d --build
+#
+# Credenciales de acceso (creadas por el seed):
+#   Email:    duran.utrerasergio2612@gmail.com
+#   Password: (la que usaste al generar el hash del seed.sql)
+#   Rol:      admin
+#
+# URL de la app: http://localhost/
+# =============================================================================
+
+services:
+
+  backend:
+    env_file:
+      - path: ./backend/.env.dev
+        required: true
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/stay_sidekick
+      ALLOWED_ORIGINS: "http://localhost"
+
+  postgres:
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/db/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro,Z
+      - ./backend/seed.sql:/docker-entrypoint-initdb.d/seed.sql:ro,Z
+      - ./backend/db/stamp_alembic.sql:/docker-entrypoint-initdb.d/stamp_alembic.sql:ro,Z

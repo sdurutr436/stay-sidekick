@@ -20,6 +20,7 @@ from app.h_maestro_apartamentos.schemas import (
 from app.h_maestro_apartamentos.smoobu_client import SmoobuClient
 from app.h_maestro_apartamentos.xlsx_parser import parse_xlsx
 from app.h_maestro_apartamentos.model import ORIGEN_SMOOBU, ORIGEN_XLSX, ORIGEN_MANUAL
+from app.empresas.model import Empresa
 
 logger = logging.getLogger(__name__)
 
@@ -36,6 +37,7 @@ def _apt_to_dict(apt) -> dict:
     return {
         "id": str(apt.id),
         "empresa_id": str(apt.empresa_id),
+        "id_pms": apt.id_pms,
         "id_externo": apt.id_externo,
         "nombre": apt.nombre,
         "direccion": apt.direccion,
@@ -140,6 +142,7 @@ def sync_from_smoobu(empresa_id: str) -> tuple[dict | None, str | None]:
     for apt_data in apartments:
         _, es_nuevo = repo.upsert_from_external(
             empresa_id=empresa_id,
+            id_pms=apt_data.id_externo,      # en Smoobu id_pms = id_externo
             id_externo=apt_data.id_externo,
             nombre=apt_data.nombre,
             direccion=apt_data.direccion,
@@ -171,7 +174,7 @@ def sync_from_smoobu(empresa_id: str) -> tuple[dict | None, str | None]:
 
 
 def import_from_xlsx(empresa_id: str, file_bytes: bytes) -> tuple[dict | None, list[str]]:
-    apartments, parse_errors = parse_xlsx(file_bytes)
+    apartments, parse_errors = parse_xlsx(file_bytes, col_override=_get_xlsx_col_override(empresa_id))
 
     if not apartments and parse_errors:
         repo.create_sync_log(
@@ -186,8 +189,10 @@ def import_from_xlsx(empresa_id: str, file_bytes: bytes) -> tuple[dict | None, l
     nuevos = 0
     actualizados = 0
     for apt_data in apartments:
+        id_pms = apt_data.id_pms or apt_data.id_externo   # fallback si col 1 vacía
         _, es_nuevo = repo.upsert_from_external(
             empresa_id=empresa_id,
+            id_pms=id_pms,
             id_externo=apt_data.id_externo,
             nombre=apt_data.nombre,
             direccion=apt_data.direccion,
@@ -220,38 +225,32 @@ def import_from_xlsx(empresa_id: str, file_bytes: bytes) -> tuple[dict | None, l
 # ── Preview importación XLSX ─────────────────────────────────────────────
 
 
-def preview_import_xlsx(empresa_id: str, file_bytes: bytes) -> tuple[dict | None, list[str]]:
-    apartments, parse_errors = parse_xlsx(file_bytes)
-
-    if not apartments and parse_errors:
-        return None, parse_errors
+def preview_import_xlsx(empresa_id: str, file_bytes: bytes) -> tuple[dict, list[str]]:
+    apartments, parse_errors = parse_xlsx(file_bytes, col_override=_get_xlsx_col_override(empresa_id))
 
     nuevos = []
     actualizados = []
     sin_cambios = []
 
     for apt_data in apartments:
-        existing = repo.get_by_id_externo(empresa_id, apt_data.id_externo)
+        id_pms = apt_data.id_pms or apt_data.id_externo
+        existing = repo.get_by_id_pms(empresa_id, id_pms)
+        entry_base = {
+            "id_pms": id_pms,
+            "id_externo": apt_data.id_externo,
+            "nombre": apt_data.nombre,
+            "ciudad": apt_data.ciudad,
+            "direccion": apt_data.direccion,
+        }
         if not existing:
-            nuevos.append({
-                "id_externo": apt_data.id_externo,
-                "nombre": apt_data.nombre,
-                "ciudad": apt_data.ciudad,
-                "direccion": apt_data.direccion,
-            })
+            nuevos.append(entry_base)
         else:
             campos_cambian = (
                 existing.nombre != apt_data.nombre
                 or (apt_data.ciudad and existing.ciudad != apt_data.ciudad)
                 or (apt_data.direccion and existing.direccion != apt_data.direccion)
             )
-            entry = {
-                "id_externo": apt_data.id_externo,
-                "nombre": apt_data.nombre,
-                "nombre_actual": existing.nombre,
-                "ciudad": apt_data.ciudad,
-                "direccion": apt_data.direccion,
-            }
+            entry = {**entry_base, "nombre_actual": existing.nombre}
             if campos_cambian:
                 actualizados.append(entry)
             else:
@@ -313,6 +312,16 @@ def delete_pms_config(empresa_id: str) -> str | None:
 
 
 # ── Utilidades ───────────────────────────────────────────────────────────
+
+
+def _get_xlsx_col_override(empresa_id: str) -> dict | None:
+    empresa = Empresa.query.filter_by(id=empresa_id).first()
+    if not empresa:
+        return None
+    cfg = (empresa.configuracion or {}).get("xlsx_apartamentos", {})
+    if (cfg.get("col_id_externo") or 0) > 0 and (cfg.get("col_nombre") or 0) > 0:
+        return cfg
+    return None
 
 
 def _flatten(messages: dict) -> list[str]:

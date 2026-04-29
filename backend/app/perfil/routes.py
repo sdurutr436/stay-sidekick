@@ -1,11 +1,13 @@
 """Blueprint de perfil de usuario.
 
 Rutas (todas requieren JWT):
-- GET  /api/perfil                     → datos del usuario autenticado
-- PUT  /api/perfil/password            → cambiar contraseña
-- GET  /api/perfil/integraciones       → estado de las integraciones de la empresa
-- PUT  /api/perfil/integraciones/pms   → actualizar integración PMS (solo admin)
-- PUT  /api/perfil/integraciones/ia    → actualizar integración IA (solo admin)
+- GET  /api/perfil                          → datos del usuario autenticado
+- PUT  /api/perfil/password                 → cambiar contraseña
+- GET  /api/perfil/integraciones            → estado de las integraciones de la empresa
+- PUT  /api/perfil/integraciones/pms        → actualizar integración PMS (solo admin)
+- PUT  /api/perfil/integraciones/ia         → actualizar integración IA (solo admin)
+- GET  /api/perfil/xlsx-apartamentos        → leer configuración de columnas XLSX
+- PUT  /api/perfil/xlsx-apartamentos        → guardar configuración de columnas XLSX (solo admin)
 """
 
 import logging
@@ -90,6 +92,30 @@ def actualizar_ia():
         return jsonify({"ok": False, "errors": ["Se esperaba un cuerpo JSON."]}), 400
 
     errors = service.actualizar_ia(_empresa_id(), json_data)
+    if errors:
+        return jsonify({"ok": False, "errors": errors}), 422
+
+    return jsonify({"ok": True}), 200
+
+
+@perfil_bp.route("/api/perfil/xlsx-apartamentos", methods=["GET"])
+@jwt_required
+def get_xlsx_apartamentos():
+    config = service.get_xlsx_apartamentos_config(_empresa_id())
+    return jsonify({"ok": True, "config": config or None}), 200
+
+
+@perfil_bp.route("/api/perfil/xlsx-apartamentos", methods=["PUT"])
+@jwt_required
+def save_xlsx_apartamentos():
+    if not _is_admin():
+        return jsonify({"ok": False, "errors": ["Solo el administrador puede modificar esta configuración."]}), 403
+
+    json_data = request.get_json(silent=True)
+    if not json_data:
+        return jsonify({"ok": False, "errors": ["Se esperaba un cuerpo JSON."]}), 400
+
+    errors = service.save_xlsx_apartamentos_config(_empresa_id(), json_data)
     if errors:
         return jsonify({"ok": False, "errors": errors}), 422
 

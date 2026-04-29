@@ -20,3 +20,10 @@ class ActualizarIASchema(Schema):
     proveedor = fields.Str(required=True, validate=validate.OneOf(_IA_PROVEEDORES))
     modelo    = fields.Str(load_default=None, allow_none=True, validate=validate.Length(max=100))
     api_key   = fields.Str(load_default=None, allow_none=True, validate=validate.Length(max=500))
+
+
+class XlsxApartamentosConfigSchema(Schema):
+    col_id_externo = fields.Int(required=True, validate=validate.Range(min=0, max=200))
+    col_nombre     = fields.Int(required=True, validate=validate.Range(min=0, max=200))
+    col_direccion  = fields.Int(load_default=0, validate=validate.Range(min=0, max=200))
+    col_ciudad     = fields.Int(load_default=0, validate=validate.Range(min=0, max=200))
