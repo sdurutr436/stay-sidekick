@@ -137,7 +137,7 @@ export class NotificacionesCheckinTardioPageComponent implements OnInit, OnDestr
     form.append('file', archivo);
 
     this.http.post<{ ok: boolean; checkins: CheckinHoy[]; warnings?: string[] }>(
-      '/api/notificaciones/checkin-tardio/xlsx',
+      '/api/notificaciones/checkin-tardio/checkins',
       form,
     ).subscribe({
       next: res => {
@@ -222,7 +222,7 @@ export class NotificacionesCheckinTardioPageComponent implements OnInit, OnDestr
     this.errorEnvio.set(null);
 
     this.http.post<{ ok: boolean; errors?: string[] }>(
-      '/api/notificaciones/checkin-tardio/enviar',
+      '/api/notificaciones/checkin-tardio/email',
       {
         destinatario: this.destinatario.trim(),
         asunto: this.asunto.trim(),

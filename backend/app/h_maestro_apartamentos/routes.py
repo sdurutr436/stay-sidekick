@@ -1,16 +1,16 @@
-"""Blueprint de apartamentos — CRUD, sync Smoobu e importación XLSX.
+"""Blueprint de apartamentos — CRUD, sincronización Smoobu e importación XLSX.
 
 Rutas (todas requieren JWT):
-- GET    /api/apartamentos              → listar
-- GET    /api/apartamentos/<id>         → detalle
-- POST   /api/apartamentos              → alta manual
-- PUT    /api/apartamentos/<id>         → actualizar
-- DELETE /api/apartamentos/<id>         → soft delete
-- POST   /api/apartamentos/sync/smoobu  → sincronizar desde Smoobu
-- POST   /api/apartamentos/import/xlsx  → importar desde Excel
-- GET    /api/pms/config                → ver configuración PMS
-- POST   /api/pms/config                → guardar configuración PMS
-- DELETE /api/pms/config                → eliminar configuración PMS
+- GET    /api/apartamentos                      → listar apartamentos activos de la empresa
+- GET    /api/apartamentos/<id>                 → detalle de un apartamento
+- POST   /api/apartamentos                      → alta manual de apartamento
+- PUT    /api/apartamentos/<id>                 → actualizar campos de un apartamento
+- DELETE /api/apartamentos/<id>                 → soft delete (marca como inactivo)
+- POST   /api/apartamentos/sincronizacion/smoobu → [acción] pull de propiedades desde Smoobu API (upsert interno)
+- POST   /api/apartamentos/importacion          → [acción] importa apartamentos desde XLSX subido (multipart, upsert interno)
+- GET    /api/apartamentos/pms                  → lee configuración del PMS activo (sin exponer API key)
+- PUT    /api/apartamentos/pms                  → crea o actualiza configuración PMS (upsert idempotente → PUT)
+- DELETE /api/apartamentos/pms                  → elimina configuración PMS
 """
 
 import logging
@@ -88,7 +88,7 @@ def delete_apartamento(apartamento_id: str):
 # ── Sincronización Smoobu ────────────────────────────────────────────────
 
 
-@apartamentos_bp.route("/api/apartamentos/sync/smoobu", methods=["POST"])
+@apartamentos_bp.route("/api/apartamentos/sincronizacion/smoobu", methods=["POST"])
 @limiter.limit("10/hour")
 @jwt_required
 def sync_smoobu():
@@ -101,7 +101,7 @@ def sync_smoobu():
 # ── Importación XLSX ─────────────────────────────────────────────────────
 
 
-@apartamentos_bp.route("/api/apartamentos/import/xlsx", methods=["POST"])
+@apartamentos_bp.route("/api/apartamentos/importacion", methods=["POST"])
 @limiter.limit("20/hour")
 @jwt_required
 def import_xlsx():
@@ -135,7 +135,7 @@ def import_xlsx():
 # ── Configuración PMS ────────────────────────────────────────────────────
 
 
-@apartamentos_bp.route("/api/pms/config", methods=["GET"])
+@apartamentos_bp.route("/api/apartamentos/pms", methods=["GET"])
 @jwt_required
 def get_pms_config():
     data = service.get_pms_config(_empresa_id())
@@ -144,7 +144,7 @@ def get_pms_config():
     return jsonify({"ok": True, "config": data}), 200
 
 
-@apartamentos_bp.route("/api/pms/config", methods=["POST"])
+@apartamentos_bp.route("/api/apartamentos/pms", methods=["PUT"])
 @jwt_required
 def save_pms_config():
     json_data = request.get_json(silent=True)
@@ -157,7 +157,7 @@ def save_pms_config():
     return jsonify({"ok": True, "config": data}), 200
 
 
-@apartamentos_bp.route("/api/pms/config", methods=["DELETE"])
+@apartamentos_bp.route("/api/apartamentos/pms", methods=["DELETE"])
 @jwt_required
 def delete_pms_config():
     error = service.delete_pms_config(_empresa_id())

@@ -1,16 +1,16 @@
 """Blueprint de sincronización con Google Contacts.
 
 Rutas (todas requieren JWT excepto el callback OAuth):
-- GET    /api/contactos/google/auth          → genera URL de autorización OAuth
-- GET    /api/contactos/google/callback      → intercambia código por tokens (redirect)
-- GET    /api/contactos/google/status        → estado de la conexión Google
-- DELETE /api/contactos/google/disconnect    → desconecta la cuenta Google
-- GET    /api/contactos/preferencias         → obtiene preferencias de sincronización
-- PUT    /api/contactos/preferencias         → guarda preferencias de sincronización
-- POST   /api/contactos/sync                 → lanza sincronización PMS API → Google Contacts
-- POST   /api/contactos/export/csv           → exporta CSV fallback (fuente: PMS API)
-- POST   /api/contactos/xlsx/sync            → sincroniza desde XLSX subido (multipart)
-- POST   /api/contactos/xlsx/export/csv      → exporta CSV desde XLSX subido (multipart)
+- GET    /api/contactos/google/auth               → genera URL de autorización OAuth
+- GET    /api/contactos/google/callback            → intercambia código OAuth por tokens y redirige al frontend
+- GET    /api/contactos/google/status              → estado de la conexión Google de la empresa
+- DELETE /api/contactos/google/conexion            → revoca y elimina tokens OAuth (desconectar cuenta Google)
+- GET    /api/contactos/preferencias               → obtiene preferencias de sincronización
+- PUT    /api/contactos/preferencias               → guarda preferencias de sincronización
+- POST   /api/contactos/sincronizacion             → [acción] PMS API + Google conectado: sincroniza reservas del PMS → Google Contacts (fechas en body)
+- POST   /api/contactos/exportacion/csv            → [acción] PMS API + Google desconectado: genera CSV para importación manual (fechas en body)
+- POST   /api/contactos/xlsx/sincronizacion        → [acción] XLSX + Google conectado: sincroniza desde XLSX subido → Google Contacts (file en multipart)
+- POST   /api/contactos/xlsx/exportacion/csv       → [acción] XLSX + Google desconectado: genera CSV desde XLSX subido (file en multipart)
 """
 
 import logging
@@ -92,7 +92,7 @@ def google_status():
     return jsonify({"ok": True, "google": data}), 200
 
 
-@contactos_bp.route("/api/contactos/google/disconnect", methods=["DELETE"])
+@contactos_bp.route("/api/contactos/google/conexion", methods=["DELETE"])
 @jwt_required
 def google_disconnect():
     if not _is_admin():
@@ -130,7 +130,7 @@ def save_preferencias():
 # ── Sincronización ────────────────────────────────────────────────────────
 
 
-@contactos_bp.route("/api/contactos/sync", methods=["POST"])
+@contactos_bp.route("/api/contactos/sincronizacion", methods=["POST"])
 @limiter.limit("10/hour")
 @jwt_required
 def sync_contacts():
@@ -144,7 +144,7 @@ def sync_contacts():
 # ── Export CSV ────────────────────────────────────────────────────────────
 
 
-@contactos_bp.route("/api/contactos/export/csv", methods=["POST"])
+@contactos_bp.route("/api/contactos/exportacion/csv", methods=["POST"])
 @limiter.limit("20/hour")
 @jwt_required
 def export_csv():
@@ -165,7 +165,7 @@ def export_csv():
 # ── XLSX upload ───────────────────────────────────────────────────────────
 
 
-@contactos_bp.route("/api/contactos/xlsx/sync", methods=["POST"])
+@contactos_bp.route("/api/contactos/xlsx/sincronizacion", methods=["POST"])
 @limiter.limit("10/hour")
 @jwt_required
 def xlsx_sync():
@@ -183,7 +183,7 @@ def xlsx_sync():
     return jsonify({"ok": True, "resultado": data}), 200
 
 
-@contactos_bp.route("/api/contactos/xlsx/export/csv", methods=["POST"])
+@contactos_bp.route("/api/contactos/xlsx/exportacion/csv", methods=["POST"])
 @limiter.limit("20/hour")
 @jwt_required
 def xlsx_export_csv():
