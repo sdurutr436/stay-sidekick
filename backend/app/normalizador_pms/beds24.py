@@ -5,7 +5,7 @@ El protocolo PMSClient garantiza que el servicio de contactos no necesita
 saber nada de esta implementación.
 """
 
-from app.pms.base import ReservaEstandar
+from app.normalizador_pms.base import ReservaEstandar
 
 
 class Beds24ReservationClient:

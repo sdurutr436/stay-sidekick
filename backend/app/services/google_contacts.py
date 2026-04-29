@@ -22,7 +22,7 @@ from app.common.xlsx_reservas import parse_xlsx_reservas
 from app.extensions import db
 from app.models.integraciones import IntegracionGoogle
 from app.models.logs import ORIGEN_GOOGLE_CONTACTS, ESTADO_EXITO, ESTADO_ERROR, ESTADO_PARCIAL
-from app.pms.factory import build_pms_client
+from app.normalizador_pms.factory import build_pms_client
 from app.repositories import google_integration as repo
 from app.schemas.google_contacts import PreferenciasContactosSchema, SyncRangoSchema
 from app.services.csv_contacts import build_csv, _split_nombre, _format_display_name, _build_notas, _build_grupo
