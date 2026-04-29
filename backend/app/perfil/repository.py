@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 from app.extensions import db
 from app.usuarios.model import Usuario
 from app.perfil.model import ConfiguracionPMS, ConfiguracionIA
-from app.models.integraciones import IntegracionGoogle
+from app.h_sincronizador_contactos.model import IntegracionGoogle
 
 
 def get_usuario_by_id(user_id: str) -> Usuario | None:

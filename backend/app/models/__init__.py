@@ -9,8 +9,8 @@ from app.usuarios.model import Usuario
 from app.h_maestro_apartamentos.model import Apartamento
 from app.models.vault import PlantillaVault, MensajeGenerado
 from app.perfil.model import ConfiguracionPMS, ConfiguracionIA
-from app.models.integraciones import IntegracionGoogle
-from app.models.logs import LogSincronizacion
+from app.h_sincronizador_contactos.model import IntegracionGoogle
+from app.h_sincronizador_contactos.model import LogSincronizacion
 
 __all__ = [
     "Empresa",

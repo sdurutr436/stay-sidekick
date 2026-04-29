@@ -8,7 +8,7 @@ from datetime import datetime, timezone
 from app.extensions import db
 from app.h_maestro_apartamentos.model import Apartamento
 from app.perfil.model import ConfiguracionPMS
-from app.models.logs import LogSincronizacion
+from app.h_sincronizador_contactos.model import LogSincronizacion
 
 
 # ── Apartamentos ─────────────────────────────────────────────────────────
