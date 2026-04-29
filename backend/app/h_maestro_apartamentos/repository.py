@@ -6,7 +6,7 @@ import uuid
 from datetime import datetime, timezone
 
 from app.extensions import db
-from app.models.apartamento import Apartamento
+from app.h_maestro_apartamentos.model import Apartamento
 from app.perfil.model import ConfiguracionPMS
 from app.models.logs import LogSincronizacion
 

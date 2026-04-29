@@ -27,7 +27,7 @@ from app.repositories import google_integration as repo
 from app.schemas.google_contacts import PreferenciasContactosSchema, SyncRangoSchema
 from app.services.csv_contacts import build_csv, _split_nombre, _format_display_name, _build_notas, _build_grupo
 from app.services.google_people_client import GooglePeopleClient
-from app.apartamentos import repository as apt_repo
+from app.h_maestro_apartamentos import repository as apt_repo
 
 logger = logging.getLogger(__name__)
 
@@ -454,7 +454,7 @@ def _build_contact_payload(reserva, prefs: dict, google_client: GooglePeopleClie
 
 
 def _log_sync(empresa_id: str, estado: str, num: int, detalle: str) -> None:
-    from app.apartamentos.repository import create_sync_log
+    from app.h_maestro_apartamentos.repository import create_sync_log
     create_sync_log(
         empresa_id=empresa_id,
         origen=ORIGEN_GOOGLE_CONTACTS,

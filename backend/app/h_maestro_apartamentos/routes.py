@@ -19,7 +19,7 @@ from flask import Blueprint, current_app, g, jsonify, request
 
 from app.extensions import limiter
 from app.security.jwt import jwt_required
-from app.apartamentos import service
+from app.h_maestro_apartamentos import service
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +27,6 @@ apartamentos_bp = Blueprint("apartamentos", __name__)
 
 
 def _empresa_id() -> str:
-    """Extrae el empresa_id del JWT (claim 'empresa_id' del token)."""
     return g.jwt_claims["empresa_id"]
 
 
@@ -37,7 +36,6 @@ def _empresa_id() -> str:
 @apartamentos_bp.route("/api/apartamentos", methods=["GET"])
 @jwt_required
 def list_apartamentos():
-    """Lista todos los apartamentos activos de la empresa."""
     data = service.list_apartamentos(_empresa_id())
     return jsonify({"ok": True, "apartamentos": data}), 200
 
@@ -45,7 +43,6 @@ def list_apartamentos():
 @apartamentos_bp.route("/api/apartamentos/<apartamento_id>", methods=["GET"])
 @jwt_required
 def get_apartamento(apartamento_id: str):
-    """Detalle de un apartamento."""
     data, error = service.get_apartamento(_empresa_id(), apartamento_id)
     if error:
         return jsonify({"ok": False, "errors": [error]}), 404
@@ -55,7 +52,6 @@ def get_apartamento(apartamento_id: str):
 @apartamentos_bp.route("/api/apartamentos", methods=["POST"])
 @jwt_required
 def create_apartamento():
-    """Alta manual de un apartamento."""
     json_data = request.get_json(silent=True)
     if not json_data:
         return jsonify({"ok": False, "errors": ["Se esperaba un cuerpo JSON."]}), 400
@@ -69,7 +65,6 @@ def create_apartamento():
 @apartamentos_bp.route("/api/apartamentos/<apartamento_id>", methods=["PUT"])
 @jwt_required
 def update_apartamento(apartamento_id: str):
-    """Actualiza un apartamento."""
     json_data = request.get_json(silent=True)
     if not json_data:
         return jsonify({"ok": False, "errors": ["Se esperaba un cuerpo JSON."]}), 400
@@ -84,7 +79,6 @@ def update_apartamento(apartamento_id: str):
 @apartamentos_bp.route("/api/apartamentos/<apartamento_id>", methods=["DELETE"])
 @jwt_required
 def delete_apartamento(apartamento_id: str):
-    """Soft-delete de un apartamento."""
     error = service.delete_apartamento(_empresa_id(), apartamento_id)
     if error:
         return jsonify({"ok": False, "errors": [error]}), 404
@@ -98,7 +92,6 @@ def delete_apartamento(apartamento_id: str):
 @limiter.limit("10/hour")
 @jwt_required
 def sync_smoobu():
-    """Sincroniza apartamentos desde la API de Smoobu."""
     data, error = service.sync_from_smoobu(_empresa_id())
     if error:
         return jsonify({"ok": False, "errors": [error]}), 400
@@ -112,7 +105,6 @@ def sync_smoobu():
 @limiter.limit("20/hour")
 @jwt_required
 def import_xlsx():
-    """Importa apartamentos desde un archivo Excel (.xlsx)."""
     if "file" not in request.files:
         return jsonify({"ok": False, "errors": ["Se esperaba un archivo 'file'."]}), 400
 
@@ -146,7 +138,6 @@ def import_xlsx():
 @apartamentos_bp.route("/api/pms/config", methods=["GET"])
 @jwt_required
 def get_pms_config():
-    """Devuelve la configuración PMS de la empresa (sin la API key)."""
     data = service.get_pms_config(_empresa_id())
     if data is None:
         return jsonify({"ok": True, "config": None}), 200
@@ -156,7 +147,6 @@ def get_pms_config():
 @apartamentos_bp.route("/api/pms/config", methods=["POST"])
 @jwt_required
 def save_pms_config():
-    """Guarda o actualiza la configuración PMS (API key cifrada)."""
     json_data = request.get_json(silent=True)
     if not json_data:
         return jsonify({"ok": False, "errors": ["Se esperaba un cuerpo JSON."]}), 400
@@ -170,7 +160,6 @@ def save_pms_config():
 @apartamentos_bp.route("/api/pms/config", methods=["DELETE"])
 @jwt_required
 def delete_pms_config():
-    """Elimina la configuración PMS de la empresa."""
     error = service.delete_pms_config(_empresa_id())
     if error:
         return jsonify({"ok": False, "errors": [error]}), 404

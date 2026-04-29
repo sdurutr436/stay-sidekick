@@ -6,7 +6,7 @@ en el metadata de SQLAlchemy antes de cualquier operación con la BD.
 
 from app.empresas.model import Empresa
 from app.usuarios.model import Usuario
-from app.models.apartamento import Apartamento
+from app.h_maestro_apartamentos.model import Apartamento
 from app.models.vault import PlantillaVault, MensajeGenerado
 from app.perfil.model import ConfiguracionPMS, ConfiguracionIA
 from app.models.integraciones import IntegracionGoogle

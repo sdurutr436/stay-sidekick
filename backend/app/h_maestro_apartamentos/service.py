@@ -10,17 +10,16 @@ import requests
 from marshmallow import ValidationError
 
 from app.extensions import db
-from app.common.crypto import decrypt
-from app.apartamentos import repository as repo
-from app.apartamentos.schemas import (
+from app.common.crypto import decrypt, encrypt
+from app.h_maestro_apartamentos import repository as repo
+from app.h_maestro_apartamentos.schemas import (
     ApartamentoCreateSchema,
     ApartamentoUpdateSchema,
     PMSConfigSchema,
 )
-from app.apartamentos.smoobu_client import SmoobuClient
-from app.apartamentos.xlsx_parser import parse_xlsx
-from app.common.crypto import encrypt
-from app.models.apartamento import ORIGEN_SMOOBU, ORIGEN_XLSX, ORIGEN_MANUAL
+from app.h_maestro_apartamentos.smoobu_client import SmoobuClient
+from app.h_maestro_apartamentos.xlsx_parser import parse_xlsx
+from app.h_maestro_apartamentos.model import ORIGEN_SMOOBU, ORIGEN_XLSX, ORIGEN_MANUAL
 
 logger = logging.getLogger(__name__)
 
@@ -52,13 +51,11 @@ def _apt_to_dict(apt) -> dict:
 
 
 def list_apartamentos(empresa_id: str) -> list[dict]:
-    """Lista todos los apartamentos activos de la empresa."""
     apts = repo.list_by_empresa(empresa_id)
     return [_apt_to_dict(a) for a in apts]
 
 
 def get_apartamento(empresa_id: str, apartamento_id: str) -> tuple[dict | None, str | None]:
-    """Obtiene un apartamento por ID. Devuelve (data, error)."""
     apt = repo.get_by_id(apartamento_id, empresa_id)
     if not apt:
         return None, "Apartamento no encontrado."
@@ -66,7 +63,6 @@ def get_apartamento(empresa_id: str, apartamento_id: str) -> tuple[dict | None, 
 
 
 def create_apartamento(empresa_id: str, json_data: dict) -> tuple[dict | None, list[str]]:
-    """Alta manual de un apartamento. Devuelve (data, errores)."""
     try:
         clean = _create_schema.load(json_data)
     except ValidationError as exc:
@@ -81,14 +77,12 @@ def create_apartamento(empresa_id: str, json_data: dict) -> tuple[dict | None, l
         pms_origen=ORIGEN_MANUAL,
     )
     db.session.commit()
-
     return _apt_to_dict(apt), []
 
 
 def update_apartamento(
     empresa_id: str, apartamento_id: str, json_data: dict
 ) -> tuple[dict | None, list[str]]:
-    """Actualiza un apartamento existente. Devuelve (data, errores)."""
     apt = repo.get_by_id(apartamento_id, empresa_id)
     if not apt:
         return None, ["Apartamento no encontrado."]
@@ -100,16 +94,13 @@ def update_apartamento(
 
     repo.update(apt, **clean)
     db.session.commit()
-
     return _apt_to_dict(apt), []
 
 
 def delete_apartamento(empresa_id: str, apartamento_id: str) -> str | None:
-    """Soft-delete de un apartamento. Devuelve error o None si OK."""
     apt = repo.get_by_id(apartamento_id, empresa_id)
     if not apt:
         return "Apartamento no encontrado."
-
     repo.soft_delete(apt)
     db.session.commit()
     return None
@@ -119,20 +110,6 @@ def delete_apartamento(empresa_id: str, apartamento_id: str) -> str | None:
 
 
 def sync_from_smoobu(empresa_id: str) -> tuple[dict | None, str | None]:
-    """Sincroniza apartamentos desde la API de Smoobu.
-
-    1. Lee la configuración PMS de la empresa (api_key cifrada).
-    2. Descifra la API key.
-    3. Llama a Smoobu y obtiene todas las propiedades.
-    4. Upsert en la BD.
-    5. Registra log de sincronización.
-
-    Returns
-    -------
-    tuple[dict | None, str | None]
-        (resumen, error).
-    """
-    # 1. Obtener config PMS
     config = repo.get_pms_config(empresa_id)
     if not config or not config.api_key_cifrada:
         return None, "No hay configuración PMS. Guarda tu API key primero."
@@ -140,12 +117,10 @@ def sync_from_smoobu(empresa_id: str) -> tuple[dict | None, str | None]:
     if config.proveedor != "smoobu":
         return None, f"El proveedor configurado es '{config.proveedor}', no 'smoobu'."
 
-    # 2. Descifrar API key
     api_key = decrypt(config.api_key_cifrada)
     if api_key is None:
         return None, "No se pudo descifrar la API key. Vuelve a configurarla."
 
-    # 3. Llamar a Smoobu
     client = SmoobuClient(api_key)
     try:
         apartments = client.fetch_all_normalized()
@@ -160,7 +135,6 @@ def sync_from_smoobu(empresa_id: str) -> tuple[dict | None, str | None]:
         db.session.commit()
         return None, f"Error al conectar con Smoobu: {exc}"
 
-    # 4. Upsert
     nuevos = 0
     actualizados = 0
     for apt_data in apartments:
@@ -177,7 +151,6 @@ def sync_from_smoobu(empresa_id: str) -> tuple[dict | None, str | None]:
         else:
             actualizados += 1
 
-    # 5. Log
     repo.create_sync_log(
         empresa_id=empresa_id,
         origen="pms",
@@ -198,13 +171,6 @@ def sync_from_smoobu(empresa_id: str) -> tuple[dict | None, str | None]:
 
 
 def import_from_xlsx(empresa_id: str, file_bytes: bytes) -> tuple[dict | None, list[str]]:
-    """Importa apartamentos desde un archivo Excel.
-
-    Returns
-    -------
-    tuple[dict | None, list[str]]
-        (resumen, errores).
-    """
     apartments, parse_errors = parse_xlsx(file_bytes)
 
     if not apartments and parse_errors:
@@ -244,26 +210,23 @@ def import_from_xlsx(empresa_id: str, file_bytes: bytes) -> tuple[dict | None, l
     )
     db.session.commit()
 
-    result = {
+    return {
         "total": len(apartments),
         "nuevos": nuevos,
         "actualizados": actualizados,
-    }
-    return result, parse_errors
+    }, parse_errors
 
 
 # ── Configuración PMS ────────────────────────────────────────────────────
 
 
 def save_pms_config(empresa_id: str, json_data: dict) -> tuple[dict | None, list[str]]:
-    """Guarda/actualiza la configuración del PMS (API key cifrada)."""
     try:
         clean = _pms_config_schema.load(json_data)
     except ValidationError as exc:
         return None, _flatten(exc.messages)
 
     api_key_cifrada = encrypt(clean["api_key"])
-
     config = repo.upsert_pms_config(
         empresa_id=empresa_id,
         proveedor=clean["proveedor"],
@@ -281,7 +244,6 @@ def save_pms_config(empresa_id: str, json_data: dict) -> tuple[dict | None, list
 
 
 def get_pms_config(empresa_id: str) -> dict | None:
-    """Devuelve la config PMS de la empresa (sin la API key)."""
     config = repo.get_pms_config(empresa_id)
     if not config:
         return None
@@ -294,7 +256,6 @@ def get_pms_config(empresa_id: str) -> dict | None:
 
 
 def delete_pms_config(empresa_id: str) -> str | None:
-    """Elimina la config PMS. Devuelve error o None."""
     config = repo.get_pms_config(empresa_id)
     if not config:
         return "No hay configuración PMS para eliminar."
@@ -307,7 +268,6 @@ def delete_pms_config(empresa_id: str) -> str | None:
 
 
 def _flatten(messages: dict) -> list[str]:
-    """Aplana errores de Marshmallow a lista."""
     errors: list[str] = []
     for field, msgs in messages.items():
         if isinstance(msgs, list):
