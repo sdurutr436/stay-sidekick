@@ -20,6 +20,7 @@ from app.h_maestro_apartamentos.schemas import (
 from app.h_maestro_apartamentos.smoobu_client import SmoobuClient
 from app.h_maestro_apartamentos.xlsx_parser import parse_xlsx
 from app.h_maestro_apartamentos.model import ORIGEN_SMOOBU, ORIGEN_XLSX, ORIGEN_MANUAL
+from app.empresas.model import Empresa
 
 logger = logging.getLogger(__name__)
 
@@ -171,7 +172,7 @@ def sync_from_smoobu(empresa_id: str) -> tuple[dict | None, str | None]:
 
 
 def import_from_xlsx(empresa_id: str, file_bytes: bytes) -> tuple[dict | None, list[str]]:
-    apartments, parse_errors = parse_xlsx(file_bytes)
+    apartments, parse_errors = parse_xlsx(file_bytes, col_override=_get_xlsx_col_override(empresa_id))
 
     if not apartments and parse_errors:
         repo.create_sync_log(
@@ -221,7 +222,7 @@ def import_from_xlsx(empresa_id: str, file_bytes: bytes) -> tuple[dict | None, l
 
 
 def preview_import_xlsx(empresa_id: str, file_bytes: bytes) -> tuple[dict, list[str]]:
-    apartments, parse_errors = parse_xlsx(file_bytes)
+    apartments, parse_errors = parse_xlsx(file_bytes, col_override=_get_xlsx_col_override(empresa_id))
 
     nuevos = []
     actualizados = []
@@ -310,6 +311,16 @@ def delete_pms_config(empresa_id: str) -> str | None:
 
 
 # ── Utilidades ───────────────────────────────────────────────────────────
+
+
+def _get_xlsx_col_override(empresa_id: str) -> dict | None:
+    empresa = Empresa.query.filter_by(id=empresa_id).first()
+    if not empresa:
+        return None
+    cfg = (empresa.configuracion or {}).get("xlsx_apartamentos", {})
+    if (cfg.get("col_id_externo") or 0) > 0 and (cfg.get("col_nombre") or 0) > 0:
+        return cfg
+    return None
 
 
 def _flatten(messages: dict) -> list[str]:

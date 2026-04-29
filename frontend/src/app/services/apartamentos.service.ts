@@ -48,6 +48,13 @@ export interface PmsConfig {
   ultimo_sync: string | null;
 }
 
+export interface XlsxColumnas {
+  col_id_externo: number;
+  col_nombre: number;
+  col_direccion: number;
+  col_ciudad: number;
+}
+
 @Injectable({ providedIn: 'root' })
 export class ApartamentosService {
   private readonly http = inject(HttpClient);
@@ -111,5 +118,17 @@ export class ApartamentosService {
     return this.http
       .get<{ ok: boolean; config: PmsConfig | null }>('/api/apartamentos/pms')
       .pipe(map(res => res.config));
+  }
+
+  getXlsxColumnas(): Observable<XlsxColumnas | null> {
+    return this.http
+      .get<{ ok: boolean; config: XlsxColumnas | null }>('/api/perfil/xlsx-apartamentos')
+      .pipe(map(res => res.config));
+  }
+
+  saveXlsxColumnas(config: XlsxColumnas): Observable<void> {
+    return this.http
+      .put<{ ok: boolean }>('/api/perfil/xlsx-apartamentos', config)
+      .pipe(map(() => undefined));
   }
 }

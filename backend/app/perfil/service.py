@@ -9,13 +9,14 @@ from marshmallow import ValidationError
 from app.auth.passwords import hash_password, verify_password
 from app.common.crypto import encrypt
 from app.perfil import repository as repo
-from app.perfil.schemas import CambiarPasswordSchema, ActualizarPMSSchema, ActualizarIASchema
+from app.perfil.schemas import CambiarPasswordSchema, ActualizarPMSSchema, ActualizarIASchema, XlsxApartamentosConfigSchema
 
 logger = logging.getLogger(__name__)
 
-_schema_password = CambiarPasswordSchema()
-_schema_pms      = ActualizarPMSSchema()
-_schema_ia       = ActualizarIASchema()
+_schema_password    = CambiarPasswordSchema()
+_schema_pms         = ActualizarPMSSchema()
+_schema_ia          = ActualizarIASchema()
+_schema_xlsx_config = XlsxApartamentosConfigSchema()
 
 
 def get_perfil(user_id: str) -> dict | None:
@@ -87,6 +88,19 @@ def actualizar_ia(empresa_id: str, json_data: dict) -> list[str]:
 
     api_key_cifrada = encrypt(data["api_key"]) if data.get("api_key") else None
     repo.upsert_ia(empresa_id, data["proveedor"], data.get("modelo"), api_key_cifrada)
+    return []
+
+
+def get_xlsx_apartamentos_config(empresa_id: str) -> dict:
+    return repo.get_xlsx_apartamentos_config(empresa_id)
+
+
+def save_xlsx_apartamentos_config(empresa_id: str, json_data: dict) -> list[str]:
+    try:
+        data = _schema_xlsx_config.load(json_data)
+    except ValidationError as exc:
+        return _flatten(exc.messages)
+    repo.save_xlsx_apartamentos_config(empresa_id, data)
     return []
 
 

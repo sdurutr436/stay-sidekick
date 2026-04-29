@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { PerfilService, IntegracionesData } from '../../services/perfil.service';
+import { ApartamentosService } from '../../services/apartamentos.service';
 import { PageHeaderComponent } from '../../components/organisms/page-header/page-header';
 import { PanelSeccionComponent } from '../../components/organisms/panel-seccion/panel-seccion';
 import { AlertComponent } from '../../components/molecules/alert/alert';
@@ -33,6 +34,7 @@ interface Alerta {
 export class PerfilPageComponent implements OnInit {
   readonly auth    = inject(AuthService);
   readonly service = inject(PerfilService);
+  private  readonly aptService = inject(ApartamentosService);
   private  readonly http  = inject(HttpClient);
   private  readonly route = inject(ActivatedRoute);
 
@@ -65,6 +67,14 @@ export class PerfilPageComponent implements OnInit {
   readonly googleGuardando = signal(false);
   readonly googleAlerta    = signal<Alerta | null>(null);
 
+  // XLSX — Configuración de columnas (maestro de apartamentos)
+  readonly xlsxColIdExterno = signal(0);
+  readonly xlsxColNombre    = signal(0);
+  readonly xlsxColDireccion = signal(0);
+  readonly xlsxColCiudad    = signal(0);
+  readonly xlsxGuardando    = signal(false);
+  readonly xlsxAlerta       = signal<Alerta | null>(null);
+
   readonly pmsOpciones = [
     { value: 'smoobu',    label: 'Smoobu'    },
     { value: 'beds24',    label: 'Beds24'    },
@@ -90,6 +100,7 @@ export class PerfilPageComponent implements OnInit {
     });
 
     this.cargarIntegraciones();
+    this.cargarXlsxColumnas();
 
     this.route.queryParamMap.subscribe(params => {
       if (params.get('google_conectado') === 'true') {
@@ -220,8 +231,41 @@ export class PerfilPageComponent implements OnInit {
     });
   }
 
+  guardarXlsxColumnas(): void {
+    this.xlsxAlerta.set(null);
+    this.xlsxGuardando.set(true);
+    this.aptService.saveXlsxColumnas({
+      col_id_externo: this.xlsxColIdExterno(),
+      col_nombre:     this.xlsxColNombre(),
+      col_direccion:  this.xlsxColDireccion(),
+      col_ciudad:     this.xlsxColCiudad(),
+    }).subscribe({
+      next: () => {
+        this.xlsxAlerta.set({ tipo: 'success', mensaje: 'Configuración de columnas guardada.' });
+        this.xlsxGuardando.set(false);
+      },
+      error: err => {
+        this.xlsxAlerta.set({ tipo: 'error', mensaje: err?.error?.errors?.[0] ?? 'Error al guardar la configuración.' });
+        this.xlsxGuardando.set(false);
+      },
+    });
+  }
+
   cerrarSesion(): void {
     this.auth.logout();
+  }
+
+  private cargarXlsxColumnas(): void {
+    this.aptService.getXlsxColumnas().subscribe({
+      next: config => {
+        if (config) {
+          this.xlsxColIdExterno.set(config.col_id_externo ?? 0);
+          this.xlsxColNombre.set(config.col_nombre ?? 0);
+          this.xlsxColDireccion.set(config.col_direccion ?? 0);
+          this.xlsxColCiudad.set(config.col_ciudad ?? 0);
+        }
+      },
+    });
   }
 
   private cargarIntegraciones(): void {

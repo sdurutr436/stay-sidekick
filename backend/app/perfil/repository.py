@@ -4,8 +4,11 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 
+from sqlalchemy.orm.attributes import flag_modified
+
 from app.extensions import db
 from app.usuarios.model import Usuario
+from app.empresas.model import Empresa
 from app.perfil.model import ConfiguracionPMS, ConfiguracionIA
 from app.h_sincronizador_contactos.model import IntegracionGoogle
 
@@ -39,6 +42,24 @@ def upsert_pms(empresa_id: str, proveedor: str, api_key_cifrada: str) -> None:
             proveedor=proveedor,
             api_key_cifrada=api_key_cifrada,
         ))
+    db.session.commit()
+
+
+def get_xlsx_apartamentos_config(empresa_id: str) -> dict:
+    empresa = db.session.query(Empresa).filter_by(id=empresa_id).first()
+    if not empresa:
+        return {}
+    return (empresa.configuracion or {}).get("xlsx_apartamentos", {})
+
+
+def save_xlsx_apartamentos_config(empresa_id: str, data: dict) -> None:
+    empresa = db.session.query(Empresa).filter_by(id=empresa_id).first()
+    if not empresa:
+        return
+    config = dict(empresa.configuracion or {})
+    config["xlsx_apartamentos"] = data
+    empresa.configuracion = config
+    flag_modified(empresa, "configuracion")
     db.session.commit()
 
 

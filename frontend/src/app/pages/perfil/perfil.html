@@ -270,6 +270,91 @@
 
   </app-panel-seccion>
 
+  <!-- ── Importación XLSX — Maestro de apartamentos ────────────────────── -->
+  <app-panel-seccion title="Importación XLSX — Apartamentos" [divider]="true">
+
+    <p class="u-text-secondary u-mb-8">
+      Indica el número de columna (1 = columna A) donde tu archivo XLSX tiene cada dato.
+      Si dejas un campo a 0, se intentará detectar la columna por el nombre de la cabecera.
+    </p>
+
+    @if (!isAdmin()) {
+      <p class="u-text-secondary u-mb-8">
+        Solo el administrador puede modificar esta configuración.
+      </p>
+    }
+
+    @if (xlsxAlerta()) {
+      <app-alert
+        [type]="xlsxAlerta()!.tipo"
+        [dismissible]="true"
+        (dismissed)="xlsxAlerta.set(null)"
+      >
+        {{ xlsxAlerta()!.mensaje }}
+      </app-alert>
+    }
+
+    <form class="perfil-form" (submit)="$event.preventDefault(); guardarXlsxColumnas()">
+
+      <app-form-field label="ID externo del apartamento*" for="xlsx-id-externo">
+        <app-form-input
+          id="xlsx-id-externo"
+          type="number"
+          placeholder="0 = detectar por cabecera"
+          [value]="xlsxColIdExterno().toString()"
+          [disabled]="!isAdmin()"
+          (valueChange)="xlsxColIdExterno.set(+$event || 0)"
+        />
+      </app-form-field>
+
+      <app-form-field label="Nombre del apartamento*" for="xlsx-nombre">
+        <app-form-input
+          id="xlsx-nombre"
+          type="number"
+          placeholder="0 = detectar por cabecera"
+          [value]="xlsxColNombre().toString()"
+          [disabled]="!isAdmin()"
+          (valueChange)="xlsxColNombre.set(+$event || 0)"
+        />
+      </app-form-field>
+
+      <app-form-field label="Dirección" for="xlsx-direccion">
+        <app-form-input
+          id="xlsx-direccion"
+          type="number"
+          placeholder="0 = detectar por cabecera"
+          [value]="xlsxColDireccion().toString()"
+          [disabled]="!isAdmin()"
+          (valueChange)="xlsxColDireccion.set(+$event || 0)"
+        />
+      </app-form-field>
+
+      <app-form-field label="Ciudad" for="xlsx-ciudad">
+        <app-form-input
+          id="xlsx-ciudad"
+          type="number"
+          placeholder="0 = detectar por cabecera"
+          [value]="xlsxColCiudad().toString()"
+          [disabled]="!isAdmin()"
+          (valueChange)="xlsxColCiudad.set(+$event || 0)"
+        />
+      </app-form-field>
+
+      @if (isAdmin()) {
+        <app-button
+          type="submit"
+          variant="secondary"
+          size="md"
+          [disabled]="xlsxGuardando()"
+        >
+          {{ xlsxGuardando() ? 'Guardando…' : 'Guardar configuración XLSX' }}
+        </app-button>
+      }
+
+    </form>
+
+  </app-panel-seccion>
+
   <!-- ── Cerrar sesión ───────────────────────────────────────────────────── -->
   <section class="perfil-page__sesion" aria-label="Gestión de sesión">
     <app-button variant="danger" size="md" (click)="cerrarSesion()">
