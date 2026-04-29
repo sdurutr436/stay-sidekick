@@ -12,7 +12,7 @@ from flask import Blueprint, g, jsonify, request
 
 from app.extensions import limiter
 from app.security.jwt import jwt_required
-from app.notificaciones import service
+from app.h_notificaciones_tardias import service
 
 logger = logging.getLogger(__name__)
 
@@ -20,7 +20,6 @@ notificaciones_bp = Blueprint("notificaciones", __name__)
 
 
 def _empresa_id() -> str:
-    """Extrae el empresa_id del JWT."""
     return g.jwt_claims["empresa_id"]
 
 
@@ -30,7 +29,6 @@ def _empresa_id() -> str:
 @notificaciones_bp.route("/api/notificaciones/checkin-tardio/status", methods=["GET"])
 @jwt_required
 def get_status():
-    """Estado de la herramienta: Gmail configurado, PMS, apartamentos y check-ins de hoy."""
     data = service.get_status(_empresa_id())
     return jsonify({"ok": True, **data}), 200
 
@@ -42,11 +40,6 @@ def get_status():
 @limiter.limit("20/hour")
 @jwt_required
 def upload_xlsx():
-    """Parsea un XLSX de reservas y devuelve los check-ins de hoy.
-
-    Espera el campo ``file`` con el archivo .xlsx.
-    Los datos se procesan en memoria y no se persisten (RGPD).
-    """
     if "file" not in request.files:
         return jsonify({"ok": False, "errors": ["Se esperaba un campo 'file' con el archivo."]}), 400
 
@@ -73,15 +66,6 @@ def upload_xlsx():
 @limiter.limit("30/hour")
 @jwt_required
 def enviar_notificacion():
-    """Envía un email de notificación de check-in tardío.
-
-    Body JSON esperado:
-    {
-        "destinatario": "correo@ejemplo.com",
-        "asunto": "Recordatorio de check-in",   // opcional
-        "mensaje": "Texto del email..."
-    }
-    """
     json_data = request.get_json(silent=True)
     if not json_data:
         return jsonify({"ok": False, "errors": ["Se esperaba un cuerpo JSON."]}), 400
