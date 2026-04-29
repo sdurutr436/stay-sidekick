@@ -1,9 +1,9 @@
 """Blueprint de notificaciones para check-in tardíos.
 
 Rutas (todas requieren JWT):
-- GET  /api/notificaciones/checkin-tardio/status  → estado: Gmail, PMS, check-ins hoy, apartamentos
-- POST /api/notificaciones/checkin-tardio/xlsx    → parsea XLSX, devuelve check-ins de hoy (en memoria)
-- POST /api/notificaciones/checkin-tardio/enviar  → envía email de notificación (destinatario + mensaje)
+- GET  /api/notificaciones/checkin-tardio/status   → estado: Gmail, PMS, check-ins hoy, apartamentos
+- POST /api/notificaciones/checkin-tardio/checkins → parsea XLSX subido, devuelve check-ins de hoy (en memoria, no persiste — RGPD)
+- POST /api/notificaciones/checkin-tardio/email    → dispara envío de email de notificación (destinatario + mensaje)
 """
 
 import logging
@@ -36,7 +36,7 @@ def get_status():
 # ── XLSX ──────────────────────────────────────────────────────────────────
 
 
-@notificaciones_bp.route("/api/notificaciones/checkin-tardio/xlsx", methods=["POST"])
+@notificaciones_bp.route("/api/notificaciones/checkin-tardio/checkins", methods=["POST"])
 @limiter.limit("20/hour")
 @jwt_required
 def upload_xlsx():
@@ -62,7 +62,7 @@ def upload_xlsx():
 # ── Envío de notificación ─────────────────────────────────────────────────
 
 
-@notificaciones_bp.route("/api/notificaciones/checkin-tardio/enviar", methods=["POST"])
+@notificaciones_bp.route("/api/notificaciones/checkin-tardio/email", methods=["POST"])
 @limiter.limit("30/hour")
 @jwt_required
 def enviar_notificacion():

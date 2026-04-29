@@ -124,7 +124,8 @@ export class MaestroApartamentosPageComponent {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
     if (!file) return;
-    // TODO: POST /api/apartamentos/import/xlsx con multipart/form-data
+    // TODO: POST /api/apartamentos/importacion con multipart/form-data (campo 'file', .xlsx)
+    //   Respuesta: { ok: boolean, resultado: { total, nuevos, actualizados }, warnings?: string[] }
     console.warn('[maestro-apartamentos] importar XLSX — pendiente de integrar', file.name);
     input.value = ''; // Permite volver a seleccionar el mismo archivo
   }
@@ -141,7 +142,9 @@ export class MaestroApartamentosPageComponent {
   }
 
   syncSmoobu(): void {
-    // TODO: POST /api/apartamentos/sync/smoobu
+    // TODO: POST /api/apartamentos/sincronizacion/smoobu
+    //   Requiere JWT. Respuesta: { ok: boolean, resultado: { total, nuevos, actualizados } }
+    //   Rate limit: 10/hour
     console.warn('[maestro-apartamentos] sincronizar Smoobu — pendiente de integrar');
   }
 
