@@ -5,26 +5,30 @@
     title="Maestro de apartamentos"
     description="Gestiona el catálogo de propiedades de tu empresa. Añádelos manualmente, importa un Excel o sincroniza desde Smoobu."
   >
-    <app-button variant="secondary" size="md" (click)="syncSmoobu()">
-      <span class="btn__icon" aria-hidden="true">
-        <svg class="svg svg--sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
-          <path d="M4 10a6 6 0 1 0 6-6" stroke="#2e2e2e" stroke-width="1.5" stroke-linecap="square"/>
-          <polyline points="3,6 4,10 8,10" stroke="#2e2e2e" stroke-width="1.5" fill="none" stroke-linecap="square" stroke-linejoin="miter"/>
-        </svg>
-      </span>
-      Sincronizar Smoobu
-    </app-button>
+    @if (isAdmin || pmsActivo()) {
+      <app-button variant="secondary" size="md" [disabled]="sincronizando()" (click)="syncSmoobu()">
+        <span class="btn__icon" aria-hidden="true">
+          <svg class="svg svg--sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
+            <path d="M4 10a6 6 0 1 0 6-6" stroke="#2e2e2e" stroke-width="1.5" stroke-linecap="square"/>
+            <polyline points="3,6 4,10 8,10" stroke="#2e2e2e" stroke-width="1.5" fill="none" stroke-linecap="square" stroke-linejoin="miter"/>
+          </svg>
+        </span>
+        {{ sincronizando() ? 'Sincronizando…' : 'Sincronizar Smoobu' }}
+      </app-button>
+    }
 
-    <app-button variant="secondary" size="md" (click)="triggerXlsxImport(xlsxInput)">
-      <span class="btn__icon" aria-hidden="true">
-        <svg class="svg svg--sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
-          <rect x="4" y="2" width="12" height="16" stroke="#2e2e2e" stroke-width="1.5"/>
-          <polyline points="7,10 10,7 13,10" stroke="#2e2e2e" stroke-width="1.5" fill="none" stroke-linecap="square" stroke-linejoin="miter"/>
-          <line x1="10" y1="7" x2="10" y2="14" stroke="#2e2e2e" stroke-width="1.5" stroke-linecap="square"/>
-        </svg>
-      </span>
-      Importar XLSX
-    </app-button>
+    @if (isAdmin) {
+      <app-button variant="secondary" size="md" [disabled]="xlsxCargando()" (click)="triggerXlsxImport(xlsxInput)">
+        <span class="btn__icon" aria-hidden="true">
+          <svg class="svg svg--sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
+            <rect x="4" y="2" width="12" height="16" stroke="#2e2e2e" stroke-width="1.5"/>
+            <polyline points="7,10 10,7 13,10" stroke="#2e2e2e" stroke-width="1.5" fill="none" stroke-linecap="square" stroke-linejoin="miter"/>
+            <line x1="10" y1="7" x2="10" y2="14" stroke="#2e2e2e" stroke-width="1.5" stroke-linecap="square"/>
+          </svg>
+        </span>
+        Importar XLSX
+      </app-button>
+    }
 
     <input
       #xlsxInput
@@ -37,6 +41,18 @@
     />
   </app-page-header>
 
+  @if (syncAlerta()) {
+    <app-alert [type]="syncAlerta()!.tipo" [dismissible]="true" (dismissed)="syncAlerta.set(null)">
+      {{ syncAlerta()!.mensaje }}
+    </app-alert>
+  }
+
+  @if (alertaEliminar()) {
+    <app-alert [type]="alertaEliminar()!.tipo" [dismissible]="true" (dismissed)="alertaEliminar.set(null)">
+      {{ alertaEliminar()!.mensaje }}
+    </app-alert>
+  }
+
   <app-tabla-crud
     searchPlaceholder="Buscar por nombre, ciudad o dirección…"
     [searchValue]="searchQuery()"
@@ -48,117 +64,265 @@
     <span title>Listado de apartamentos</span>
 
     <ng-container toolbar-actions>
-      <app-button variant="primary" size="md" (click)="openAddDialog()">
-        <span class="btn__icon" aria-hidden="true">
-          <svg class="svg svg--sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
-            <line x1="10" y1="3" x2="10" y2="17" stroke="#fff" stroke-width="2" stroke-linecap="square"/>
-            <line x1="3" y1="10" x2="17" y2="10" stroke="#fff" stroke-width="2" stroke-linecap="square"/>
-          </svg>
-        </span>
-        Añadir apartamento
-      </app-button>
-
-      <app-button
-        variant="secondary"
-        size="md"
-        [disabled]="selectedCount() === 0"
-        (click)="deleteSelected()"
-      >
-        <span class="btn__icon" aria-hidden="true">
-          <svg class="svg svg--sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
-            <polyline points="4,6 6,6 16,6" stroke="#2e2e2e" stroke-width="1.5" fill="none" stroke-linecap="square" stroke-linejoin="miter"/>
-            <path d="M8 6V4h4v2" stroke="#2e2e2e" stroke-width="1.5" stroke-linecap="square"/>
-            <rect x="5" y="6" width="10" height="11" stroke="#2e2e2e" stroke-width="1.5"/>
-            <line x1="8" y1="9" x2="8" y2="14" stroke="#2e2e2e" stroke-width="1.5" stroke-linecap="square"/>
-            <line x1="12" y1="9" x2="12" y2="14" stroke="#2e2e2e" stroke-width="1.5" stroke-linecap="square"/>
-          </svg>
-        </span>
-        @if (selectedCount() > 0) {
-          Eliminar ({{ selectedCount() }})
+      @if (isAdmin) {
+        @if (modoCreacion()) {
+          <app-button variant="primary" size="md" [disabled]="guardando()" (click)="guardarCreacion()">
+            {{ guardando() ? 'Guardando…' : 'Guardar cambios' }}
+          </app-button>
+          <app-button variant="ghost" size="md" [disabled]="guardando()" (click)="cancelarCreacion()">
+            Cancelar
+          </app-button>
         } @else {
-          Eliminar
+          <app-button variant="primary" size="md" (click)="activarModoCreacion()">
+            <span class="btn__icon" aria-hidden="true">
+              <svg class="svg svg--sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
+                <line x1="10" y1="3" x2="10" y2="17" stroke="#fff" stroke-width="2" stroke-linecap="square"/>
+                <line x1="3" y1="10" x2="17" y2="10" stroke="#fff" stroke-width="2" stroke-linecap="square"/>
+              </svg>
+            </span>
+            Añadir apartamento
+          </app-button>
         }
-      </app-button>
+
+        <app-button
+          variant="secondary"
+          size="md"
+          [disabled]="selectedCount() === 0 || eliminando()"
+          (click)="pedirConfirmacionEliminar()"
+        >
+          <span class="btn__icon" aria-hidden="true">
+            <svg class="svg svg--sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
+              <polyline points="4,6 6,6 16,6" stroke="#2e2e2e" stroke-width="1.5" fill="none" stroke-linecap="square" stroke-linejoin="miter"/>
+              <path d="M8 6V4h4v2" stroke="#2e2e2e" stroke-width="1.5" stroke-linecap="square"/>
+              <rect x="5" y="6" width="10" height="11" stroke="#2e2e2e" stroke-width="1.5"/>
+              <line x1="8" y1="9" x2="8" y2="14" stroke="#2e2e2e" stroke-width="1.5" stroke-linecap="square"/>
+              <line x1="12" y1="9" x2="12" y2="14" stroke="#2e2e2e" stroke-width="1.5" stroke-linecap="square"/>
+            </svg>
+          </span>
+          @if (selectedCount() > 0) {
+            Eliminar ({{ selectedCount() }})
+          } @else {
+            Eliminar
+          }
+        </app-button>
+      }
     </ng-container>
 
     <table class="tabla-crud__table" aria-label="Tabla de apartamentos">
       <thead>
         <tr>
-          <th class="tabla-crud__th tabla-crud__th--checkbox" scope="col">
-            <input
-              type="checkbox"
-              class="tabla-crud__checkbox"
-              [checked]="isAllSelected()"
-              [indeterminate]="selectedCount() > 0 && !isAllSelected()"
-              (change)="toggleSelectAll()"
-              aria-label="Seleccionar todos los apartamentos visibles"
-            />
-          </th>
+          @if (isAdmin) {
+            <th class="tabla-crud__th tabla-crud__th--checkbox" scope="col">
+              <input
+                type="checkbox"
+                class="tabla-crud__checkbox"
+                [checked]="isAllSelected()"
+                [indeterminate]="selectedCount() > 0 && !isAllSelected()"
+                (change)="toggleSelectAll()"
+                aria-label="Seleccionar todos los apartamentos visibles"
+              />
+            </th>
+          }
           <th class="tabla-crud__th" scope="col">Nombre</th>
           <th class="tabla-crud__th" scope="col">Ciudad</th>
           <th class="tabla-crud__th" scope="col">Dirección</th>
           <th class="tabla-crud__th" scope="col">Origen</th>
           <th class="tabla-crud__th" scope="col">ID externo</th>
-          <th class="tabla-crud__th" scope="col">Estado</th>
         </tr>
       </thead>
       <tbody>
-        @if (filteredApartamentos().length > 0) {
-          @for (apt of filteredApartamentos(); track apt.id) {
-            <tr
-              class="tabla-crud__row"
-              [class.tabla-crud__row--selected]="isSelected(apt.id)"
-            >
-              <td class="tabla-crud__td tabla-crud__td--checkbox">
-                <input
-                  type="checkbox"
-                  class="tabla-crud__checkbox"
-                  [checked]="isSelected(apt.id)"
-                  (change)="toggleSelect(apt.id)"
-                  [attr.aria-label]="'Seleccionar ' + apt.nombre"
-                />
-              </td>
-              <td class="tabla-crud__td tabla-crud__td--nombre">{{ apt.nombre }}</td>
-              <td class="tabla-crud__td">{{ apt.ciudad ?? '—' }}</td>
-              <td class="tabla-crud__td tabla-crud__td--direccion">{{ apt.direccion ?? '—' }}</td>
-              <td class="tabla-crud__td">
-                <app-badge [variant]="apt.pms_origen === 'smoobu' ? 'solid' : 'outline'">
-                  {{ originLabel(apt.pms_origen) }}
-                </app-badge>
-              </td>
-              <td class="tabla-crud__td tabla-crud__td--mono">{{ apt.id_externo ?? '—' }}</td>
-              <td class="tabla-crud__td">
-                <app-badge [variant]="apt.activo ? 'solid' : 'outline'">
-                  {{ apt.activo ? 'Activo' : 'Inactivo' }}
-                </app-badge>
+
+        @if (cargando()) {
+          @for (i of [1, 2, 3]; track i) {
+            <tr class="tabla-crud__row tabla-crud__row--skeleton">
+              @if (isAdmin) {
+                <td class="tabla-crud__td tabla-crud__td--checkbox">
+                  <span class="tabla-crud__skeleton"></span>
+                </td>
+              }
+              <td class="tabla-crud__td"><span class="tabla-crud__skeleton"></span></td>
+              <td class="tabla-crud__td"><span class="tabla-crud__skeleton"></span></td>
+              <td class="tabla-crud__td"><span class="tabla-crud__skeleton"></span></td>
+              <td class="tabla-crud__td"><span class="tabla-crud__skeleton"></span></td>
+              <td class="tabla-crud__td"><span class="tabla-crud__skeleton"></span></td>
+            </tr>
+          }
+        } @else if (error()) {
+          <tr>
+            <td class="tabla-crud__empty" [attr.colspan]="isAdmin ? 6 : 5">
+              <app-alert type="error">{{ error() }}</app-alert>
+            </td>
+          </tr>
+        } @else {
+
+          @if (modoCreacion()) {
+            @for (fila of filasEntrada(); track fila.id) {
+              <tr class="tabla-crud__row tabla-crud__row--entrada">
+                @if (isAdmin) {
+                  <td class="tabla-crud__td tabla-crud__td--checkbox">
+                    <button
+                      class="tabla-crud__btn-eliminar-fila"
+                      type="button"
+                      [disabled]="filasEntrada().length === 1"
+                      (click)="eliminarFila(fila.id)"
+                      aria-label="Quitar fila"
+                    >×</button>
+                  </td>
+                }
+                <td class="tabla-crud__td tabla-crud__td--nombre">
+                  <app-form-input
+                    [id]="'nombre-' + fila.id"
+                    placeholder="Nombre*"
+                    [value]="fila.nombre"
+                    [ariaLabel]="'Nombre del apartamento'"
+                    (valueChange)="actualizarFila(fila.id, 'nombre', $event)"
+                  />
+                  @if (fila.errores.nombre) {
+                    <span class="tabla-crud__error">El nombre es obligatorio.</span>
+                  }
+                </td>
+                <td class="tabla-crud__td">
+                  <app-form-input
+                    [id]="'ciudad-' + fila.id"
+                    placeholder="Ciudad"
+                    [value]="fila.ciudad"
+                    [ariaLabel]="'Ciudad'"
+                    (valueChange)="actualizarFila(fila.id, 'ciudad', $event)"
+                  />
+                </td>
+                <td class="tabla-crud__td tabla-crud__td--direccion">
+                  <app-form-input
+                    [id]="'direccion-' + fila.id"
+                    placeholder="Dirección"
+                    [value]="fila.direccion"
+                    [ariaLabel]="'Dirección'"
+                    (valueChange)="actualizarFila(fila.id, 'direccion', $event)"
+                  />
+                </td>
+                <td class="tabla-crud__td">
+                  <app-badge variant="outline">Manual</app-badge>
+                </td>
+                <td class="tabla-crud__td tabla-crud__td--mono">
+                  <app-form-input
+                    [id]="'idexterno-' + fila.id"
+                    placeholder="ID externo"
+                    [value]="fila.idexterno"
+                    [ariaLabel]="'ID externo'"
+                    (valueChange)="actualizarFila(fila.id, 'idexterno', $event)"
+                  />
+                </td>
+              </tr>
+            }
+            <tr class="tabla-crud__row tabla-crud__row--agregar">
+              <td [attr.colspan]="isAdmin ? 6 : 5">
+                <app-button variant="ghost" size="sm" (click)="agregarFila()">
+                  + Añadir uno más
+                </app-button>
               </td>
             </tr>
           }
-        } @else {
-          <tr>
-            <td class="tabla-crud__empty" colspan="7">
-              <div class="tabla-crud__empty-inner">
-                <p class="tabla-crud__empty-title">
-                  @if (searchQuery()) {
-                    Sin resultados para "{{ searchQuery() }}"
-                  } @else {
-                    No hay apartamentos registrados todavía
-                  }
-                </p>
-                <p class="tabla-crud__empty-desc">
-                  @if (searchQuery()) {
-                    Prueba con otro término o limpia el filtro.
-                  } @else {
-                    Añade uno manualmente, importa un Excel o sincroniza con Smoobu.
-                  }
-                </p>
-              </div>
-            </td>
-          </tr>
+
+          @if (confirmandoEliminar()) {
+            <tr>
+              <td [attr.colspan]="isAdmin ? 6 : 5">
+                <app-confirm-inline
+                  [visible]="true"
+                  [cargando]="eliminando()"
+                  [mensaje]="'¿Eliminar ' + selectedCount() + ' apartamento' + (selectedCount() !== 1 ? 's' : '') + '? Esta acción no se puede deshacer.'"
+                  (confirmado)="confirmarEliminar()"
+                  (cancelado)="cancelarEliminar()"
+                />
+              </td>
+            </tr>
+          }
+
+          @if (apartamentosPaginados().length > 0) {
+            @for (apt of apartamentosPaginados(); track apt.id) {
+              <tr
+                class="tabla-crud__row"
+                [class.tabla-crud__row--selected]="isSelected(apt.id)"
+              >
+                @if (isAdmin) {
+                  <td class="tabla-crud__td tabla-crud__td--checkbox">
+                    <input
+                      type="checkbox"
+                      class="tabla-crud__checkbox"
+                      [checked]="isSelected(apt.id)"
+                      (change)="toggleSelect(apt.id)"
+                      [attr.aria-label]="'Seleccionar ' + apt.nombre"
+                    />
+                  </td>
+                }
+                <td class="tabla-crud__td tabla-crud__td--nombre">{{ apt.nombre }}</td>
+                <td class="tabla-crud__td">{{ apt.ciudad ?? '—' }}</td>
+                <td class="tabla-crud__td tabla-crud__td--direccion">{{ apt.direccion ?? '—' }}</td>
+                <td class="tabla-crud__td">
+                  <app-badge [variant]="apt.pms_origen === 'smoobu' ? 'solid' : 'outline'">
+                    {{ originLabel(apt.pms_origen) }}
+                  </app-badge>
+                </td>
+                <td class="tabla-crud__td tabla-crud__td--mono">{{ apt.id_externo ?? '—' }}</td>
+              </tr>
+            }
+          } @else if (!modoCreacion()) {
+            <tr>
+              <td class="tabla-crud__empty" [attr.colspan]="isAdmin ? 6 : 5">
+                <div class="tabla-crud__empty-inner">
+                  <p class="tabla-crud__empty-title">
+                    @if (searchQuery()) {
+                      Sin resultados para "{{ searchQuery() }}"
+                    } @else {
+                      No hay apartamentos registrados todavía
+                    }
+                  </p>
+                  <p class="tabla-crud__empty-desc">
+                    @if (searchQuery()) {
+                      Prueba con otro término o limpia el filtro.
+                    } @else {
+                      Añade uno manualmente, importa un Excel o sincroniza con Smoobu.
+                    }
+                  </p>
+                </div>
+              </td>
+            </tr>
+          }
+
         }
       </tbody>
     </table>
 
   </app-tabla-crud>
 
+  @if (totalPaginas() > 1) {
+    <nav class="maestro-apartamentos__paginacion" aria-label="Paginación">
+      <app-button
+        variant="ghost"
+        size="sm"
+        [disabled]="paginaActual() === 1"
+        (click)="irPagina(paginaActual() - 1)"
+      >
+        ← Anterior
+      </app-button>
+      <span class="maestro-apartamentos__paginacion-info">
+        Página {{ paginaActual() }} de {{ totalPaginas() }}
+      </span>
+      <app-button
+        variant="ghost"
+        size="sm"
+        [disabled]="paginaActual() === totalPaginas()"
+        (click)="irPagina(paginaActual() + 1)"
+      >
+        Siguiente →
+      </app-button>
+    </nav>
+  }
+
 </div>
+
+<app-modal-importacion-xlsx
+  [preview]="xlsxPreview()"
+  [open]="xlsxModalAbierto()"
+  [cargando]="xlsxCargando()"
+  (confirmar)="confirmarImportacion()"
+  (cerrar)="cerrarModalXlsx()"
+/>

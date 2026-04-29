@@ -34,6 +34,11 @@
   animation: slide-down var(--transition-slow) ease both;
 }
 
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+
 // Respetar preferencia de movimiento reducido
 @media (prefers-reduced-motion: reduce) {
   .a-fade-in,

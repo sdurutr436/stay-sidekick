@@ -14,4 +14,17 @@
   &__xlsx-input {
     display: none;
   }
+
+  &__paginacion {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: $space-4;
+    padding-block: $space-4;
+  }
+
+  &__paginacion-info {
+    @include text-body-sm;
+    color: $color-text-secondary;
+  }
 }
