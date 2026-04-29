@@ -4,7 +4,7 @@ Importar este paquete garantiza que todos los modelos queden registrados
 en el metadata de SQLAlchemy antes de cualquier operación con la BD.
 """
 
-from app.models.empresa import Empresa
+from app.empresas.model import Empresa
 from app.models.usuario import Usuario
 from app.models.apartamento import Apartamento
 from app.models.vault import PlantillaVault, MensajeGenerado

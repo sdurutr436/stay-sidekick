@@ -10,7 +10,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 
 from app.extensions import db
-from app.models.empresa import Empresa
+from app.empresas.model import Empresa
 from app.models.integraciones import IntegracionGoogle
 
 
