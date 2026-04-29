@@ -121,7 +121,7 @@ export class SincronizadorContactosPageComponent implements OnInit {
 
   private cargarEstadoPms(): void {
     this.http.get<{ ok: boolean; config: { proveedor: string } | null }>(
-      '/api/pms/config'
+      '/api/apartamentos/pms'
     ).subscribe({
       next: res => this.pmsConectado.set(res.config !== null),
       error: () => this.pmsConectado.set(false),
@@ -169,7 +169,7 @@ export class SincronizadorContactosPageComponent implements OnInit {
     this.syncEnCurso.set(true);
 
     this.http.post<{ ok: boolean; resultado: SyncResultado }>(
-      '/api/contactos/sync',
+      '/api/contactos/sincronizacion',
       this._parseFechasPayload(),
     ).subscribe({
       next: res => {
@@ -188,7 +188,7 @@ export class SincronizadorContactosPageComponent implements OnInit {
   }
 
   exportarCsv(): void {
-    this.http.post('/api/contactos/export/csv', this._parseFechasPayload(), { responseType: 'blob' }).subscribe({
+    this.http.post('/api/contactos/exportacion/csv', this._parseFechasPayload(), { responseType: 'blob' }).subscribe({
       next: blob => this._descargarBlob(blob, 'contactos_google.csv'),
       error: err => console.error('[sincronizador-contactos] Error al exportar CSV:', err),
     });
@@ -212,7 +212,7 @@ export class SincronizadorContactosPageComponent implements OnInit {
     form.append('file', archivo);
 
     this.http.post<{ ok: boolean; resultado: SyncResultado }>(
-      '/api/contactos/xlsx/sync',
+      '/api/contactos/xlsx/sincronizacion',
       form,
     ).subscribe({
       next: res => {
@@ -237,7 +237,7 @@ export class SincronizadorContactosPageComponent implements OnInit {
     const form = new FormData();
     form.append('file', archivo);
 
-    this.http.post('/api/contactos/xlsx/export/csv', form, { responseType: 'blob' }).subscribe({
+    this.http.post('/api/contactos/xlsx/exportacion/csv', form, { responseType: 'blob' }).subscribe({
       next: blob => this._descargarBlob(blob, 'contactos_google.csv'),
       error: err => console.error('[sincronizador-contactos] Error al exportar CSV desde XLSX:', err),
     });

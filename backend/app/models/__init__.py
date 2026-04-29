@@ -4,12 +4,13 @@ Importar este paquete garantiza que todos los modelos queden registrados
 en el metadata de SQLAlchemy antes de cualquier operación con la BD.
 """
 
-from app.models.empresa import Empresa
-from app.models.usuario import Usuario
-from app.models.apartamento import Apartamento
-from app.models.vault import PlantillaVault, MensajeGenerado
-from app.models.integraciones import ConfiguracionPMS, IntegracionGoogle, ConfiguracionIA
-from app.models.logs import LogSincronizacion
+from app.empresas.model import Empresa
+from app.usuarios.model import Usuario
+from app.h_maestro_apartamentos.model import Apartamento
+from app.h_vault_comunicaciones.model import PlantillaVault, MensajeGenerado
+from app.perfil.model import ConfiguracionPMS, ConfiguracionIA
+from app.h_sincronizador_contactos.model import IntegracionGoogle
+from app.h_sincronizador_contactos.model import LogSincronizacion
 
 __all__ = [
     "Empresa",
