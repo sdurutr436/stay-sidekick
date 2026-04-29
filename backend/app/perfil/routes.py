@@ -13,7 +13,7 @@ import logging
 from flask import Blueprint, g, jsonify, request
 
 from app.security.jwt import jwt_required
-from app.services import perfil as service
+from app.perfil import service
 
 logger = logging.getLogger(__name__)
 

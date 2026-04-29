@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 
 from app.extensions import db
 from app.models.apartamento import Apartamento
-from app.models.integraciones import ConfiguracionPMS
+from app.perfil.model import ConfiguracionPMS
 from app.models.logs import LogSincronizacion
 
 

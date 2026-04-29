@@ -55,7 +55,7 @@ def create_app(config_class: type = Config) -> Flask:
     from app.apartamentos.routes import apartamentos_bp                      # noqa: E402
     from app.routes.contactos import contactos_bp                            # noqa: E402
     from app.notificaciones.routes import notificaciones_bp                  # noqa: E402
-    from app.routes.perfil import perfil_bp                                  # noqa: E402
+    from app.perfil.routes import perfil_bp                                  # noqa: E402
     app.register_blueprint(solicitud_bp)
     app.register_blueprint(auth_bp)
     app.register_blueprint(empresas_bp)

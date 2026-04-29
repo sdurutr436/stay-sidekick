@@ -6,7 +6,8 @@ from datetime import datetime, timezone
 
 from app.extensions import db
 from app.usuarios.model import Usuario
-from app.models.integraciones import ConfiguracionPMS, ConfiguracionIA, IntegracionGoogle
+from app.perfil.model import ConfiguracionPMS, ConfiguracionIA
+from app.models.integraciones import IntegracionGoogle
 
 
 def get_usuario_by_id(user_id: str) -> Usuario | None:
