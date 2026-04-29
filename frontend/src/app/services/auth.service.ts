@@ -39,7 +39,7 @@ export class AuthService {
     return this.decodePayload(token);
   }
 
-  isAdmin(): boolean {
+  get isAdmin(): boolean {
     return this.getUser()?.rol === 'admin';
   }
 

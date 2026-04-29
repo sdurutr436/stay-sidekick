@@ -1,0 +1,71 @@
+<app-modal title="Vista previa de importación" [open]="open" (cerrar)="cerrar.emit()">
+
+  @if (preview) {
+    <div class="modal-importacion-xlsx">
+
+      @if (preview.errores.length > 0) {
+        <app-accordion-item titulo="Problemas en el archivo" [count]="preview.errores.length" [abierto]="true">
+          <ul class="modal-importacion-xlsx__lista modal-importacion-xlsx__lista--error">
+            @for (error of preview.errores; track $index) {
+              <li>{{ error }}</li>
+            }
+          </ul>
+        </app-accordion-item>
+      }
+
+      <app-accordion-item titulo="Nuevos" [count]="preview.nuevos.length" [abierto]="preview.nuevos.length > 0">
+        @if (preview.nuevos.length === 0) {
+          <p class="modal-importacion-xlsx__vacio">Ninguno.</p>
+        } @else {
+          <ul class="modal-importacion-xlsx__lista">
+            @for (apt of preview.nuevos; track apt.id_externo) {
+              <li><strong>{{ apt.nombre }}</strong>@if (apt.ciudad) { · {{ apt.ciudad }}}  <span class="modal-importacion-xlsx__id">#{{ apt.id_externo }}</span></li>
+            }
+          </ul>
+        }
+      </app-accordion-item>
+
+      <app-accordion-item titulo="Se actualizarán" [count]="preview.actualizados.length">
+        @if (preview.actualizados.length === 0) {
+          <p class="modal-importacion-xlsx__vacio">Ninguno.</p>
+        } @else {
+          <ul class="modal-importacion-xlsx__lista">
+            @for (apt of preview.actualizados; track apt.id_externo) {
+              <li><strong>{{ apt.nombre }}</strong>@if (apt.nombre_actual && apt.nombre_actual !== apt.nombre) { <span class="modal-importacion-xlsx__anterior">(antes: {{ apt.nombre_actual }})</span>} <span class="modal-importacion-xlsx__id">#{{ apt.id_externo }}</span></li>
+            }
+          </ul>
+        }
+      </app-accordion-item>
+
+      <app-accordion-item titulo="Sin cambios" [count]="preview.sin_cambios.length">
+        @if (preview.sin_cambios.length === 0) {
+          <p class="modal-importacion-xlsx__vacio">Ninguno.</p>
+        } @else {
+          <ul class="modal-importacion-xlsx__lista">
+            @for (apt of preview.sin_cambios; track apt.id_externo) {
+              <li>{{ apt.nombre }} <span class="modal-importacion-xlsx__id">#{{ apt.id_externo }}</span></li>
+            }
+          </ul>
+        }
+      </app-accordion-item>
+
+    </div>
+  } @else if (cargando) {
+    <p class="modal-importacion-xlsx__cargando">Analizando archivo…</p>
+  }
+
+  <div modal-footer>
+    <app-button variant="ghost" size="md" [disabled]="cargando" (click)="cerrar.emit()">
+      Cancelar
+    </app-button>
+    <app-button
+      variant="primary"
+      size="md"
+      [disabled]="cargando || !preview || (preview.nuevos.length === 0 && preview.actualizados.length === 0)"
+      (click)="confirmar.emit()"
+    >
+      {{ cargando ? 'Importando…' : 'Confirmar importación' }}
+    </app-button>
+  </div>
+
+</app-modal>

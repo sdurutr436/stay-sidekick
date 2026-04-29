@@ -1,0 +1,75 @@
+// =============================================================================
+// COMPONENTS: MODAL (organism)
+// =============================================================================
+
+.modal {
+  &__overlay {
+    position: fixed;
+    inset: 0;
+    z-index: $z-modal;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.45);
+    padding: $space-4;
+  }
+
+  &__panel {
+    background: $color-surface;
+    border: $border-width $border-style $color-border;
+    width: 100%;
+    max-width: 560px;
+    max-height: 90dvh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: $shadow-md;
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: $space-5 $space-6;
+    border-bottom: $border-width $border-style $color-border;
+    flex-shrink: 0;
+  }
+
+  &__title {
+    @include text-body-md;
+    font-weight: $font-weight-label;
+    color: $color-text-primary;
+    margin: 0;
+  }
+
+  &__close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: $color-text-secondary;
+
+    &:hover {
+      background: $color-gray-100;
+      color: $color-text-primary;
+    }
+  }
+
+  &__body {
+    padding: $space-6;
+    overflow-y: auto;
+    flex: 1;
+  }
+
+  &__footer {
+    padding: $space-4 $space-6;
+    border-top: $border-width $border-style $color-border;
+    display: flex;
+    justify-content: flex-end;
+    gap: $space-2;
+    flex-shrink: 0;
+  }
+}

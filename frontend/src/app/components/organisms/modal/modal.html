@@ -1,0 +1,21 @@
+@if (open) {
+  <div class="modal__overlay" role="dialog" aria-modal="true" [attr.aria-label]="title" (click)="onOverlayClick($event)">
+    <div class="modal__panel">
+      <header class="modal__header">
+        <h2 class="modal__title">{{ title }}</h2>
+        <button class="modal__close" type="button" aria-label="Cerrar" (click)="cerrar.emit()">
+          <svg class="svg svg--sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <line x1="4" y1="4" x2="12" y2="12" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
+            <line x1="12" y1="4" x2="4" y2="12" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
+          </svg>
+        </button>
+      </header>
+      <div class="modal__body">
+        <ng-content />
+      </div>
+      <footer class="modal__footer">
+        <ng-content select="[modal-footer]" />
+      </footer>
+    </div>
+  </div>
+}

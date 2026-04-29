@@ -217,6 +217,54 @@ def import_from_xlsx(empresa_id: str, file_bytes: bytes) -> tuple[dict | None, l
     }, parse_errors
 
 
+# ── Preview importación XLSX ─────────────────────────────────────────────
+
+
+def preview_import_xlsx(empresa_id: str, file_bytes: bytes) -> tuple[dict | None, list[str]]:
+    apartments, parse_errors = parse_xlsx(file_bytes)
+
+    if not apartments and parse_errors:
+        return None, parse_errors
+
+    nuevos = []
+    actualizados = []
+    sin_cambios = []
+
+    for apt_data in apartments:
+        existing = repo.get_by_id_externo(empresa_id, apt_data.id_externo)
+        if not existing:
+            nuevos.append({
+                "id_externo": apt_data.id_externo,
+                "nombre": apt_data.nombre,
+                "ciudad": apt_data.ciudad,
+                "direccion": apt_data.direccion,
+            })
+        else:
+            campos_cambian = (
+                existing.nombre != apt_data.nombre
+                or (apt_data.ciudad and existing.ciudad != apt_data.ciudad)
+                or (apt_data.direccion and existing.direccion != apt_data.direccion)
+            )
+            entry = {
+                "id_externo": apt_data.id_externo,
+                "nombre": apt_data.nombre,
+                "nombre_actual": existing.nombre,
+                "ciudad": apt_data.ciudad,
+                "direccion": apt_data.direccion,
+            }
+            if campos_cambian:
+                actualizados.append(entry)
+            else:
+                sin_cambios.append(entry)
+
+    return {
+        "nuevos": nuevos,
+        "actualizados": actualizados,
+        "sin_cambios": sin_cambios,
+        "errores": parse_errors,
+    }, []
+
+
 # ── Configuración PMS ────────────────────────────────────────────────────
 
 

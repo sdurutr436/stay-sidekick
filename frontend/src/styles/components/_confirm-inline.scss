@@ -1,0 +1,24 @@
+// =============================================================================
+// COMPONENTS: CONFIRM INLINE (molecule)
+// =============================================================================
+
+.confirm-inline {
+  display: flex;
+  align-items: center;
+  gap: $space-4;
+  padding: $space-3 $space-4;
+  background: $color-surface-alt;
+  border-bottom: $border-width $border-style $color-border;
+
+  &__mensaje {
+    flex: 1;
+    @include text-body-sm;
+    color: $color-text-primary;
+  }
+
+  &__acciones {
+    display: flex;
+    gap: $space-2;
+    flex-shrink: 0;
+  }
+}
