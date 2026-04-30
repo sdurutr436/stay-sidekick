@@ -18,16 +18,17 @@ class _XlsxReservasColsSchema(Schema):
 class PreferenciasContactosSchema(Schema):
     """Validación para guardar preferencias de sincronización de contactos.
 
-    Todos los campos son opcionales en el PUT para permitir updates parciales.
+    Todos los campos son opcionales (sin load_default) para que Marshmallow
+    solo incluya en el output lo que llegó en el payload. Así el repositorio
+    puede hacer un merge parcial sin sobreescribir campos no enviados.
     """
 
-    plantilla = fields.String(load_default="{FECHA} - {APT} - {NOMBRE}")
-    separador_apt = fields.String(load_default=", ")
+    plantilla = fields.String()
+    separador_apt = fields.String()
     formato_fecha_salida = fields.String(
         validate=validate.OneOf(FORMATOS_FECHA_SALIDA),
-        load_default="YYMMDD",
     )
-    xlsx_reservas = fields.Nested(_XlsxReservasColsSchema, load_default=dict)
+    xlsx_reservas = fields.Nested(_XlsxReservasColsSchema)
 
 
 class SyncRangoSchema(Schema):
