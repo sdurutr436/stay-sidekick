@@ -355,6 +355,92 @@
 
   </app-panel-seccion>
 
+  <!-- ── Importación XLSX — Reservas ──────────────────────────────────── -->
+  <app-panel-seccion title="Importación XLSX — Reservas" [divider]="true">
+
+    <p class="u-text-secondary u-mb-8">
+      Indica el número de columna (1 = columna A) donde tu archivo de reservas
+      tiene cada dato. Si dejas un campo a 0, se intentará detectar la columna
+      por el nombre de la cabecera.
+    </p>
+
+    @if (!isAdmin()) {
+      <p class="u-text-secondary u-mb-8">
+        Solo el administrador puede modificar esta configuración.
+      </p>
+    }
+
+    @if (xlsxReservasAlerta()) {
+      <app-alert
+        [type]="xlsxReservasAlerta()!.tipo"
+        [dismissible]="true"
+        (dismissed)="xlsxReservasAlerta.set(null)"
+      >
+        {{ xlsxReservasAlerta()!.mensaje }}
+      </app-alert>
+    }
+
+    <form class="perfil-form" (submit)="$event.preventDefault(); guardarXlsxReservasColumnas()">
+
+      <app-form-field label="Columna check-in" for="xlsx-r-checkin">
+        <app-form-input
+          id="xlsx-r-checkin"
+          type="number"
+          placeholder="0 = detectar por cabecera"
+          [value]="xlsxRColCheckin().toString()"
+          [disabled]="!isAdmin()"
+          (valueChange)="xlsxRColCheckin.set(+$event || 0)"
+        />
+      </app-form-field>
+
+      <app-form-field label="Columna nombre del huésped" for="xlsx-r-nombre">
+        <app-form-input
+          id="xlsx-r-nombre"
+          type="number"
+          placeholder="0 = detectar por cabecera"
+          [value]="xlsxRColNombre().toString()"
+          [disabled]="!isAdmin()"
+          (valueChange)="xlsxRColNombre.set(+$event || 0)"
+        />
+      </app-form-field>
+
+      <app-form-field label="Columna ID tipología" for="xlsx-r-tipologia">
+        <app-form-input
+          id="xlsx-r-tipologia"
+          type="number"
+          placeholder="0 = detectar por cabecera"
+          [value]="xlsxRColTipologia().toString()"
+          [disabled]="!isAdmin()"
+          (valueChange)="xlsxRColTipologia.set(+$event || 0)"
+        />
+      </app-form-field>
+
+      <app-form-field label="Columna teléfono" for="xlsx-r-telefono">
+        <app-form-input
+          id="xlsx-r-telefono"
+          type="number"
+          placeholder="0 = detectar por cabecera"
+          [value]="xlsxRColTelefono().toString()"
+          [disabled]="!isAdmin()"
+          (valueChange)="xlsxRColTelefono.set(+$event || 0)"
+        />
+      </app-form-field>
+
+      @if (isAdmin()) {
+        <app-button
+          type="submit"
+          variant="secondary"
+          size="md"
+          [disabled]="xlsxReservasGuardando()"
+        >
+          {{ xlsxReservasGuardando() ? 'Guardando…' : 'Guardar configuración XLSX' }}
+        </app-button>
+      }
+
+    </form>
+
+  </app-panel-seccion>
+
   <!-- ── Cerrar sesión ───────────────────────────────────────────────────── -->
   <section class="perfil-page__sesion" aria-label="Gestión de sesión">
     <app-button variant="danger" size="md" (click)="cerrarSesion()">

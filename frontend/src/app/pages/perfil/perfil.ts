@@ -4,6 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { PerfilService, IntegracionesData } from '../../services/perfil.service';
 import { ApartamentosService } from '../../services/apartamentos.service';
+import { ContactosService } from '../../services/contactos.service';
 import { PageHeaderComponent } from '../../components/organisms/page-header/page-header';
 import { PanelSeccionComponent } from '../../components/organisms/panel-seccion/panel-seccion';
 import { AlertComponent } from '../../components/molecules/alert/alert';
@@ -34,7 +35,8 @@ interface Alerta {
 export class PerfilPageComponent implements OnInit {
   readonly auth    = inject(AuthService);
   readonly service = inject(PerfilService);
-  private  readonly aptService = inject(ApartamentosService);
+  private  readonly aptService       = inject(ApartamentosService);
+  private  readonly contactosService = inject(ContactosService);
   private  readonly http  = inject(HttpClient);
   private  readonly route = inject(ActivatedRoute);
 
@@ -75,6 +77,14 @@ export class PerfilPageComponent implements OnInit {
   readonly xlsxGuardando    = signal(false);
   readonly xlsxAlerta       = signal<Alerta | null>(null);
 
+  // XLSX — Configuración de columnas (reservas de contactos)
+  readonly xlsxRColCheckin   = signal(0);
+  readonly xlsxRColNombre    = signal(0);
+  readonly xlsxRColTipologia = signal(0);
+  readonly xlsxRColTelefono  = signal(0);
+  readonly xlsxReservasGuardando = signal(false);
+  readonly xlsxReservasAlerta    = signal<Alerta | null>(null);
+
   readonly pmsOpciones = [
     { value: 'smoobu',    label: 'Smoobu'    },
     { value: 'beds24',    label: 'Beds24'    },
@@ -101,6 +111,7 @@ export class PerfilPageComponent implements OnInit {
 
     this.cargarIntegraciones();
     this.cargarXlsxColumnas();
+    this.cargarXlsxReservasColumnas();
 
     this.route.queryParamMap.subscribe(params => {
       if (params.get('google_conectado') === 'true') {
@@ -251,6 +262,28 @@ export class PerfilPageComponent implements OnInit {
     });
   }
 
+  guardarXlsxReservasColumnas(): void {
+    this.xlsxReservasAlerta.set(null);
+    this.xlsxReservasGuardando.set(true);
+    this.contactosService.savePreferencias({
+      xlsx_reservas: {
+        col_checkin:   this.xlsxRColCheckin(),
+        col_nombre:    this.xlsxRColNombre(),
+        col_tipologia: this.xlsxRColTipologia(),
+        col_telefono:  this.xlsxRColTelefono(),
+      },
+    }).subscribe({
+      next: () => {
+        this.xlsxReservasAlerta.set({ tipo: 'success', mensaje: 'Configuración de columnas guardada.' });
+        this.xlsxReservasGuardando.set(false);
+      },
+      error: err => {
+        this.xlsxReservasAlerta.set({ tipo: 'error', mensaje: err?.error?.errors?.[0] ?? 'Error al guardar la configuración.' });
+        this.xlsxReservasGuardando.set(false);
+      },
+    });
+  }
+
   cerrarSesion(): void {
     this.auth.logout();
   }
@@ -264,6 +297,17 @@ export class PerfilPageComponent implements OnInit {
           this.xlsxColDireccion.set(config.col_direccion ?? 0);
           this.xlsxColCiudad.set(config.col_ciudad ?? 0);
         }
+      },
+    });
+  }
+
+  private cargarXlsxReservasColumnas(): void {
+    this.contactosService.getPreferencias().subscribe({
+      next: prefs => {
+        this.xlsxRColCheckin.set(prefs.xlsx_reservas?.col_checkin ?? 0);
+        this.xlsxRColNombre.set(prefs.xlsx_reservas?.col_nombre ?? 0);
+        this.xlsxRColTipologia.set(prefs.xlsx_reservas?.col_tipologia ?? 0);
+        this.xlsxRColTelefono.set(prefs.xlsx_reservas?.col_telefono ?? 0);
       },
     });
   }
