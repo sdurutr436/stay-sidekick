@@ -2,7 +2,7 @@
 
 Gestiona la persistencia de IntegracionGoogle (tokens cifrados) y las
 preferencias de sincronización de contactos almacenadas en el JSONB
-empresas.configuracion.
+empresas.configuracion bajo la clave "contactos".
 """
 
 from __future__ import annotations
@@ -71,41 +71,50 @@ def delete_google_integration(integracion: IntegracionGoogle) -> None:
     db.session.flush()
 
 
-# ── Preferencias de sincronización (empresas.configuracion JSONB) ─────────
+# ── Preferencias de sincronización (empresas.configuracion["contactos"]) ─────
 
-_KEY_FORMATO_NOMBRE = "formato_nombre_contacto"
-_KEY_INCLUIR_APARTAMENTO = "incluir_apartamento_contacto"
-_KEY_FORMATO_APARTAMENTO = "formato_apartamento_contacto"
-_KEY_INCLUIR_CHECKIN = "incluir_checkin_contacto"
-
-DEFAULTS_PREFERENCIAS = {
-    _KEY_FORMATO_NOMBRE: "nombre_apellidos",
-    _KEY_INCLUIR_APARTAMENTO: True,
-    _KEY_FORMATO_APARTAMENTO: "nota",
-    _KEY_INCLUIR_CHECKIN: True,
+DEFAULTS_PREFERENCIAS: dict = {
+    "plantilla": "{FECHA} - {APT} - {NOMBRE}",
+    "separador_apt": ", ",
+    "formato_fecha_salida": "YYMMDD",
+    "xlsx_reservas": {
+        "col_checkin": 0,
+        "col_nombre": 0,
+        "col_tipologia": 0,
+        "col_telefono": 0,
+    },
 }
 
 
 def get_preferencias_contactos(empresa_id: str) -> dict:
-    """Lee las preferencias de contactos del JSONB empresas.configuracion."""
+    """Lee las preferencias de contactos del JSONB empresas.configuracion["contactos"]."""
     empresa = Empresa.query.filter_by(id=empresa_id).first()
     config = empresa.configuracion or {} if empresa else {}
+    contactos = config.get("contactos") or {}
+    xlsx_defaults = DEFAULTS_PREFERENCIAS["xlsx_reservas"]
     return {
-        _KEY_FORMATO_NOMBRE: config.get(_KEY_FORMATO_NOMBRE, DEFAULTS_PREFERENCIAS[_KEY_FORMATO_NOMBRE]),
-        _KEY_INCLUIR_APARTAMENTO: config.get(_KEY_INCLUIR_APARTAMENTO, DEFAULTS_PREFERENCIAS[_KEY_INCLUIR_APARTAMENTO]),
-        _KEY_FORMATO_APARTAMENTO: config.get(_KEY_FORMATO_APARTAMENTO, DEFAULTS_PREFERENCIAS[_KEY_FORMATO_APARTAMENTO]),
-        _KEY_INCLUIR_CHECKIN: config.get(_KEY_INCLUIR_CHECKIN, DEFAULTS_PREFERENCIAS[_KEY_INCLUIR_CHECKIN]),
+        "plantilla": contactos.get("plantilla", DEFAULTS_PREFERENCIAS["plantilla"]),
+        "separador_apt": contactos.get("separador_apt", DEFAULTS_PREFERENCIAS["separador_apt"]),
+        "formato_fecha_salida": contactos.get(
+            "formato_fecha_salida", DEFAULTS_PREFERENCIAS["formato_fecha_salida"]
+        ),
+        "xlsx_reservas": {
+            **xlsx_defaults,
+            **contactos.get("xlsx_reservas", {}),
+        },
     }
 
 
 def save_preferencias_contactos(empresa_id: str, preferencias: dict) -> dict:
-    """Persiste las preferencias de contactos en empresas.configuracion."""
+    """Persiste las preferencias de contactos en empresas.configuracion["contactos"]."""
     empresa = Empresa.query.filter_by(id=empresa_id).first()
     if empresa is None:
         return {}
 
     config = dict(empresa.configuracion or {})
-    config.update(preferencias)
+    existing = dict(config.get("contactos") or {})
+    existing.update(preferencias)
+    config["contactos"] = existing
     empresa.configuracion = config
     empresa.updated_at = datetime.now(timezone.utc)
     db.session.flush()
