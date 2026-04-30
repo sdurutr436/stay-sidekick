@@ -1,14 +1,13 @@
 """Cliente HTTP para Google People API (contactos).
 
 Gestiona el ciclo de vida del access_token (refresh automático) y
-expone operaciones de alto nivel: crear contacto, actualizar contacto,
-buscar por email y gestionar grupos de contactos.
+expone operaciones de alto nivel: crear contacto, actualizar contacto
+y buscar por teléfono.
+
+Upsert por teléfono: si el teléfono ya existe en los contactos → actualiza
+displayName. Si no → crea el contacto. No usa grupos ni memberships.
 
 Autenticación: OAuth 2.0 con refresh_token (Bearer token en cabecera).
-
-Referencias:
-- https://developers.google.com/people/api/rest
-- Scopes necesarios: https://www.googleapis.com/auth/contacts
 """
 
 import logging
@@ -43,7 +42,7 @@ class GooglePeopleClient:
         self._access_token = access_token
         self._refresh_token = refresh_token
         self._token_expiry = token_expiry
-        self._token_refreshed = False  # indica si se renovó durante esta sesión
+        self._token_refreshed = False
 
     # ── Tokens ───────────────────────────────────────────────────────────
 
@@ -52,7 +51,6 @@ class GooglePeopleClient:
         ahora = datetime.now(timezone.utc)
         expiry = self._token_expiry
 
-        # Renovar si el token falta, expiró o expirará en los próximos 60s
         if (
             self._access_token is None
             or expiry is None
@@ -77,15 +75,12 @@ class GooglePeopleClient:
 
         self._access_token = data["access_token"]
         expires_in = data.get("expires_in", 3600)
-        self._token_expiry = datetime.now(timezone.utc) + timedelta(
-            seconds=expires_in
-        )
+        self._token_expiry = datetime.now(timezone.utc) + timedelta(seconds=expires_in)
         self._token_refreshed = True
         logger.info("Google OAuth: access_token renovado")
 
     @property
     def token_refreshed(self) -> bool:
-        """True si el access_token fue renovado durante esta sesión."""
         return self._token_refreshed
 
     @property
@@ -103,67 +98,26 @@ class GooglePeopleClient:
             "Content-Type": "application/json",
         }
 
-    # ── Grupos de contactos (etiquetas) ──────────────────────────────────
-
-    def get_or_create_contact_group(self, nombre: str) -> str:
-        """Devuelve el resourceName del grupo, creándolo si no existe.
-
-        Parameters
-        ----------
-        nombre:
-            Nombre del grupo (p.ej. nombre del apartamento).
-
-        Returns
-        -------
-        str
-            resourceName del grupo: "contactGroups/<id>".
-        """
-        existing = self._find_contact_group(nombre)
-        if existing:
-            return existing
-
-        resp = requests.post(
-            f"{_PEOPLE_API}/contactGroups",
-            headers=self._headers(),
-            json={"contactGroup": {"name": nombre}},
-            timeout=_TIMEOUT,
-        )
-        resp.raise_for_status()
-        return resp.json()["resourceName"]
-
-    def _find_contact_group(self, nombre: str) -> str | None:
-        """Busca un grupo por nombre exacto. Devuelve resourceName o None."""
-        resp = requests.get(
-            f"{_PEOPLE_API}/contactGroups",
-            headers=self._headers(),
-            params={"pageSize": 200},
-            timeout=_TIMEOUT,
-        )
-        resp.raise_for_status()
-        for group in resp.json().get("contactGroups", []):
-            if group.get("name") == nombre:
-                return group["resourceName"]
-        return None
-
     # ── Contactos ────────────────────────────────────────────────────────
 
-    def search_contact_by_email(self, email: str) -> str | None:
-        """Busca un contacto por email. Devuelve resourceName o None."""
+    def search_contact_by_phone(self, telefono: str) -> str | None:
+        """Busca un contacto por teléfono. Devuelve resourceName o None."""
         resp = requests.get(
             f"{_PEOPLE_API}/people:searchContacts",
             headers=self._headers(),
             params={
-                "query": email,
-                "readMask": "emailAddresses",
+                "query": telefono,
+                "readMask": "phoneNumbers",
                 "pageSize": 5,
             },
             timeout=_TIMEOUT,
         )
         resp.raise_for_status()
+        normalized = telefono.replace(" ", "")
         for result in resp.json().get("results", []):
             person = result.get("person", {})
-            for addr in person.get("emailAddresses", []):
-                if addr.get("value", "").lower() == email.lower():
+            for phone in person.get("phoneNumbers", []):
+                if phone.get("value", "").replace(" ", "") == normalized:
                     return person.get("resourceName")
         return None
 
@@ -180,12 +134,10 @@ class GooglePeopleClient:
 
     def update_contact(self, resource_name: str, payload: dict, update_mask: str) -> None:
         """Actualiza campos de un contacto existente."""
-        # People API requiere el etag del contacto para hacer PATCH
-        # Primero obtenemos el etag
         resp = requests.get(
             f"{_PEOPLE_API}/{resource_name}",
             headers=self._headers(),
-            params={"personFields": "names,emailAddresses,phoneNumbers,biographies,memberships"},
+            params={"personFields": "names,phoneNumbers"},
             timeout=_TIMEOUT,
         )
         resp.raise_for_status()
@@ -201,20 +153,18 @@ class GooglePeopleClient:
         )
         resp.raise_for_status()
 
-    def upsert_contact(self, payload: dict, email: str | None) -> tuple[str, bool]:
-        """Crea o actualiza un contacto según si ya existe el email.
+    def upsert_contact(self, payload: dict, telefono: str) -> tuple[str, bool]:
+        """Crea o actualiza un contacto buscando por teléfono.
 
         Returns
         -------
         tuple[str, bool]
             (resourceName, es_nuevo).
         """
-        if email:
-            resource_name = self.search_contact_by_email(email)
-            if resource_name:
-                update_mask = "names,emailAddresses,phoneNumbers,biographies,memberships"
-                self.update_contact(resource_name, payload, update_mask)
-                return resource_name, False
+        resource_name = self.search_contact_by_phone(telefono)
+        if resource_name:
+            self.update_contact(resource_name, payload, "names,phoneNumbers")
+            return resource_name, False
 
         resource_name = self.create_contact(payload)
         return resource_name, True
