@@ -2,7 +2,7 @@
 
 Orquesta el flujo completo:
 1. OAuth 2.0: generación de URL, intercambio de código, almacenamiento de tokens.
-2. Sincronización: PMS → normalizar → Google People API.
+2. Sincronización: PMS/XLSX → agrupar por nombre-teléfono → Google People API.
 3. Fallback: exportación CSV para importación manual.
 
 Los datos de huéspedes se procesan en memoria y NO se persisten en BD
@@ -10,15 +10,17 @@ Los datos de huéspedes se procesan en memoria y NO se persisten en BD
 """
 
 import logging
+import re
 import secrets
+from io import BytesIO
 from urllib.parse import urlencode
 
 import requests
 from flask import current_app
 from marshmallow import ValidationError
+from openpyxl import load_workbook
 
 from app.common.crypto import decrypt, encrypt
-from app.common.xlsx_reservas import parse_xlsx_reservas
 from app.extensions import db
 from app.h_sincronizador_contactos.model import (
     IntegracionGoogle,
@@ -29,14 +31,15 @@ from app.h_sincronizador_contactos.model import (
 )
 from app.h_sincronizador_contactos import repository as repo
 from app.h_sincronizador_contactos.schemas import PreferenciasContactosSchema, SyncRangoSchema
-from app.h_sincronizador_contactos.csv_export import (
-    build_csv,
-    _split_nombre,
-    _format_display_name,
-    _build_notas,
-    _build_grupo,
-)
+from app.h_sincronizador_contactos.csv_export import build_csv
 from app.h_sincronizador_contactos.google_people_client import GooglePeopleClient
+from app.h_sincronizador_contactos.contacto_formatter import (
+    ContactoAgrupado,
+    parsear_fecha,
+    parsear_telefono,
+    agrupar_contactos,
+    aplicar_plantilla,
+)
 from app.normalizador_pms.factory import build_pms_client
 from app.h_maestro_apartamentos import repository as apt_repo
 
@@ -45,6 +48,9 @@ logger = logging.getLogger(__name__)
 _GOOGLE_AUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth"
 _GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token"
 _SCOPES = "https://www.googleapis.com/auth/contacts"
+
+# Regex para extraer IDs de tipología del formato {12345} o {12345}{67890}
+_RE_IDS_TIP = re.compile(r"\{(\d+)\}")
 
 _pref_schema = PreferenciasContactosSchema()
 _sync_schema = SyncRangoSchema()
@@ -98,7 +104,10 @@ def exchange_code_for_tokens(code: str, empresa_id: str) -> tuple[bool, str | No
 
     refresh_token = data.get("refresh_token")
     if not refresh_token:
-        return False, "Google no devolvió refresh_token. Revoca el acceso desde tu cuenta Google y vuelve a conectar."
+        return False, (
+            "Google no devolvió refresh_token. Revoca el acceso desde tu cuenta Google "
+            "y vuelve a conectar."
+        )
 
     access_token = data.get("access_token", "")
     expires_in = data.get("expires_in", 3600)
@@ -199,6 +208,7 @@ def sync_contacts(empresa_id: str, json_data: dict) -> tuple[dict | None, str | 
         return None, f"Error al obtener reservas del PMS: {exc}"
 
     prefs = repo.get_preferencias_contactos(empresa_id)
+    contactos = _reservas_a_contactos(reservas)
 
     client_id = current_app.config["GOOGLE_CLIENT_ID"]
     client_secret = current_app.config["GOOGLE_CLIENT_SECRET"]
@@ -215,17 +225,17 @@ def sync_contacts(empresa_id: str, json_data: dict) -> tuple[dict | None, str | 
     actualizados = 0
     errores: list[str] = []
 
-    for reserva in reservas:
+    for contacto in contactos:
         try:
-            payload = _build_contact_payload(reserva, prefs, google_client)
-            _, es_nuevo = google_client.upsert_contact(payload, reserva.email)
+            payload = _build_contact_payload(contacto, prefs)
+            _, es_nuevo = google_client.upsert_contact(payload, contacto.telefono)
             if es_nuevo:
                 nuevos += 1
             else:
                 actualizados += 1
         except requests.RequestException as exc:
-            logger.warning("Error al subir contacto '%s': %s", reserva.nombre_raw, exc)
-            errores.append(f"{reserva.nombre_raw}: {exc}")
+            logger.warning("Error al subir contacto '%s': %s", contacto.nombre, exc)
+            errores.append(f"{contacto.nombre}: {exc}")
 
     if google_client.token_refreshed:
         new_at = google_client.current_access_token
@@ -276,7 +286,8 @@ def export_csv(empresa_id: str, json_data: dict) -> tuple[bytes | None, str | No
         return None, f"Error al obtener reservas del PMS: {exc}"
 
     prefs = repo.get_preferencias_contactos(empresa_id)
-    csv_bytes = build_csv(reservas, prefs)
+    contactos = _reservas_a_contactos(reservas)
+    csv_bytes = build_csv(contactos, prefs)
     return csv_bytes, None
 
 
@@ -298,11 +309,12 @@ def sync_from_xlsx(empresa_id: str, file_bytes: bytes) -> tuple[dict | None, str
     if refresh_token is None:
         return None, "No se pudo descifrar el refresh_token de Google."
 
-    reservas, parse_errors = parse_xlsx_reservas(file_bytes)
-    if not reservas and parse_errors:
+    prefs = repo.get_preferencias_contactos(empresa_id)
+    registros, parse_errors = _parse_xlsx_contactos(file_bytes, empresa_id, prefs)
+    if not registros and parse_errors:
         return None, parse_errors[0]
 
-    prefs = repo.get_preferencias_contactos(empresa_id)
+    contactos = agrupar_contactos(registros)
     client_id = current_app.config["GOOGLE_CLIENT_ID"]
     client_secret = current_app.config["GOOGLE_CLIENT_SECRET"]
 
@@ -318,17 +330,17 @@ def sync_from_xlsx(empresa_id: str, file_bytes: bytes) -> tuple[dict | None, str
     actualizados = 0
     errores: list[str] = list(parse_errors)
 
-    for reserva in reservas:
+    for contacto in contactos:
         try:
-            payload = _build_contact_payload(reserva, prefs, google_client)
-            _, es_nuevo = google_client.upsert_contact(payload, reserva.email)
+            payload = _build_contact_payload(contacto, prefs)
+            _, es_nuevo = google_client.upsert_contact(payload, contacto.telefono)
             if es_nuevo:
                 nuevos += 1
             else:
                 actualizados += 1
         except requests.RequestException as exc:
-            logger.warning("Error al subir contacto '%s': %s", reserva.nombre_raw, exc)
-            errores.append(f"{reserva.nombre_raw}: {exc}")
+            logger.warning("Error al subir contacto '%s': %s", contacto.nombre, exc)
+            errores.append(f"{contacto.nombre}: {exc}")
 
     if google_client.token_refreshed:
         new_at = google_client.current_access_token
@@ -345,7 +357,7 @@ def sync_from_xlsx(empresa_id: str, file_bytes: bytes) -> tuple[dict | None, str
     db.session.commit()
 
     result: dict = {
-        "total": len(reservas),
+        "total": len(contactos),
         "nuevos": nuevos,
         "actualizados": actualizados,
     }
@@ -356,46 +368,160 @@ def sync_from_xlsx(empresa_id: str, file_bytes: bytes) -> tuple[dict | None, str
 
 def export_csv_from_xlsx(empresa_id: str, file_bytes: bytes) -> tuple[bytes | None, str | None]:
     """Genera el CSV de Google Contacts desde un XLSX subido."""
-    reservas, parse_errors = parse_xlsx_reservas(file_bytes)
-    if not reservas and parse_errors:
+    prefs = repo.get_preferencias_contactos(empresa_id)
+    registros, parse_errors = _parse_xlsx_contactos(file_bytes, empresa_id, prefs)
+    if not registros and parse_errors:
         return None, parse_errors[0]
 
-    prefs = repo.get_preferencias_contactos(empresa_id)
-    csv_bytes = build_csv(reservas, prefs)
+    contactos = agrupar_contactos(registros)
+    csv_bytes = build_csv(contactos, prefs)
     return csv_bytes, None
 
 
 # ── Helpers ───────────────────────────────────────────────────────────────
 
 
-def _build_contact_payload(reserva, prefs: dict, google_client: GooglePeopleClient) -> dict:
-    given_name, family_name = _split_nombre(reserva.nombre_raw)
+def _reservas_a_contactos(reservas: list) -> list[ContactoAgrupado]:
+    """Convierte lista de ReservaEstandar a ContactoAgrupado (filtra sin teléfono)."""
+    registros = []
+    for r in reservas:
+        tel = parsear_telefono(r.telefono)
+        if tel is None:
+            continue  # skip silencioso: sin teléfono no hay contacto útil
+        registros.append({
+            "nombre": r.nombre_raw,
+            "telefono": tel,
+            "checkin_date": parsear_fecha(r.checkin),
+            "apartamentos": [r.nombre_apartamento] if r.nombre_apartamento else [],
+        })
+    return agrupar_contactos(registros)
 
-    payload: dict = {
-        "names": [{"givenName": given_name, "familyName": family_name}],
-    }
 
-    if reserva.email:
-        payload["emailAddresses"] = [{"value": reserva.email, "type": "work"}]
+def _parse_xlsx_contactos(
+    file_bytes: bytes,
+    empresa_id: str,
+    prefs: dict,
+) -> tuple[list[dict], list[str]]:
+    """Parsea XLSX de reservas con posiciones de columna configuradas.
 
-    if reserva.telefono:
-        payload["phoneNumbers"] = [{"value": reserva.telefono, "type": "mobile"}]
+    Usa los índices de columna de prefs["xlsx_reservas"] (1-indexado; 0 = detección
+    por cabecera). Extrae IDs de tipología en formato {12345} y los cruza con el
+    maestro de apartamentos. Sin teléfono → skip silencioso.
 
-    notas = _build_notas(reserva, prefs)
-    if notas:
-        payload["biographies"] = [{"value": notas, "contentType": "TEXT_PLAIN"}]
+    Returns list de dicts con: nombre, telefono, checkin_date, apartamentos.
+    """
+    cols = prefs.get("xlsx_reservas") or {}
+    col_checkin   = int(cols.get("col_checkin",   0))
+    col_nombre    = int(cols.get("col_nombre",    0))
+    col_tipologia = int(cols.get("col_tipologia", 0))
+    col_telefono  = int(cols.get("col_telefono",  0))
 
-    if (
-        prefs.get("incluir_apartamento_contacto", True)
-        and prefs.get("formato_apartamento_contacto") == "etiqueta"
-        and reserva.nombre_apartamento
-    ):
-        group_resource = google_client.get_or_create_contact_group(reserva.nombre_apartamento)
-        payload["memberships"] = [
-            {"contactGroupMembership": {"contactGroupResourceName": group_resource}}
+    errors: list[str] = []
+
+    try:
+        wb = load_workbook(filename=BytesIO(file_bytes), read_only=True, data_only=True)
+    except Exception as exc:
+        return [], [f"No se pudo abrir el archivo Excel: {exc}"]
+
+    try:
+        ws = wb.active
+        if ws is None:
+            return [], ["El archivo Excel no tiene hojas de cálculo."]
+
+        rows = list(ws.iter_rows(values_only=True))
+        if len(rows) < 2:
+            return [], ["El archivo debe tener cabeceras en la primera fila y al menos una fila de datos."]
+
+        headers = [
+            str(h).strip().lower().replace(" ", "_") if h is not None else ""
+            for h in rows[0]
         ]
 
-    return payload
+        _HEADER_MAP = {
+            "checkin":   ["checkin", "check-in", "check_in", "fecha_entrada", "arrival", "entrada"],
+            "nombre":    ["nombre", "name", "guest", "huesped", "huésped", "guest_name", "referencia"],
+            "tipologia": ["tipologia", "tipología", "id_tipologia", "unit_type", "tipo"],
+            "telefono":  ["telefono", "teléfono", "phone", "tel", "movil", "móvil"],
+        }
+
+        def _find_col(configured: int, candidates: list[str]) -> int | None:
+            if configured > 0:
+                return configured - 1  # 1-indexado → 0-indexado
+            for i, h in enumerate(headers):
+                if h in candidates:
+                    return i
+            return None
+
+        idx_checkin   = _find_col(col_checkin,   _HEADER_MAP["checkin"])
+        idx_nombre    = _find_col(col_nombre,    _HEADER_MAP["nombre"])
+        idx_tipologia = _find_col(col_tipologia, _HEADER_MAP["tipologia"])
+        idx_telefono  = _find_col(col_telefono,  _HEADER_MAP["telefono"])
+
+        if idx_nombre is None:
+            return [], [
+                "No se encontró columna de nombre del huésped. "
+                "Configura la posición de columna en el perfil o añade una cabecera reconocida."
+            ]
+
+        registros: list[dict] = []
+        for row in rows[1:]:
+            def _cell(idx: int | None):
+                return row[idx] if idx is not None and idx < len(row) else None
+
+            nombre_raw = _cell(idx_nombre)
+            if not nombre_raw:
+                continue
+            nombre = str(nombre_raw).strip()
+            if not nombre:
+                continue
+
+            tel = parsear_telefono(_cell(idx_telefono))
+            if tel is None:
+                continue  # skip silencioso
+
+            checkin_date = parsear_fecha(_cell(idx_checkin))
+
+            # Extraer IDs de tipología {12345} y cruzar con maestro
+            tip_val = _cell(idx_tipologia)
+            apartamentos: list[str] = []
+            if tip_val is not None:
+                ids = _RE_IDS_TIP.findall(str(tip_val))
+                for id_tip in ids:
+                    apt = apt_repo.get_by_id_externo(empresa_id, id_tip)
+                    if apt:
+                        apartamentos.append(apt.nombre)
+
+            registros.append({
+                "nombre": nombre,
+                "telefono": tel,
+                "checkin_date": checkin_date,
+                "apartamentos": apartamentos,
+            })
+
+        logger.info(
+            "XLSX contactos: %d filas con teléfono procesadas",
+            len(registros),
+        )
+        return registros, errors
+
+    finally:
+        wb.close()
+
+
+def _build_contact_payload(contacto: ContactoAgrupado, prefs: dict) -> dict:
+    """Construye el payload de Google People API para un ContactoAgrupado."""
+    nombre_compuesto = aplicar_plantilla(
+        plantilla=prefs.get("plantilla", "{FECHA} - {APT} - {NOMBRE}"),
+        fecha=contacto.checkin_date,
+        apartamentos=contacto.apartamentos,
+        nombre=contacto.nombre,
+        formato_fecha=prefs.get("formato_fecha_salida", "YYMMDD"),
+        separador_apt=prefs.get("separador_apt", ", "),
+    )
+    return {
+        "names": [{"givenName": nombre_compuesto}],
+        "phoneNumbers": [{"value": contacto.telefono}],
+    }
 
 
 def _log_sync(empresa_id: str, estado: str, num: int, detalle: str) -> None:

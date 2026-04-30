@@ -1,41 +1,34 @@
 """Schemas Marshmallow para validación de payloads de Google Contacts."""
 
-from marshmallow import Schema, fields, validate, pre_load
+from marshmallow import Schema, fields, validate
 
 
-# Valores admitidos para las preferencias de formato
-FORMATOS_NOMBRE = ("nombre_apellidos", "apellidos_nombre", "nombre_solo")
-FORMATOS_APARTAMENTO = ("nota", "etiqueta", "ninguno")
+FORMATOS_FECHA_SALIDA = (
+    "YYMMDD", "YYYYMMDD", "DD/MM/YYYY", "DD/MM/YY", "MM/DD/YYYY", "DD-MM-YYYY"
+)
+
+
+class _XlsxReservasColsSchema(Schema):
+    col_checkin   = fields.Integer(load_default=0)
+    col_nombre    = fields.Integer(load_default=0)
+    col_tipologia = fields.Integer(load_default=0)
+    col_telefono  = fields.Integer(load_default=0)
 
 
 class PreferenciasContactosSchema(Schema):
     """Validación para guardar preferencias de sincronización de contactos.
 
-    Todos los campos son opcionales en el PUT para permitir updates parciales.
+    Todos los campos son opcionales (sin load_default) para que Marshmallow
+    solo incluya en el output lo que llegó en el payload. Así el repositorio
+    puede hacer un merge parcial sin sobreescribir campos no enviados.
     """
 
-    formato_nombre_contacto = fields.String(
-        validate=validate.OneOf(FORMATOS_NOMBRE),
+    plantilla = fields.String()
+    separador_apt = fields.String()
+    formato_fecha_salida = fields.String(
+        validate=validate.OneOf(FORMATOS_FECHA_SALIDA),
     )
-    incluir_apartamento_contacto = fields.Boolean()
-    formato_apartamento_contacto = fields.String(
-        validate=validate.OneOf(FORMATOS_APARTAMENTO),
-    )
-    incluir_checkin_contacto = fields.Boolean()
-
-    @pre_load
-    def sanitize(self, data, **kwargs):
-        if "formato_nombre_contacto" in data and isinstance(
-            data["formato_nombre_contacto"], str
-        ):
-            data["formato_nombre_contacto"] = data["formato_nombre_contacto"].strip()
-        if "formato_apartamento_contacto" in data and isinstance(
-            data["formato_apartamento_contacto"], str
-        ):
-            data["formato_apartamento_contacto"] = data[
-                "formato_apartamento_contacto"
-            ].strip()
-        return data
+    xlsx_reservas = fields.Nested(_XlsxReservasColsSchema)
 
 
 class SyncRangoSchema(Schema):

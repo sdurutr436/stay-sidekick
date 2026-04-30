@@ -31,6 +31,15 @@ services:
       ALLOWED_ORIGINS: "http://localhost"
 
   postgres:
+    # Healthcheck más estricto: el backend no arranca hasta que alembic_version
+    # exista (garantía de que stamp_alembic.sql ya se ejecutó en initdb.d).
+    healthcheck:
+      test:
+        - "CMD-SHELL"
+        - "pg_isready -U postgres -d stay_sidekick && psql -U postgres -d stay_sidekick -c 'SELECT version_num FROM alembic_version LIMIT 1' > /dev/null 2>&1"
+      interval: 3s
+      timeout: 5s
+      retries: 30
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./backend/db/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro,Z

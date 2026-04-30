@@ -99,6 +99,7 @@ class SmoobuReservationClient:
 
         prop = booking.get("property") or {}
 
+        # Smoobu devuelve el teléfono del huésped en el campo "phone" de la reserva.
         return ReservaEstandar(
             id_externo=str(booking.get("id", "")),
             nombre_raw=nombre_raw,
