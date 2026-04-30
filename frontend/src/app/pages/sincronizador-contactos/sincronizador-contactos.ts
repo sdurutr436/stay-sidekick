@@ -1,22 +1,22 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 import { BadgeComponent } from '../../components/atoms/badge/badge';
 import { ButtonComponent } from '../../components/atoms/button/button';
+import { FormInputComponent } from '../../components/atoms/form-input/form-input';
+import { FormSelectComponent } from '../../components/atoms/form-select/form-select';
+import { FormFieldComponent } from '../../components/molecules/form-field/form-field';
 import { FormInputIconComponent } from '../../components/molecules/form-input-icon/form-input-icon';
+import { AlertComponent } from '../../components/molecules/alert/alert';
 import { PageHeaderComponent } from '../../components/organisms/page-header/page-header';
 import { PanelSeccionComponent } from '../../components/organisms/panel-seccion/panel-seccion';
 import { TarjetaEstadoComponent } from '../../components/molecules/tarjeta-estado/tarjeta-estado';
+import { ModalComponent } from '../../components/organisms/modal/modal';
+import { ContactosService, PREFS_CONTACTOS_DEFECTO } from '../../services/contactos.service';
 
-type FormatoNombre = 'nombre_apellidos' | 'apellidos_nombre' | 'nombre_solo';
-type FormatoApartamento = 'nota' | 'etiqueta' | 'ninguno';
-
-interface PreferenciasContactos {
-  formato_nombre_contacto: FormatoNombre;
-  incluir_apartamento_contacto: boolean;
-  formato_apartamento_contacto: FormatoApartamento;
-  incluir_checkin_contacto: boolean;
+interface Alerta {
+  tipo: 'success' | 'error';
+  mensaje: string;
 }
 
 interface SyncResultado {
@@ -26,11 +26,13 @@ interface SyncResultado {
   advertencias?: string[];
 }
 
-const _PREFS_DEFECTO: PreferenciasContactos = {
-  formato_nombre_contacto: 'nombre_apellidos',
-  incluir_apartamento_contacto: true,
-  formato_apartamento_contacto: 'nota',
-  incluir_checkin_contacto: true,
+const _FECHA_PREVIEW: Record<string, string> = {
+  YYMMDD:     '260101',
+  YYYYMMDD:   '20260101',
+  'DD/MM/YYYY': '01/01/2026',
+  'DD/MM/YY':   '01/01/26',
+  'MM/DD/YYYY': '01/01/2026',
+  'DD-MM-YYYY': '01-01-2026',
 };
 
 @Component({
@@ -38,12 +40,25 @@ const _PREFS_DEFECTO: PreferenciasContactos = {
   templateUrl: './sincronizador-contactos.html',
   styleUrl: './sincronizador-contactos.scss',
   standalone: true,
-  imports: [FormsModule, PageHeaderComponent, ButtonComponent, BadgeComponent, TarjetaEstadoComponent, PanelSeccionComponent, FormInputIconComponent],
+  imports: [
+    PageHeaderComponent,
+    ButtonComponent,
+    BadgeComponent,
+    TarjetaEstadoComponent,
+    PanelSeccionComponent,
+    FormInputIconComponent,
+    FormInputComponent,
+    FormSelectComponent,
+    FormFieldComponent,
+    AlertComponent,
+    ModalComponent,
+  ],
 })
 export class SincronizadorContactosPageComponent implements OnInit {
 
   private readonly http = inject(HttpClient);
   private readonly route = inject(ActivatedRoute);
+  private readonly contactosService = inject(ContactosService);
 
   // ── Estado PMS ──────────────────────────────────────────────────────────
   readonly pmsConectado = signal(false);
@@ -52,9 +67,6 @@ export class SincronizadorContactosPageComponent implements OnInit {
   readonly googleConectado = signal(false);
   readonly ultimoSync = signal<string | null>(null);
   readonly syncEnCurso = signal(false);
-
-  // ── Preferencias ──────────────────────────────────────────────────────────
-  readonly preferencias = signal<PreferenciasContactos>({ ..._PREFS_DEFECTO });
 
   // ── XLSX ──────────────────────────────────────────────────────────────────
   readonly xlsxArchivo = signal<File | null>(null);
@@ -75,18 +87,35 @@ export class SincronizadorContactosPageComponent implements OnInit {
   // ── Nuevos contactos (resultado de última operación) ─────────────────────
   readonly nuevosContactos = signal(0);
 
-  // ── Opciones de formulario ────────────────────────────────────────────────
-  readonly formatoNombreOpciones: { valor: FormatoNombre; label: string }[] = [
-    { valor: 'nombre_apellidos', label: 'Nombre Apellidos (ej. Juan García)' },
-    { valor: 'apellidos_nombre', label: 'Apellidos, Nombre (ej. García, Juan)' },
-    { valor: 'nombre_solo', label: 'Solo nombre (ej. Juan)' },
+  // ── Plantilla / formato ───────────────────────────────────────────────────
+  readonly plantillaInput    = signal(PREFS_CONTACTOS_DEFECTO.plantilla);
+  readonly formatoFechaInput = signal(PREFS_CONTACTOS_DEFECTO.formato_fecha_salida);
+  readonly separadorApt      = signal(PREFS_CONTACTOS_DEFECTO.separador_apt);
+  readonly guardandoPlantilla = signal(false);
+  readonly plantillaAlerta    = signal<Alerta | null>(null);
+
+  readonly previewNombre = computed(() => {
+    const plantilla = this.plantillaInput();
+    const formato   = this.formatoFechaInput();
+    const sep       = this.separadorApt();
+    const fecha     = _FECHA_PREVIEW[formato] ?? '260101';
+    return plantilla
+      .replace('{FECHA}', fecha)
+      .replace('{APT}', `Cádiz Espiral Marítima`)
+      .replace('{NOMBRE}', 'Manolito Fernandez Ruiz');
+  });
+
+  readonly formatoFechaOpciones = [
+    { value: 'YYMMDD',     label: 'YYMMDD — ej. 260101'    },
+    { value: 'YYYYMMDD',   label: 'YYYYMMDD — ej. 20260101' },
+    { value: 'DD/MM/YYYY', label: 'DD/MM/YYYY'               },
+    { value: 'DD/MM/YY',   label: 'DD/MM/YY'                 },
+    { value: 'MM/DD/YYYY', label: 'MM/DD/YYYY'               },
+    { value: 'DD-MM-YYYY', label: 'DD-MM-YYYY'               },
   ];
 
-  readonly formatoApartamentoOpciones: { valor: FormatoApartamento; label: string }[] = [
-    { valor: 'nota', label: 'En notas del contacto' },
-    { valor: 'etiqueta', label: 'Como etiqueta de grupo en Google Contacts' },
-    { valor: 'ninguno', label: 'No incluir' },
-  ];
+  // ── Modal de instrucciones XLSX ───────────────────────────────────────────
+  readonly modalInstruccionesAbierto = signal(false);
 
   // ── Ciclo de vida ─────────────────────────────────────────────────────────
 
@@ -129,11 +158,33 @@ export class SincronizadorContactosPageComponent implements OnInit {
   }
 
   private cargarPreferencias(): void {
-    this.http.get<{ ok: boolean; preferencias: PreferenciasContactos }>(
-      '/api/contactos/preferencias'
-    ).subscribe({
-      next: res => this.preferencias.set(res.preferencias),
+    this.contactosService.getPreferencias().subscribe({
+      next: prefs => {
+        this.plantillaInput.set(prefs.plantilla);
+        this.formatoFechaInput.set(prefs.formato_fecha_salida);
+        this.separadorApt.set(prefs.separador_apt);
+      },
       error: err => console.error('[sincronizador-contactos] Error al obtener preferencias:', err),
+    });
+  }
+
+  // ── Plantilla / formato ───────────────────────────────────────────────────
+
+  guardarPlantilla(): void {
+    this.plantillaAlerta.set(null);
+    this.guardandoPlantilla.set(true);
+    this.contactosService.savePreferencias({
+      plantilla: this.plantillaInput(),
+      formato_fecha_salida: this.formatoFechaInput(),
+    }).subscribe({
+      next: () => {
+        this.plantillaAlerta.set({ tipo: 'success', mensaje: 'Formato guardado correctamente.' });
+        this.guardandoPlantilla.set(false);
+      },
+      error: err => {
+        this.plantillaAlerta.set({ tipo: 'error', mensaje: err?.error?.errors?.[0] ?? 'Error al guardar el formato.' });
+        this.guardandoPlantilla.set(false);
+      },
     });
   }
 
@@ -176,9 +227,6 @@ export class SincronizadorContactosPageComponent implements OnInit {
         this.syncEnCurso.set(false);
         this.ultimoSync.set(new Date().toISOString());
         this.nuevosContactos.set(res.resultado.nuevos);
-        if (res.resultado.advertencias?.length) {
-          console.warn('[sincronizador-contactos] Sync con advertencias:', res.resultado.advertencias);
-        }
       },
       error: err => {
         this.syncEnCurso.set(false);
@@ -219,9 +267,6 @@ export class SincronizadorContactosPageComponent implements OnInit {
         this.xlsxEnCurso.set(false);
         this.ultimoSync.set(new Date().toISOString());
         this.nuevosContactos.set(res.resultado.nuevos);
-        if (res.resultado.advertencias?.length) {
-          console.warn('[sincronizador-contactos] XLSX sync con advertencias:', res.resultado.advertencias);
-        }
       },
       error: err => {
         this.xlsxEnCurso.set(false);
