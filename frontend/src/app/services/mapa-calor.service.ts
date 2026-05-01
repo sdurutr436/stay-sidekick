@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 export interface DiaCalor {
   fecha: string;          // ISO YYYY-MM-DD
@@ -21,6 +22,11 @@ export interface UmbralesCalor {
   // nivel4 = cualquier valor superior a nivel3 → intensidad máxima
 }
 
+export interface HeatmapXlsxColumnas {
+  col_fecha_checkin:  number;  // columna de fecha en el XLSX de check-ins  (1 = col. A)
+  col_fecha_checkout: number;  // columna de fecha en el XLSX de check-outs (1 = col. A)
+}
+
 @Injectable({ providedIn: 'root' })
 export class MapaCalorService {
   private readonly http = inject(HttpClient);
@@ -38,5 +44,19 @@ export class MapaCalorService {
 
   getUmbrales(): Observable<UmbralesCalor> {
     return this.http.get<UmbralesCalor>('/api/heatmap/umbrales');
+  }
+
+  saveUmbrales(umbrales: UmbralesCalor): Observable<void> {
+    return this.http.put<void>('/api/heatmap/umbrales', umbrales);
+  }
+
+  getXlsxColumnas(): Observable<HeatmapXlsxColumnas | null> {
+    return this.http
+      .get<{ ok: boolean; config: HeatmapXlsxColumnas | null }>('/api/heatmap/xlsx-columnas')
+      .pipe(map(res => res.config));
+  }
+
+  saveXlsxColumnas(config: HeatmapXlsxColumnas): Observable<void> {
+    return this.http.put<void>('/api/heatmap/xlsx-columnas', config);
   }
 }
