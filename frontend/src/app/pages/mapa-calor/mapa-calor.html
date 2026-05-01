@@ -1,0 +1,241 @@
+<!-- Página: Mapa de calor -->
+<div class="mapa-calor">
+
+  <app-page-header
+    title="Mapa de calor"
+    description="Visualiza la distribución de check-ins y check-outs en el período seleccionado."
+  />
+
+  <!-- Panel de control -->
+  <app-panel-seccion title="Configuración" [divider]="true" [hasIcon]="true">
+    <svg title-icon class="svg svg--sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+      <rect x="3" y="4" width="14" height="13" stroke="currentColor" stroke-width="1.5"/>
+      <line x1="3" y1="8" x2="17" y2="8" stroke="currentColor" stroke-width="1.5"/>
+      <line x1="7" y1="2" x2="7" y2="5" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
+      <line x1="13" y1="2" x2="13" y2="5" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
+    </svg>
+
+    <div class="mapa-calor__control">
+
+      <!-- Badge PMS (caso A) -->
+      @if (pmsActivo()) {
+        <div class="mapa-calor__control-badge">
+          <app-badge variant="solid">
+            PMS conectado{{ pmsProveedor() ? ': ' + pmsProveedor() : '' }}
+          </app-badge>
+        </div>
+      }
+
+      <!-- Instrucciones XLSX (caso B) -->
+      @if (!pmsActivo()) {
+        <div class="instrucciones-body">
+          <p class="instrucciones-body__intro">
+            Para generar el mapa de calor sin PMS, exporta los listados desde
+            tu software y súbelos aquí.
+          </p>
+          <ol class="instrucciones-pasos">
+            <li class="instrucciones-pasos__item">
+              <span class="instrucciones-pasos__num" aria-hidden="true">1</span>
+              <div class="instrucciones-pasos__content">
+                <strong>Exporta los check-ins:</strong> descarga desde tu PMS
+                el listado de check-ins del periodo en formato <code>.xlsx</code>.
+                La columna de fecha debe estar configurada en el perfil de empresa
+                (Ajustes → Mapa de calor).
+              </div>
+            </li>
+            <li class="instrucciones-pasos__item">
+              <span class="instrucciones-pasos__num" aria-hidden="true">2</span>
+              <div class="instrucciones-pasos__content">
+                <strong>Exporta los check-outs (opcional):</strong> el mismo
+                proceso para las salidas. Sin este archivo solo se mostrarán
+                los check-ins.
+              </div>
+            </li>
+            <li class="instrucciones-pasos__item">
+              <span class="instrucciones-pasos__num" aria-hidden="true">3</span>
+              <div class="instrucciones-pasos__content">
+                <strong>Selecciona el rango de fechas</strong> que quieres
+                visualizar en el mapa.
+              </div>
+            </li>
+            <li class="instrucciones-pasos__item">
+              <span class="instrucciones-pasos__num" aria-hidden="true">4</span>
+              <div class="instrucciones-pasos__content">
+                <strong>Sube los archivos</strong> y pulsa "Generar mapa de calor".
+              </div>
+            </li>
+          </ol>
+        </div>
+      }
+
+      <!-- Selectores de fecha (siempre visibles) -->
+      <div class="mapa-calor__fechas">
+        <div class="form-group">
+          <label class="form-label" for="mapa-fecha-desde">Fecha inicio</label>
+          <input
+            #inputDesde
+            id="mapa-fecha-desde"
+            type="text"
+            class="form-input"
+            placeholder="Selecciona fecha"
+            readonly
+            aria-required="true"
+          />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="mapa-fecha-hasta">Fecha fin</label>
+          <input
+            #inputHasta
+            id="mapa-fecha-hasta"
+            type="text"
+            class="form-input"
+            placeholder="Selecciona fecha"
+            readonly
+            aria-required="true"
+          />
+        </div>
+      </div>
+
+      <!-- Subida de archivos XLSX (caso B) -->
+      @if (!pmsActivo()) {
+        <div class="mapa-calor__uploads">
+
+          <!-- Check-ins (obligatorio) -->
+          <div class="mapa-calor__upload-bloque">
+            <p class="mapa-calor__upload-label">
+              Archivo de check-ins <span aria-label="obligatorio">*</span>
+            </p>
+            <div class="mapa-calor__upload-fila">
+              <app-button variant="secondary" size="md" (click)="inputCheckins.click()">
+                <span class="btn__icon" aria-hidden="true">
+                  <svg class="svg svg--sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
+                    <rect x="4" y="2" width="12" height="16" stroke="currentColor" stroke-width="1.5"/>
+                    <polyline points="7,9 10,6 13,9" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="square" stroke-linejoin="miter"/>
+                    <line x1="10" y1="6" x2="10" y2="14" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
+                  </svg>
+                </span>
+                Seleccionar XLSX
+              </app-button>
+              @if (archivoCheckins()) {
+                <span class="mapa-calor__filename" aria-live="polite">
+                  {{ archivoCheckins()!.name }}
+                </span>
+                <button
+                  type="button"
+                  class="mapa-calor__eliminar-archivo"
+                  (click)="eliminarCheckins()"
+                  aria-label="Eliminar archivo de check-ins"
+                >×</button>
+              }
+            </div>
+            <input
+              #inputCheckins
+              type="file"
+              accept=".xlsx"
+              class="u-hidden"
+              aria-hidden="true"
+              tabindex="-1"
+              (change)="onCheckinsSeleccionado($event)"
+            />
+          </div>
+
+          <!-- Check-outs (opcional) -->
+          <div class="mapa-calor__upload-bloque">
+            <p class="mapa-calor__upload-label">
+              Archivo de check-outs <span class="mapa-calor__upload-opcional">(opcional)</span>
+            </p>
+            <div class="mapa-calor__upload-fila">
+              <app-button variant="secondary" size="md" (click)="inputCheckouts.click()">
+                <span class="btn__icon" aria-hidden="true">
+                  <svg class="svg svg--sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
+                    <rect x="4" y="2" width="12" height="16" stroke="currentColor" stroke-width="1.5"/>
+                    <polyline points="7,9 10,6 13,9" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="square" stroke-linejoin="miter"/>
+                    <line x1="10" y1="6" x2="10" y2="14" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
+                  </svg>
+                </span>
+                Seleccionar XLSX
+              </app-button>
+              @if (archivoCheckouts()) {
+                <span class="mapa-calor__filename" aria-live="polite">
+                  {{ archivoCheckouts()!.name }}
+                </span>
+                <button
+                  type="button"
+                  class="mapa-calor__eliminar-archivo"
+                  (click)="eliminarCheckouts()"
+                  aria-label="Eliminar archivo de check-outs"
+                >×</button>
+              }
+            </div>
+            <input
+              #inputCheckouts
+              type="file"
+              accept=".xlsx"
+              class="u-hidden"
+              aria-hidden="true"
+              tabindex="-1"
+              (change)="onCheckoutsSeleccionado($event)"
+            />
+          </div>
+
+        </div>
+      }
+
+      <!-- Alerta de validación -->
+      @if (alertaValidacion()) {
+        <app-alert
+          [type]="pmsActivo() ? 'error' : 'warning'"
+          [dismissible]="true"
+          (dismissed)="alertaValidacion.set(null)"
+        >
+          {{ alertaValidacion() }}
+        </app-alert>
+      }
+
+      <!-- Separador -->
+      <div class="acciones-body__separator" aria-hidden="true">
+        <hr /><span>Ejecutar</span><hr />
+      </div>
+
+      <!-- Botón generar -->
+      <div class="mapa-calor__control-ejecutar">
+        <app-button
+          class="mapa-calor__btn-generar"
+          variant="primary"
+          size="lg"
+          [disabled]="!puedeGenerar() || cargando()"
+          (click)="generar()"
+        >
+          <span class="btn__icon" aria-hidden="true">
+            <svg class="svg svg--sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
+              <rect x="2" y="4" width="16" height="13" stroke="#fff" stroke-width="1.5"/>
+              <line x1="2" y1="8" x2="18" y2="8" stroke="#fff" stroke-width="1.5"/>
+              <line x1="6" y1="2" x2="6" y2="5" stroke="#fff" stroke-width="1.5" stroke-linecap="square"/>
+              <line x1="14" y1="2" x2="14" y2="5" stroke="#fff" stroke-width="1.5" stroke-linecap="square"/>
+            </svg>
+          </span>
+          @if (cargando()) { Generando… } @else { Generar mapa de calor }
+        </app-button>
+      </div>
+
+    </div>
+  </app-panel-seccion>
+
+  <!-- Alerta de error de API -->
+  @if (error()) {
+    <app-alert type="error" [dismissible]="true" (dismissed)="error.set(null)">
+      {{ error() }}
+    </app-alert>
+  }
+
+  <!-- Cuadrícula del mapa de calor -->
+  @if (diasCalor().length > 0) {
+    <app-panel-seccion title="Resultados" class="mapa-calor__grid">
+      <app-heatmap-grid
+        [dias]="diasCalor()"
+        [umbrales]="umbrales()"
+      />
+    </app-panel-seccion>
+  }
+
+</div>
