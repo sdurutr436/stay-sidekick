@@ -1,11 +1,27 @@
-import { Component, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import type { DiaCalor, UmbralesCalor } from '../../../services/mapa-calor.service';
 
-const MESES_ABREV = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+const MESES_ABREV = ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC'];
 const DIAS_SEMANA = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
 
+function intensidad(valor: number, um: UmbralesCalor): string {
+  if (valor <= 0) return '0';
+  if (valor <= um.nivel1) return '25';
+  if (valor <= um.nivel2) return '50';
+  if (valor <= um.nivel3) return '75';
+  return '100';
+}
+
+interface DiaCalorEnGrid extends DiaCalor {
+  diaDeMes: string;
+  mesAbrev: string;
+  clasesCheckins: string;
+  clasesCheckinsSolo: string;
+  clasesCheckouts: string;
+}
+
 interface FilaCalendario {
-  dias: DiaCalor[];
+  dias: DiaCalorEnGrid[];
   labelMes: string | null;
 }
 
@@ -14,6 +30,7 @@ interface FilaCalendario {
   templateUrl: './heatmap-grid.html',
   styleUrl: './heatmap-grid.scss',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HeatmapGridComponent {
   readonly dias     = input<DiaCalor[]>([]);
@@ -21,13 +38,15 @@ export class HeatmapGridComponent {
 
   readonly diasSemana = DIAS_SEMANA;
 
-  // Si todos los días tienen checkouts === 0, se asume que no hay datos de checkout
-  readonly soloCheckins = computed(() => this.dias().every(d => d.checkouts === 0));
+  readonly soloCheckins = computed(() =>
+    this.dias().length > 0 && this.dias().every(d => d.checkouts === 0)
+  );
 
   readonly filas = computed((): FilaCalendario[] => {
     const dias = this.dias();
     if (!dias.length) return [];
 
+    const um = this.umbrales();
     const sorted = [...dias].sort((a, b) => a.fecha.localeCompare(b.fecha));
     const filas: FilaCalendario[] = [];
     let mesActual = '';
@@ -36,9 +55,23 @@ export class HeatmapGridComponent {
       const slice = sorted.slice(i, i + 7);
       let labelMes: string | null = null;
 
-      for (const dia of slice) {
+      const diasEnGrid: DiaCalorEnGrid[] = slice.map(dia => {
+        const mesIdx = parseInt(dia.fecha.split('-')[1]) - 1;
+        const iC = intensidad(dia.checkins, um);
+        const iO = intensidad(dia.checkouts, um);
+        return {
+          ...dia,
+          diaDeMes: String(parseInt(dia.fecha.split('-')[2])),
+          mesAbrev: MESES_ABREV[mesIdx],
+          clasesCheckins:     `heatmap-grid__checkins heatmap-grid__checkins--i${iC}`,
+          clasesCheckinsSolo: `heatmap-grid__checkins heatmap-grid__checkins--solo heatmap-grid__checkins--i${iC}`,
+          clasesCheckouts:    `heatmap-grid__checkouts heatmap-grid__checkouts--i${iO}`,
+        };
+      });
+
+      for (const dia of diasEnGrid) {
         if (!dia.mesAdyacente) {
-          const mesKey = dia.fecha.substring(0, 7); // YYYY-MM
+          const mesKey = dia.fecha.substring(0, 7);
           if (mesKey !== mesActual) {
             mesActual = mesKey;
             labelMes = MESES_ABREV[parseInt(dia.fecha.split('-')[1]) - 1];
@@ -47,38 +80,9 @@ export class HeatmapGridComponent {
         }
       }
 
-      filas.push({ dias: slice, labelMes });
+      filas.push({ dias: diasEnGrid, labelMes });
     }
 
     return filas;
   });
-
-  clasesCheckins(valor: number): string {
-    return `heatmap-grid__checkins heatmap-grid__checkins--i${this._intensidad(valor)}`;
-  }
-
-  clasesCheckinsSolo(valor: number): string {
-    return `heatmap-grid__checkins heatmap-grid__checkins--solo heatmap-grid__checkins--i${this._intensidad(valor)}`;
-  }
-
-  clasesCheckouts(valor: number): string {
-    return `heatmap-grid__checkouts heatmap-grid__checkouts--i${this._intensidad(valor)}`;
-  }
-
-  diaDeMes(fecha: string): string {
-    return String(parseInt(fecha.split('-')[2]));
-  }
-
-  mesAbrev(fecha: string): string {
-    return MESES_ABREV[parseInt(fecha.split('-')[1]) - 1].substring(0, 3).toUpperCase();
-  }
-
-  private _intensidad(valor: number): string {
-    if (valor <= 0) return '0';
-    const um = this.umbrales();
-    if (valor <= um.nivel1) return '25';
-    if (valor <= um.nivel2) return '50';
-    if (valor <= um.nivel3) return '75';
-    return '100';
-  }
 }

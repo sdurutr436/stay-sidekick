@@ -1,10 +1,9 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Observable, map } from 'rxjs';
 
 export interface DiaCalor {
-  fecha: string;          // ISO YYYY-MM-DD
+  fecha: string;
   checkins: number;
   checkouts: number;
   mesAdyacente: boolean;  // true si el día está fuera del rango seleccionado
@@ -16,15 +15,15 @@ export interface MapaCalorResponse {
 }
 
 export interface UmbralesCalor {
-  nivel1: number;  // ≤ este valor → intensidad 1 (más claro)
+  nivel1: number;
   nivel2: number;
   nivel3: number;
   // nivel4 = cualquier valor superior a nivel3 → intensidad máxima
 }
 
 export interface HeatmapXlsxColumnas {
-  col_fecha_checkin:  number;  // columna de fecha en el XLSX de check-ins  (1 = col. A)
-  col_fecha_checkout: number;  // columna de fecha en el XLSX de check-outs (1 = col. A)
+  col_fecha_checkin:  number;
+  col_fecha_checkout: number;
 }
 
 @Injectable({ providedIn: 'root' })

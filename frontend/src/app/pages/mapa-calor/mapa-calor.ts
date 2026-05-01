@@ -1,6 +1,6 @@
 // Date picker: flatpickr — elegido por ser ligero, sin Material Design,
 // con CSS completamente sobreescribible y compatible con cualquier versión de Angular.
-import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild, computed, inject, signal } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild, WritableSignal, computed, inject, signal } from '@angular/core';
 import flatpickr from 'flatpickr';
 import { forkJoin, catchError, of } from 'rxjs';
 import { BadgeComponent } from '../../components/atoms/badge/badge';
@@ -31,44 +31,29 @@ export class MapaCalorPageComponent implements OnInit, AfterViewInit, OnDestroy 
   private readonly apartamentosService = inject(ApartamentosService);
   private readonly mapaCalorService    = inject(MapaCalorService);
 
-  // ── Estado PMS ──────────────────────────────────────────────────────────────
-  readonly pmsActivo   = signal(false);
+  readonly pmsActivo    = signal(false);
   readonly pmsProveedor = signal<string | null>(null);
-
-  // ── Estado de la página ──────────────────────────────────────────────────────
-  readonly cargando = signal(false);
-  readonly error    = signal<string | null>(null);
-
-  // ── Fechas seleccionadas (YYYY-MM-DD) ─────────────────────────────────────
-  readonly fechaDesde = signal<string | null>(null);
-  readonly fechaHasta = signal<string | null>(null);
-
-  // ── Archivos XLSX ─────────────────────────────────────────────────────────
+  readonly cargando     = signal(false);
+  readonly error        = signal<string | null>(null);
+  readonly fechaDesde   = signal<string | null>(null);
+  readonly fechaHasta   = signal<string | null>(null);
   readonly archivoCheckins  = signal<File | null>(null);
   readonly archivoCheckouts = signal<File | null>(null);
-
-  // ── Resultado del mapa ────────────────────────────────────────────────────
-  readonly diasCalor = signal<DiaCalor[]>([]);
-  readonly umbrales  = signal<UmbralesCalor>({ nivel1: 10, nivel2: 20, nivel3: 30 });
-
-  // ── Validación de alertas ─────────────────────────────────────────────────
+  readonly diasCalor    = signal<DiaCalor[]>([]);
+  readonly umbrales     = signal<UmbralesCalor>({ nivel1: 10, nivel2: 20, nivel3: 30 });
   readonly alertaValidacion = signal<string | null>(null);
 
-  // ── Computed: puede generar ───────────────────────────────────────────────
   readonly puedeGenerar = computed(() => {
     const fechasOk = !!this.fechaDesde() && !!this.fechaHasta();
     if (this.pmsActivo()) return fechasOk;
     return fechasOk && !!this.archivoCheckins();
   });
 
-  // ── Refs de flatpickr ─────────────────────────────────────────────────────
   @ViewChild('inputDesde') private readonly inputDesdeRef!: ElementRef<HTMLInputElement>;
   @ViewChild('inputHasta') private readonly inputHastaRef!: ElementRef<HTMLInputElement>;
 
   private _pickerDesde?: flatpickr.Instance;
   private _pickerHasta?: flatpickr.Instance;
-
-  // ── Ciclo de vida ─────────────────────────────────────────────────────────
 
   ngOnInit(): void {
     forkJoin({
@@ -83,11 +68,10 @@ export class MapaCalorPageComponent implements OnInit, AfterViewInit, OnDestroy 
 
   ngAfterViewInit(): void {
     const hoy = new Date().toISOString().split('T')[0];
+    const baseConfig = { dateFormat: 'Y-m-d', minDate: hoy, locale: { firstDayOfWeek: 1 } };
 
     this._pickerDesde = flatpickr(this.inputDesdeRef.nativeElement, {
-      dateFormat: 'Y-m-d',
-      minDate: hoy,
-      locale: { firstDayOfWeek: 1 },
+      ...baseConfig,
       onChange: ([date]) => {
         const val = date ? date.toISOString().split('T')[0] : null;
         this.fechaDesde.set(val);
@@ -96,9 +80,7 @@ export class MapaCalorPageComponent implements OnInit, AfterViewInit, OnDestroy 
     }) as flatpickr.Instance;
 
     this._pickerHasta = flatpickr(this.inputHastaRef.nativeElement, {
-      dateFormat: 'Y-m-d',
-      minDate: hoy,
-      locale: { firstDayOfWeek: 1 },
+      ...baseConfig,
       onChange: ([date]) => {
         this.fechaHasta.set(date ? date.toISOString().split('T')[0] : null);
       },
@@ -110,54 +92,29 @@ export class MapaCalorPageComponent implements OnInit, AfterViewInit, OnDestroy 
     this._pickerHasta?.destroy();
   }
 
-  // ── Archivos XLSX ─────────────────────────────────────────────────────────
-
-  onCheckinsSeleccionado(event: Event): void {
+  onArchivoSeleccionado(event: Event, target: WritableSignal<File | null>): void {
     const input = event.target as HTMLInputElement;
-    this.archivoCheckins.set(input.files?.[0] ?? null);
+    target.set(input.files?.[0] ?? null);
     input.value = '';
   }
-
-  onCheckoutsSeleccionado(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    this.archivoCheckouts.set(input.files?.[0] ?? null);
-    input.value = '';
-  }
-
-  eliminarCheckins(): void {
-    this.archivoCheckins.set(null);
-  }
-
-  eliminarCheckouts(): void {
-    this.archivoCheckouts.set(null);
-  }
-
-  // ── Generación del mapa ───────────────────────────────────────────────────
 
   generar(): void {
     this.alertaValidacion.set(null);
 
     if (!this.puedeGenerar()) {
-      if (this.pmsActivo()) {
-        this.alertaValidacion.set('Selecciona una fecha de inicio y una fecha de fin para continuar.');
-      } else {
-        this.alertaValidacion.set(
-          !this.archivoCheckins()
-            ? 'Sube el archivo de check-ins antes de generar el mapa.'
-            : 'Selecciona una fecha de inicio y una fecha de fin para continuar.'
-        );
-      }
+      this.alertaValidacion.set(
+        !this.pmsActivo() && !this.archivoCheckins()
+          ? 'Sube el archivo de check-ins antes de generar el mapa.'
+          : 'Selecciona una fecha de inicio y una fecha de fin para continuar.'
+      );
       return;
     }
 
     this.cargando.set(true);
     this.error.set(null);
 
-    const desde = this.fechaDesde()!;
-    const hasta = this.fechaHasta()!;
-
     const fuente$ = this.pmsActivo()
-      ? this.mapaCalorService.generarDesdePms(desde, hasta)
+      ? this.mapaCalorService.generarDesdePms(this.fechaDesde()!, this.fechaHasta()!)
       : this.mapaCalorService.generarDesdeXlsx(this.archivoCheckins()!, this.archivoCheckouts() ?? undefined);
 
     fuente$.subscribe({

@@ -538,9 +538,9 @@
           id="heatmap-nivel1"
           type="number"
           placeholder="ej. 10"
-          [value]="heatmapNivel1().toString()"
+          [value]="heatmapUmbrales().nivel1.toString()"
           [disabled]="!isAdmin()"
-          (valueChange)="heatmapNivel1.set(+$event || 1)"
+          (valueChange)="heatmapUmbrales.update(u => ({ ...u, nivel1: +$event || 1 }))"
         />
       </app-form-field>
 
@@ -549,9 +549,9 @@
           id="heatmap-nivel2"
           type="number"
           placeholder="ej. 20"
-          [value]="heatmapNivel2().toString()"
+          [value]="heatmapUmbrales().nivel2.toString()"
           [disabled]="!isAdmin()"
-          (valueChange)="heatmapNivel2.set(+$event || 1)"
+          (valueChange)="heatmapUmbrales.update(u => ({ ...u, nivel2: +$event || 1 }))"
         />
       </app-form-field>
 
@@ -560,9 +560,9 @@
           id="heatmap-nivel3"
           type="number"
           placeholder="ej. 30"
-          [value]="heatmapNivel3().toString()"
+          [value]="heatmapUmbrales().nivel3.toString()"
           [disabled]="!isAdmin()"
-          (valueChange)="heatmapNivel3.set(+$event || 1)"
+          (valueChange)="heatmapUmbrales.update(u => ({ ...u, nivel3: +$event || 1 }))"
         />
       </app-form-field>
 

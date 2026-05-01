@@ -94,9 +94,7 @@ export class PerfilPageComponent implements OnInit {
   readonly heatmapXlsxAlerta    = signal<Alerta | null>(null);
 
   // Mapa de calor — Umbrales de color
-  readonly heatmapNivel1 = signal(10);
-  readonly heatmapNivel2 = signal(20);
-  readonly heatmapNivel3 = signal(30);
+  readonly heatmapUmbrales          = signal<UmbralesCalor>({ nivel1: 10, nivel2: 20, nivel3: 30 });
   readonly heatmapUmbralesGuardando = signal(false);
   readonly heatmapUmbralesAlerta    = signal<Alerta | null>(null);
 
@@ -322,12 +320,7 @@ export class PerfilPageComponent implements OnInit {
   guardarHeatmapUmbrales(): void {
     this.heatmapUmbralesAlerta.set(null);
     this.heatmapUmbralesGuardando.set(true);
-    const umbrales: UmbralesCalor = {
-      nivel1: this.heatmapNivel1(),
-      nivel2: this.heatmapNivel2(),
-      nivel3: this.heatmapNivel3(),
-    };
-    this.mapaCalorService.saveUmbrales(umbrales).subscribe({
+    this.mapaCalorService.saveUmbrales(this.heatmapUmbrales()).subscribe({
       next: () => {
         this.heatmapUmbralesAlerta.set({ tipo: 'success', mensaje: 'Umbrales de color guardados.' });
         this.heatmapUmbralesGuardando.set(false);
@@ -380,11 +373,7 @@ export class PerfilPageComponent implements OnInit {
 
   private cargarHeatmapUmbrales(): void {
     this.mapaCalorService.getUmbrales().subscribe({
-      next: u => {
-        this.heatmapNivel1.set(u.nivel1);
-        this.heatmapNivel2.set(u.nivel2);
-        this.heatmapNivel3.set(u.nivel3);
-      },
+      next: u => this.heatmapUmbrales.set(u),
     });
   }
 
