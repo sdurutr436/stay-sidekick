@@ -147,12 +147,6 @@ def generar_desde_xlsx():
     if desde > hasta:
         return jsonify({"ok": False, "errors": ["'desde' debe ser anterior o igual a 'hasta'."]}), 422
 
-    if desde < date.today():
-        return jsonify({
-            "ok": False,
-            "errors": ["No se puede generar un mapa de calor con fechas pasadas."],
-        }), 422
-
     checkins_file = request.files["checkins"]
     if not checkins_file.filename or not checkins_file.filename.lower().endswith(".xlsx"):
         return jsonify({"ok": False, "errors": ["El archivo 'checkins' debe ser .xlsx."]}), 400

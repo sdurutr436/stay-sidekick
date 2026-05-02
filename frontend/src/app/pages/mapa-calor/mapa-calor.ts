@@ -67,8 +67,7 @@ export class MapaCalorPageComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   ngAfterViewInit(): void {
-    const hoy = new Date().toISOString().split('T')[0];
-    const baseConfig = { dateFormat: 'Y-m-d', minDate: hoy, locale: { firstDayOfWeek: 1 } };
+    const baseConfig = { dateFormat: 'Y-m-d', locale: { firstDayOfWeek: 1 } };
 
     this._pickerDesde = flatpickr(this.inputDesdeRef.nativeElement, {
       ...baseConfig,
