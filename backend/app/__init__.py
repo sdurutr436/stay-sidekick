@@ -57,6 +57,7 @@ def create_app(config_class: type = Config) -> Flask:
     from app.h_notificaciones_tardias.routes import notificaciones_bp         # noqa: E402
     from app.h_vault_comunicaciones.routes import h_vault_comunicaciones_bp   # noqa: E402
     from app.perfil.routes import perfil_bp                                  # noqa: E402
+    from app.h_mapa_de_calor.routes import heatmap_bp                        # noqa: E402
     app.register_blueprint(solicitud_bp)
     app.register_blueprint(auth_bp)
     app.register_blueprint(empresas_bp)
@@ -66,6 +67,7 @@ def create_app(config_class: type = Config) -> Flask:
     app.register_blueprint(notificaciones_bp)
     app.register_blueprint(h_vault_comunicaciones_bp)
     app.register_blueprint(perfil_bp)
+    app.register_blueprint(heatmap_bp)
 
     # ── Healthcheck (Railway) ────────────────────────────────────────────
     @app.route("/api/health")

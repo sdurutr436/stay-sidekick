@@ -1,0 +1,47 @@
+<!-- Organismo: Cuadrícula del mapa de calor -->
+<div class="heatmap-grid">
+
+  <!-- Cabecera de días de la semana -->
+  @for (dia of diasSemana; track dia) {
+    <div class="heatmap-grid__header">{{ dia }}</div>
+  }
+
+  <!-- Filas de semanas con etiquetas de mes -->
+  @for (fila of filas(); track $index) {
+
+    @if (fila.labelMes) {
+      <div class="heatmap-grid__mes-separador" aria-label="Mes: {{ fila.labelMes }}">
+        {{ fila.labelMes }}
+      </div>
+    }
+
+    @for (dia of fila.dias; track dia.fecha) {
+      <div
+        class="heatmap-grid__celda"
+        [class.heatmap-grid__celda--adyacente]="dia.mesAdyacente"
+        [class.heatmap-grid__celda--vacia]="dia.checkins === 0 && dia.checkouts === 0"
+      >
+        <span class="heatmap-grid__dia" aria-hidden="true">{{ dia.diaDeMes }}</span>
+        <span class="heatmap-grid__mes" aria-hidden="true">{{ dia.mesAbrev }}</span>
+
+        <div class="heatmap-grid__contenido">
+          @if (soloCheckins()) {
+            <div [class]="dia.clasesCheckinsSolo">
+              @if (dia.checkins > 0) { <span>{{ dia.checkins }}</span> }
+            </div>
+          } @else {
+            <div [class]="dia.clasesCheckins">
+              @if (dia.checkins > 0) { <span>{{ dia.checkins }}</span> }
+            </div>
+            <div class="heatmap-grid__divisor" aria-hidden="true"></div>
+            <div [class]="dia.clasesCheckouts">
+              @if (dia.checkouts > 0) { <span>{{ dia.checkouts }}</span> }
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+  }
+
+</div>

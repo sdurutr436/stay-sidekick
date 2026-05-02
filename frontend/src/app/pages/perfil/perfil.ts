@@ -1,10 +1,11 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { PerfilService, IntegracionesData } from '../../services/perfil.service';
 import { ApartamentosService } from '../../services/apartamentos.service';
 import { ContactosService } from '../../services/contactos.service';
+import { MapaCalorService, UmbralesCalor } from '../../services/mapa-calor.service';
 import { PageHeaderComponent } from '../../components/organisms/page-header/page-header';
 import { PanelSeccionComponent } from '../../components/organisms/panel-seccion/panel-seccion';
 import { AlertComponent } from '../../components/molecules/alert/alert';
@@ -35,8 +36,9 @@ interface Alerta {
 export class PerfilPageComponent implements OnInit {
   readonly auth    = inject(AuthService);
   readonly service = inject(PerfilService);
-  private  readonly aptService       = inject(ApartamentosService);
-  private  readonly contactosService = inject(ContactosService);
+  private  readonly aptService        = inject(ApartamentosService);
+  private  readonly contactosService  = inject(ContactosService);
+  private  readonly mapaCalorService  = inject(MapaCalorService);
   private  readonly http  = inject(HttpClient);
   private  readonly route = inject(ActivatedRoute);
 
@@ -85,6 +87,24 @@ export class PerfilPageComponent implements OnInit {
   readonly xlsxReservasGuardando = signal(false);
   readonly xlsxReservasAlerta    = signal<Alerta | null>(null);
 
+  // Mapa de calor — Columnas XLSX
+  readonly heatmapColCheckin  = signal('');
+  readonly heatmapColCheckout = signal('');
+  readonly heatmapXlsxGuardando = signal(false);
+  readonly heatmapXlsxAlerta    = signal<Alerta | null>(null);
+
+  // Mapa de calor — Umbrales de color
+  readonly heatmapUmbrales          = signal<UmbralesCalor>({ nivel1: 10, nivel2: 20, nivel3: 30 });
+  readonly heatmapUmbralesGuardando = signal(false);
+  readonly heatmapUmbralesAlerta    = signal<Alerta | null>(null);
+
+  readonly heatmapUmbralesError = computed(() => {
+    const u = this.heatmapUmbrales();
+    if (u.nivel1 <= 0 || u.nivel2 <= 0 || u.nivel3 <= 0) return 'Los tres niveles deben ser enteros positivos.';
+    if (!(u.nivel1 < u.nivel2 && u.nivel2 < u.nivel3)) return 'Debe cumplirse: Nivel 1 < Nivel 2 < Nivel 3.';
+    return null;
+  });
+
   readonly pmsOpciones = [
     { value: 'smoobu',    label: 'Smoobu'    },
     { value: 'beds24',    label: 'Beds24'    },
@@ -112,6 +132,8 @@ export class PerfilPageComponent implements OnInit {
     this.cargarIntegraciones();
     this.cargarXlsxColumnas();
     this.cargarXlsxReservasColumnas();
+    this.cargarHeatmapXlsxColumnas();
+    this.cargarHeatmapUmbrales();
 
     this.route.queryParamMap.subscribe(params => {
       if (params.get('google_conectado') === 'true') {
@@ -284,6 +306,39 @@ export class PerfilPageComponent implements OnInit {
     });
   }
 
+  guardarHeatmapXlsxColumnas(): void {
+    this.heatmapXlsxAlerta.set(null);
+    this.heatmapXlsxGuardando.set(true);
+    this.mapaCalorService.saveConfigXlsx({
+      col_fecha_checkin:  this.heatmapColCheckin() || null,
+      col_fecha_checkout: this.heatmapColCheckout() || null,
+    }).subscribe({
+      next: () => {
+        this.heatmapXlsxAlerta.set({ tipo: 'success', mensaje: 'Configuración de columnas guardada.' });
+        this.heatmapXlsxGuardando.set(false);
+      },
+      error: err => {
+        this.heatmapXlsxAlerta.set({ tipo: 'error', mensaje: err?.error?.errors?.[0] ?? 'Error al guardar la configuración.' });
+        this.heatmapXlsxGuardando.set(false);
+      },
+    });
+  }
+
+  guardarHeatmapUmbrales(): void {
+    this.heatmapUmbralesAlerta.set(null);
+    this.heatmapUmbralesGuardando.set(true);
+    this.mapaCalorService.saveUmbrales(this.heatmapUmbrales()).subscribe({
+      next: () => {
+        this.heatmapUmbralesAlerta.set({ tipo: 'success', mensaje: 'Umbrales de color guardados.' });
+        this.heatmapUmbralesGuardando.set(false);
+      },
+      error: err => {
+        this.heatmapUmbralesAlerta.set({ tipo: 'error', mensaje: err?.error?.errors?.[0] ?? 'Error al guardar los umbrales.' });
+        this.heatmapUmbralesGuardando.set(false);
+      },
+    });
+  }
+
   cerrarSesion(): void {
     this.auth.logout();
   }
@@ -309,6 +364,23 @@ export class PerfilPageComponent implements OnInit {
         this.xlsxRColTipologia.set(prefs.xlsx_reservas?.col_tipologia ?? 0);
         this.xlsxRColTelefono.set(prefs.xlsx_reservas?.col_telefono ?? 0);
       },
+    });
+  }
+
+  private cargarHeatmapXlsxColumnas(): void {
+    this.mapaCalorService.getConfigXlsx().subscribe({
+      next: config => {
+        if (config) {
+          this.heatmapColCheckin.set(config.col_fecha_checkin ?? '');
+          this.heatmapColCheckout.set(config.col_fecha_checkout ?? '');
+        }
+      },
+    });
+  }
+
+  private cargarHeatmapUmbrales(): void {
+    this.mapaCalorService.getUmbrales().subscribe({
+      next: u => this.heatmapUmbrales.set(u),
     });
   }
 

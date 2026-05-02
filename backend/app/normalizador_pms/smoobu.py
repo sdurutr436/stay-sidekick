@@ -79,6 +79,52 @@ class SmoobuReservationClient:
         resp.raise_for_status()
         return resp.json()
 
+    def fetch_by_departure(
+        self,
+        desde: str,
+        hasta: str,
+    ) -> list[ReservaEstandar]:
+        """Obtiene reservas cuyo checkout cae en el rango [desde, hasta].
+
+        # TODO: validar con documentación oficial de Smoobu en https://docs.smoobu.com
+        # Endpoint: GET https://login.smoobu.com/api/reservations
+        # Parámetros asumidos: departureFrom, departureTo (análogos a arrivalFrom/arrivalTo)
+        """
+        reservas: list[ReservaEstandar] = []
+        page = 1
+
+        while True:
+            raw = self._fetch_page_by_departure(desde, hasta, page)
+            bookings = raw.get("bookings", [])
+            if not bookings:
+                break
+            for booking in bookings:
+                reserva = self._normalize(booking)
+                if reserva is not None:
+                    reservas.append(reserva)
+            total_pages = raw.get("page_count", 1)
+            if page >= total_pages:
+                break
+            page += 1
+
+        logger.info(
+            "Smoobu checkouts: %d obtenidos (rango %s — %s)",
+            len(reservas), desde, hasta,
+        )
+        return reservas
+
+    def _fetch_page_by_departure(self, desde: str, hasta: str, page: int) -> dict:
+        url = f"{_BASE_URL}/api/reservations"
+        params = {
+            "departureFrom": desde,
+            "departureTo": hasta,
+            "pageSize": _PAGE_SIZE,
+            "page": page,
+        }
+        resp = self._session.get(url, params=params, timeout=_TIMEOUT)
+        resp.raise_for_status()
+        return resp.json()
+
     @staticmethod
     def _normalize(booking: dict) -> ReservaEstandar | None:
         """Convierte un booking de Smoobu en ReservaEstandar."""

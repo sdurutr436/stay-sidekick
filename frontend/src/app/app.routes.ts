@@ -34,6 +34,11 @@ export const routes: Routes = [
         ],
       },
       {
+        path: 'mapa-calor',
+        loadComponent: () =>
+          import('./pages/mapa-calor/mapa-calor').then(m => m.MapaCalorPageComponent),
+      },
+      {
         path: 'vault-comunicaciones',
         loadComponent: () =>
           import('./pages/vault-comunicaciones/vault-comunicaciones').then(
