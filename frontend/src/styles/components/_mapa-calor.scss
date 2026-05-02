@@ -1,0 +1,314 @@
+// =============================================================================
+// COMPONENTS: MAPA DE CALOR (página + organismo heatmap-grid)
+//
+// Layout:
+//   .mapa-calor           — wrapper principal de página
+//   .mapa-calor__control  — panel de control superior (fechas, upload, botón)
+//   .mapa-calor__grid     — wrapper de la cuadrícula de resultados
+//   .heatmap-grid         — cuadrícula CSS Grid de 7 columnas
+//
+// Variables de color (locales — no contaminar el sistema de diseño global):
+//   $heatmap-color-checkins:  verde para check-ins
+//   $heatmap-color-checkouts: rojo para check-outs
+//
+// Reutiliza:
+//   .instrucciones-pasos, .acciones-body__separator (de sincronizador-contactos)
+//   .panel-seccion, .page-header, .badge, .btn, .form-*
+// =============================================================================
+
+// Variables de color locales al mapa de calor
+$heatmap-color-checkins:  #4CAF50;
+$heatmap-color-checkouts: #F44336;
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Wrapper de página
+// ─────────────────────────────────────────────────────────────────────────────
+
+.mapa-calor {
+  @include container;
+  padding-block: 0;
+  display: flex;
+  flex-direction: column;
+  gap: $space-8;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Panel de control
+// ─────────────────────────────────────────────────────────────────────────────
+
+.mapa-calor__control {
+  display: flex;
+  flex-direction: column;
+  gap: $space-6;
+}
+
+.mapa-calor__control-badge {
+  display: flex;
+}
+
+// Selectores de fecha (dos inputs en fila)
+.mapa-calor__fechas {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $space-4;
+
+  @include respond-until('sm') {
+    grid-template-columns: 1fr;
+  }
+}
+
+// Bloque de subida de archivos (caso B)
+.mapa-calor__uploads {
+  display: flex;
+  flex-direction: column;
+  gap: $space-4;
+}
+
+.mapa-calor__upload-bloque {
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;
+}
+
+.mapa-calor__upload-label {
+  @include text-body-md;
+  color: $color-text-primary;
+}
+
+.mapa-calor__upload-opcional {
+  @include text-caption-md;
+  color: $color-text-secondary;
+}
+
+.mapa-calor__upload-fila {
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+  flex-wrap: wrap;
+}
+
+.mapa-calor__filename {
+  @include text-body-sm;
+  color: $color-text-secondary;
+  font-style: italic;
+  word-break: break-all;
+}
+
+.mapa-calor__eliminar-archivo {
+  @include text-body-md;
+  background: none;
+  border: none;
+  padding: 0 $space-1;
+  cursor: pointer;
+  color: $color-text-secondary;
+  line-height: 1;
+
+  &:hover {
+    color: $color-text-primary;
+  }
+}
+
+// Botón generar — ocupa todo el ancho
+.mapa-calor__control-ejecutar {
+  display: flex;
+}
+
+.mapa-calor__btn-generar {
+  width: 100%;
+  display: flex;
+
+  .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// flatpickr — override de estilos para ajustarse al wireframe
+// ─────────────────────────────────────────────────────────────────────────────
+
+.flatpickr-calendar {
+  border: $border-width $border-style $color-border;
+  border-radius: $border-radius-default;
+  box-shadow: $shadow-md;
+  font-family: $font-family-base;
+  @include text-body-sm;
+  color: $color-text-primary;
+  background: $color-surface;
+
+  &.open {
+    z-index: $z-tooltip;
+  }
+}
+
+.flatpickr-month,
+.flatpickr-current-month,
+.flatpickr-prev-month,
+.flatpickr-next-month {
+  color: $color-text-primary;
+  fill: $color-text-primary;
+}
+
+.flatpickr-weekday {
+  @include text-caption-md;
+  color: $color-text-secondary;
+  text-transform: uppercase;
+}
+
+.flatpickr-day {
+  border-radius: $border-radius-default;
+  color: $color-text-primary;
+  @include text-body-sm;
+
+  &:hover,
+  &:focus {
+    background: $color-gray-100;
+    border-color: $color-border;
+  }
+
+  &.selected,
+  &.selected:hover {
+    background: $color-gray-800;
+    border-color: $color-gray-800;
+    color: $color-white;
+  }
+
+  &.today {
+    border-color: $color-gray-500;
+  }
+
+  &.flatpickr-disabled {
+    color: $color-text-disabled;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Organismo: Cuadrícula del mapa de calor (.heatmap-grid)
+// ─────────────────────────────────────────────────────────────────────────────
+
+.heatmap-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: $space-1;
+  width: 100%;
+
+  // Cabecera de días de la semana (L M X J V S D)
+  &__header {
+    text-align: center;
+    padding: $space-1 0;
+    @include text-caption-md;
+    color: $color-text-secondary;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  // Separador de mes — ocupa toda la fila
+  &__mes-separador {
+    grid-column: 1 / -1;
+    padding: $space-3 0 $space-1;
+    @include text-label-md;
+    color: $color-text-secondary;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    border-top: $border-width $border-style $color-border;
+    margin-top: $space-1;
+  }
+
+  // Celda individual
+  &__celda {
+    position: relative;
+    border: $border-width $border-style $color-border;
+    min-height: 5rem;
+    display: flex;
+    flex-direction: column;
+    background: $color-surface;
+
+    &--adyacente {
+      opacity: 0.6;
+    }
+
+    &--vacia {
+      background-color: $color-surface-alt;
+    }
+  }
+
+  // Número del día (esquina sup. izq.)
+  &__dia {
+    position: absolute;
+    top: $space-1;
+    left: $space-2;
+    @include text-caption-md;
+    color: $color-text-secondary;
+    pointer-events: none;
+    z-index: 1;
+    line-height: 1;
+  }
+
+  // 2-3 letras del mes (esquina sup. der.)
+  &__mes {
+    position: absolute;
+    top: $space-1;
+    right: $space-2;
+    font-size: $font-size-caption-xs;
+    font-weight: $font-weight-caption;
+    line-height: $line-height-caption;
+    color: $color-text-secondary;
+    pointer-events: none;
+    z-index: 1;
+    letter-spacing: 0.02em;
+  }
+
+  // Contenedor de mitades (check-ins / divisor / check-outs)
+  &__contenido {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+
+  // Mitad superior — check-ins
+  &__checkins {
+    flex: 1;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding: $space-6 $space-1 $space-1;
+    @include text-body-sm;
+    font-weight: $font-weight-label;
+
+    // Modo solo check-ins: ocupa toda la celda centrado
+    &--solo {
+      align-items: center;
+      font-size: $font-size-body-md;
+      font-weight: $font-weight-body;
+    }
+
+    &--i0   { background-color: transparent; }
+    &--i25  { background-color: rgba($heatmap-color-checkins, 0.25); }
+    &--i50  { background-color: rgba($heatmap-color-checkins, 0.50); }
+    &--i75  { background-color: rgba($heatmap-color-checkins, 0.75); }
+    &--i100 { background-color: $heatmap-color-checkins; color: $color-white; }
+  }
+
+  // Línea divisoria horizontal
+  &__divisor {
+    border-top: $border-width $border-style rgba($color-border, 0.6);
+    flex-shrink: 0;
+  }
+
+  // Mitad inferior — check-outs
+  &__checkouts {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: $space-1;
+    @include text-body-sm;
+    font-weight: $font-weight-label;
+
+    &--i0   { background-color: transparent; }
+    &--i25  { background-color: rgba($heatmap-color-checkouts, 0.25); }
+    &--i50  { background-color: rgba($heatmap-color-checkouts, 0.50); }
+    &--i75  { background-color: rgba($heatmap-color-checkouts, 0.75); }
+    &--i100 { background-color: $heatmap-color-checkouts; color: $color-white; }
+  }
+}
