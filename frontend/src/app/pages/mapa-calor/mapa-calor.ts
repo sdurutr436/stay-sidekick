@@ -127,7 +127,7 @@ export class MapaCalorPageComponent implements OnInit, AfterViewInit, OnDestroy 
         this.cargando.set(false);
       },
       error: err => {
-        this.error.set(err?.error?.message ?? 'Error al generar el mapa de calor.');
+        this.error.set(err?.error?.errors?.[0] ?? err?.error?.message ?? 'Error al generar el mapa de calor.');
         this.cargando.set(false);
       },
     });

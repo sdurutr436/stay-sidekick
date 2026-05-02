@@ -203,14 +203,29 @@ def _sanitize_xlsx(file_bytes: bytes) -> openpyxl.Workbook:
     return wb
 
 
+def _col_letra_a_idx(letra: str) -> int | None:
+    """Convierte letra de columna Excel (A, B, ..., Z, AA...) a índice 0-based."""
+    letra = letra.strip().upper()
+    if not letra or not letra.isalpha():
+        return None
+    idx = 0
+    for c in letra:
+        idx = idx * 26 + (ord(c) - ord("A") + 1)
+    return idx - 1
+
+
 def _parsear_xlsx_fechas(
     file_bytes: bytes,
-    col_nombre: str,
+    col_letra: str,
 ) -> tuple[dict[str, int], list[str], str | None]:
-    """Extrae y agrega fechas de la columna indicada en el XLSX.
+    """Extrae y agrega fechas de la columna indicada (letra Excel) en el XLSX.
 
-    Devuelve ({fecha_iso: count}, warnings, error). Si error no es None el resto es vacío.
+    Ignora la fila 1 (cabecera). Devuelve ({fecha_iso: count}, warnings, error).
     """
+    idx = _col_letra_a_idx(col_letra)
+    if idx is None:
+        return {}, [], f"'{col_letra}' no es una letra de columna válida (ej. A, B, C...)."
+
     try:
         wb = _sanitize_xlsx(file_bytes)
     except Exception as exc:
@@ -220,33 +235,18 @@ def _parsear_xlsx_fechas(
         ws = wb.active
         if ws is None:
             return {}, [], "El archivo Excel no tiene hojas de cálculo."
-
         data = list(ws.values)
     finally:
         wb.close()
 
     if len(data) < 2:
-        return {}, [], "El archivo debe tener cabeceras en la primera fila y al menos una fila de datos."
-
-    headers = [str(h).strip() if h is not None else "" for h in data[0]]
-    col_lower = col_nombre.strip().lower()
-    idx = next(
-        (i for i, h in enumerate(headers) if h.strip().lower() == col_lower),
-        None,
-    )
-    if idx is None:
-        return {}, [], (
-            f"Columna '{col_nombre}' no encontrada en el archivo. "
-            "Comprueba el nombre configurado en el perfil de empresa."
-        )
-
-    df = pd.DataFrame(data[1:], columns=headers)
-    serie = df.iloc[:, idx]
+        return {}, [], "El archivo debe tener al menos dos filas (cabecera + datos)."
 
     conteo: dict[str, int] = {}
     descartadas = 0
 
-    for val in serie:
+    for row in data[1:]:
+        val = row[idx] if row and len(row) > idx else None
         if val is None or (isinstance(val, float) and pd.isna(val)):
             descartadas += 1
             continue
@@ -259,7 +259,7 @@ def _parsear_xlsx_fechas(
 
     warnings: list[str] = []
     if descartadas:
-        warnings.append(f"{descartadas} filas descartadas por fecha inválida")
+        warnings.append(f"{descartadas} filas descartadas por fecha inválida o celda vacía")
 
     return conteo, warnings, None
 

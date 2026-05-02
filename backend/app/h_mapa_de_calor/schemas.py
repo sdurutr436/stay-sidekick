@@ -18,14 +18,19 @@ class UmbralesSchema(Schema):
                 )
 
 
+def _validar_letra_columna(valor):
+    if valor and not valor.strip().upper().isalpha():
+        raise ValidationError("Debe ser una letra de columna Excel (ej. A, B, C, AA...).")
+
+
 class ConfigXlsxSchema(Schema):
     col_fecha_checkin = fields.String(
         required=True,
-        validate=validate.Length(min=1, max=100),
+        validate=[validate.Length(min=1, max=3), _validar_letra_columna],
     )
     col_fecha_checkout = fields.String(
         required=False,
         allow_none=True,
         load_default=None,
-        validate=validate.Length(max=100),
+        validate=[validate.Length(max=3), _validar_letra_columna],
     )

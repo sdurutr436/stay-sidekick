@@ -446,8 +446,9 @@
     <app-panel-seccion title="Mapa de calor — Columnas XLSX" [divider]="true">
 
       <p class="u-text-secondary u-mb-8">
-        Indica el nombre exacto de la columna de tu archivo XLSX exportado
-        desde tu PMS que contiene la fecha de cada movimiento.
+        Indica la letra de la columna (A, B, C…) de tu archivo XLSX que
+        contiene la fecha de cada movimiento. La primera fila de cabeceras
+        se descarta automáticamente.
       </p>
 
       @if (!isAdmin()) {
@@ -468,22 +469,22 @@
 
       <form class="perfil-form" (submit)="$event.preventDefault(); guardarHeatmapXlsxColumnas()">
 
-        <app-form-field label="Nombre de columna — check-ins *" for="heatmap-col-checkin">
+        <app-form-field label="Columna check-ins *" for="heatmap-col-checkin">
           <app-form-input
             id="heatmap-col-checkin"
             type="text"
-            placeholder="ej. Fecha de entrada"
+            placeholder="ej. C"
             [value]="heatmapColCheckin()"
             [disabled]="!isAdmin()"
             (valueChange)="heatmapColCheckin.set($event)"
           />
         </app-form-field>
 
-        <app-form-field label="Nombre de columna — check-outs (opcional)" for="heatmap-col-checkout">
+        <app-form-field label="Columna check-outs (opcional)" for="heatmap-col-checkout">
           <app-form-input
             id="heatmap-col-checkout"
             type="text"
-            placeholder="ej. Fecha de salida"
+            placeholder="ej. D"
             [value]="heatmapColCheckout()"
             [disabled]="!isAdmin()"
             (valueChange)="heatmapColCheckout.set($event)"
