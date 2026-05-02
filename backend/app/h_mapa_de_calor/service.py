@@ -286,7 +286,7 @@ def _construir_grid(
             "fecha": iso,
             "checkins": checkins.get(iso, 0),
             "checkouts": checkouts.get(iso, 0),
-            "mes_adyacente": dia < desde or dia > hasta,
+            "mesAdyacente": dia < desde or dia > hasta,
         })
         dia += timedelta(days=1)
 

@@ -115,7 +115,12 @@ export class MapaCalorPageComponent implements OnInit, AfterViewInit, OnDestroy 
 
     const fuente$ = this.pmsActivo()
       ? this.mapaCalorService.generarDesdePms(this.fechaDesde()!, this.fechaHasta()!)
-      : this.mapaCalorService.generarDesdeXlsx(this.archivoCheckins()!, this.archivoCheckouts() ?? undefined);
+      : this.mapaCalorService.generarDesdeXlsx(
+          this.archivoCheckins()!,
+          this.archivoCheckouts() ?? undefined,
+          this.fechaDesde()!,
+          this.fechaHasta()!,
+        );
 
     fuente$.subscribe({
       next: res => {

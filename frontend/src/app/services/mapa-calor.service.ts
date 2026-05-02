@@ -6,24 +6,23 @@ export interface DiaCalor {
   fecha: string;
   checkins: number;
   checkouts: number;
-  mesAdyacente: boolean;  // true si el día está fuera del rango seleccionado
-                          // pero pertenece a la semana visible del calendario
+  mesAdyacente: boolean;
 }
 
 export interface MapaCalorResponse {
   dias: DiaCalor[];
+  warnings?: string[];
 }
 
 export interface UmbralesCalor {
   nivel1: number;
   nivel2: number;
   nivel3: number;
-  // nivel4 = cualquier valor superior a nivel3 → intensidad máxima
 }
 
-export interface HeatmapXlsxColumnas {
-  col_fecha_checkin:  number;
-  col_fecha_checkout: number;
+export interface ConfigXlsx {
+  col_fecha_checkin: string | null;
+  col_fecha_checkout: string | null;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -31,31 +30,43 @@ export class MapaCalorService {
   private readonly http = inject(HttpClient);
 
   generarDesdePms(desde: string, hasta: string): Observable<MapaCalorResponse> {
-    return this.http.get<MapaCalorResponse>(`/api/heatmap?desde=${desde}&hasta=${hasta}`);
+    return this.http.get<{ ok: boolean; dias: DiaCalor[] }>(
+      `/api/heatmap?desde=${desde}&hasta=${hasta}`
+    ).pipe(map(res => ({ dias: res.dias })));
   }
 
-  generarDesdeXlsx(checkins: File, checkouts?: File): Observable<MapaCalorResponse> {
+  generarDesdeXlsx(checkins: File, checkouts: File | undefined, desde: string, hasta: string): Observable<MapaCalorResponse> {
     const fd = new FormData();
     fd.append('checkins', checkins);
     if (checkouts) fd.append('checkouts', checkouts);
-    return this.http.post<MapaCalorResponse>('/api/heatmap/xlsx', fd);
+    fd.append('desde', desde);
+    fd.append('hasta', hasta);
+    return this.http.post<{ ok: boolean; dias: DiaCalor[]; warnings?: string[] }>(
+      '/api/heatmap/xlsx', fd
+    ).pipe(map(res => ({ dias: res.dias, warnings: res.warnings })));
   }
 
   getUmbrales(): Observable<UmbralesCalor> {
-    return this.http.get<UmbralesCalor>('/api/heatmap/umbrales');
-  }
-
-  saveUmbrales(umbrales: UmbralesCalor): Observable<void> {
-    return this.http.put<void>('/api/heatmap/umbrales', umbrales);
-  }
-
-  getXlsxColumnas(): Observable<HeatmapXlsxColumnas | null> {
     return this.http
-      .get<{ ok: boolean; config: HeatmapXlsxColumnas | null }>('/api/heatmap/xlsx-columnas')
+      .get<{ ok: boolean; umbrales: UmbralesCalor }>('/api/heatmap/umbrales')
+      .pipe(map(res => res.umbrales));
+  }
+
+  saveUmbrales(umbrales: UmbralesCalor): Observable<UmbralesCalor> {
+    return this.http
+      .put<{ ok: boolean; umbrales: UmbralesCalor }>('/api/heatmap/umbrales', umbrales)
+      .pipe(map(res => res.umbrales));
+  }
+
+  getConfigXlsx(): Observable<ConfigXlsx> {
+    return this.http
+      .get<{ ok: boolean; config: ConfigXlsx }>('/api/heatmap/config-xlsx')
       .pipe(map(res => res.config));
   }
 
-  saveXlsxColumnas(config: HeatmapXlsxColumnas): Observable<void> {
-    return this.http.put<void>('/api/heatmap/xlsx-columnas', config);
+  saveConfigXlsx(config: ConfigXlsx): Observable<ConfigXlsx> {
+    return this.http
+      .put<{ ok: boolean; config: ConfigXlsx }>('/api/heatmap/config-xlsx', config)
+      .pipe(map(res => res.config));
   }
 }

@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
@@ -88,8 +88,8 @@ export class PerfilPageComponent implements OnInit {
   readonly xlsxReservasAlerta    = signal<Alerta | null>(null);
 
   // Mapa de calor — Columnas XLSX
-  readonly heatmapColCheckin  = signal(0);
-  readonly heatmapColCheckout = signal(0);
+  readonly heatmapColCheckin  = signal('');
+  readonly heatmapColCheckout = signal('');
   readonly heatmapXlsxGuardando = signal(false);
   readonly heatmapXlsxAlerta    = signal<Alerta | null>(null);
 
@@ -97,6 +97,13 @@ export class PerfilPageComponent implements OnInit {
   readonly heatmapUmbrales          = signal<UmbralesCalor>({ nivel1: 10, nivel2: 20, nivel3: 30 });
   readonly heatmapUmbralesGuardando = signal(false);
   readonly heatmapUmbralesAlerta    = signal<Alerta | null>(null);
+
+  readonly heatmapUmbralesError = computed(() => {
+    const u = this.heatmapUmbrales();
+    if (u.nivel1 <= 0 || u.nivel2 <= 0 || u.nivel3 <= 0) return 'Los tres niveles deben ser enteros positivos.';
+    if (!(u.nivel1 < u.nivel2 && u.nivel2 < u.nivel3)) return 'Debe cumplirse: Nivel 1 < Nivel 2 < Nivel 3.';
+    return null;
+  });
 
   readonly pmsOpciones = [
     { value: 'smoobu',    label: 'Smoobu'    },
@@ -302,9 +309,9 @@ export class PerfilPageComponent implements OnInit {
   guardarHeatmapXlsxColumnas(): void {
     this.heatmapXlsxAlerta.set(null);
     this.heatmapXlsxGuardando.set(true);
-    this.mapaCalorService.saveXlsxColumnas({
-      col_fecha_checkin:  this.heatmapColCheckin(),
-      col_fecha_checkout: this.heatmapColCheckout(),
+    this.mapaCalorService.saveConfigXlsx({
+      col_fecha_checkin:  this.heatmapColCheckin() || null,
+      col_fecha_checkout: this.heatmapColCheckout() || null,
     }).subscribe({
       next: () => {
         this.heatmapXlsxAlerta.set({ tipo: 'success', mensaje: 'Configuración de columnas guardada.' });
@@ -361,11 +368,11 @@ export class PerfilPageComponent implements OnInit {
   }
 
   private cargarHeatmapXlsxColumnas(): void {
-    this.mapaCalorService.getXlsxColumnas().subscribe({
+    this.mapaCalorService.getConfigXlsx().subscribe({
       next: config => {
         if (config) {
-          this.heatmapColCheckin.set(config.col_fecha_checkin ?? 0);
-          this.heatmapColCheckout.set(config.col_fecha_checkout ?? 0);
+          this.heatmapColCheckin.set(config.col_fecha_checkin ?? '');
+          this.heatmapColCheckout.set(config.col_fecha_checkout ?? '');
         }
       },
     });

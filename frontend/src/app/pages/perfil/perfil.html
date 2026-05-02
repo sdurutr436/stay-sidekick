@@ -441,79 +441,73 @@
 
   </app-panel-seccion>
 
-  <!-- ── Mapa de calor — Columnas XLSX ─────────────────────────────────── -->
-  <app-panel-seccion title="Mapa de calor — Columnas XLSX" [divider]="true">
+  <!-- ── Mapa de calor — Columnas XLSX (solo sin PMS) ─────────────────── -->
+  @if (!integraciones()?.pms?.configurado) {
+    <app-panel-seccion title="Mapa de calor — Columnas XLSX" [divider]="true">
 
-    <p class="u-text-secondary u-mb-8">
-      Indica el número de columna (1 = columna A) donde tu archivo XLSX de
-      check-ins y check-outs tiene la fecha de entrada o salida. Si dejas un
-      campo a 0, se intentará detectar la columna por el nombre de la cabecera.
-    </p>
-
-    @if (!isAdmin()) {
       <p class="u-text-secondary u-mb-8">
-        Solo el administrador puede modificar esta configuración.
+        Indica el nombre exacto de la columna de tu archivo XLSX exportado
+        desde tu PMS que contiene la fecha de cada movimiento.
       </p>
-    }
 
-    @if (heatmapXlsxAlerta()) {
-      <app-alert
-        [type]="heatmapXlsxAlerta()!.tipo"
-        [dismissible]="true"
-        (dismissed)="heatmapXlsxAlerta.set(null)"
-      >
-        {{ heatmapXlsxAlerta()!.mensaje }}
-      </app-alert>
-    }
-
-    <form class="perfil-form" (submit)="$event.preventDefault(); guardarHeatmapXlsxColumnas()">
-
-      <app-form-field label="Columna fecha de check-in" for="heatmap-col-checkin">
-        <app-form-input
-          id="heatmap-col-checkin"
-          type="number"
-          placeholder="0 = detectar por cabecera"
-          [value]="heatmapColCheckin().toString()"
-          [disabled]="!isAdmin()"
-          (valueChange)="heatmapColCheckin.set(+$event || 0)"
-        />
-      </app-form-field>
-
-      <app-form-field label="Columna fecha de check-out" for="heatmap-col-checkout">
-        <app-form-input
-          id="heatmap-col-checkout"
-          type="number"
-          placeholder="0 = detectar por cabecera"
-          [value]="heatmapColCheckout().toString()"
-          [disabled]="!isAdmin()"
-          (valueChange)="heatmapColCheckout.set(+$event || 0)"
-        />
-      </app-form-field>
-
-      @if (isAdmin()) {
-        <app-button
-          type="submit"
-          variant="secondary"
-          size="md"
-          [disabled]="heatmapXlsxGuardando()"
-        >
-          {{ heatmapXlsxGuardando() ? 'Guardando…' : 'Guardar configuración XLSX' }}
-        </app-button>
+      @if (!isAdmin()) {
+        <p class="u-text-secondary u-mb-8">
+          Solo el administrador puede modificar esta configuración.
+        </p>
       }
 
-    </form>
+      @if (heatmapXlsxAlerta()) {
+        <app-alert
+          [type]="heatmapXlsxAlerta()!.tipo"
+          [dismissible]="true"
+          (dismissed)="heatmapXlsxAlerta.set(null)"
+        >
+          {{ heatmapXlsxAlerta()!.mensaje }}
+        </app-alert>
+      }
 
-  </app-panel-seccion>
+      <form class="perfil-form" (submit)="$event.preventDefault(); guardarHeatmapXlsxColumnas()">
+
+        <app-form-field label="Nombre de columna — check-ins *" for="heatmap-col-checkin">
+          <app-form-input
+            id="heatmap-col-checkin"
+            type="text"
+            placeholder="ej. Fecha de entrada"
+            [value]="heatmapColCheckin()"
+            [disabled]="!isAdmin()"
+            (valueChange)="heatmapColCheckin.set($event)"
+          />
+        </app-form-field>
+
+        <app-form-field label="Nombre de columna — check-outs (opcional)" for="heatmap-col-checkout">
+          <app-form-input
+            id="heatmap-col-checkout"
+            type="text"
+            placeholder="ej. Fecha de salida"
+            [value]="heatmapColCheckout()"
+            [disabled]="!isAdmin()"
+            (valueChange)="heatmapColCheckout.set($event)"
+          />
+        </app-form-field>
+
+        @if (isAdmin()) {
+          <app-button
+            type="submit"
+            variant="secondary"
+            size="md"
+            [disabled]="heatmapXlsxGuardando() || !heatmapColCheckin()"
+          >
+            {{ heatmapXlsxGuardando() ? 'Guardando…' : 'Guardar configuración XLSX' }}
+          </app-button>
+        }
+
+      </form>
+
+    </app-panel-seccion>
+  }
 
   <!-- ── Mapa de calor — Umbrales de color ──────────────────────────────── -->
   <app-panel-seccion title="Mapa de calor — Umbrales de color" [divider]="true">
-
-    <p class="u-text-secondary u-mb-8">
-      Define cuándo cambia la intensidad del color en la cuadrícula.
-      Las celdas con un valor entre 1 y Nivel 1 se mostrarán al 25% de
-      intensidad; entre Nivel 1+1 y Nivel 2 al 50%; entre Nivel 2+1 y
-      Nivel 3 al 75%; por encima de Nivel 3 al 100%.
-    </p>
 
     @if (!isAdmin()) {
       <p class="u-text-secondary u-mb-8">
@@ -531,9 +525,13 @@
       </app-alert>
     }
 
+    @if (heatmapUmbralesError()) {
+      <app-alert type="error">{{ heatmapUmbralesError() }}</app-alert>
+    }
+
     <form class="perfil-form" (submit)="$event.preventDefault(); guardarHeatmapUmbrales()">
 
-      <app-form-field label="Nivel 1 (25% intensidad hasta…)" for="heatmap-nivel1">
+      <app-form-field label="Umbral nivel 1" for="heatmap-nivel1">
         <app-form-input
           id="heatmap-nivel1"
           type="number"
@@ -542,9 +540,12 @@
           [disabled]="!isAdmin()"
           (valueChange)="heatmapUmbrales.update(u => ({ ...u, nivel1: +$event || 1 }))"
         />
+        <p class="u-text-secondary u-mt-4">
+          Días con hasta {{ heatmapUmbrales().nivel1 }} reservas → color tenue.
+        </p>
       </app-form-field>
 
-      <app-form-field label="Nivel 2 (50% intensidad hasta…)" for="heatmap-nivel2">
+      <app-form-field label="Umbral nivel 2" for="heatmap-nivel2">
         <app-form-input
           id="heatmap-nivel2"
           type="number"
@@ -553,9 +554,12 @@
           [disabled]="!isAdmin()"
           (valueChange)="heatmapUmbrales.update(u => ({ ...u, nivel2: +$event || 1 }))"
         />
+        <p class="u-text-secondary u-mt-4">
+          Días con {{ heatmapUmbrales().nivel1 + 1 }} a {{ heatmapUmbrales().nivel2 }} reservas → color medio.
+        </p>
       </app-form-field>
 
-      <app-form-field label="Nivel 3 (75% intensidad hasta…)" for="heatmap-nivel3">
+      <app-form-field label="Umbral nivel 3" for="heatmap-nivel3">
         <app-form-input
           id="heatmap-nivel3"
           type="number"
@@ -564,6 +568,10 @@
           [disabled]="!isAdmin()"
           (valueChange)="heatmapUmbrales.update(u => ({ ...u, nivel3: +$event || 1 }))"
         />
+        <p class="u-text-secondary u-mt-4">
+          Días con {{ heatmapUmbrales().nivel2 + 1 }} a {{ heatmapUmbrales().nivel3 }} reservas → color fuerte.
+          Más de {{ heatmapUmbrales().nivel3 }} → color máximo.
+        </p>
       </app-form-field>
 
       @if (isAdmin()) {
@@ -571,7 +579,7 @@
           type="submit"
           variant="secondary"
           size="md"
-          [disabled]="heatmapUmbralesGuardando()"
+          [disabled]="heatmapUmbralesGuardando() || !!heatmapUmbralesError()"
         >
           {{ heatmapUmbralesGuardando() ? 'Guardando…' : 'Guardar umbrales' }}
         </app-button>
