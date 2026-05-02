@@ -25,10 +25,8 @@
 - Comparación lado a lado entre dos periodos distintos.
 
 ### Configuración por empresa
-- Panel en perfil para ajustar los umbrales de intensidad (nivel1, nivel2, nivel3)
-  sin necesidad de contactar con soporte.
-- Columnas XLSX configurables por empresa (actualmente gestionadas en perfil
-  para el sincronizador de contactos, mismo patrón aplicable aquí).
+- (Implementado) Umbrales de color configurables en perfil de empresa.
+- (Implementado) Columnas XLSX configurables en perfil de empresa (solo visible sin PMS).
 
 ### Mejoras de UX
 - Estado de carga con skeleton en la cuadrícula mientras se generan los datos.
