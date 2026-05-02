@@ -26,7 +26,7 @@ from app.h_sincronizador_contactos.model import ESTADO_EXITO
 logger = logging.getLogger(__name__)
 
 ORIGEN_HEATMAP_PMS = "heatmap_pms"
-ORIGEN_HEATMAP_XLSX = "heatmap_xlsx"
+ORIGEN_HEATMAP_XLSX = "xlsx"
 
 _umbrales_schema = UmbralesSchema()
 _config_xlsx_schema = ConfigXlsxSchema()
