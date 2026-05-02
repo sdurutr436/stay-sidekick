@@ -4,9 +4,9 @@ from marshmallow import Schema, ValidationError, fields, validate, validates_sch
 
 
 class UmbralesSchema(Schema):
-    nivel1 = fields.Integer(required=True, strict=True, validate=validate.Range(min=1))
-    nivel2 = fields.Integer(required=True, strict=True, validate=validate.Range(min=1))
-    nivel3 = fields.Integer(required=True, strict=True, validate=validate.Range(min=1))
+    nivel1 = fields.Integer(required=True, strict=True, validate=validate.Range(min=1, max=9999))
+    nivel2 = fields.Integer(required=True, strict=True, validate=validate.Range(min=1, max=9999))
+    nivel3 = fields.Integer(required=True, strict=True, validate=validate.Range(min=1, max=9999))
 
     @validates_schema
     def validate_orden(self, data, **kwargs):
