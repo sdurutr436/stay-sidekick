@@ -1,10 +1,166 @@
 ---
 layout: base.njk
 title: Funcionalidades
+description: Las 5 herramientas del MVP de Stay Sidekick para equipos de alquiler vacacional.
 section: producto
 ---
 
-<section class="l-container">
-  <h1>Funcionalidades</h1>
-  <p class="u-text-secondary u-mt-4">Esta sección está en construcción.</p>
-</section>
+{% import "macros/atoms.njk" as atoms %}
+{% import "macros/molecules.njk" as molecules %}
+{% import "macros/organisms.njk" as organisms %}
+
+<div class="l-container" style="padding-block: var(--space-16);">
+
+  {{ organisms.pageHeader('Funcionalidades', 'Las 5 herramientas del MVP diseñadas para equipos operativos de alquiler vacacional.') }}
+
+  {# ── 1. Mapa de calor ─────────────────────────────────────────────────── #}
+  <article style="margin-top: var(--space-12); padding-bottom: var(--space-12); border-bottom: 1px solid var(--color-border, #e0e0e0);" aria-labelledby="herramienta-mapa-calor">
+    <h2 id="herramienta-mapa-calor">Mapa de calor de entradas/salidas</h2>
+    <p class="u-text-secondary" style="margin-top: var(--space-2);">
+      Visualización semanal y mensual de check-ins y check-outs por día. Coordina limpiezas y
+      turnos de un vistazo sin depender de informes manuales.
+    </p>
+
+    <h3 style="margin-top: var(--space-6);">Cómo funciona</h3>
+    <ol style="margin-top: var(--space-3); padding-left: var(--space-6); display: flex; flex-direction: column; gap: var(--space-2);">
+      <li>Conecta tu PMS o sube un fichero XLSX con las reservas del período.</li>
+      <li>La herramienta genera automáticamente la cuadrícula de calor por día.</li>
+      <li>Cada celda muestra entradas (verde) y salidas (rojo) con intensidad proporcional al volumen.</li>
+      <li>Exporta o comparte la vista para coordinar al equipo de limpieza.</li>
+    </ol>
+
+    <figure class="producto-screenshot" style="margin-top: var(--space-8);">
+      <img
+        src="/assets/img/screenshots/mapa-calor.png"
+        alt="Captura de pantalla del Mapa de calor de entradas y salidas"
+        loading="lazy"
+        width="1200"
+        height="675"
+        style="width: 100%; height: auto; border: 1px solid var(--color-border, #e0e0e0);"
+      >
+      {# TODO: Añadir captura de pantalla de Mapa de calor #}
+    </figure>
+  </article>
+
+  {# ── 2. Notificaciones check-ins tardíos ──────────────────────────────── #}
+  <article style="margin-top: var(--space-12); padding-bottom: var(--space-12); border-bottom: 1px solid var(--color-border, #e0e0e0);" aria-labelledby="herramienta-notificaciones">
+    <h2 id="herramienta-notificaciones">Notificaciones para check-ins tardíos</h2>
+    <p class="u-text-secondary" style="margin-top: var(--space-2);">
+      Detecta reservas con llegada posterior a la hora de corte configurada y genera el mensaje
+      de comunicación listo para enviar sin redactar nada desde cero.
+    </p>
+
+    <h3 style="margin-top: var(--space-6);">Cómo funciona</h3>
+    <ol style="margin-top: var(--space-3); padding-left: var(--space-6); display: flex; flex-direction: column; gap: var(--space-2);">
+      <li>Define la hora de corte (por defecto, 20:00 h) en la configuración de tu empresa.</li>
+      <li>La herramienta filtra las reservas del día con hora de llegada posterior a ese límite.</li>
+      <li>Se genera automáticamente el mensaje personalizado según el protocolo interno.</li>
+      <li>Copia el mensaje y envíalo por WhatsApp, email o SMS directamente desde la app.</li>
+    </ol>
+
+    <figure class="producto-screenshot" style="margin-top: var(--space-8);">
+      <img
+        src="/assets/img/screenshots/notificaciones-checkin-tardio.png"
+        alt="Captura de pantalla de Notificaciones para check-ins tardíos"
+        loading="lazy"
+        width="1200"
+        height="675"
+        style="width: 100%; height: auto; border: 1px solid var(--color-border, #e0e0e0);"
+      >
+      {# TODO: Añadir captura de pantalla de Notificaciones para check-ins tardíos #}
+    </figure>
+  </article>
+
+  {# ── 3. Sincronización con Google Contacts ────────────────────────────── #}
+  <article style="margin-top: var(--space-12); padding-bottom: var(--space-12); border-bottom: 1px solid var(--color-border, #e0e0e0);" aria-labelledby="herramienta-contactos">
+    <h2 id="herramienta-contactos">Sincronización con Google Contacts</h2>
+    <p class="u-text-secondary" style="margin-top: var(--space-2);">
+      Crea y actualiza contactos en la agenda corporativa de Google directamente desde los datos
+      de reserva. Sin exportación manual ni duplicados.
+    </p>
+
+    <h3 style="margin-top: var(--space-6);">Cómo funciona</h3>
+    <ol style="margin-top: var(--space-3); padding-left: var(--space-6); display: flex; flex-direction: column; gap: var(--space-2);">
+      <li>Conecta tu cuenta de Google mediante OAuth 2.0 (sin compartir contraseñas).</li>
+      <li>Carga los datos de reservas desde el PMS o mediante fichero XLSX.</li>
+      <li>La herramienta busca contactos existentes por teléfono y los actualiza, o los crea si son nuevos.</li>
+      <li>Como alternativa, exporta un CSV compatible con Google Contacts para importación manual.</li>
+    </ol>
+
+    <figure class="producto-screenshot" style="margin-top: var(--space-8);">
+      <img
+        src="/assets/img/screenshots/sincronizador-contactos.png"
+        alt="Captura de pantalla de Sincronización con Google Contacts"
+        loading="lazy"
+        width="1200"
+        height="675"
+        style="width: 100%; height: auto; border: 1px solid var(--color-border, #e0e0e0);"
+      >
+      {# TODO: Añadir captura de pantalla de Sincronización con Google Contacts #}
+    </figure>
+  </article>
+
+  {# ── 4. Maestro de alojamientos ───────────────────────────────────────── #}
+  <article style="margin-top: var(--space-12); padding-bottom: var(--space-12); border-bottom: 1px solid var(--color-border, #e0e0e0);" aria-labelledby="herramienta-maestro">
+    <h2 id="herramienta-maestro">Base de datos de alojamientos</h2>
+    <p class="u-text-secondary" style="margin-top: var(--space-2);">
+      Maestro centralizado de alojamientos gestionado por la empresa. Sirve de tabla de
+      referencia para cruzar datos en el resto de herramientas.
+    </p>
+
+    <h3 style="margin-top: var(--space-6);">Cómo funciona</h3>
+    <ol style="margin-top: var(--space-3); padding-left: var(--space-6); display: flex; flex-direction: column; gap: var(--space-2);">
+      <li>Crea el listado de alojamientos con su ID, nombre, dirección y ciudad.</li>
+      <li>Importa el maestro desde un fichero XLSX o sincroniza desde la API del PMS.</li>
+      <li>Edita registros individualmente cuando se produzcan cambios en el inventario.</li>
+      <li>El resto de herramientas usan este maestro para enriquecer los datos automáticamente.</li>
+    </ol>
+
+    <figure class="producto-screenshot" style="margin-top: var(--space-8);">
+      <img
+        src="/assets/img/screenshots/maestro-apartamentos.png"
+        alt="Captura de pantalla de la Base de datos de alojamientos"
+        loading="lazy"
+        width="1200"
+        height="675"
+        style="width: 100%; height: auto; border: 1px solid var(--color-border, #e0e0e0);"
+      >
+      {# TODO: Añadir captura de pantalla de la Base de datos de alojamientos #}
+    </figure>
+  </article>
+
+  {# ── 5. Vault de comunicaciones con IA ────────────────────────────────── #}
+  <article style="margin-top: var(--space-12);" aria-labelledby="herramienta-vault">
+    <h2 id="herramienta-vault">Vault de comunicaciones con IA</h2>
+    <p class="u-text-secondary" style="margin-top: var(--space-2);">
+      Biblioteca centralizada de plantillas de mensajes con generación asistida por IA. La IA
+      adapta la plantilla al tono, idioma y contexto de cada reserva; nunca inventa contenido
+      desde cero.
+    </p>
+
+    <h3 style="margin-top: var(--space-6);">Cómo funciona</h3>
+    <ol style="margin-top: var(--space-3); padding-left: var(--space-6); display: flex; flex-direction: column; gap: var(--space-2);">
+      <li>Crea y organiza plantillas de mensajes con marcadores como
+        <code>&#123;&#123;NOMBRE&#125;&#125;</code>, <code>&#123;&#123;APARTAMENTO&#125;&#125;</code>
+        o <code>&#123;&#123;HORA_LLEGADA&#125;&#125;</code>.
+      </li>
+      <li>Selecciona la plantilla adecuada y aporta el contexto de la reserva.</li>
+      <li>El asistente de IA (Gemini 2.0 Flash por defecto, o tu propia clave API) adapta el
+        mensaje al tono e idioma deseados.</li>
+      <li>Revisa, copia y envía el mensaje final por el canal que prefieras.</li>
+    </ol>
+
+    <figure class="producto-screenshot" style="margin-top: var(--space-8);">
+      <img
+        src="/assets/img/screenshots/vault-comunicaciones.png"
+        alt="Captura de pantalla del Vault de comunicaciones con IA"
+        loading="lazy"
+        width="1200"
+        height="675"
+        style="width: 100%; height: auto; border: 1px solid var(--color-border, #e0e0e0);"
+      >
+      {# TODO: Añadir captura de pantalla del Vault de comunicaciones con IA #}
+    </figure>
+  </article>
+
+</div>
