@@ -1,10 +1,114 @@
 ---
 layout: base.njk
 title: Política de privacidad
+description: Política de privacidad de Stay Sidekick conforme al RGPD y la LOPDGDD.
 section: legal
 ---
 
-<article class="l-container">
-  <h1>Política de privacidad</h1>
-  <p class="u-text-secondary u-mt-4">Este documento está en elaboración.</p>
+{% import "macros/organisms.njk" as organisms %}
+
+<article class="l-container" style="padding-block: var(--space-16);">
+
+  {{ organisms.pageHeader('Política de privacidad', 'Última actualización: mayo de 2026') }}
+
+  <section aria-labelledby="privacidad-responsable">
+    <h2 id="privacidad-responsable">1. Identidad del responsable del tratamiento</h2>
+    <p>
+      <strong>Responsable:</strong> Sergio Durán Utrera<br>
+      <strong>Correo electrónico:</strong>
+      <a href="mailto:duran.utrerasergio2612@gmail.com">duran.utrerasergio2612@gmail.com</a><br>
+      <strong>Ubicación:</strong> Cádiz, España
+    </p>
+    <p>
+      Stay Sidekick actúa como <strong>encargado del tratamiento</strong> en nombre de las empresas
+      cliente que utilizan la plataforma. Cada empresa cliente es, a su vez, responsable del
+      tratamiento de los datos de sus huéspedes.
+    </p>
+  </section>
+
+  <section aria-labelledby="privacidad-datos">
+    <h2 id="privacidad-datos">2. Datos tratados y finalidad</h2>
+
+    <h3>2.1 Empresas clientes (registro y uso de la plataforma)</h3>
+    <ul>
+      <li><strong>Datos recogidos:</strong> nombre comercial, dirección de correo electrónico,
+        ciudad y configuración de la cuenta.</li>
+      <li><strong>Finalidad:</strong> gestión de la relación contractual, prestación del servicio
+        y soporte técnico.</li>
+      <li><strong>Base legal:</strong> ejecución de un contrato (art. 6.1.b RGPD).</li>
+      <li><strong>Plazo de conservación:</strong> durante la vigencia del contrato y los plazos
+        legales aplicables tras su resolución (máximo 5 años para obligaciones fiscales).</li>
+    </ul>
+
+    <h3>2.2 Huéspedes de terceros (procesados en memoria)</h3>
+    <ul>
+      <li><strong>Datos procesados:</strong> nombre, teléfono y datos de reserva aportados por
+        la empresa cliente mediante ficheros XLSX o la API del PMS.</li>
+      <li><strong>Finalidad:</strong> generación de comunicaciones y contactos en nombre de la
+        empresa cliente.</li>
+      <li><strong>Base legal:</strong> interés legítimo de la empresa cliente para gestionar
+        sus operaciones (art. 6.1.f RGPD).</li>
+      <li><strong>Importante:</strong> los datos de huéspedes <strong>no se almacenan en la base
+        de datos de Stay Sidekick</strong>. Se procesan exclusivamente en memoria durante la
+        sesión de uso y no se persisten.</li>
+      <li><strong>Plazo de conservación:</strong> no aplica; los datos no se persisten.</li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="privacidad-destinatarios">
+    <h2 id="privacidad-destinatarios">3. Destinatarios de los datos</h2>
+    <p>
+      Los datos no se ceden a terceros, salvo en los siguientes casos:
+    </p>
+    <ul>
+      <li>
+        <strong>Google People API:</strong> cuando la empresa cliente activa la herramienta de
+        sincronización de contactos, los datos de huéspedes (nombre y teléfono) se transfieren
+        a Google LLC en su rol de encargado del tratamiento, conforme al acuerdo de procesamiento
+        de datos de Google y las cláusulas contractuales tipo aprobadas por la Comisión Europea.
+      </li>
+      <li>
+        <strong>Obligación legal:</strong> cuando así lo exija una autoridad competente.
+      </li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="privacidad-derechos">
+    <h2 id="privacidad-derechos">4. Derechos de los interesados</h2>
+    <p>
+      Puede ejercer los derechos de acceso, rectificación, supresión, oposición, limitación del
+      tratamiento y portabilidad de los datos (derechos ARCO+) mediante correo electrónico a:
+    </p>
+    <p>
+      <a href="mailto:duran.utrerasergio2612@gmail.com">duran.utrerasergio2612@gmail.com</a>
+    </p>
+    <p>
+      Si considera que el tratamiento no se ajusta a la normativa vigente, tiene derecho a
+      presentar una reclamación ante la
+      <strong>Agencia Española de Protección de Datos (AEPD)</strong>:
+      <a href="https://www.aepd.es" target="_blank" rel="noopener noreferrer">www.aepd.es</a>.
+    </p>
+  </section>
+
+  <section aria-labelledby="privacidad-seguridad">
+    <h2 id="privacidad-seguridad">5. Medidas de seguridad</h2>
+    <p>Stay Sidekick aplica las siguientes medidas técnicas y organizativas:</p>
+    <ul>
+      <li>Cifrado de contraseñas mediante hashing seguro (bcrypt).</li>
+      <li>Cifrado de datos sensibles en reposo mediante Fernet (criptografía simétrica).</li>
+      <li>Comunicaciones cifradas mediante HTTPS (TLS).</li>
+      <li>Autenticación y autorización mediante tokens JWT con caducidad.</li>
+      <li>No persistencia de datos de huéspedes en base de datos.</li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="privacidad-modificaciones">
+    <h2 id="privacidad-modificaciones">6. Modificaciones de esta política</h2>
+    <p>
+      Esta política puede actualizarse para adaptarse a cambios normativos o en el servicio.
+      La fecha de última actualización aparece al comienzo del documento. Se recomienda revisarla
+      periódicamente.
+    </p>
+  </section>
+
 </article>
