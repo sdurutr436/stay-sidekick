@@ -3,10 +3,13 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
 import { ButtonComponent } from '../../components/atoms/button/button';
+import { BadgeComponent } from '../../components/atoms/badge/badge';
+import { FormInputComponent } from '../../components/atoms/form-input/form-input';
+import { FormTextareaComponent } from '../../components/atoms/form-textarea/form-textarea';
+import { AlertComponent } from '../../components/molecules/alert/alert';
+import { FormFieldComponent } from '../../components/molecules/form-field/form-field';
 import { PageHeaderComponent } from '../../components/organisms/page-header/page-header';
 import { PanelSeccionComponent } from '../../components/organisms/panel-seccion/panel-seccion';
-import { AlertComponent } from '../../components/molecules/alert/alert';
-import { BadgeComponent } from '../../components/atoms/badge/badge';
 import { AuthService } from '../../services/auth.service';
 
 interface CheckinHoy {
@@ -61,7 +64,7 @@ interface StatusResponse {
   templateUrl: './notificaciones-checkin-tardio.html',
   styleUrl: './notificaciones-checkin-tardio.scss',
   standalone: true,
-  imports: [FormsModule, RouterLink, PageHeaderComponent, PanelSeccionComponent, ButtonComponent, AlertComponent, BadgeComponent],
+  imports: [FormsModule, RouterLink, PageHeaderComponent, PanelSeccionComponent, ButtonComponent, AlertComponent, BadgeComponent, FormFieldComponent, FormInputComponent, FormTextareaComponent],
 })
 export class NotificacionesCheckinTardioPageComponent implements OnInit, OnDestroy {
 

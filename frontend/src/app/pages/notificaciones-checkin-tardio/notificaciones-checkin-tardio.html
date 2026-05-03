@@ -158,29 +158,22 @@
           <!-- Formulario nueva plantilla (solo admin) -->
           @if (panelNuevaPlantilla()) {
             <div class="notif-plantillas__nueva">
-              <div class="form-group">
-                <label class="form-label" for="notif-nueva-nombre">Nombre</label>
-                <input
+              <app-form-field label="Nombre" for="notif-nueva-nombre">
+                <app-form-input
                   id="notif-nueva-nombre"
-                  type="text"
-                  class="form-input"
                   placeholder="Nombre de la plantilla…"
                   [value]="nuevaPlantillaNombre()"
-                  (input)="nuevaPlantillaNombre.set($any($event.target).value)"
-                  maxlength="100"
+                  (valueChange)="nuevaPlantillaNombre.set($event)"
                 />
-              </div>
-              <div class="form-group">
-                <label class="form-label" for="notif-nueva-contenido">Contenido</label>
-                <textarea
+              </app-form-field>
+              <app-form-field label="Contenido" for="notif-nueva-contenido">
+                <app-form-textarea
                   id="notif-nueva-contenido"
-                  class="form-textarea"
-                  rows="6"
                   placeholder="Usa {NOMBRE}, {APARTAMENTO}, {HORA_LLEGADA}, {DIRECCION}…"
                   [value]="nuevaPlantillaContenido()"
-                  (input)="nuevaPlantillaContenido.set($any($event.target).value)"
-                ></textarea>
-              </div>
+                  (valueChange)="nuevaPlantillaContenido.set($event)"
+                />
+              </app-form-field>
               <!-- TODO: conectar con POST /api/notificaciones/checkin-tardio/plantillas -->
               <app-button
                 variant="primary"
