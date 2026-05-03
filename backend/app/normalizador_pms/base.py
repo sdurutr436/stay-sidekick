@@ -29,6 +29,7 @@ class ReservaEstandar:
     checkout: str | None               # ISO 8601: "YYYY-MM-DD"
     nombre_apartamento: str | None
     id_apartamento_externo: str | None
+    hora_llegada: str | None = None    # "HH:MM" o None si no se conoce
 
 
 class PMSClient(Protocol):
