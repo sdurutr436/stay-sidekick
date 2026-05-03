@@ -11,7 +11,7 @@ class Config:
     """Configuración base — valores cargados de .env."""
 
     # Flask
-    SECRET_KEY: str = os.environ.get("SECRET_KEY", "change-me")
+    SECRET_KEY: str = os.environ["SECRET_KEY"]
     FLASK_ENV: str = os.environ.get("FLASK_ENV", "production")
 
     # CORS
@@ -37,7 +37,7 @@ class Config:
     DISCORD_WEBHOOK_URL: str = os.environ.get("DISCORD_WEBHOOK_URL", "")
 
     # JWT (para rutas autenticadas del panel)
-    JWT_SECRET_KEY: str = os.environ.get("JWT_SECRET_KEY", "change-me-jwt")
+    JWT_SECRET_KEY: str = os.environ["JWT_SECRET_KEY"]
     JWT_ACCESS_TOKEN_HOURS: int = int(os.environ.get("JWT_ACCESS_TOKEN_HOURS", "1"))
 
     # Rate limiting
