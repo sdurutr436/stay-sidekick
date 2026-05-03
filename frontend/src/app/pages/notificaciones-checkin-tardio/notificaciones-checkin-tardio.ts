@@ -5,9 +5,9 @@ import { RouterLink } from '@angular/router';
 import { ButtonComponent } from '../../components/atoms/button/button';
 import { PageHeaderComponent } from '../../components/organisms/page-header/page-header';
 import { PanelSeccionComponent } from '../../components/organisms/panel-seccion/panel-seccion';
-import { TarjetaEstadoComponent } from '../../components/molecules/tarjeta-estado/tarjeta-estado';
 import { AlertComponent } from '../../components/molecules/alert/alert';
 import { BadgeComponent } from '../../components/atoms/badge/badge';
+import { AuthService } from '../../services/auth.service';
 
 interface CheckinHoy {
   nombre: string;
@@ -26,6 +26,27 @@ interface ApartamentoRef {
   ciudad: string | null;
 }
 
+interface PlantillaNotif {
+  id: string;
+  nombre: string;
+  contenido: string; // tokens: {NOMBRE} {APARTAMENTO} {HORA_LLEGADA} {DIRECCION}
+}
+
+// ── INICIO DATOS MOCK ──────────────────────────────────────────────────
+// TODO: reemplazar por GET /api/notificaciones/checkin-tardio/plantillas
+const MOCK_PLANTILLAS: PlantillaNotif[] = [
+  {
+    id: 'default',
+    nombre: 'Recordatorio estándar',
+    contenido:
+      'Estimado/a {NOMBRE},\n\nLe recordamos que su check-in en {APARTAMENTO} está programado para hoy.\n' +
+      'Hora prevista: {HORA_LLEGADA}\n' +
+      'Dirección: {DIRECCION}\n\n' +
+      'Si prevé llegar más tarde de lo habitual, le agradecemos que nos lo comunique.\n\nSaludos cordiales.',
+  },
+];
+// ── FIN DATOS MOCK ─────────────────────────────────────────────────────
+
 interface StatusResponse {
   ok: boolean;
   pms_configurado: boolean;
@@ -40,11 +61,14 @@ interface StatusResponse {
   templateUrl: './notificaciones-checkin-tardio.html',
   styleUrl: './notificaciones-checkin-tardio.scss',
   standalone: true,
-  imports: [FormsModule, RouterLink, PageHeaderComponent, PanelSeccionComponent, ButtonComponent, TarjetaEstadoComponent, AlertComponent, BadgeComponent],
+  imports: [FormsModule, RouterLink, PageHeaderComponent, PanelSeccionComponent, ButtonComponent, AlertComponent, BadgeComponent],
 })
 export class NotificacionesCheckinTardioPageComponent implements OnInit, OnDestroy {
 
   private readonly http = inject(HttpClient);
+  private readonly auth = inject(AuthService);
+
+  readonly isAdmin = this.auth.isAdmin;
 
   // ── Estado general ────────────────────────────────────────────────────
   readonly cargando = signal(true);
@@ -72,6 +96,15 @@ export class NotificacionesCheckinTardioPageComponent implements OnInit, OnDestr
   });
 
   readonly hayCheckins = computed(() => this.todosCheckins().length > 0);
+
+  // ── Plantillas ────────────────────────────────────────────────────────
+  // TODO: reemplazar MOCK_PLANTILLAS por llamada al backend
+  readonly plantillas = signal<PlantillaNotif[]>(MOCK_PLANTILLAS);
+  readonly plantillaSeleccionada = signal<PlantillaNotif | null>(null);
+  readonly panelNuevaPlantilla = signal(false);
+  readonly nuevaPlantillaNombre = signal('');
+  readonly nuevaPlantillaContenido = signal('');
+  readonly guardandoPlantilla = signal(false);
 
   // ── Notificación ──────────────────────────────────────────────────────
   mensaje = '';
@@ -156,7 +189,29 @@ export class NotificacionesCheckinTardioPageComponent implements OnInit, OnDestr
     });
   }
 
-  // ── Plantilla de mensaje ──────────────────────────────────────────────
+  // ── Plantillas ────────────────────────────────────────────────────────
+
+  usarPlantilla(p: PlantillaNotif): void {
+    this.plantillaSeleccionada.set(p);
+    const checkins = this.todosCheckins();
+    if (checkins.length > 0) {
+      this.mensaje = this._buildConPlantilla(checkins, p.contenido);
+    }
+  }
+
+  private _buildConPlantilla(checkins: CheckinHoy[], plantilla: string): string {
+    return checkins
+      .map(c =>
+        plantilla
+          .replace(/{NOMBRE}/g, c.nombre)
+          .replace(/{APARTAMENTO}/g, c.apartamento ?? '—')
+          .replace(/{HORA_LLEGADA}/g, c.hora_llegada ?? '—')
+          .replace(/{DIRECCION}/g, c.direccion ?? '—'),
+      )
+      .join('\n\n---\n\n');
+  }
+
+  // ── Plantilla automática (sin plantilla guardada) ─────────────────────
 
   generarPlantilla(): void {
     const checkins = this.todosCheckins();
