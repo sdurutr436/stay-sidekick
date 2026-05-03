@@ -3,199 +3,285 @@
 
   <app-page-header
     title="Notificaciones de check-in tardíos"
-    description="Consulta los check-ins de hoy, importa el listado desde Excel y envía un recordatorio personalizado por email a quien necesites."
+    description="Genera recordatorios personalizados para huéspedes con check-in tardío."
   />
+
+  <!-- ── Tarjetas de estado ─────────────────────────────────────────── -->
+  @if (!cargando()) {
+    <div class="notif-checkin__estados">
+
+      <app-tarjeta-estado label="Estado PMS" valor="">
+        <svg icon class="svg svg--xs" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          @if (pmsConfigurado()) {
+            <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/>
+            <polyline points="5,8 7,10 11,6" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="square"/>
+          } @else {
+            <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/>
+            <line x1="8" y1="5" x2="8" y2="9" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
+            <circle cx="8" cy="11.5" r="0.75" fill="currentColor"/>
+          }
+        </svg>
+        <ng-container actions>
+          @if (pmsConfigurado()) {
+            <app-badge variant="solid">Conectado</app-badge>
+          } @else {
+            <app-badge variant="outline">Sin PMS</app-badge>
+          }
+        </ng-container>
+      </app-tarjeta-estado>
+
+      <app-tarjeta-estado label="Hora de corte" [valor]="horaCortePerfil()">
+        <ng-container actions>
+          Configurable en <a routerLink="/perfil">Perfil</a>
+        </ng-container>
+      </app-tarjeta-estado>
+
+    </div>
+  }
 
   @if (cargando()) {
     <p class="notif-checkin__cargando" aria-live="polite">Cargando datos…</p>
   } @else {
 
-    <!-- ── Sección 1: Estado del día (PMS) ───────────────────────────── -->
-    <app-panel-seccion
-      title="Check-ins de hoy"
-      description="Reservas con entrada programada para hoy obtenidas desde tu PMS."
-    >
-      @if (!pmsConfigurado()) {
-        <p class="notif-checkin__aviso" role="note">
-          No hay PMS configurado. Configura tu API key en el apartado de
-          ajustes para obtener las reservas automáticamente.
+    <!-- ── Sección XLSX (solo sin PMS) ────────────────────────────────── -->
+    @if (!pmsConfigurado()) {
+      <app-panel-seccion title="Importar reservas del día (XLSX)">
+        <p class="u-text-secondary u-mb-8">
+          Exporta las reservas de hoy a Excel y súbelas. El archivo se procesa en servidor sin almacenarse (RGPD).
+          Columnas reconocidas: <code>nombre</code>, <code>telefono</code>, <code>checkin</code>,
+          <code>hora_llegada</code>, <code>apartamento</code>.
         </p>
-      } @else if (pmsError()) {
-        <p class="notif-checkin__aviso notif-checkin__aviso--error" role="alert">
-          {{ pmsError() }}
-        </p>
-      } @else if (reservasPms().length === 0) {
-        <p class="notif-checkin__aviso" role="note">
-          No hay check-ins registrados para hoy en el PMS.
-        </p>
-      } @else {
-        <table class="tabla-checkins" aria-label="Check-ins de hoy (PMS)">
-          <thead class="tabla-checkins__head">
-            <tr>
-              <th scope="col">Huésped</th>
-              <th scope="col">Apartamento</th>
-              <th scope="col">Email</th>
-              <th scope="col">Teléfono</th>
-              <th scope="col">Checkout</th>
-            </tr>
-          </thead>
-          <tbody class="tabla-checkins__body">
-            @for (r of reservasPms(); track r.nombre) {
-              <tr>
-                <td>{{ r.nombre }}</td>
-                <td>{{ r.apartamento ?? '—' }}</td>
-                <td>{{ r.email ?? '—' }}</td>
-                <td>{{ r.telefono ?? '—' }}</td>
-                <td>{{ r.checkout ?? '—' }}</td>
-              </tr>
+
+        <div class="xlsx-import">
+          <div class="xlsx-import__fila">
+            <input
+              #xlsxInput
+              type="file"
+              accept=".xlsx"
+              class="xlsx-import__input"
+              aria-label="Seleccionar archivo Excel de reservas del día"
+              (change)="onXlsxSeleccionado($event)"
+            />
+            <app-button variant="secondary" size="md" (click)="xlsxInput.click()">
+              <span class="btn__icon" aria-hidden="true">
+                <svg class="svg svg--sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
+                  <rect x="4" y="2" width="12" height="16" stroke="currentColor" stroke-width="1.5"/>
+                  <polyline points="7,9 10,6 13,9" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="square" stroke-linejoin="miter"/>
+                  <line x1="10" y1="6" x2="10" y2="14" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
+                </svg>
+              </span>
+              Seleccionar .xlsx
+            </app-button>
+
+            @if (xlsxArchivo()) {
+              @if (xlsxEnCurso()) {
+                <span class="xlsx-import__filename" aria-live="polite">Procesando…</span>
+              } @else {
+                <span class="xlsx-import__filename" aria-live="polite">{{ xlsxArchivo()!.name }}</span>
+                <button type="button" class="xlsx-import__limpiar" aria-label="Quitar archivo" (click)="limpiarXlsx()">✕</button>
+              }
             }
-          </tbody>
-        </table>
-      }
-    </app-panel-seccion>
+          </div>
 
-    <!-- ── Sección 2: Importar desde XLSX ────────────────────────────── -->
-    <app-panel-seccion title="Importar reservas del día (XLSX)">
-      <!-- Descripción con etiquetas <code>: usa [pre-body] para conservar el HTML -->
-      <p class="panel-seccion__desc" pre-body>
-        Si tu PMS no tiene API, exporta el listado de reservas de hoy a Excel
-        y súbelo aquí. Los datos se procesan en servidor sin almacenarse (RGPD).
-        Columnas reconocidas: <code>nombre</code>, <code>email</code>,
-        <code>telefono</code>, <code>checkin</code>, <code>checkout</code>,
-        <code>apartamento</code>.
-      </p>
+          @if (xlsxAdvertencias().length > 0) {
+            <ul class="notif-checkin__advertencias" role="note" aria-label="Advertencias del archivo">
+              @for (w of xlsxAdvertencias(); track w) { <li>{{ w }}</li> }
+            </ul>
+          }
 
-      <div class="xlsx-import">
-
-        <!-- Selector de archivo -->
-        <div class="xlsx-import__selector">
-          <input
-            #xlsxInput
-            type="file"
-            accept=".xlsx"
-            class="xlsx-import__input"
-            aria-label="Seleccionar archivo Excel de reservas del día"
-            (change)="onXlsxSeleccionado($event)"
-          />
-          <app-button variant="secondary" size="md" (click)="xlsxInput.click()">
-            <span class="btn__icon" aria-hidden="true">
-              <svg class="svg svg--sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
-                <rect x="4" y="2" width="12" height="16" stroke="currentColor" stroke-width="1.5"/>
-                <polyline points="7,9 10,6 13,9" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="square" stroke-linejoin="miter"/>
-                <line x1="10" y1="6" x2="10" y2="14" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
-              </svg>
-            </span>
-            Seleccionar archivo .xlsx
-          </app-button>
-
-          @if (xlsxArchivo()) {
-            <span class="xlsx-import__filename" aria-live="polite">
-              {{ xlsxArchivo()!.name }}
-            </span>
+          @if (xlsxCheckins().length > 0) {
+            <table class="tabla-checkins" aria-label="Check-ins del XLSX">
+              <thead class="tabla-checkins__head">
+                <tr>
+                  <th scope="col">Huésped</th>
+                  <th scope="col">Apartamento</th>
+                  <th scope="col">Teléfono</th>
+                  <th scope="col">Hora llegada</th>
+                  <th scope="col">Dirección</th>
+                </tr>
+              </thead>
+              <tbody class="tabla-checkins__body">
+                @for (r of xlsxCheckins(); track r.nombre) {
+                  <tr>
+                    <td>{{ r.nombre }}</td>
+                    <td>{{ r.apartamento ?? '—' }}</td>
+                    <td>{{ r.telefono ?? '—' }}</td>
+                    <td>{{ r.hora_llegada ?? '—' }}</td>
+                    <td>{{ r.direccion ?? '—' }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
           }
         </div>
+      </app-panel-seccion>
+    }
 
-        <!-- Botón procesar -->
-        @if (xlsxArchivo()) {
-          <div class="xlsx-import__acciones">
+    <!-- ── 2 paneles: Plantillas | Mensaje ──────────────────────────────── -->
+    <div class="notif-bloques">
+
+      <!-- ── Panel izquierdo: Plantillas ─────────────────────────────── -->
+      <app-panel-seccion title="Plantillas">
+
+        @if (plantillaAlerta()) {
+          <app-alert
+            [type]="plantillaAlerta()!.tipo"
+            [dismissible]="true"
+            (dismissed)="plantillaAlerta.set(null)"
+          >
+            {{ plantillaAlerta()!.mensaje }}
+          </app-alert>
+        }
+
+        @if (modoEditor() !== 'ninguno') {
+
+          <!-- ── Formulario crear / editar plantilla ─── -->
+          <p class="notif-editor__subtitulo">
+            {{ modoEditor() === 'nueva' ? 'Nueva plantilla' : 'Editar plantilla' }}
+          </p>
+
+          <input
+            type="text"
+            class="form-input"
+            placeholder="Nombre de la plantilla…"
+            [value]="editNombre()"
+            (input)="editNombre.set(($event.target)!['value'])"
+            aria-label="Nombre de la plantilla"
+            maxlength="200"
+          />
+
+          <div class="notif-editor__toolbar">
+            <app-dropdown-buscador
+              [options]="tokensOpciones()"
+              placeholder="Insertar variable…"
+              searchPlaceholder="Buscar variable…"
+              emptyMessage="Sin variables"
+              (optionSelected)="onTokenEditorSel($event)"
+            />
+            <app-button
+              variant="secondary"
+              size="sm"
+              [disabled]="!tokenEditorSel()"
+              title="Inserta la variable en la posición del cursor"
+              (click)="insertarTokenEnPlantilla()"
+            >
+              Insertar
+            </app-button>
+          </div>
+
+          <div class="form-editor">
+            <div class="form-editor__body">
+              <textarea
+                #editTextarea
+                class="form-textarea notif-editor__textarea"
+                [value]="editContenido()"
+                placeholder="Usa &#123;NOMBRE&#125;, &#123;APARTAMENTO&#125;, &#123;TELEFONO&#125;, &#123;HORA_LLEGADA&#125;, &#123;DIRECCION&#125;…"
+                (input)="onEditInput($event)"
+                (click)="onEditCursor($event)"
+                (keyup)="onEditCursor($event)"
+                (blur)="onEditCursor($event)"
+                aria-label="Contenido de la plantilla"
+              ></textarea>
+            </div>
+          </div>
+
+          <div class="notif-editor__acciones">
+            <app-button variant="ghost" size="md" (click)="cancelarEdicion()">Cancelar</app-button>
             <app-button
               variant="primary"
               size="md"
-              [disabled]="xlsxEnCurso()"
-              (click)="procesarXlsx()"
+              [disabled]="guardandoEdit() || !editNombre().trim() || !editContenido().trim()"
+              (click)="guardarEdicion()"
             >
-              @if (xlsxEnCurso()) { Procesando… } @else { Procesar XLSX }
+              @if (guardandoEdit()) { Guardando… } @else { Guardar plantilla }
             </app-button>
           </div>
-        }
 
-        <!-- Advertencias del XLSX -->
-        @if (xlsxAdvertencias().length > 0) {
-          <ul class="notif-checkin__advertencias" role="note" aria-label="Advertencias del archivo">
-            @for (w of xlsxAdvertencias(); track w) {
-              <li>{{ w }}</li>
+        } @else {
+
+          <!-- ── Lista de plantillas ─── -->
+          <input
+            type="search"
+            class="form-input"
+            placeholder="Buscar plantilla…"
+            [value]="searchPlantillas()"
+            (input)="onSearchPlantillas($event)"
+            aria-label="Buscar plantilla por nombre"
+          />
+
+          @if (isAdmin) {
+            <button
+              type="button"
+              class="notif-sidebar__nueva-btn"
+              [class.notif-sidebar__nueva-btn--activo]="modoEditor() === 'nueva'"
+              (click)="nuevaPlantilla()"
+            >
+              <svg class="svg svg--xs" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <line x1="8" y1="2" x2="8" y2="14" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
+                <line x1="2" y1="8" x2="14" y2="8" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
+              </svg>
+              Nueva plantilla
+            </button>
+          }
+
+          <ul class="notif-sidebar__list" role="listbox" aria-label="Listado de plantillas">
+            @if (plantillasFiltradas().length > 0) {
+              @for (p of plantillasFiltradas(); track p.id) {
+                <li
+                  class="notif-sidebar__item"
+                  [class.notif-sidebar__item--activo]="plantillaSeleccionada()?.id === p.id"
+                  role="option"
+                  [attr.aria-selected]="plantillaSeleccionada()?.id === p.id"
+                  (click)="seleccionarPlantilla(p)"
+                >
+                  <span class="notif-sidebar__item-nombre">{{ p.nombre }}</span>
+                  @if (isAdmin) {
+                    <div class="notif-sidebar__item-acciones" (click)="$event.stopPropagation()">
+                      <button type="button" class="notif-sidebar__item-btn" aria-label="Editar" (click)="iniciarEdicion(p)">
+                        <svg class="svg svg--xs" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                          <path d="M11 2l3 3-8 8H3v-3z" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linejoin="round"/>
+                        </svg>
+                      </button>
+                      <button type="button" class="notif-sidebar__item-btn notif-sidebar__item-btn--danger" aria-label="Eliminar" (click)="eliminarPlantilla(p)">
+                        <svg class="svg svg--xs" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                          <polyline points="2,4 14,4" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
+                          <path d="M5 4V2h6v2" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                          <rect x="3" y="4" width="10" height="10" stroke="currentColor" stroke-width="1.5"/>
+                        </svg>
+                      </button>
+                    </div>
+                  }
+                </li>
+              }
+            } @else {
+              <li class="notif-sidebar__empty" role="option" aria-selected="false">
+                @if (searchPlantillas()) { Sin resultados para "{{ searchPlantillas() }}" }
+                @else { No hay plantillas guardadas. }
+              </li>
             }
           </ul>
+
         }
 
-        <!-- Tabla de check-ins del XLSX -->
-        @if (xlsxCheckins().length > 0) {
-          <table class="tabla-checkins" aria-label="Check-ins del XLSX">
-            <thead class="tabla-checkins__head">
-              <tr>
-                <th scope="col">Huésped</th>
-                <th scope="col">Apartamento</th>
-                <th scope="col">Email</th>
-                <th scope="col">Teléfono</th>
-                <th scope="col">Checkout</th>
-              </tr>
-            </thead>
-            <tbody class="tabla-checkins__body">
-              @for (r of xlsxCheckins(); track r.nombre) {
-                <tr>
-                  <td>{{ r.nombre }}</td>
-                  <td>{{ r.apartamento ?? '—' }}</td>
-                  <td>{{ r.email ?? '—' }}</td>
-                  <td>{{ r.telefono ?? '—' }}</td>
-                  <td>{{ r.checkout ?? '—' }}</td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        }
+      </app-panel-seccion>
 
-      </div>
-    </app-panel-seccion>
+      <!-- ── Panel derecho: Mensaje ───────────────────────────────────── -->
+      <app-panel-seccion title="Mensaje">
 
-    <!-- ── Sección 3: Maestro de apartamentos (referencia) ───────────── -->
-    <app-panel-seccion
-      title="Maestro de apartamentos"
-      description="Propiedades activas registradas en tu cuenta."
-    >
-      @if (apartamentos().length === 0) {
-        <p class="notif-checkin__aviso" role="note">
-          No hay apartamentos registrados. Añádelos desde el Maestro de apartamentos.
-        </p>
-      } @else {
-        <ul class="notif-checkin__apt-list">
-          @for (apt of apartamentos(); track apt.id) {
-            <li class="notif-checkin__apt-item">
-              <span class="notif-checkin__apt-nombre">{{ apt.nombre }}</span>
-              @if (apt.ciudad) {
-                <span class="notif-checkin__apt-ciudad">{{ apt.ciudad }}</span>
-              }
-            </li>
+        <p class="notif-editor__subtitulo">
+          @if (plantillaSeleccionada()) {
+            Plantilla: <strong>{{ plantillaSeleccionada()!.nombre }}</strong>
+          } @else {
+            Selecciona una plantilla o genera el mensaje automáticamente.
           }
-        </ul>
-      }
-    </app-panel-seccion>
+        </p>
 
-    <!-- ── Sección 4: Enviar notificación ────────────────────────────── -->
-    <app-panel-seccion
-      title="Enviar notificación"
-      description="Personaliza el mensaje y envíalo por email. Puedes generar una plantilla automática a partir de los check-ins cargados o escribir el tuyo propio."
-    >
-      <!-- Aviso Gmail fuera del body principal: usa [pre-body] -->
-      @if (!gmailConfigurado()) {
-        <div class="notif-checkin__gmail-aviso" role="alert" pre-body>
-          <p>
-            <strong>Gmail SMTP no configurado.</strong>
-            Para habilitar el envío de emails, añade
-            <code>GMAIL_USER</code> y <code>GMAIL_APP_PASSWORD</code>
-            en las variables de entorno del servidor.
-          </p>
-        </div>
-      }
-
-      <div class="notif-form">
-
-        <!-- Botón generar plantilla -->
-        <div class="notif-form__plantilla-accion">
+        <div class="notif-editor__generar">
           <app-button
             variant="secondary"
             size="md"
             [disabled]="!hayCheckins()"
-            (click)="generarPlantilla()"
+            (click)="generarMensaje()"
           >
             <span class="btn__icon" aria-hidden="true">
               <svg class="svg svg--sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
@@ -205,98 +291,58 @@
                 <line x1="6" y1="13" x2="11" y2="13" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
               </svg>
             </span>
-            Generar plantilla
+            Generar automáticamente
           </app-button>
           @if (!hayCheckins()) {
-            <span class="notif-form__hint">
-              Carga check-ins desde el PMS o XLSX para generar la plantilla.
-            </span>
+            <p class="notif-form__hint">Carga check-ins desde el PMS o el XLSX.</p>
           }
         </div>
 
-        <!-- Destinatario -->
-        <div class="form-group">
-          <label class="form-label" for="notif-destinatario">Enviar a</label>
-          <input
-            id="notif-destinatario"
-            type="email"
-            class="form-input"
-            placeholder="correo@ejemplo.com"
-            [disabled]="!gmailConfigurado()"
-            [(ngModel)]="destinatario"
-            name="destinatario"
+        <div class="notif-editor__toolbar">
+          <app-dropdown-buscador
+            [options]="tokensOpciones()"
+            placeholder="Insertar variable…"
+            searchPlaceholder="Buscar variable…"
+            emptyMessage="Sin variables"
+            (optionSelected)="onTokenMensajeSel($event)"
           />
-        </div>
-
-        <!-- Asunto -->
-        <div class="form-group">
-          <label class="form-label" for="notif-asunto">Asunto</label>
-          <input
-            id="notif-asunto"
-            type="text"
-            class="form-input"
-            [disabled]="!gmailConfigurado()"
-            [(ngModel)]="asunto"
-            name="asunto"
-          />
-        </div>
-
-        <!-- Mensaje (editable) con botón de copiar -->
-        <div class="form-group">
-          <label class="form-label" for="notif-mensaje">Mensaje</label>
-          <div class="form-editor">
-            <div class="form-editor__header">
-              <div class="form-editor__tabs"></div>
-              <div class="form-editor__toolbar">
-                <button
-                  class="form-editor__tool"
-                  type="button"
-                  [disabled]="!mensaje"
-                  (click)="copiarMensaje()"
-                >
-                  @if (copiadoOk()) { Copiado } @else { Copiar }
-                </button>
-              </div>
-            </div>
-            <div class="form-editor__body">
-              <textarea
-                id="notif-mensaje"
-                class="form-textarea notif-form__textarea"
-                placeholder="Escribe o genera el mensaje de notificación aquí…"
-                [attr.disabled]="!gmailConfigurado() ? '' : null"
-                [(ngModel)]="mensaje"
-                name="mensaje"
-              ></textarea>
-            </div>
-          </div>
-        </div>
-
-        <!-- Acciones envío -->
-        <div class="form-actions">
           <app-button
-            variant="primary"
-            size="md"
-            [disabled]="!gmailConfigurado() || enviando() || !destinatario.trim() || !mensaje.trim()"
-            (click)="enviarNotificacion()"
+            variant="secondary"
+            size="sm"
+            [disabled]="!tokenMensajeSel()"
+            (click)="insertarTokenEnMensaje()"
           >
-            @if (enviando()) { Enviando… } @else { Enviar notificación }
+            Insertar
           </app-button>
         </div>
 
-        <!-- Feedback de envío -->
-        @if (estadoEnvio() === 'ok') {
-          <p class="notif-form__feedback notif-form__feedback--ok" role="status" aria-live="polite">
-            Email enviado correctamente.
-          </p>
-        }
-        @if (estadoEnvio() === 'error') {
-          <p class="notif-form__feedback notif-form__feedback--error" role="alert" aria-live="assertive">
-            {{ errorEnvio() }}
-          </p>
-        }
+        <div class="form-editor">
+          <div class="form-editor__header">
+            <div class="form-editor__tabs"></div>
+            <div class="form-editor__toolbar">
+              <button class="form-editor__tool" type="button" [disabled]="!mensaje" (click)="copiarMensaje()">
+                @if (copiadoOk()) { Copiado } @else { Copiar }
+              </button>
+            </div>
+          </div>
+          <div class="form-editor__body">
+            <textarea
+              #mensajeTextarea
+              id="notif-mensaje"
+              class="form-textarea notif-form__textarea"
+              placeholder="Genera el mensaje o escríbelo aquí…"
+              [(ngModel)]="mensaje"
+              name="mensaje"
+              (click)="onMsgCursor($event)"
+              (keyup)="onMsgCursor($event)"
+              (blur)="onMsgCursor($event)"
+            ></textarea>
+          </div>
+        </div>
 
-      </div>
-    </app-panel-seccion>
+      </app-panel-seccion>
+
+    </div>
 
   }
 

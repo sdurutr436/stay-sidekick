@@ -1,4 +1,4 @@
-<!-- Página: Perfil de usuario -->
+﻿<!-- Página: Perfil de usuario -->
 <div class="perfil-page">
 
   <app-page-header
@@ -441,14 +441,107 @@
 
   </app-panel-seccion>
 
+  <!-- ── Notificaciones de check-in tardío ─────────────────────────────── -->
+  @if (isAdmin()) {
+    <app-panel-seccion title="Notificaciones de check-in tardío" [divider]="true">
+
+      <p class="u-text-secondary u-mb-8">
+        Indica la letra de columna (A, B...) de tu XLSX para cada dato. Vacío = detectar por cabecera.
+      </p>
+
+      @if (notifAlerta()) {
+        <app-alert
+          [type]="notifAlerta()!.tipo"
+          [dismissible]="true"
+          (dismissed)="notifAlerta.set(null)"
+        >
+          {{ notifAlerta()!.mensaje }}
+        </app-alert>
+      }
+
+      <form class="perfil-form" (submit)="$event.preventDefault(); guardarNotifConfig()">
+
+        <app-form-field label="Hora de corte" for="notif-hora-corte">
+          <app-form-input
+            id="notif-hora-corte"
+            type="text"
+            placeholder="20:00"
+            [value]="notifHoraCorte()"
+            (valueChange)="notifHoraCorte.set($event)"
+          />
+          <p class="u-text-secondary u-mt-4">Formato HH:MM.</p>
+        </app-form-field>
+
+        <app-form-field label="Columna XLSX — Nombre del huésped" for="notif-col-nombre">
+          <app-form-input
+            id="notif-col-nombre"
+            type="text"
+            placeholder="A"
+            [value]="notifColNombre()"
+            (valueChange)="notifColNombre.set($event)"
+          />
+        </app-form-field>
+
+        <app-form-field label="Columna XLSX — Fecha de check-in" for="notif-col-checkin">
+          <app-form-input
+            id="notif-col-checkin"
+            type="text"
+            placeholder="B"
+            [value]="notifColCheckin()"
+            (valueChange)="notifColCheckin.set($event)"
+          />
+        </app-form-field>
+
+        <app-form-field label="Columna XLSX — Hora de llegada" for="notif-col-hora-llegada">
+          <app-form-input
+            id="notif-col-hora-llegada"
+            type="text"
+            placeholder="C"
+            [value]="notifColHoraLlegada()"
+            (valueChange)="notifColHoraLlegada.set($event)"
+          />
+        </app-form-field>
+
+        <app-form-field label="Columna XLSX — Teléfono" for="notif-col-telefono">
+          <app-form-input
+            id="notif-col-telefono"
+            type="text"
+            placeholder="D"
+            [value]="notifColTelefono()"
+            (valueChange)="notifColTelefono.set($event)"
+          />
+        </app-form-field>
+
+        <app-form-field label="Columna XLSX — Apartamento" for="notif-col-apartamento">
+          <app-form-input
+            id="notif-col-apartamento"
+            type="text"
+            placeholder="E"
+            [value]="notifColApartamento()"
+            (valueChange)="notifColApartamento.set($event)"
+          />
+        </app-form-field>
+
+        <app-button
+          type="submit"
+          variant="secondary"
+          size="md"
+          [disabled]="notifGuardando()"
+        >
+          {{ notifGuardando() ? 'Guardando…' : 'Guardar configuración' }}
+        </app-button>
+
+      </form>
+
+    </app-panel-seccion>
+  }
+
   <!-- ── Mapa de calor — Columnas XLSX (solo sin PMS) ─────────────────── -->
   @if (!integraciones()?.pms?.configurado) {
     <app-panel-seccion title="Mapa de calor — Columnas XLSX" [divider]="true">
 
       <p class="u-text-secondary u-mb-8">
-        Indica la letra de la columna (A, B, C…) de tu archivo XLSX que
-        contiene la fecha de cada movimiento. La primera fila de cabeceras
-        se descarta automáticamente.
+        Indica la letra de columna (A, B...) que contiene la fecha de cada movimiento.
       </p>
 
       @if (!isAdmin()) {
