@@ -1,4 +1,4 @@
-<!-- Página: Perfil de usuario -->
+﻿<!-- Página: Perfil de usuario -->
 <div class="perfil-page">
 
   <app-page-header
@@ -443,10 +443,10 @@
 
   <!-- ── Notificaciones de check-in tardío ─────────────────────────────── -->
   @if (isAdmin()) {
-    <app-panel-seccion title="Notificaciones de check-in tard\u00edo" [divider]="true">
+    <app-panel-seccion title="Notificaciones de check-in tardío" [divider]="true">
 
       <p class="u-text-secondary u-mb-8">
-        Indica la letra de columna (A, B\u2026) de tu XLSX para cada dato. Vac\u00edo = detectar por cabecera.
+        Indica la letra de columna (A, B...) de tu XLSX para cada dato. Vacío = detectar por cabecera.
       </p>
 
       @if (notifAlerta()) {
@@ -472,7 +472,7 @@
           <p class="u-text-secondary u-mt-4">Formato HH:MM.</p>
         </app-form-field>
 
-        <app-form-field label="Columna XLSX \u2014 Nombre del hu\u00e9sped" for="notif-col-nombre">
+        <app-form-field label="Columna XLSX — Nombre del huésped" for="notif-col-nombre">
           <app-form-input
             id="notif-col-nombre"
             type="text"
@@ -482,7 +482,7 @@
           />
         </app-form-field>
 
-        <app-form-field label="Columna XLSX \u2014 Fecha de check-in" for="notif-col-checkin">
+        <app-form-field label="Columna XLSX — Fecha de check-in" for="notif-col-checkin">
           <app-form-input
             id="notif-col-checkin"
             type="text"
@@ -492,7 +492,7 @@
           />
         </app-form-field>
 
-        <app-form-field label="Columna XLSX \u2014 Hora de llegada" for="notif-col-hora-llegada">
+        <app-form-field label="Columna XLSX — Hora de llegada" for="notif-col-hora-llegada">
           <app-form-input
             id="notif-col-hora-llegada"
             type="text"
@@ -502,7 +502,7 @@
           />
         </app-form-field>
 
-        <app-form-field label="Columna XLSX \u2014 Tel\u00e9fono" for="notif-col-telefono">
+        <app-form-field label="Columna XLSX — Teléfono" for="notif-col-telefono">
           <app-form-input
             id="notif-col-telefono"
             type="text"
@@ -512,7 +512,7 @@
           />
         </app-form-field>
 
-        <app-form-field label="Columna XLSX \u2014 Apartamento" for="notif-col-apartamento">
+        <app-form-field label="Columna XLSX — Apartamento" for="notif-col-apartamento">
           <app-form-input
             id="notif-col-apartamento"
             type="text"
@@ -528,7 +528,7 @@
           size="md"
           [disabled]="notifGuardando()"
         >
-          {{ notifGuardando() ? 'Guardando\u2026' : 'Guardar configuraci\u00f3n' }}
+          {{ notifGuardando() ? 'Guardando…' : 'Guardar configuración' }}
         </app-button>
 
       </form>
@@ -541,7 +541,7 @@
     <app-panel-seccion title="Mapa de calor — Columnas XLSX" [divider]="true">
 
       <p class="u-text-secondary u-mb-8">
-        Indica la letra de columna (A, B…) que contiene la fecha de cada movimiento.
+        Indica la letra de columna (A, B...) que contiene la fecha de cada movimiento.
       </p>
 
       @if (!isAdmin()) {
