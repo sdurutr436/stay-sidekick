@@ -1,14 +1,14 @@
 // =============================================================================
 // COMPONENTS: NOTIFICACIONES CHECK-IN TARDÍOS (página)
 //
-// Organismos propios:
-//   .notif-checkin          — wrapper principal de página
-//   .tabla-checkins         — tabla ligera de check-ins (sin toolbar ni selección)
-//   .notif-form             — formulario de envío de notificación
-//
-// Nota: .panel-seccion, .xlsx-import, .form-actions, .form-group, .form-label,
-//       .form-input, .form-textarea, .form-editor están definidos en sus
-//       archivos ITCSS correspondientes. No se redefinen aquí.
+// Layout:
+//   .notif-checkin          — wrapper principal
+//   .notif-checkin__estados — grid de tarjetas de estado
+//   .notif-layout           — grid 2 columnas (sidebar | editor)
+//   .notif-sidebar          — panel izquierdo: lista de plantillas
+//   .notif-editor           — panel derecho: compositor / editor de plantilla
+//   .tabla-checkins         — tabla de check-ins del XLSX
+//   .xlsx-import            — fila de importación de archivo
 // =============================================================================
 
 // ── Wrapper de página ─────────────────────────────────────────────────────
@@ -21,7 +21,7 @@
   gap: $space-8;
 }
 
-// ── Fila de tarjetas de estado ────────────────────────────────────────────
+// ── Tarjetas de estado ────────────────────────────────────────────────────
 
 .notif-checkin__estados {
   display: grid;
@@ -40,77 +40,7 @@
   color: $color-text-secondary;
 }
 
-// ── Aviso genérico (nota informativa / error) ─────────────────────────────
-
-.notif-checkin__aviso {
-  @include text-body-sm;
-  color: $color-text-secondary;
-  padding: $space-3 $space-4;
-  border: $border-width $border-style $color-border;
-  background-color: $color-surface-alt;
-
-  &--error {
-    border-left: 3px solid $color-gray-700;
-    color: $color-gray-700;
-    background-color: $color-surface;
-  }
-}
-
-// ── Aviso Gmail no configurado ────────────────────────────────────────────
-
-.notif-checkin__gmail-aviso {
-  padding: $space-4;
-  border: $border-width $border-style $color-border;
-  border-left: 3px solid $color-gray-700;
-  background-color: $color-surface-alt;
-  margin-bottom: $space-4;
-
-  p {
-    @include text-body-sm;
-    color: $color-text-primary;
-    margin: 0;
-  }
-
-  code {
-    font-family: monospace;
-    @include text-caption-md;
-    background-color: $color-gray-200;
-    padding: 0.1em 0.35em;
-  }
-}
-
-// ── Lista de apartamentos de referencia ──────────────────────────────────
-
-.notif-checkin__apt-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: $space-2;
-}
-
-.notif-checkin__apt-item {
-  display: flex;
-  align-items: baseline;
-  gap: $space-3;
-  padding: $space-2 $space-4;
-  border: $border-width $border-style $color-border;
-  background-color: $color-surface-alt;
-}
-
-.notif-checkin__apt-nombre {
-  @include text-body-md;
-  font-weight: $font-weight-label;
-  color: $color-text-primary;
-}
-
-.notif-checkin__apt-ciudad {
-  @include text-caption-md;
-  color: $color-text-secondary;
-}
-
-// ── Importación XLSX ─────────────────────────────────────────────────────
+// ── Importación XLSX ──────────────────────────────────────────────────────
 
 .xlsx-import {
   display: flex;
@@ -134,103 +64,19 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    max-width: 20ch;
+    max-width: 24ch;
   }
-}
 
-// ── Referencia de tokens/variables ───────────────────────────────────────
-
-.notif-plantillas__tokens {
-  display: flex;
-  flex-direction: column;
-  gap: $space-2;
-  padding: $space-3 $space-4;
-  background-color: $color-surface-alt;
-  border: $border-width $border-style $color-border;
-}
-
-.notif-plantillas__tokens-label {
-  @include text-label-sm;
-  color: $color-text-secondary;
-}
-
-.notif-plantillas__tokens-lista {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: $space-2 $space-5;
-
-  li {
+  &__limpiar {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0 $space-2;
     @include text-body-sm;
-    color: $color-text-primary;
+    color: $color-text-secondary;
+
+    &:hover { color: $color-text-primary; }
   }
-
-  code {
-    font-family: monospace;
-    @include text-caption-md;
-    background-color: $color-gray-200;
-    padding: 0.1em 0.35em;
-    color: $color-text-primary;
-  }
-}
-
-// ── Lista de plantillas ───────────────────────────────────────────────────
-
-.notif-plantillas {
-  display: flex;
-  flex-direction: column;
-  gap: $space-5;
-}
-
-.notif-plantillas__lista {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: $space-1;
-}
-
-.notif-plantillas__item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: $space-2 $space-4;
-  border: $border-width $border-style $color-border;
-  background-color: $color-surface;
-
-  &--activo {
-    border-color: $color-gray-500;
-    background-color: $color-surface-alt;
-  }
-}
-
-.notif-plantillas__nombre {
-  @include text-body-md;
-  color: $color-text-primary;
-}
-
-.notif-plantillas__vacia {
-  @include text-body-sm;
-  color: $color-text-secondary;
-}
-
-.notif-plantillas__nueva-wrap {
-  display: flex;
-  flex-direction: column;
-  gap: $space-4;
-}
-
-.notif-plantillas__nueva {
-  display: flex;
-  flex-direction: column;
-  gap: $space-4;
-  padding: $space-4;
-  border: $border-width $border-style $color-border;
-  background-color: $color-surface-alt;
-  max-width: 36rem;
 }
 
 // ── Advertencias del XLSX ─────────────────────────────────────────────────
@@ -249,37 +95,27 @@
 }
 
 // ── Tabla de check-ins ────────────────────────────────────────────────────
-// Tabla ligera de sólo lectura (no reutiliza .tabla-crud para no arrastrar
-// la lógica de toolbar, selección múltiple y footer).
 
 .tabla-checkins {
   width: 100%;
   border-collapse: collapse;
   @include text-body-sm;
 
-  &__head {
-    th {
-      text-align: left;
-      padding: $space-2 $space-4;
-      @include text-label-sm;
-      color: $color-text-secondary;
-      white-space: nowrap;
-      background-color: $color-surface-alt;
-      border-bottom: $border-width $border-style $color-border;
-    }
+  &__head th {
+    text-align: left;
+    padding: $space-2 $space-4;
+    @include text-label-sm;
+    color: $color-text-secondary;
+    white-space: nowrap;
+    background-color: $color-surface-alt;
+    border-bottom: $border-width $border-style $color-border;
   }
 
   &__body {
     tr {
       border-bottom: $border-width $border-style $color-border;
-
-      &:last-child {
-        border-bottom: none;
-      }
-
-      &:hover {
-        background-color: $color-gray-50;
-      }
+      &:last-child { border-bottom: none; }
+      &:hover { background-color: $color-gray-50; }
     }
 
     td {
@@ -290,56 +126,169 @@
   }
 }
 
-// ── Formulario de notificación ────────────────────────────────────────────
+// ── Layout 2 columnas (Plantillas | Editor) ───────────────────────────────
 
-.notif-form {
+.notif-layout {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: $space-6;
+  align-items: start;
+
+  @include respond-until('md') {
+    grid-template-columns: 1fr;
+  }
+}
+
+// ── Sidebar de plantillas ─────────────────────────────────────────────────
+
+.notif-sidebar {
+  border: $border-width $border-style $color-border;
   display: flex;
   flex-direction: column;
-  gap: $space-5;
-  max-width: 48rem;
+  overflow: hidden;
 
-  // Fila "Generar plantilla" + hint
-  &__plantilla-accion {
+  &__search-wrap {
+    padding: $space-3;
+    border-bottom: $border-width $border-style $color-border;
+  }
+
+  &__nueva-wrap {
+    padding: $space-3;
+    border-bottom: $border-width $border-style $color-border;
+  }
+
+  &__nueva-btn {
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+    width: 100%;
+    padding: $space-2 $space-3;
+    background: none;
+    border: $border-width dashed $color-border;
+    cursor: pointer;
+    @include text-body-sm;
+    color: $color-text-secondary;
+    transition: background-color var(--transition-base);
+
+    &:hover { background-color: $color-gray-100; }
+
+    &--activo {
+      background-color: $color-gray-200;
+      border-style: solid;
+      color: $color-text-primary;
+    }
+  }
+
+  &__list {
+    list-style: none;
+    margin: 0;
+    padding: $space-2 0;
+    max-height: 420px;
+    overflow-y: auto;
+  }
+
+  &__item {
+    padding: $space-2 $space-4;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $space-2;
+    transition: background-color var(--transition-base);
+
+    &:hover { background-color: $color-gray-100; }
+
+    &--activo {
+      background-color: $color-gray-200;
+      .notif-sidebar__item-nombre { font-weight: $font-weight-heading; }
+    }
+  }
+
+  &__item-nombre {
+    @include text-body-sm;
+    color: $color-text-primary;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1;
+  }
+
+  &__item-acciones {
+    display: flex;
+    gap: $space-1;
+    flex-shrink: 0;
+  }
+
+  &__item-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: $space-1;
+    color: $color-text-secondary;
+    display: flex;
+    align-items: center;
+
+    &:hover { color: $color-text-primary; }
+    &--danger:hover { color: $color-gray-700; }
+  }
+
+  &__empty {
+    padding: $space-4;
+    @include text-body-sm;
+    color: $color-text-secondary;
+    text-align: center;
+  }
+}
+
+// ── Editor / compositor ───────────────────────────────────────────────────
+
+.notif-editor {
+  display: flex;
+  flex-direction: column;
+  gap: $space-4;
+
+  &__subtitulo {
+    @include text-body-sm;
+    color: $color-text-secondary;
+    margin: 0;
+  }
+
+  &__toolbar {
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+    flex-wrap: wrap;
+  }
+
+  &__textarea {
+    min-height: 12rem;
+  }
+
+  &__acciones {
+    display: flex;
+    gap: $space-3;
+    flex-wrap: wrap;
+  }
+
+  &__generar {
     display: flex;
     align-items: center;
     gap: $space-4;
     flex-wrap: wrap;
   }
-
-  &__hint {
-    @include text-caption-md;
-    color: $color-text-secondary;
-  }
-
-  // Ajuste del form-editor para el área de mensaje:
-  // sin borde-left en la barra (no hay pestañas a su izquierda).
-  .form-editor__toolbar {
-    border-left: none;
-  }
-
-  // Textarea del mensaje — anula el min-height por defecto del form-textarea
-  // y permite redimensión vertical cómoda.
-  .form-textarea {
-    min-height: 14rem;
-  }
 }
 
-// ── Feedback de envío ─────────────────────────────────────────────────────
+// ── Mensaje ───────────────────────────────────────────────────────────────
 
-.notif-form__feedback {
-  @include text-body-sm;
-  padding: $space-3 $space-4;
-  border: $border-width $border-style $color-border;
+.notif-form__hint {
+  @include text-caption-md;
+  color: $color-text-secondary;
+}
 
-  &--ok {
-    border-left: 3px solid $color-gray-500;
-    color: $color-text-primary;
-    background-color: $color-surface-alt;
-  }
+.notif-form__textarea {
+  min-height: 14rem;
+}
 
-  &--error {
-    border-left: 3px solid $color-gray-700;
-    color: $color-gray-700;
-    background-color: $color-surface;
-  }
+.notif-editor .form-editor__toolbar {
+  border-left: none;
 }

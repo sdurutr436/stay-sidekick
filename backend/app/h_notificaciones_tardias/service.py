@@ -157,13 +157,15 @@ def enviar_notificacion(
 
 def _reserva_a_dict(r, apartamentos_por_externo: dict | None = None) -> dict:
     direccion = None
+    nombre_apt = r.nombre_apartamento
     if apartamentos_por_externo and r.id_apartamento_externo:
         apt = apartamentos_por_externo.get(r.id_apartamento_externo)
         if apt:
             direccion = apt.direccion
+            nombre_apt = apt.nombre
     return {
         "nombre": r.nombre_raw,
-        "apartamento": r.nombre_apartamento,
+        "apartamento": nombre_apt,
         "email": r.email,
         "telefono": r.telefono,
         "checkin": r.checkin,

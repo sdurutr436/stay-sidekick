@@ -445,6 +445,10 @@
   @if (isAdmin()) {
     <app-panel-seccion title="Notificaciones de check-in tard\u00edo" [divider]="true">
 
+      <p class="u-text-secondary u-mb-8">
+        Indica la letra de columna (A, B\u2026) de tu XLSX para cada dato. Vac\u00edo = detectar por cabecera.
+      </p>
+
       @if (notifAlerta()) {
         <app-alert
           [type]="notifAlerta()!.tipo"
@@ -465,7 +469,7 @@
             [value]="notifHoraCorte()"
             (valueChange)="notifHoraCorte.set($event)"
           />
-          <p class="u-text-secondary u-mt-4">Formato HH:MM (ej. 20:00).</p>
+          <p class="u-text-secondary u-mt-4">Formato HH:MM.</p>
         </app-form-field>
 
         <app-form-field label="Columna XLSX \u2014 Nombre del hu\u00e9sped" for="notif-col-nombre">
@@ -476,7 +480,6 @@
             [value]="notifColNombre()"
             (valueChange)="notifColNombre.set($event)"
           />
-          <p class="u-text-secondary u-mt-4">Letra A-Z o AA-AZ. Vac\u00edo = detectar por cabecera.</p>
         </app-form-field>
 
         <app-form-field label="Columna XLSX \u2014 Fecha de check-in" for="notif-col-checkin">
@@ -487,7 +490,6 @@
             [value]="notifColCheckin()"
             (valueChange)="notifColCheckin.set($event)"
           />
-          <p class="u-text-secondary u-mt-4">Letra A-Z o AA-AZ. Vac\u00edo = detectar por cabecera.</p>
         </app-form-field>
 
         <app-form-field label="Columna XLSX \u2014 Hora de llegada" for="notif-col-hora-llegada">
@@ -498,7 +500,6 @@
             [value]="notifColHoraLlegada()"
             (valueChange)="notifColHoraLlegada.set($event)"
           />
-          <p class="u-text-secondary u-mt-4">Letra A-Z o AA-AZ. Vac\u00edo = detectar por cabecera.</p>
         </app-form-field>
 
         <app-form-field label="Columna XLSX \u2014 Tel\u00e9fono" for="notif-col-telefono">
@@ -509,7 +510,6 @@
             [value]="notifColTelefono()"
             (valueChange)="notifColTelefono.set($event)"
           />
-          <p class="u-text-secondary u-mt-4">Letra A-Z o AA-AZ. Vac\u00edo = detectar por cabecera.</p>
         </app-form-field>
 
         <app-form-field label="Columna XLSX \u2014 Apartamento" for="notif-col-apartamento">
@@ -520,7 +520,6 @@
             [value]="notifColApartamento()"
             (valueChange)="notifColApartamento.set($event)"
           />
-          <p class="u-text-secondary u-mt-4">Letra A-Z o AA-AZ. Vac\u00edo = detectar por cabecera.</p>
         </app-form-field>
 
         <app-button
@@ -542,9 +541,7 @@
     <app-panel-seccion title="Mapa de calor — Columnas XLSX" [divider]="true">
 
       <p class="u-text-secondary u-mb-8">
-        Indica la letra de la columna (A, B, C…) de tu archivo XLSX que
-        contiene la fecha de cada movimiento. La primera fila de cabeceras
-        se descarta automáticamente.
+        Indica la letra de columna (A, B…) que contiene la fecha de cada movimiento.
       </p>
 
       @if (!isAdmin()) {
