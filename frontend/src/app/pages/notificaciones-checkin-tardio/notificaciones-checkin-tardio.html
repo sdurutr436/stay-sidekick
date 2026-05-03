@@ -28,6 +28,39 @@
     <p class="notif-checkin__cargando" aria-live="polite">Cargando datos…</p>
   } @else {
 
+    <!-- ── Sección 0: Estado de la herramienta ─────────────────────── -->
+    <app-panel-seccion title="Estado">
+      <div class="notif-checkin__estados">
+
+        <app-tarjeta-estado label="Estado PMS" valor="">
+          <svg icon class="svg svg--xs" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            @if (pmsConfigurado()) {
+              <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/>
+              <polyline points="5,8 7,10 11,6" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="square"/>
+            } @else {
+              <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/>
+              <line x1="8" y1="5" x2="8" y2="9" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
+              <circle cx="8" cy="11.5" r="0.75" fill="currentColor"/>
+            }
+          </svg>
+          <ng-container actions>
+            @if (pmsConfigurado()) {
+              <app-badge variant="solid">Conectado</app-badge>
+            } @else {
+              <app-badge variant="outline">Sin PMS</app-badge>
+            }
+          </ng-container>
+        </app-tarjeta-estado>
+
+        <app-tarjeta-estado label="Hora de corte" [valor]="horaCortePerfil()">
+          <ng-container actions>
+            Configurable en <a routerLink="/perfil">Perfil</a>
+          </ng-container>
+        </app-tarjeta-estado>
+
+      </div>
+    </app-panel-seccion>
+
     <!-- ── Sección 1: Importar desde XLSX (solo sin PMS) ───────────── -->
     @if (!pmsConfigurado()) {
       <app-panel-seccion title="Importar reservas del día (XLSX)">
