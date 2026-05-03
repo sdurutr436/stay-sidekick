@@ -3,6 +3,7 @@ layout: base.njk
 title: Inicio
 description: Stay Sidekick — La plataforma para gestionar tus solicitudes de estancia.
 ---
+{% import "macros/atoms.njk" as atoms %}
 
 <section class="l-container u-text-center" style="padding-block: var(--space-16);">
   <h1>Stay Sidekick</h1>
@@ -10,7 +11,7 @@ description: Stay Sidekick — La plataforma para gestionar tus solicitudes de e
     Página de inicio en construcción. Vuelve pronto.
   </p>
   <div class="l-flex l-flex--center l-flex--gap-3 u-mt-8">
-    <a href="/app/solicitud" class="btn btn--primary btn--lg">Presentar solicitud</a>
-    <a href="/app/login" class="btn btn--secondary btn--lg">Iniciar sesión</a>
+    {{ atoms.button('Presentar solicitud', '/app/solicitud', 'primary', 'lg') }}
+    {{ atoms.button('Iniciar sesión', '/app/login', 'secondary', 'lg') }}
   </div>
 </section>

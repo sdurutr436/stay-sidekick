@@ -1,10 +1,83 @@
 ---
 layout: base.njk
 title: Precios
+description: Consulta los precios de Stay Sidekick — planes para empresas de alquiler vacacional.
 section: producto
+permalink: /precios/
 ---
 
-<section class="l-container">
-  <h1>Precios</h1>
-  <p class="u-text-secondary u-mt-4">Esta sección está en construcción.</p>
-</section>
+{% import "macros/atoms.njk" as atoms %}
+{% import "macros/molecules.njk" as molecules %}
+{% import "macros/organisms.njk" as organisms %}
+
+<div class="web-page">
+
+  {{ organisms.pageHeader('Precios', 'Transparencia total: lo que pagas y para qué sirve cada concepto.') }}
+
+  <section class="web-page__section web-page__section--last" aria-labelledby="precios-tabla-titulo">
+    <h2 id="precios-tabla-titulo" class="u-sr-only">Tabla de precios</h2>
+
+    <div class="web-page__price-grid">
+
+      {# Hosting #}
+      {% call molecules.card() %}
+        <h3>Hosting</h3>
+        <p class="u-text-secondary">Infraestructura en la nube (Railway)</p>
+        <p><strong>0 €/mes</strong> <span class="u-text-secondary">(MVP)</span></p>
+        <p class="u-text-secondary">
+          Gratuito durante el desarrollo. Precio futuro estimado: 9 €/mes en plan de producción.
+        </p>
+      {% endcall %}
+
+      {# Seguridad #}
+      {% call molecules.card() %}
+        <h3>Seguridad</h3>
+        <p class="u-text-secondary">SSL, backups y encriptación</p>
+        <p><strong>Incluido</strong> en el plan base</p>
+        <p class="u-text-secondary">
+          HTTPS obligatorio, cifrado Fernet para datos sensibles y copias de seguridad automáticas.
+        </p>
+      {% endcall %}
+
+      {# Cuenta de empresa #}
+      {% call molecules.card() %}
+        <h3>Cuenta de empresa</h3>
+        <p class="u-text-secondary">Hasta 5 usuarios incluidos</p>
+        <p><strong>29 €/mes</strong></p>
+        <p class="u-text-secondary">
+          Plan estándar para pequeñas y medianas empresas del sector vacacional.
+        </p>
+      {% endcall %}
+
+      {# Usuarios extra #}
+      {% call molecules.card() %}
+        <h3>Usuarios extra</h3>
+        <p class="u-text-secondary">A partir del usuario 6</p>
+        <p><strong>7 €/usuario/mes</strong></p>
+        <p class="u-text-secondary">
+          Sin límite de usuarios adicionales. Escala según el tamaño de tu equipo.
+        </p>
+      {% endcall %}
+
+      {# Desarrollo personalizado #}
+      {% call molecules.card() %}
+        <h3>Desarrollo personalizado</h3>
+        <p class="u-text-secondary">Nueva herramienta a medida</p>
+        <p><strong>Desde 400 €</strong></p>
+        <p class="u-text-secondary">
+          Estimación media: 2–4 semanas según la complejidad del flujo de trabajo.
+        </p>
+      {% endcall %}
+
+    </div>
+
+    <aside class="web-page__note" role="note" aria-label="Nota sobre período gratuito">
+      <p>
+        <strong>Acceso gratuito hasta mayo de 2026</strong> para empresas colaboradoras del MVP.
+        Los precios indicados son orientativos y pueden variar antes del lanzamiento oficial.
+      </p>
+    </aside>
+
+  </section>
+
+</div>

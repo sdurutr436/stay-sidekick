@@ -1,10 +1,84 @@
 ---
 layout: base.njk
 title: Sobre nosotros
+description: Conoce a Sergio Durán Utrera, el autor de Stay Sidekick.
 section: empresa
 ---
 
-<section class="l-container">
-  <h1>Sobre nosotros</h1>
-  <p class="u-text-secondary u-mt-4">Esta sección está en construcción.</p>
-</section>
+{% import "macros/atoms.njk" as atoms %}
+{% import "macros/organisms.njk" as organisms %}
+
+<div class="web-page">
+
+  {{ organisms.pageHeader('Sobre nosotros', 'El proyecto y la persona detrás de Stay Sidekick.') }}
+
+  <section class="web-page__section web-page__section--last" aria-labelledby="sobre-autor">
+    <div class="web-page__two-col">
+
+      {# Foto de perfil #}
+      <figure>
+        {# TODO: Añadir foto de perfil en /assets/img/sergio.jpg #}
+        <img
+          class="web-page__profile-img"
+          src="/assets/img/sergio.jpg"
+          alt="Foto de perfil de Sergio Durán Utrera"
+          loading="lazy"
+          width="300"
+          height="300"
+        >
+      </figure>
+
+      {# Datos del autor #}
+      <div>
+        <h2 id="sobre-autor">Sergio Durán Utrera</h2>
+        <p>
+          Estudiante de 2.º de DAW (Desarrollo de Aplicaciones Web) en el
+          <strong>IES Rafael Alberti, Cádiz</strong>.
+        </p>
+
+        <h3>Experiencia previa</h3>
+        <p>
+          Antes de iniciar el ciclo formativo, trabajé durante <strong>2 años y 5 meses</strong>
+          como <strong>recepcionista en una empresa de gestión de apartamentos vacacionales</strong>.
+          Esa experiencia me permitió vivir de primera mano los flujos operativos reales:
+          coordinación de limpiezas, gestión de check-ins tardíos, comunicación con huéspedes
+          y el trabajo diario con PMS.
+        </p>
+
+        <h3>El origen del proyecto</h3>
+        <p>
+          Stay Sidekick nació de la observación directa de tareas repetitivas que los PMS
+          no cubren bien: exportar contactos manualmente, detectar llegadas tardías sin
+          automatización, gestionar bases de datos de alojamientos en hojas de cálculo o
+          escribir el mismo mensaje de bienvenida una y otra vez con pequeñas variaciones.
+          Conversaciones con compañeros del sector operativo y de limpieza confirmaron que
+          estos problemas eran transversales a muchas empresas del sector.
+        </p>
+
+        <nav aria-label="Redes sociales y contacto de Sergio Durán Utrera">
+          <ul class="web-page__links web-page__links--row">
+            <li>
+              <a href="https://github.com/sdurutr436" target="_blank" rel="noopener noreferrer"
+                 aria-label="Perfil de GitHub de Sergio Durán Utrera">
+                GitHub
+              </a>
+            </li>
+            <li>
+              <a href="https://www.linkedin.com/in/sergio-dur%C3%A1n-utrera/" target="_blank" rel="noopener noreferrer"
+                 aria-label="Perfil de LinkedIn de Sergio Durán Utrera">
+                LinkedIn
+              </a>
+            </li>
+            <li>
+              <a href="mailto:duran.utrerasergio2612@gmail.com">
+                duran.utrerasergio2612@gmail.com
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+
+    </div>
+  </section>
+
+</div>

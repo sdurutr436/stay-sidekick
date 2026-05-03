@@ -1,10 +1,118 @@
 ---
 layout: base.njk
 title: Contacto
+description: Ponte en contacto con Stay Sidekick.
 section: empresa
 ---
 
-<section class="l-container">
-  <h1>Contacto</h1>
-  <p class="u-text-secondary u-mt-4">Esta sección está en construcción.</p>
-</section>
+{% import "macros/atoms.njk" as atoms %}
+{% import "macros/molecules.njk" as molecules %}
+{% import "macros/organisms.njk" as organisms %}
+
+<div class="web-page">
+
+  {{ organisms.pageHeader('Contacto', '¿Tienes alguna pregunta, propuesta o quieres colaborar? Escríbenos.') }}
+
+  <div class="web-page__two-col web-page__section web-page__section--last">
+
+    {# Columna izquierda: info de contacto #}
+    <aside aria-label="Información de contacto directo">
+      <h2>Contacto directo</h2>
+      <p class="u-text-secondary">
+        Prefiero el correo electrónico para consultas detalladas. También puedes encontrarme
+        en las redes profesionales.
+      </p>
+
+      <ul class="web-page__links">
+        <li>
+          <a href="mailto:duran.utrerasergio2612@gmail.com" aria-label="Enviar correo a duran.utrerasergio2612@gmail.com">
+            duran.utrerasergio2612@gmail.com
+          </a>
+        </li>
+        <li>
+          <a href="https://www.linkedin.com/in/sergio-dur%C3%A1n-utrera/" target="_blank" rel="noopener noreferrer"
+             aria-label="Perfil de LinkedIn de Sergio Durán Utrera">
+            LinkedIn
+          </a>
+        </li>
+        <li>
+          <a href="https://github.com/sdurutr436" target="_blank" rel="noopener noreferrer"
+             aria-label="Perfil de GitHub de Sergio Durán Utrera">
+            GitHub
+          </a>
+        </li>
+      </ul>
+    </aside>
+
+    {# Columna derecha: formulario #}
+    <section aria-labelledby="contacto-formulario-titulo">
+      <h2 id="contacto-formulario-titulo">Enviar un mensaje</h2>
+
+      {# TODO: Conectar al endpoint serverless cuando esté disponible #}
+      <form
+        class="form"
+        method="post"
+        action=""
+        novalidate
+      >
+
+        {% call molecules.formField('Nombre', 'contacto-nombre') %}
+          <input
+            class="form-input"
+            type="text"
+            id="contacto-nombre"
+            name="nombre"
+            placeholder="Tu nombre completo"
+            autocomplete="name"
+            maxlength="100"
+            required
+          >
+        {% endcall %}
+
+        {% call molecules.formField('Correo electrónico', 'contacto-email') %}
+          <input
+            class="form-input"
+            type="email"
+            id="contacto-email"
+            name="email"
+            placeholder="tu@correo.com"
+            autocomplete="email"
+            maxlength="254"
+            required
+          >
+        {% endcall %}
+
+        {% call molecules.formField('Empresa (opcional)', 'contacto-empresa') %}
+          <input
+            class="form-input"
+            type="text"
+            id="contacto-empresa"
+            name="empresa"
+            placeholder="Nombre de tu empresa"
+            autocomplete="organization"
+            maxlength="150"
+          >
+        {% endcall %}
+
+        {% call molecules.formField('Mensaje', 'contacto-mensaje') %}
+          <textarea
+            class="form-input"
+            id="contacto-mensaje"
+            name="mensaje"
+            placeholder="Cuéntanos en qué podemos ayudarte..."
+            rows="5"
+            maxlength="2000"
+            required
+          ></textarea>
+        {% endcall %}
+
+        {# TODO: Insertar widget Turnstile aquí — ver docs/todo/turnstile.md #}
+
+        {{ atoms.button('Enviar mensaje', '', 'primary', 'md', false, 'submit') }}
+
+      </form>
+    </section>
+
+  </div>
+
+</div>

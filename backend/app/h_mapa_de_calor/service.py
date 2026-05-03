@@ -95,8 +95,8 @@ def generar_desde_pms(
         reservas_checkin = client.fetch_reservations(desde=desde_str, hasta=hasta_str)
         reservas_checkout = client.fetch_by_departure(desde_str, hasta_str)
     except (requests.RequestException, ValueError, NotImplementedError) as exc:
-        logger.error("Error al obtener reservas del PMS para heatmap: %s", exc)
-        return None, f"Error al obtener datos del PMS: {exc}"
+        logger.error("Error al obtener reservas del PMS para heatmap [empresa=%s]: %s", empresa_id, exc, exc_info=True)
+        return None, "Error al obtener datos del PMS. Inténtalo de nuevo."
 
     checkins: dict[str, int] = {}
     for r in reservas_checkin:
@@ -229,7 +229,8 @@ def _parsear_xlsx_fechas(
     try:
         wb = _sanitize_xlsx(file_bytes)
     except Exception as exc:
-        return {}, [], f"No se pudo abrir el archivo Excel: {exc}"
+        logger.error("Error al abrir XLSX para heatmap: %s", exc, exc_info=True)
+        return {}, [], "No se pudo abrir el archivo Excel. Comprueba que el fichero no está dañado."
 
     try:
         ws = wb.active

@@ -4,6 +4,8 @@
   BEM: .form-solicitud (organismo)
   Wireframe: estilos blocky, escala de grises
 #}
+{% import "macros/atoms.njk" as atoms %}
+{% import "macros/molecules.njk" as molecules %}
 
 <form
   class="form-solicitud"
@@ -28,9 +30,8 @@
   {# ── Datos de la empresa ───────────────────────────────────────────── #}
   <div class="form-solicitud__section">
 
-    <div class="form-field">
-      <label class="form-label" for="empresa-nombre">Nombre de la empresa</label>
-      <div class="form-input-wrapper">
+    {% call molecules.formField('Nombre de la empresa', 'empresa-nombre') %}
+      {% call molecules.formInputIcon() %}
         <span class="form-input-wrapper__icon" aria-hidden="true">
           <svg class="svg svg--md" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
             <rect x="3" y="3" width="18" height="18" stroke="currentColor" stroke-width="1.5"/>
@@ -48,12 +49,11 @@
           autocomplete="organization"
           maxlength="150"
         />
-      </div>
-    </div>
+      {% endcall %}
+    {% endcall %}
 
-    <div class="form-field">
-      <label class="form-label" for="empresa-correo">Correo de contacto</label>
-      <div class="form-input-wrapper">
+    {% call molecules.formField('Correo de contacto', 'empresa-correo') %}
+      {% call molecules.formInputIcon() %}
         <span class="form-input-wrapper__icon" aria-hidden="true">
           <svg class="svg svg--md" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
             <rect x="3" y="5" width="18" height="14" stroke="currentColor" stroke-width="1.5"/>
@@ -69,16 +69,15 @@
           autocomplete="email"
           maxlength="254"
         />
-      </div>
-    </div>
+      {% endcall %}
+    {% endcall %}
 
     {# Prefijo fijo España — no visible #}
     <input type="hidden" name="country_code" value="ES" />
 
     {# ── Teléfono ─────────────────────────────────────────────────────── #}
-    <div class="form-field">
-      <label class="form-label" for="empresa-telefono">Teléfono de contacto</label>
-      <div class="form-input-wrapper">
+    {% call molecules.formField('Teléfono de contacto', 'empresa-telefono') %}
+      {% call molecules.formInputIcon() %}
         <span class="form-input-wrapper__icon" aria-hidden="true">
           <svg class="svg svg--md" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
             <rect x="5" y="2" width="14" height="20" stroke="currentColor" stroke-width="1.5"/>
@@ -95,8 +94,8 @@
           autocomplete="tel-national"
           maxlength="20"
         />
-      </div>
-    </div>
+      {% endcall %}
+    {% endcall %}
 
   </div>
 
@@ -137,8 +136,7 @@
     aria-live="polite"
     aria-hidden="true"
   >
-    <div class="form-field">
-      <label class="form-label" for="solicitud-detalle">Cuéntanos tu situación</label>
+    {% call molecules.formField('Cuéntanos tu situación', 'solicitud-detalle') %}
       <p class="form-solicitud__helper">
         Incluye todos los detalles que normalmente enviarías por correo o Discord.
       </p>
@@ -161,7 +159,7 @@
           ></textarea>
         </div>
       </div>
-    </div>
+    {% endcall %}
   </div>
 
   {# ── Condiciones ───────────────────────────────────────────────────── #}
@@ -209,9 +207,7 @@
 
   {# ── Enviar ────────────────────────────────────────────────────────── #}
   <div class="form-solicitud__actions">
-    <button type="submit" class="btn btn--primary btn--md" id="form-submit-btn">
-      Enviar formulario
-    </button>
+    {{ atoms.button('Enviar formulario', '', 'primary', 'md', false, 'submit', 'form-submit-btn') }}
   </div>
 
 </form>
