@@ -8,6 +8,7 @@ import { FormInputComponent } from '../../components/atoms/form-input/form-input
 import { FormTextareaComponent } from '../../components/atoms/form-textarea/form-textarea';
 import { AlertComponent } from '../../components/molecules/alert/alert';
 import { FormFieldComponent } from '../../components/molecules/form-field/form-field';
+import { TarjetaEstadoComponent } from '../../components/molecules/tarjeta-estado/tarjeta-estado';
 import { PageHeaderComponent } from '../../components/organisms/page-header/page-header';
 import { PanelSeccionComponent } from '../../components/organisms/panel-seccion/panel-seccion';
 import { AuthService } from '../../services/auth.service';
@@ -64,7 +65,7 @@ interface StatusResponse {
   templateUrl: './notificaciones-checkin-tardio.html',
   styleUrl: './notificaciones-checkin-tardio.scss',
   standalone: true,
-  imports: [FormsModule, RouterLink, PageHeaderComponent, PanelSeccionComponent, ButtonComponent, AlertComponent, BadgeComponent, FormFieldComponent, FormInputComponent, FormTextareaComponent],
+  imports: [FormsModule, RouterLink, PageHeaderComponent, PanelSeccionComponent, ButtonComponent, AlertComponent, BadgeComponent, FormFieldComponent, FormInputComponent, FormTextareaComponent, TarjetaEstadoComponent],
 })
 export class NotificacionesCheckinTardioPageComponent implements OnInit, OnDestroy {
 
