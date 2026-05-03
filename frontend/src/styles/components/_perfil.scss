@@ -39,8 +39,20 @@
 // ── Grupo de campos del formulario ────────────────────────────────────────
 
 .perfil-form {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
   gap: $space-4;
   margin-block-end: $space-6;
+
+  // Alertas, botones y párrafos de descripción siempre a ancho completo
+  > app-alert,
+  > app-button,
+  > p,
+  > section {
+    grid-column: 1 / -1;
+  }
+
+  @include respond-until('sm') {
+    grid-template-columns: 1fr;
+  }
 }

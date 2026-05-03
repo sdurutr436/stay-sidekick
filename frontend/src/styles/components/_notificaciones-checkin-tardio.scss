@@ -126,11 +126,11 @@
   }
 }
 
-// ── Layout 2 columnas (Plantillas | Editor) ───────────────────────────────
+// ── 2 paneles lado a lado (Plantillas | Mensaje) ─────────────────────────
 
-.notif-layout {
+.notif-bloques {
   display: grid;
-  grid-template-columns: 260px 1fr;
+  grid-template-columns: 280px 1fr;
   gap: $space-6;
   align-items: start;
 
@@ -139,23 +139,12 @@
   }
 }
 
-// ── Sidebar de plantillas ─────────────────────────────────────────────────
+// ── Sidebar de plantillas (dentro del panel izquierdo) ────────────────────
 
 .notif-sidebar {
-  border: $border-width $border-style $color-border;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
-
-  &__search-wrap {
-    padding: $space-3;
-    border-bottom: $border-width $border-style $color-border;
-  }
-
-  &__nueva-wrap {
-    padding: $space-3;
-    border-bottom: $border-width $border-style $color-border;
-  }
+  gap: $space-3;
 
   &__nueva-btn {
     display: flex;
