@@ -5,11 +5,13 @@ description: Términos de uso de Stay Sidekick conforme a la LSSI-CE.
 section: legal
 ---
 
-{% import "macros/organisms.njk" as organisms %}
+{% import "macros/organisms.njk" as organisms %>
 
-<article class="l-container" style="padding-block: var(--space-16);">
+<article class="web-page">
 
   {{ organisms.pageHeader('Términos de uso', 'Última actualización: mayo de 2026') }}
+
+  <div class="web-page__prose">
 
   <section aria-labelledby="terminos-titular">
     <h2 id="terminos-titular">1. Identificación del titular</h2>
@@ -104,5 +106,7 @@ section: legal
       otro fuero que pudiera corresponderles.
     </p>
   </section>
+
+  </div>{# /.web-page__prose #}
 
 </article>
