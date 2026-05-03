@@ -21,6 +21,18 @@
   gap: $space-8;
 }
 
+// ── Fila de tarjetas de estado ────────────────────────────────────────────
+
+.notif-checkin__estados {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $space-4;
+
+  @include respond-until('sm') {
+    grid-template-columns: 1fr;
+  }
+}
+
 // ── Estado de carga ───────────────────────────────────────────────────────
 
 .notif-checkin__cargando {
