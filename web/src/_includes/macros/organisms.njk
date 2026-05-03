@@ -4,11 +4,14 @@
 #}
 
 {# ── pageHeader ───────────────────────────────────────────────────────────── #}
+{# Espejo de app-page-header: estructura BEM completa para _page-header.scss  #}
 {% macro pageHeader(title, subtitle='') %}
   <div class="page-header">
-    <h1>{{ title }}</h1>
-    {% if subtitle %}
-      <p>{{ subtitle }}</p>
-    {% endif %}
+    <div class="page-header__start">
+      <h1 class="page-header__title">{{ title }}</h1>
+      {% if subtitle %}
+        <p class="page-header__desc">{{ subtitle }}</p>
+      {% endif %}
+    </div>
   </div>
 {% endmacro %}
