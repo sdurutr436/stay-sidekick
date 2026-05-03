@@ -113,3 +113,41 @@ def create_plantilla():
     db.session.commit()
 
     return jsonify({"ok": True, "plantilla": _plantilla_to_dict(plantilla)}), 201
+
+
+@notificaciones_bp.route("/api/notificaciones/checkin-tardio/plantillas/<uuid:plantilla_id>", methods=["PUT"])
+@jwt_required
+def update_plantilla(plantilla_id):
+    body = request.get_json(silent=True) or {}
+    nombre = (body.get("nombre") or "").strip()
+    contenido = (body.get("contenido") or "").strip()
+
+    if not nombre:
+        return jsonify({"ok": False, "errors": ["El nombre es obligatorio."]}), 400
+    if not contenido:
+        return jsonify({"ok": False, "errors": ["El contenido es obligatorio."]}), 400
+
+    plantilla = PlantillaVault.query.filter_by(
+        id=plantilla_id, empresa_id=_empresa_id(), categoria=_CATEGORIA
+    ).first()
+    if not plantilla:
+        return jsonify({"ok": False, "errors": ["Plantilla no encontrada."]}), 404
+
+    plantilla.nombre = nombre
+    plantilla.contenido = contenido
+    db.session.commit()
+    return jsonify({"ok": True, "plantilla": _plantilla_to_dict(plantilla)}), 200
+
+
+@notificaciones_bp.route("/api/notificaciones/checkin-tardio/plantillas/<uuid:plantilla_id>", methods=["DELETE"])
+@jwt_required
+def delete_plantilla(plantilla_id):
+    plantilla = PlantillaVault.query.filter_by(
+        id=plantilla_id, empresa_id=_empresa_id(), categoria=_CATEGORIA
+    ).first()
+    if not plantilla:
+        return jsonify({"ok": False, "errors": ["Plantilla no encontrada."]}), 404
+
+    db.session.delete(plantilla)
+    db.session.commit()
+    return jsonify({"ok": True}), 200
