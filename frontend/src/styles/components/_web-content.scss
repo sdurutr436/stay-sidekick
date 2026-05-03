@@ -1,0 +1,230 @@
+// =============================================================================
+// COMPONENTS: WEB CONTENT
+// Estilos para las páginas estáticas del sitio (11ty / Nunjucks).
+// Complementa los componentes existentes (page-header, card, etc.) con
+// clases de layout y contenido específicas de las páginas de marketing y legal.
+//
+// Estructura BEM:
+//   .web-page                    — contenedor principal (container + padding)
+//     .web-page__section         — sección con separador inferior
+//     .web-page__section--last   — última sección (sin separador)
+//     .web-page__prose           — cuerpo de texto largo (legal, etc.)
+//     .web-page__price-grid      — cuadrícula de tarjetas de precio
+//     .web-page__two-col         — layout de dos columnas (contacto, nosotros)
+//     .web-page__screenshot      — figura con captura de pantalla
+//     .web-page__steps           — lista ordenada de pasos
+//     .web-page__note            — recuadro de aviso / nota al pie
+//     .web-page__links           — lista de enlaces de contacto/redes (col)
+//     .web-page__links--row      — variante horizontal
+//     .web-page__profile-img     — imagen de perfil cuadrada
+//     .web-page__table-wrap      — contenedor scrollable para tablas
+//     .web-page__table           — tabla estilizada
+// =============================================================================
+
+.web-page {
+  @include container;
+  padding-block: $space-12;
+
+  // ---------------------------------------------------------------------------
+  // Sección — separa bloques de contenido
+  // ---------------------------------------------------------------------------
+  &__section {
+    margin-top: $space-12;
+    padding-bottom: $space-12;
+    border-bottom: $border-width $border-style $color-border;
+
+    &--last {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Prosa — bloques de texto largo (páginas legales, nosotros)
+  // Aplica espaciado vertical automático a los hijos semánticos.
+  // ---------------------------------------------------------------------------
+  &__prose {
+    h2 {
+      margin-top: $space-8;
+      margin-bottom: $space-3;
+    }
+
+    h3 {
+      margin-top: $space-6;
+      margin-bottom: $space-2;
+    }
+
+    p {
+      margin-top: $space-3;
+    }
+
+    ul,
+    ol {
+      margin-top: $space-3;
+      padding-left: $space-6;
+      display: flex;
+      flex-direction: column;
+      gap: $space-2;
+    }
+
+    a {
+      color: $color-text-primary;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+
+    section + section {
+      margin-top: $space-8;
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Cuadrícula de precios — tarjetas auto-fill
+  // ---------------------------------------------------------------------------
+  &__price-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: $space-6;
+    margin-top: $space-8;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Dos columnas — ratio 1:2 (lateral + principal)
+  // ---------------------------------------------------------------------------
+  &__two-col {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: $space-8;
+    align-items: start;
+    margin-top: $space-8;
+
+    @include respond-until('md') {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Figura de captura de pantalla
+  // ---------------------------------------------------------------------------
+  &__screenshot {
+    margin-top: $space-8;
+    border: $border-width $border-style $color-border;
+
+    img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Lista de pasos (ol)
+  // ---------------------------------------------------------------------------
+  &__steps {
+    margin-top: $space-4;
+    padding-left: $space-6;
+    display: flex;
+    flex-direction: column;
+    gap: $space-2;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Nota / aviso destacado
+  // ---------------------------------------------------------------------------
+  &__note {
+    margin-top: $space-8;
+    padding: $space-6;
+    border: $border-width $border-style $color-border;
+    background-color: $color-surface-alt;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Lista de enlaces (contacto, redes sociales)
+  // ---------------------------------------------------------------------------
+  &__links {
+    list-style: none;
+    padding: 0;
+    margin-top: $space-6;
+    display: flex;
+    flex-direction: column;
+    gap: $space-4;
+
+    a {
+      color: $color-text-primary;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+
+    // Variante horizontal (logos sociales)
+    &--row {
+      flex-direction: row;
+      flex-wrap: wrap;
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Imagen de perfil cuadrada
+  // ---------------------------------------------------------------------------
+  &__profile-img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    border: $border-width $border-style $color-border;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Tabla de cookies / precios
+  // ---------------------------------------------------------------------------
+  &__table-wrap {
+    overflow-x: auto;
+    margin-top: $space-4;
+  }
+
+  &__table {
+    width: 100%;
+    border-collapse: collapse;
+
+    th {
+      text-align: left;
+      padding: $space-3;
+      border-bottom: 2px solid $color-border-strong;
+      @include text-label-lg;
+      color: $color-text-primary;
+    }
+
+    td {
+      padding: $space-3;
+      border-bottom: $border-width $border-style $color-border;
+      @include text-body-md;
+      color: $color-text-primary;
+
+      code {
+        font-size: 0.875em;
+      }
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Encabezado de sección de herramienta (funcionalidades)
+  // ---------------------------------------------------------------------------
+  &__tool-section {
+    margin-top: $space-12;
+    padding-bottom: $space-12;
+    border-bottom: $border-width $border-style $color-border;
+
+    &--last {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    h2 {
+      margin-bottom: $space-2;
+    }
+
+    h3 {
+      margin-top: $space-6;
+      margin-bottom: $space-3;
+    }
+  }
+}
