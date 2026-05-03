@@ -117,74 +117,132 @@
       </app-panel-seccion>
     }
 
-    <!-- ── Sección principal: 2 columnas (Plantillas | Mensaje) ───────── -->
-    <app-panel-seccion title="Plantillas y mensaje">
+    <!-- ── 2 paneles: Plantillas | Mensaje ──────────────────────────────── -->
+    <div class="notif-bloques">
 
-      @if (plantillaAlerta()) {
-        <app-alert
-          [type]="plantillaAlerta()!.tipo"
-          [dismissible]="true"
-          (dismissed)="plantillaAlerta.set(null)"
-        >
-          {{ plantillaAlerta()!.mensaje }}
-        </app-alert>
-      }
+      <!-- ── Panel izquierdo: Plantillas ─────────────────────────────── -->
+      <app-panel-seccion title="Plantillas">
 
-      <div class="notif-layout">
+        @if (plantillaAlerta()) {
+          <app-alert
+            [type]="plantillaAlerta()!.tipo"
+            [dismissible]="true"
+            (dismissed)="plantillaAlerta.set(null)"
+          >
+            {{ plantillaAlerta()!.mensaje }}
+          </app-alert>
+        }
 
-        <!-- ── Columna izquierda: sidebar de plantillas ─────────────── -->
-        <aside class="notif-sidebar" aria-label="Plantillas disponibles">
+        @if (modoEditor() !== 'ninguno') {
 
-          <!-- Buscador -->
-          <div class="notif-sidebar__search-wrap">
-            <input
-              type="search"
-              class="form-input"
-              placeholder="Buscar plantilla…"
-              [value]="searchPlantillas()"
-              (input)="onSearchPlantillas($event)"
-              aria-label="Buscar plantilla por nombre"
+          <!-- ── Formulario crear / editar plantilla ─── -->
+          <p class="notif-editor__subtitulo">
+            {{ modoEditor() === 'nueva' ? 'Nueva plantilla' : 'Editar plantilla' }}
+          </p>
+
+          <input
+            type="text"
+            class="form-input"
+            placeholder="Nombre de la plantilla…"
+            [value]="editNombre()"
+            (input)="editNombre.set(($event.target)!['value'])"
+            aria-label="Nombre de la plantilla"
+            maxlength="200"
+          />
+
+          <div class="notif-editor__toolbar">
+            <app-dropdown-buscador
+              [options]="tokensOpciones()"
+              placeholder="Insertar variable…"
+              searchPlaceholder="Buscar variable…"
+              emptyMessage="Sin variables"
+              (optionSelected)="onTokenEditorSel($event)"
             />
+            <app-button
+              variant="secondary"
+              size="sm"
+              [disabled]="!tokenEditorSel()"
+              title="Inserta la variable en la posición del cursor"
+              (click)="insertarTokenEnPlantilla()"
+            >
+              Insertar
+            </app-button>
           </div>
 
-          <!-- Botón nueva (solo admin) -->
-          @if (isAdmin) {
-            <div class="notif-sidebar__nueva-wrap">
-              <button
-                type="button"
-                class="notif-sidebar__nueva-btn"
-                [class.notif-sidebar__nueva-btn--activo]="modoEditor() === 'nueva'"
-                (click)="nuevaPlantilla()"
-              >
-                <svg class="svg svg--xs" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                  <line x1="8" y1="2" x2="8" y2="14" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
-                  <line x1="2" y1="8" x2="14" y2="8" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
-                </svg>
-                Nueva plantilla
-              </button>
+          <div class="form-editor">
+            <div class="form-editor__body">
+              <textarea
+                #editTextarea
+                class="form-textarea notif-editor__textarea"
+                [value]="editContenido()"
+                placeholder="Usa &#123;NOMBRE&#125;, &#123;APARTAMENTO&#125;, &#123;TELEFONO&#125;, &#123;HORA_LLEGADA&#125;, &#123;DIRECCION&#125;…"
+                (input)="onEditInput($event)"
+                (click)="onEditCursor($event)"
+                (keyup)="onEditCursor($event)"
+                (blur)="onEditCursor($event)"
+                aria-label="Contenido de la plantilla"
+              ></textarea>
             </div>
+          </div>
+
+          <div class="notif-editor__acciones">
+            <app-button variant="ghost" size="md" (click)="cancelarEdicion()">Cancelar</app-button>
+            <app-button
+              variant="primary"
+              size="md"
+              [disabled]="guardandoEdit() || !editNombre().trim() || !editContenido().trim()"
+              (click)="guardarEdicion()"
+            >
+              @if (guardandoEdit()) { Guardando… } @else { Guardar plantilla }
+            </app-button>
+          </div>
+
+        } @else {
+
+          <!-- ── Lista de plantillas ─── -->
+          <input
+            type="search"
+            class="form-input"
+            placeholder="Buscar plantilla…"
+            [value]="searchPlantillas()"
+            (input)="onSearchPlantillas($event)"
+            aria-label="Buscar plantilla por nombre"
+          />
+
+          @if (isAdmin) {
+            <button
+              type="button"
+              class="notif-sidebar__nueva-btn"
+              [class.notif-sidebar__nueva-btn--activo]="modoEditor() === 'nueva'"
+              (click)="nuevaPlantilla()"
+            >
+              <svg class="svg svg--xs" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <line x1="8" y1="2" x2="8" y2="14" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
+                <line x1="2" y1="8" x2="14" y2="8" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
+              </svg>
+              Nueva plantilla
+            </button>
           }
 
-          <!-- Lista -->
           <ul class="notif-sidebar__list" role="listbox" aria-label="Listado de plantillas">
             @if (plantillasFiltradas().length > 0) {
               @for (p of plantillasFiltradas(); track p.id) {
                 <li
                   class="notif-sidebar__item"
-                  [class.notif-sidebar__item--activo]="plantillaSeleccionada()?.id === p.id && modoEditor() === 'ninguno'"
+                  [class.notif-sidebar__item--activo]="plantillaSeleccionada()?.id === p.id"
                   role="option"
-                  [attr.aria-selected]="plantillaSeleccionada()?.id === p.id && modoEditor() === 'ninguno'"
+                  [attr.aria-selected]="plantillaSeleccionada()?.id === p.id"
                   (click)="seleccionarPlantilla(p)"
                 >
                   <span class="notif-sidebar__item-nombre">{{ p.nombre }}</span>
                   @if (isAdmin) {
                     <div class="notif-sidebar__item-acciones" (click)="$event.stopPropagation()">
-                      <button type="button" class="notif-sidebar__item-btn" aria-label="Editar plantilla" (click)="iniciarEdicion(p)">
+                      <button type="button" class="notif-sidebar__item-btn" aria-label="Editar" (click)="iniciarEdicion(p)">
                         <svg class="svg svg--xs" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" aria-hidden="true">
                           <path d="M11 2l3 3-8 8H3v-3z" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linejoin="round"/>
                         </svg>
                       </button>
-                      <button type="button" class="notif-sidebar__item-btn notif-sidebar__item-btn--danger" aria-label="Eliminar plantilla" (click)="eliminarPlantilla(p)">
+                      <button type="button" class="notif-sidebar__item-btn notif-sidebar__item-btn--danger" aria-label="Eliminar" (click)="eliminarPlantilla(p)">
                         <svg class="svg svg--xs" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" aria-hidden="true">
                           <polyline points="2,4 14,4" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
                           <path d="M5 4V2h6v2" stroke="currentColor" stroke-width="1.5" fill="none"/>
@@ -197,180 +255,94 @@
               }
             } @else {
               <li class="notif-sidebar__empty" role="option" aria-selected="false">
-                @if (searchPlantillas()) {
-                  Sin resultados para "{{ searchPlantillas() }}"
-                } @else {
-                  No hay plantillas guardadas.
-                }
+                @if (searchPlantillas()) { Sin resultados para "{{ searchPlantillas() }}" }
+                @else { No hay plantillas guardadas. }
               </li>
             }
           </ul>
 
-        </aside>
+        }
 
-        <!-- ── Columna derecha: editor de plantilla / compositor ─────── -->
-        <section class="notif-editor" aria-label="Editor">
+      </app-panel-seccion>
 
-          @if (modoEditor() !== 'ninguno') {
+      <!-- ── Panel derecho: Mensaje ───────────────────────────────────── -->
+      <app-panel-seccion title="Mensaje">
 
-            <!-- ── Modo edición / nueva plantilla ─── -->
-            <p class="notif-editor__subtitulo">
-              {{ modoEditor() === 'nueva' ? 'Nueva plantilla' : 'Editar plantilla' }}
-            </p>
-
-            <div class="notif-editor__nombre-wrap">
-              <input
-                type="text"
-                class="form-input"
-                placeholder="Nombre de la plantilla…"
-                [value]="editNombre()"
-                (input)="editNombre.set(($event.target)!['value'])"
-                aria-label="Nombre de la plantilla"
-                maxlength="200"
-              />
-            </div>
-
-            <!-- Toolbar de variables -->
-            <div class="notif-editor__toolbar">
-              <app-dropdown-buscador
-                [options]="tokensOpciones()"
-                placeholder="Insertar variable…"
-                searchPlaceholder="Buscar variable…"
-                emptyMessage="Sin variables"
-                (optionSelected)="onTokenEditorSel($event)"
-              />
-              <app-button
-                variant="secondary"
-                size="sm"
-                [disabled]="!tokenEditorSel()"
-                title="Inserta la variable en la posición del cursor"
-                (click)="insertarTokenEnPlantilla()"
-              >
-                Insertar
-              </app-button>
-            </div>
-
-            <!-- Área de texto -->
-            <div class="notif-editor__textarea-wrap form-editor">
-              <div class="form-editor__body">
-                <textarea
-                  #editTextarea
-                  class="form-textarea notif-editor__textarea"
-                  [value]="editContenido()"
-                  placeholder="Usa &#123;NOMBRE&#125;, &#123;APARTAMENTO&#125;, &#123;TELEFONO&#125;, &#123;HORA_LLEGADA&#125;, &#123;DIRECCION&#125;…"
-                  (input)="onEditInput($event)"
-                  (click)="onEditCursor($event)"
-                  (keyup)="onEditCursor($event)"
-                  (blur)="onEditCursor($event)"
-                  aria-label="Contenido de la plantilla"
-                ></textarea>
-              </div>
-            </div>
-
-            <!-- Acciones -->
-            <div class="notif-editor__acciones">
-              <app-button variant="ghost" size="md" (click)="cancelarEdicion()">Cancelar</app-button>
-              <app-button
-                variant="primary"
-                size="md"
-                [disabled]="guardandoEdit() || !editNombre().trim() || !editContenido().trim()"
-                (click)="guardarEdicion()"
-              >
-                @if (guardandoEdit()) { Guardando… } @else { Guardar plantilla }
-              </app-button>
-            </div>
-
+        <p class="notif-editor__subtitulo">
+          @if (plantillaSeleccionada()) {
+            Plantilla: <strong>{{ plantillaSeleccionada()!.nombre }}</strong>
           } @else {
-
-            <!-- ── Modo compositor de mensaje ─── -->
-            <p class="notif-editor__subtitulo">
-              @if (plantillaSeleccionada()) {
-                Plantilla: <strong>{{ plantillaSeleccionada()!.nombre }}</strong>
-              } @else {
-                Selecciona una plantilla o genera el mensaje automáticamente.
-              }
-            </p>
-
-            <!-- Botón generar -->
-            <div class="notif-editor__generar">
-              <app-button
-                variant="secondary"
-                size="md"
-                [disabled]="!hayCheckins()"
-                (click)="generarMensaje()"
-              >
-                <span class="btn__icon" aria-hidden="true">
-                  <svg class="svg svg--sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
-                    <rect x="3" y="3" width="14" height="14" stroke="currentColor" stroke-width="1.5"/>
-                    <line x1="6" y1="7" x2="14" y2="7" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
-                    <line x1="6" y1="10" x2="14" y2="10" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
-                    <line x1="6" y1="13" x2="11" y2="13" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
-                  </svg>
-                </span>
-                Generar automáticamente
-              </app-button>
-              @if (!hayCheckins()) {
-                <p class="notif-form__hint">Carga check-ins desde el PMS o el XLSX.</p>
-              }
-            </div>
-
-            <!-- Toolbar de variables para el mensaje -->
-            <div class="notif-editor__toolbar">
-              <app-dropdown-buscador
-                [options]="tokensOpciones()"
-                placeholder="Insertar variable…"
-                searchPlaceholder="Buscar variable…"
-                emptyMessage="Sin variables"
-                (optionSelected)="onTokenMensajeSel($event)"
-              />
-              <app-button
-                variant="secondary"
-                size="sm"
-                [disabled]="!tokenMensajeSel()"
-                title="Inserta la variable en la posición del cursor"
-                (click)="insertarTokenEnMensaje()"
-              >
-                Insertar
-              </app-button>
-            </div>
-
-            <!-- Textarea del mensaje con botón copiar -->
-            <div class="form-editor">
-              <div class="form-editor__header">
-                <div class="form-editor__tabs"></div>
-                <div class="form-editor__toolbar">
-                  <button
-                    class="form-editor__tool"
-                    type="button"
-                    [disabled]="!mensaje"
-                    (click)="copiarMensaje()"
-                  >
-                    @if (copiadoOk()) { Copiado } @else { Copiar }
-                  </button>
-                </div>
-              </div>
-              <div class="form-editor__body">
-                <textarea
-                  #mensajeTextarea
-                  id="notif-mensaje"
-                  class="form-textarea notif-form__textarea"
-                  placeholder="Genera el mensaje o escríbelo aquí…"
-                  [(ngModel)]="mensaje"
-                  name="mensaje"
-                  (click)="onMsgCursor($event)"
-                  (keyup)="onMsgCursor($event)"
-                  (blur)="onMsgCursor($event)"
-                ></textarea>
-              </div>
-            </div>
-
+            Selecciona una plantilla o genera el mensaje automáticamente.
           }
+        </p>
 
-        </section>
+        <div class="notif-editor__generar">
+          <app-button
+            variant="secondary"
+            size="md"
+            [disabled]="!hayCheckins()"
+            (click)="generarMensaje()"
+          >
+            <span class="btn__icon" aria-hidden="true">
+              <svg class="svg svg--sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
+                <rect x="3" y="3" width="14" height="14" stroke="currentColor" stroke-width="1.5"/>
+                <line x1="6" y1="7" x2="14" y2="7" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
+                <line x1="6" y1="10" x2="14" y2="10" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
+                <line x1="6" y1="13" x2="11" y2="13" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
+              </svg>
+            </span>
+            Generar automáticamente
+          </app-button>
+          @if (!hayCheckins()) {
+            <p class="notif-form__hint">Carga check-ins desde el PMS o el XLSX.</p>
+          }
+        </div>
 
-      </div>
+        <div class="notif-editor__toolbar">
+          <app-dropdown-buscador
+            [options]="tokensOpciones()"
+            placeholder="Insertar variable…"
+            searchPlaceholder="Buscar variable…"
+            emptyMessage="Sin variables"
+            (optionSelected)="onTokenMensajeSel($event)"
+          />
+          <app-button
+            variant="secondary"
+            size="sm"
+            [disabled]="!tokenMensajeSel()"
+            (click)="insertarTokenEnMensaje()"
+          >
+            Insertar
+          </app-button>
+        </div>
 
-    </app-panel-seccion>
+        <div class="form-editor">
+          <div class="form-editor__header">
+            <div class="form-editor__tabs"></div>
+            <div class="form-editor__toolbar">
+              <button class="form-editor__tool" type="button" [disabled]="!mensaje" (click)="copiarMensaje()">
+                @if (copiadoOk()) { Copiado } @else { Copiar }
+              </button>
+            </div>
+          </div>
+          <div class="form-editor__body">
+            <textarea
+              #mensajeTextarea
+              id="notif-mensaje"
+              class="form-textarea notif-form__textarea"
+              placeholder="Genera el mensaje o escríbelo aquí…"
+              [(ngModel)]="mensaje"
+              name="mensaje"
+              (click)="onMsgCursor($event)"
+              (keyup)="onMsgCursor($event)"
+              (blur)="onMsgCursor($event)"
+            ></textarea>
+          </div>
+        </div>
+
+      </app-panel-seccion>
+
+    </div>
 
   }
 
