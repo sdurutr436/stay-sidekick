@@ -7,9 +7,11 @@ section: legal
 
 {% import "macros/organisms.njk" as organisms %}
 
-<article class="l-container" style="padding-block: var(--space-16);">
+<article class="web-page">
 
   {{ organisms.pageHeader('Política de cookies', 'Última actualización: mayo de 2026') }}
+
+  <div class="web-page__prose">
 
   <section aria-labelledby="cookies-que-son">
     <h2 id="cookies-que-son">1. ¿Qué son las cookies?</h2>
@@ -38,34 +40,28 @@ section: legal
     <p>
       A continuación se detallan las cookies que pueden estar presentes al utilizar Stay Sidekick:
     </p>
-    <div role="region" aria-label="Tabla de cookies" style="overflow-x: auto;">
-      <table style="width: 100%; border-collapse: collapse; margin-top: var(--space-4);">
+    <div class="web-page__table-wrap">
+      <table class="web-page__table">
         <caption class="u-sr-only">Listado de cookies técnicas utilizadas en Stay Sidekick</caption>
         <thead>
           <tr>
-            <th scope="col" style="text-align: left; padding: var(--space-3); border-bottom: 2px solid currentColor;">Nombre</th>
-            <th scope="col" style="text-align: left; padding: var(--space-3); border-bottom: 2px solid currentColor;">Tipo</th>
-            <th scope="col" style="text-align: left; padding: var(--space-3); border-bottom: 2px solid currentColor;">Finalidad</th>
-            <th scope="col" style="text-align: left; padding: var(--space-3); border-bottom: 2px solid currentColor;">Duración</th>
+            <th scope="col">Nombre</th>
+            <th scope="col">Tipo</th>
+            <th scope="col">Finalidad</th>
+            <th scope="col">Duración</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td style="padding: var(--space-3); border-bottom: 1px solid var(--color-border, #e0e0e0);">
-              <code>session</code>
-            </td>
-            <td style="padding: var(--space-3); border-bottom: 1px solid var(--color-border, #e0e0e0);">Técnica / Sesión</td>
-            <td style="padding: var(--space-3); border-bottom: 1px solid var(--color-border, #e0e0e0);">
-              Mantiene la sesión autenticada del usuario en la plataforma.
-            </td>
-            <td style="padding: var(--space-3); border-bottom: 1px solid var(--color-border, #e0e0e0);">
-              Sesión (se elimina al cerrar el navegador)
-            </td>
+            <td><code>session</code></td>
+            <td>Técnica / Sesión</td>
+            <td>Mantiene la sesión autenticada del usuario en la plataforma.</td>
+            <td>Sesión (se elimina al cerrar el navegador)</td>
           </tr>
         </tbody>
       </table>
     </div>
-    <p style="margin-top: var(--space-4);" class="u-text-secondary">
+    <p class="u-text-secondary">
       Si en el futuro se añaden nuevas cookies, esta tabla se actualizará antes de su activación.
     </p>
   </section>
@@ -102,5 +98,7 @@ section: legal
       <a href="mailto:duran.utrerasergio2612@gmail.com">duran.utrerasergio2612@gmail.com</a>.
     </p>
   </section>
+
+  </div>{# /.web-page__prose #}
 
 </article>
