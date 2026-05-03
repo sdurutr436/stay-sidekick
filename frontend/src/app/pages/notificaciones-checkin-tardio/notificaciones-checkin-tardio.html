@@ -4,222 +4,163 @@
   <app-page-header
     title="Notificaciones de check-in tardíos"
     description="Genera recordatorios personalizados para huéspedes con check-in tardío."
-  >
-    @if (!cargando()) {
-      <div class="notif-checkin__header-estado">
-        @if (pmsConfigurado()) {
-          <app-badge variant="solid">PMS conectado</app-badge>
-        } @else {
-          <app-badge variant="outline">Sin PMS</app-badge>
-        }
-        <span class="notif-checkin__corte" title="Configurable en Perfil">
-          Corte: <strong>{{ horaCortePerfil() }}</strong>
-        </span>
-        @if (reservasPms().length > 0) {
-          <span class="notif-checkin__contador">
-            {{ reservasPms().length }} tardío{{ reservasPms().length !== 1 ? 's' : '' }}
-          </span>
-        }
-      </div>
-    }
-  </app-page-header>
+  />
+
+  <!-- ── Tarjetas de estado (al nivel del header) ──────────────────── -->
+  @if (!cargando()) {
+    <div class="notif-checkin__estados">
+
+      <app-tarjeta-estado label="Estado PMS" valor="">
+        <svg icon class="svg svg--xs" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          @if (pmsConfigurado()) {
+            <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/>
+            <polyline points="5,8 7,10 11,6" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="square"/>
+          } @else {
+            <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/>
+            <line x1="8" y1="5" x2="8" y2="9" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
+            <circle cx="8" cy="11.5" r="0.75" fill="currentColor"/>
+          }
+        </svg>
+        <ng-container actions>
+          @if (pmsConfigurado()) {
+            <app-badge variant="solid">Conectado</app-badge>
+          } @else {
+            <app-badge variant="outline">Sin PMS</app-badge>
+          }
+        </ng-container>
+      </app-tarjeta-estado>
+
+      <app-tarjeta-estado label="Hora de corte" [valor]="horaCortePerfil()">
+        <ng-container actions>
+          Configurable en <a routerLink="/perfil">Perfil</a>
+        </ng-container>
+      </app-tarjeta-estado>
+
+    </div>
+  }
 
   @if (cargando()) {
     <p class="notif-checkin__cargando" aria-live="polite">Cargando datos…</p>
   } @else {
 
-    <!-- ── Sección 0: Estado de la herramienta ─────────────────────── -->
-    <app-panel-seccion title="Estado">
-      <div class="notif-checkin__estados">
-
-        <app-tarjeta-estado label="Estado PMS" valor="">
-          <svg icon class="svg svg--xs" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-            @if (pmsConfigurado()) {
-              <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/>
-              <polyline points="5,8 7,10 11,6" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="square"/>
-            } @else {
-              <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/>
-              <line x1="8" y1="5" x2="8" y2="9" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
-              <circle cx="8" cy="11.5" r="0.75" fill="currentColor"/>
-            }
-          </svg>
-          <ng-container actions>
-            @if (pmsConfigurado()) {
-              <app-badge variant="solid">Conectado</app-badge>
-            } @else {
-              <app-badge variant="outline">Sin PMS</app-badge>
-            }
-          </ng-container>
-        </app-tarjeta-estado>
-
-        <app-tarjeta-estado label="Hora de corte" [valor]="horaCortePerfil()">
-          <ng-container actions>
-            Configurable en <a routerLink="/perfil">Perfil</a>
-          </ng-container>
-        </app-tarjeta-estado>
-
-      </div>
-    </app-panel-seccion>
-
     <!-- ── Sección 1: Importar desde XLSX (solo sin PMS) ───────────── -->
     @if (!pmsConfigurado()) {
       <app-panel-seccion title="Importar reservas del día (XLSX)">
-      <!-- Descripción con etiquetas <code>: usa [pre-body] para conservar el HTML -->
-      <p class="panel-seccion__desc" pre-body>
-        Si tu PMS no tiene API, exporta el listado de reservas de hoy a Excel
-        y súbelo aquí. Los datos se procesan en servidor sin almacenarse (RGPD).
-        Columnas reconocidas: <code>nombre</code>, <code>email</code>,
-        <code>telefono</code>, <code>checkin</code>, <code>checkout</code>,
-        <code>apartamento</code>.
-      </p>
+        <p class="u-text-secondary u-mb-8">
+          Exporta el listado de reservas de hoy a Excel y súbelo aquí.
+          Los datos se procesan en servidor sin almacenarse (RGPD).
+          Columnas reconocidas: <code>nombre</code>, <code>telefono</code>,
+          <code>checkin</code>, <code>hora_llegada</code>, <code>apartamento</code>.
+        </p>
 
-      <div class="xlsx-import">
+        <div class="xlsx-import">
 
-        <!-- Selector de archivo -->
-        <div class="xlsx-import__selector">
-          <input
-            #xlsxInput
-            type="file"
-            accept=".xlsx"
-            class="xlsx-import__input"
-            aria-label="Seleccionar archivo Excel de reservas del día"
-            (change)="onXlsxSeleccionado($event)"
-          />
-          <app-button variant="secondary" size="md" (click)="xlsxInput.click()">
-            <span class="btn__icon" aria-hidden="true">
-              <svg class="svg svg--sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
-                <rect x="4" y="2" width="12" height="16" stroke="currentColor" stroke-width="1.5"/>
-                <polyline points="7,9 10,6 13,9" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="square" stroke-linejoin="miter"/>
-                <line x1="10" y1="6" x2="10" y2="14" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
-              </svg>
-            </span>
-            Seleccionar archivo .xlsx
-          </app-button>
-
-          @if (xlsxArchivo()) {
-            <span class="xlsx-import__filename" aria-live="polite">
-              {{ xlsxArchivo()!.name }}
-            </span>
-          }
-        </div>
-
-        <!-- Botón procesar -->
-        @if (xlsxArchivo()) {
-          <div class="xlsx-import__acciones">
-            <app-button
-              variant="primary"
-              size="md"
-              [disabled]="xlsxEnCurso()"
-              (click)="procesarXlsx()"
-            >
-              @if (xlsxEnCurso()) { Procesando… } @else { Procesar XLSX }
+          <!-- Fila: seleccionar + nombre archivo + procesar -->
+          <div class="xlsx-import__fila">
+            <input
+              #xlsxInput
+              type="file"
+              accept=".xlsx"
+              class="xlsx-import__input"
+              aria-label="Seleccionar archivo Excel de reservas del día"
+              (change)="onXlsxSeleccionado($event)"
+            />
+            <app-button variant="secondary" size="md" (click)="xlsxInput.click()">
+              <span class="btn__icon" aria-hidden="true">
+                <svg class="svg svg--sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
+                  <rect x="4" y="2" width="12" height="16" stroke="currentColor" stroke-width="1.5"/>
+                  <polyline points="7,9 10,6 13,9" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="square" stroke-linejoin="miter"/>
+                  <line x1="10" y1="6" x2="10" y2="14" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
+                </svg>
+              </span>
+              Seleccionar .xlsx
             </app-button>
-          </div>
-        }
 
-        <!-- Advertencias del XLSX -->
-        @if (xlsxAdvertencias().length > 0) {
-          <ul class="notif-checkin__advertencias" role="note" aria-label="Advertencias del archivo">
-            @for (w of xlsxAdvertencias(); track w) {
-              <li>{{ w }}</li>
-            }
-          </ul>
-        }
-
-        <!-- Tabla de check-ins del XLSX -->
-        @if (xlsxCheckins().length > 0) {
-          <table class="tabla-checkins" aria-label="Check-ins del XLSX">
-            <thead class="tabla-checkins__head">
-              <tr>
-                <th scope="col">Huésped</th>
-                <th scope="col">Apartamento</th>
-                <th scope="col">Email</th>
-                <th scope="col">Teléfono</th>
-                <th scope="col">Hora llegada</th>
-                <th scope="col">Dirección</th>
-                <th scope="col">Checkout</th>
-              </tr>
-            </thead>
-            <tbody class="tabla-checkins__body">
-              @for (r of xlsxCheckins(); track r.nombre) {
-                <tr>
-                  <td>{{ r.nombre }}</td>
-                  <td>{{ r.apartamento ?? '—' }}</td>
-                  <td>{{ r.email ?? '—' }}</td>
-                  <td>{{ r.telefono ?? '—' }}</td>
-                  <td>{{ r.hora_llegada ?? '—' }}</td>
-                  <td>{{ r.direccion ?? '—' }}</td>
-                  <td>{{ r.checkout ?? '—' }}</td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        }
-
-      </div>
-    </app-panel-seccion>
-    }
-
-    <!-- ── Sección 2: Maestro de apartamentos (referencia) ─────────── -->
-    <app-panel-seccion
-      title="Maestro de apartamentos"
-      description="Propiedades activas registradas en tu cuenta."
-    >
-      <p>{{ apartamentos().length }} apartamentos activos registrados.</p>
-      <a routerLink="/perfil" class="u-link">Ver Maestro de apartamentos</a>
-    </app-panel-seccion>
-
-    <!-- ── Sección 3: Mensaje ───────────────────────────────────────────── -->
-    <app-panel-seccion
-      title="Mensaje"
-      description="Selecciona una plantilla o genera el mensaje automáticamente. Cópialo y pégalo en tu cliente de correo."
-    >
-
-      <div class="notif-form">
-
-        <!-- Lista de plantillas -->
-        <div class="notif-plantillas">
-          <div class="notif-plantillas__cabecera">
-            <span class="notif-plantillas__titulo">Plantillas guardadas</span>
-            @if (isAdmin) {
-              <app-button variant="ghost" size="sm" (click)="panelNuevaPlantilla.set(!panelNuevaPlantilla())">
-                @if (panelNuevaPlantilla()) { Cancelar } @else { + Nueva }
-              </app-button>
-            }
-          </div>
-
-          <!-- Formulario nueva plantilla (solo admin) -->
-          @if (panelNuevaPlantilla()) {
-            <div class="notif-plantillas__nueva">
-              <app-form-field label="Nombre" for="notif-nueva-nombre">
-                <app-form-input
-                  id="notif-nueva-nombre"
-                  placeholder="Nombre de la plantilla…"
-                  [value]="nuevaPlantillaNombre()"
-                  (valueChange)="nuevaPlantillaNombre.set($event)"
-                />
-              </app-form-field>
-              <app-form-field label="Contenido" for="notif-nueva-contenido">
-                <app-form-textarea
-                  id="notif-nueva-contenido"
-                  placeholder="Usa {NOMBRE}, {APARTAMENTO}, {HORA_LLEGADA}, {DIRECCION}…"
-                  [value]="nuevaPlantillaContenido()"
-                  (valueChange)="nuevaPlantillaContenido.set($event)"
-                />
-              </app-form-field>
-              <!-- TODO: conectar con POST /api/notificaciones/checkin-tardio/plantillas -->
+            @if (xlsxArchivo()) {
+              <span class="xlsx-import__filename" aria-live="polite">
+                {{ xlsxArchivo()!.name }}
+              </span>
               <app-button
                 variant="primary"
-                size="sm"
-                [disabled]="!nuevaPlantillaNombre().trim() || !nuevaPlantillaContenido().trim() || guardandoPlantilla()"
-                (click)="guardandoPlantilla.set(true)"
+                size="md"
+                [disabled]="xlsxEnCurso()"
+                (click)="procesarXlsx()"
               >
-                @if (guardandoPlantilla()) { Guardando… } @else { Guardar plantilla }
+                @if (xlsxEnCurso()) { Procesando… } @else { Procesar }
               </app-button>
-            </div>
+            }
+          </div>
+
+          <!-- Advertencias del XLSX -->
+          @if (xlsxAdvertencias().length > 0) {
+            <ul class="notif-checkin__advertencias" role="note" aria-label="Advertencias del archivo">
+              @for (w of xlsxAdvertencias(); track w) {
+                <li>{{ w }}</li>
+              }
+            </ul>
           }
 
-          <!-- Lista de plantillas disponibles -->
+          <!-- Tabla de check-ins del XLSX -->
+          @if (xlsxCheckins().length > 0) {
+            <table class="tabla-checkins" aria-label="Check-ins del XLSX">
+              <thead class="tabla-checkins__head">
+                <tr>
+                  <th scope="col">Huésped</th>
+                  <th scope="col">Apartamento</th>
+                  <th scope="col">Teléfono</th>
+                  <th scope="col">Hora llegada</th>
+                  <th scope="col">Dirección</th>
+                </tr>
+              </thead>
+              <tbody class="tabla-checkins__body">
+                @for (r of xlsxCheckins(); track r.nombre) {
+                  <tr>
+                    <td>{{ r.nombre }}</td>
+                    <td>{{ r.apartamento ?? '—' }}</td>
+                    <td>{{ r.telefono ?? '—' }}</td>
+                    <td>{{ r.hora_llegada ?? '—' }}</td>
+                    <td>{{ r.direccion ?? '—' }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          }
+
+        </div>
+      </app-panel-seccion>
+    }
+
+    <!-- ── Sección 2: Plantillas ─────────────────────────────────────── -->
+    <app-panel-seccion
+      title="Plantillas"
+      description="Selecciona una plantilla guardada para generar el mensaje o crea una nueva."
+    >
+      <div class="notif-plantillas">
+
+        <!-- Alerta de resultado al guardar -->
+        @if (plantillaAlerta()) {
+          <app-alert
+            [type]="plantillaAlerta()!.tipo"
+            [dismissible]="true"
+            (dismissed)="plantillaAlerta.set(null)"
+          >
+            {{ plantillaAlerta()!.mensaje }}
+          </app-alert>
+        }
+
+        <!-- Variables disponibles -->
+        <div class="notif-plantillas__tokens">
+          <span class="notif-plantillas__tokens-label">Variables disponibles:</span>
+          <ul class="notif-plantillas__tokens-lista">
+            <li><code>&#123;NOMBRE&#125;</code> — Nombre del huésped</li>
+            <li><code>&#123;APARTAMENTO&#125;</code> — Nombre del apartamento</li>
+            <li><code>&#123;HORA_LLEGADA&#125;</code> — Hora prevista de llegada</li>
+            <li><code>&#123;DIRECCION&#125;</code> — Dirección del alojamiento</li>
+          </ul>
+        </div>
+
+        <!-- Lista de plantillas disponibles -->
+        @if (plantillas().length > 0) {
           <ul class="notif-plantillas__lista" role="listbox" aria-label="Plantillas disponibles">
             @for (p of plantillas(); track p.id) {
               <li
@@ -240,10 +181,66 @@
               </li>
             }
           </ul>
-          @if (!hayCheckins()) {
-            <p class="notif-form__hint">Carga check-ins desde el PMS o XLSX para poder usar una plantilla.</p>
-          }
-        </div>
+        } @else {
+          <p class="notif-plantillas__vacia">No hay plantillas guardadas todavía.</p>
+        }
+
+        @if (!hayCheckins()) {
+          <p class="notif-form__hint">Carga check-ins desde el PMS o el XLSX para poder usar una plantilla.</p>
+        }
+
+        <!-- Nueva plantilla (solo admin) -->
+        @if (isAdmin) {
+          <div class="notif-plantillas__nueva-wrap">
+            <app-button
+              variant="ghost"
+              size="sm"
+              (click)="panelNuevaPlantilla.set(!panelNuevaPlantilla())"
+            >
+              @if (panelNuevaPlantilla()) { Cancelar } @else { + Nueva plantilla }
+            </app-button>
+
+            @if (panelNuevaPlantilla()) {
+              <div class="notif-plantillas__nueva">
+                <app-form-field label="Nombre" for="notif-nueva-nombre">
+                  <app-form-input
+                    id="notif-nueva-nombre"
+                    placeholder="Nombre de la plantilla…"
+                    [value]="nuevaPlantillaNombre()"
+                    (valueChange)="nuevaPlantillaNombre.set($event)"
+                  />
+                </app-form-field>
+                <app-form-field label="Contenido" for="notif-nueva-contenido">
+                  <app-form-textarea
+                    id="notif-nueva-contenido"
+                    placeholder="Usa {NOMBRE}, {APARTAMENTO}, {HORA_LLEGADA}, {DIRECCION}…"
+                    [value]="nuevaPlantillaContenido()"
+                    (valueChange)="nuevaPlantillaContenido.set($event)"
+                  />
+                </app-form-field>
+                <app-button
+                  variant="primary"
+                  size="sm"
+                  [disabled]="!nuevaPlantillaNombre().trim() || !nuevaPlantillaContenido().trim() || guardandoPlantilla()"
+                  (click)="guardarNuevaPlantilla()"
+                >
+                  @if (guardandoPlantilla()) { Guardando… } @else { Guardar plantilla }
+                </app-button>
+              </div>
+            }
+          </div>
+        }
+
+      </div>
+    </app-panel-seccion>
+
+    <!-- ── Sección 3: Mensaje ─────────────────────────────────────────── -->
+    <app-panel-seccion
+      title="Mensaje"
+      description="Genera el texto automáticamente o escríbelo a mano. Cópialo y pégalo en tu cliente de correo."
+    >
+
+      <div class="notif-form">
 
         <!-- Generación automática -->
         <div class="notif-form__auto">
@@ -264,12 +261,6 @@
             Generar automáticamente
           </app-button>
         </div>
-
-        <!-- Aviso: envío no disponible -->
-        <app-alert type="info">
-          El envío directo por Gmail estará disponible próximamente.
-          Copia el mensaje y pégalo en tu cliente de correo.
-        </app-alert>
 
         <!-- Mensaje (editable) con botón de copiar -->
         <div class="form-group">
