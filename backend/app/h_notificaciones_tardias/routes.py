@@ -1,9 +1,8 @@
 """Blueprint de notificaciones para check-in tardíos.
 
 Rutas (todas requieren JWT):
-- GET  /api/notificaciones/checkin-tardio/status   → estado: Gmail, PMS, check-ins hoy, apartamentos
-- POST /api/notificaciones/checkin-tardio/checkins → parsea XLSX subido, devuelve check-ins de hoy (en memoria, no persiste — RGPD)
-- POST /api/notificaciones/checkin-tardio/email    → dispara envío de email de notificación (destinatario + mensaje)
+- GET  /api/notificaciones/checkin-tardio/status   → estado: Gmail, PMS, check-ins hoy, apartamentos, hora_corte
+- POST /api/notificaciones/checkin-tardio/checkins → parsea XLSX, devuelve check-ins tardíos (hora_llegada >= hora_corte); en memoria, no persiste — RGPD
 """
 
 import logging
@@ -11,6 +10,7 @@ import logging
 from flask import Blueprint, g, jsonify, request
 
 from app.extensions import limiter
+from app.perfil import repository as perfil_repo
 from app.security.jwt import jwt_required
 from app.h_notificaciones_tardias import service
 
@@ -51,7 +51,12 @@ def upload_xlsx():
     if not file_bytes:
         return jsonify({"ok": False, "errors": ["El archivo está vacío."]}), 400
 
-    checkins, advertencias = service.parse_checkins_xlsx(file_bytes)
+    config = perfil_repo.get_notif_tardio_config(_empresa_id())
+    hora_corte = config.get("hora_corte", "20:00")
+
+    checkins, advertencias = service.parse_checkins_xlsx(
+        file_bytes, _empresa_id(), hora_corte, config
+    )
 
     result: dict = {"ok": True, "checkins": checkins}
     if advertencias:
@@ -59,28 +64,4 @@ def upload_xlsx():
     return jsonify(result), 200
 
 
-# ── Envío de notificación ─────────────────────────────────────────────────
-
-
-@notificaciones_bp.route("/api/notificaciones/checkin-tardio/email", methods=["POST"])
-@limiter.limit("30/hour")
-@jwt_required
-def enviar_notificacion():
-    json_data = request.get_json(silent=True)
-    if not json_data:
-        return jsonify({"ok": False, "errors": ["Se esperaba un cuerpo JSON."]}), 400
-
-    destinatario = (json_data.get("destinatario") or "").strip()
-    asunto = (json_data.get("asunto") or "Recordatorio de check-in").strip()
-    mensaje = (json_data.get("mensaje") or "").strip()
-
-    if not destinatario:
-        return jsonify({"ok": False, "errors": ["El campo 'destinatario' es obligatorio."]}), 422
-    if not mensaje:
-        return jsonify({"ok": False, "errors": ["El campo 'mensaje' no puede estar vacío."]}), 422
-
-    ok, error = service.enviar_notificacion(destinatario, asunto, mensaje)
-    if not ok:
-        return jsonify({"ok": False, "errors": [error]}), 400
-
-    return jsonify({"ok": True}), 200
+# TODO: Gmail API OAuth -- pendiente de implementar (scope futuro)
