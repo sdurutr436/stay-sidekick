@@ -9,21 +9,21 @@ section: empresa
 {% import "macros/molecules.njk" as molecules %}
 {% import "macros/organisms.njk" as organisms %}
 
-<div class="l-container" style="padding-block: var(--space-16);">
+<div class="web-page">
 
   {{ organisms.pageHeader('Contacto', '¿Tienes alguna pregunta, propuesta o quieres colaborar? Escríbenos.') }}
 
-  <div class="l-grid" style="margin-top: var(--space-8);">
+  <div class="web-page__two-col web-page__section web-page__section--last">
 
     {# Columna izquierda: info de contacto #}
-    <aside class="l-col-12 l-col-md-4" aria-label="Información de contacto directo">
+    <aside aria-label="Información de contacto directo">
       <h2>Contacto directo</h2>
-      <p class="u-text-secondary" style="margin-top: var(--space-2);">
+      <p class="u-text-secondary">
         Prefiero el correo electrónico para consultas detalladas. También puedes encontrarme
         en las redes profesionales.
       </p>
 
-      <ul style="list-style: none; padding: 0; margin-top: var(--space-6); display: flex; flex-direction: column; gap: var(--space-4);">
+      <ul class="web-page__links">
         <li>
           <a href="mailto:duran.utrerasergio2612@gmail.com" aria-label="Enviar correo a duran.utrerasergio2612@gmail.com">
             duran.utrerasergio2612@gmail.com
@@ -45,7 +45,7 @@ section: empresa
     </aside>
 
     {# Columna derecha: formulario #}
-    <section class="l-col-12 l-col-md-8" aria-labelledby="contacto-formulario-titulo">
+    <section aria-labelledby="contacto-formulario-titulo">
       <h2 id="contacto-formulario-titulo">Enviar un mensaje</h2>
 
       {# TODO: Conectar al endpoint serverless cuando esté disponible #}
@@ -54,7 +54,6 @@ section: empresa
         method="post"
         action=""
         novalidate
-        style="margin-top: var(--space-4); display: flex; flex-direction: column; gap: var(--space-4);"
       >
 
         {% call molecules.formField('Nombre', 'contacto-nombre') %}
@@ -104,7 +103,6 @@ section: empresa
             rows="5"
             maxlength="2000"
             required
-            style="resize: vertical;"
           ></textarea>
         {% endcall %}
 
