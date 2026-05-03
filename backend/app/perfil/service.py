@@ -9,7 +9,7 @@ from marshmallow import ValidationError
 from app.auth.passwords import hash_password, verify_password
 from app.common.crypto import encrypt
 from app.perfil import repository as repo
-from app.perfil.schemas import CambiarPasswordSchema, ActualizarPMSSchema, ActualizarIASchema, XlsxApartamentosConfigSchema
+from app.perfil.schemas import CambiarPasswordSchema, ActualizarPMSSchema, ActualizarIASchema, XlsxApartamentosConfigSchema, NotifTardioConfigSchema
 
 logger = logging.getLogger(__name__)
 
@@ -17,6 +17,7 @@ _schema_password    = CambiarPasswordSchema()
 _schema_pms         = ActualizarPMSSchema()
 _schema_ia          = ActualizarIASchema()
 _schema_xlsx_config = XlsxApartamentosConfigSchema()
+_schema_notif_tardio = NotifTardioConfigSchema()
 
 
 def get_perfil(user_id: str) -> dict | None:
@@ -101,6 +102,19 @@ def save_xlsx_apartamentos_config(empresa_id: str, json_data: dict) -> list[str]
     except ValidationError as exc:
         return _flatten(exc.messages)
     repo.save_xlsx_apartamentos_config(empresa_id, data)
+    return []
+
+
+def get_notif_tardio_config(empresa_id: str) -> dict:
+    return repo.get_notif_tardio_config(empresa_id)
+
+
+def save_notif_tardio_config(empresa_id: str, json_data: dict) -> list[str]:
+    try:
+        data = _schema_notif_tardio.load(json_data)
+    except ValidationError as exc:
+        return _flatten(exc.messages)
+    repo.save_notif_tardio_config(empresa_id, data)
     return []
 
 
