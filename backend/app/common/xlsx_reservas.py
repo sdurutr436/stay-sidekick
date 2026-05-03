@@ -83,16 +83,30 @@ _HEADER_MAP: dict[str, str] = {
     "reservation_id": "id_externo",
     "ref": "id_externo",
     "referencia": "id_externo",
+    # Hora de llegada
+    "hora": "hora_llegada",
+    "hora_llegada": "hora_llegada",
+    "hora_entrada": "hora_llegada",
+    "arrival_time": "hora_llegada",
+    "check_in_time": "hora_llegada",
+    "hora_checkin": "hora_llegada",
+    "time": "hora_llegada",
 }
 
 
-def parse_xlsx_reservas(file_bytes: bytes) -> tuple[list[ReservaEstandar], list[str]]:
+def parse_xlsx_reservas(
+    file_bytes: bytes,
+    col_overrides: dict[int, str] | None = None,
+) -> tuple[list[ReservaEstandar], list[str]]:
     """Parsea un archivo .xlsx y devuelve reservas normalizadas.
 
     Parameters
     ----------
     file_bytes:
         Contenido binario del archivo Excel.
+    col_overrides:
+        Mapa opcional ``{índice_columna: campo_normalizado}`` que sobreescribe
+        el col_map resuelto por cabeceras para los campos indicados.
 
     Returns
     -------
@@ -129,6 +143,11 @@ def parse_xlsx_reservas(file_bytes: bytes) -> tuple[list[ReservaEstandar], list[
             if field and field not in col_map.values():
                 col_map[i] = field
 
+        # Aplicar sobreescrituras de columna explícitas
+        if col_overrides:
+            for col_idx, field in col_overrides.items():
+                col_map[col_idx] = field
+
         # Columna de nombre es obligatoria
         if "nombre_raw" not in col_map.values():
             return [], [
@@ -147,13 +166,27 @@ def parse_xlsx_reservas(file_bytes: bytes) -> tuple[list[ReservaEstandar], list[
                 "checkin": None,
                 "checkout": None,
                 "nombre_apartamento": None,
+                "hora_llegada": None,
             }
 
             for col_idx, field in col_map.items():
                 if col_idx < len(row) and row[col_idx] is not None:
                     raw = row[col_idx]
+                    if field == "hora_llegada":
+                        # Objeto datetime/time con atributo hour
+                        if hasattr(raw, "hour"):
+                            record[field] = f"{raw.hour:02d}:{raw.minute:02d}"
+                        else:
+                            s = str(raw).strip()
+                            if len(s) >= 5 and s[2] == ":" and s[:5].replace(":", "").isdigit():
+                                record[field] = s[:5]
+                            else:
+                                record[field] = None
+                                errors.append(
+                                    f"Fila {row_idx}: valor de hora_llegada no reconocido '{raw}' — ignorado."
+                                )
                     # Las fechas pueden venir como objetos date/datetime de openpyxl
-                    if hasattr(raw, "isoformat"):
+                    elif hasattr(raw, "isoformat"):
                         record[field] = raw.isoformat()[:10]  # solo YYYY-MM-DD
                     else:
                         record[field] = str(raw).strip()
@@ -175,6 +208,7 @@ def parse_xlsx_reservas(file_bytes: bytes) -> tuple[list[ReservaEstandar], list[
                 checkout=record["checkout"] or None,
                 nombre_apartamento=record["nombre_apartamento"] or None,
                 id_apartamento_externo=None,
+                hora_llegada=record["hora_llegada"] or None,
             ))
 
         logger.info(
