@@ -7,9 +7,11 @@ section: legal
 
 {% import "macros/organisms.njk" as organisms %}
 
-<article class="l-container" style="padding-block: var(--space-16);">
+<article class="web-page">
 
   {{ organisms.pageHeader('Política de privacidad', 'Última actualización: mayo de 2026') }}
+
+  <div class="web-page__prose">
 
   <section aria-labelledby="privacidad-responsable">
     <h2 id="privacidad-responsable">1. Identidad del responsable del tratamiento</h2>
@@ -110,5 +112,7 @@ section: legal
       periódicamente.
     </p>
   </section>
+
+  </div>{# /.web-page__prose #}
 
 </article>
