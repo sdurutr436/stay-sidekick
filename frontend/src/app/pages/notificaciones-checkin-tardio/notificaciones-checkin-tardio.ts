@@ -1,9 +1,13 @@
 import { Component, computed, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+import { RouterLink } from '@angular/router';
 import { ButtonComponent } from '../../components/atoms/button/button';
 import { PageHeaderComponent } from '../../components/organisms/page-header/page-header';
 import { PanelSeccionComponent } from '../../components/organisms/panel-seccion/panel-seccion';
+import { TarjetaEstadoComponent } from '../../components/molecules/tarjeta-estado/tarjeta-estado';
+import { AlertComponent } from '../../components/molecules/alert/alert';
+import { BadgeComponent } from '../../components/atoms/badge/badge';
 
 interface CheckinHoy {
   nombre: string;
@@ -12,6 +16,8 @@ interface CheckinHoy {
   telefono: string | null;
   checkin: string | null;
   checkout: string | null;
+  hora_llegada: string | null;
+  direccion: string | null;
 }
 
 interface ApartamentoRef {
@@ -22,21 +28,19 @@ interface ApartamentoRef {
 
 interface StatusResponse {
   ok: boolean;
-  gmail_configurado: boolean;
   pms_configurado: boolean;
+  hora_corte: string;
   pms_error: string | null;
   apartamentos: ApartamentoRef[];
   reservas_pms: CheckinHoy[];
 }
-
-type EstadoEnvio = 'idle' | 'ok' | 'error';
 
 @Component({
   selector: 'app-notificaciones-checkin-tardio',
   templateUrl: './notificaciones-checkin-tardio.html',
   styleUrl: './notificaciones-checkin-tardio.scss',
   standalone: true,
-  imports: [FormsModule, PageHeaderComponent, PanelSeccionComponent, ButtonComponent],
+  imports: [FormsModule, RouterLink, PageHeaderComponent, PanelSeccionComponent, ButtonComponent, TarjetaEstadoComponent, AlertComponent, BadgeComponent],
 })
 export class NotificacionesCheckinTardioPageComponent implements OnInit, OnDestroy {
 
@@ -44,9 +48,9 @@ export class NotificacionesCheckinTardioPageComponent implements OnInit, OnDestr
 
   // ── Estado general ────────────────────────────────────────────────────
   readonly cargando = signal(true);
-  readonly gmailConfigurado = signal(false);
   readonly pmsConfigurado = signal(false);
   readonly pmsError = signal<string | null>(null);
+  readonly horaCortePerfil = signal<string>('20:00');
 
   // ── Datos del día ─────────────────────────────────────────────────────
   readonly apartamentos = signal<ApartamentoRef[]>([]);
@@ -70,13 +74,8 @@ export class NotificacionesCheckinTardioPageComponent implements OnInit, OnDestr
   readonly hayCheckins = computed(() => this.todosCheckins().length > 0);
 
   // ── Notificación ──────────────────────────────────────────────────────
-  destinatario = '';
-  asunto = 'Recordatorio de check-in';
   mensaje = '';
 
-  readonly enviando = signal(false);
-  readonly estadoEnvio = signal<EstadoEnvio>('idle');
-  readonly errorEnvio = signal<string | null>(null);
   readonly copiadoOk = signal(false);
   private _copiadoTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -98,8 +97,8 @@ export class NotificacionesCheckinTardioPageComponent implements OnInit, OnDestr
       '/api/notificaciones/checkin-tardio/status'
     ).subscribe({
       next: res => {
-        this.gmailConfigurado.set(res.gmail_configurado);
         this.pmsConfigurado.set(res.pms_configurado);
+        this.horaCortePerfil.set(res.hora_corte ?? '20:00');
         this.pmsError.set(res.pms_error ?? null);
         this.apartamentos.set(res.apartamentos);
         this.reservasPms.set(res.reservas_pms);
@@ -174,10 +173,15 @@ export class NotificacionesCheckinTardioPageComponent implements OnInit, OnDestr
     if (checkins.length === 1) {
       const c = checkins[0];
       const apt = c.apartamento ? ` en ${c.apartamento}` : '';
+      const extras = [
+        c.hora_llegada ? `Hora prevista: ${c.hora_llegada}` : null,
+        c.direccion    ? `Dirección: ${c.direccion}`         : null,
+      ].filter(Boolean).join('\n');
       return (
         `Estimado/a ${c.nombre},\n\n` +
-        `Le recordamos que su check-in${apt} está programado para hoy, ${hoy}.\n\n` +
-        `Si prevé llegar más tarde de lo habitual, le agradecemos que nos lo comunique lo antes posible para poder gestionar correctamente el acceso.\n\n` +
+        `Le recordamos que su check-in${apt} está programado para hoy, ${hoy}.` +
+        (extras ? `\n${extras}` : '') +
+        `\n\nSi prevé llegar más tarde de lo habitual, le agradecemos que nos lo comunique lo antes posible para poder gestionar correctamente el acceso.\n\n` +
         `Quedo a su disposición para cualquier consulta.\n\n` +
         `Saludos cordiales.`
       );
@@ -187,7 +191,11 @@ export class NotificacionesCheckinTardioPageComponent implements OnInit, OnDestr
       .map(c => {
         const apt = c.apartamento ? ` — ${c.apartamento}` : '';
         const hora = c.checkin ? ` (check-in: ${c.checkin})` : '';
-        return `• ${c.nombre}${apt}${hora}`;
+        const extras = [
+          c.hora_llegada ? `  Hora prevista: ${c.hora_llegada}` : null,
+          c.direccion    ? `  Dirección: ${c.direccion}`         : null,
+        ].filter(Boolean).join('\n');
+        return `• ${c.nombre}${apt}${hora}` + (extras ? `\n${extras}` : '');
       })
       .join('\n');
 
@@ -211,40 +219,5 @@ export class NotificacionesCheckinTardioPageComponent implements OnInit, OnDestr
     });
   }
 
-  // ── Envío de notificación ─────────────────────────────────────────────
-
-  enviarNotificacion(): void {
-    if (this.enviando() || !this.gmailConfigurado()) return;
-    if (!this.destinatario.trim() || !this.mensaje.trim()) return;
-
-    this.enviando.set(true);
-    this.estadoEnvio.set('idle');
-    this.errorEnvio.set(null);
-
-    this.http.post<{ ok: boolean; errors?: string[] }>(
-      '/api/notificaciones/checkin-tardio/email',
-      {
-        destinatario: this.destinatario.trim(),
-        asunto: this.asunto.trim(),
-        mensaje: this.mensaje.trim(),
-      },
-    ).subscribe({
-      next: res => {
-        this.enviando.set(false);
-        if (res.ok) {
-          this.estadoEnvio.set('ok');
-        } else {
-          this.estadoEnvio.set('error');
-          this.errorEnvio.set(res.errors?.[0] ?? 'Error desconocido.');
-        }
-      },
-      error: err => {
-        this.enviando.set(false);
-        this.estadoEnvio.set('error');
-        this.errorEnvio.set(
-          err?.error?.errors?.[0] ?? 'No se pudo conectar con el servidor.'
-        );
-      },
-    });
-  }
 }
+
