@@ -110,6 +110,129 @@
   color: $color-text-secondary;
 }
 
+// ── Importación XLSX ─────────────────────────────────────────────────────
+
+.xlsx-import {
+  display: flex;
+  flex-direction: column;
+  gap: $space-4;
+
+  &__input {
+    display: none;
+  }
+
+  &__fila {
+    display: flex;
+    align-items: center;
+    gap: $space-3;
+    flex-wrap: wrap;
+  }
+
+  &__filename {
+    @include text-body-sm;
+    color: $color-text-secondary;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 20ch;
+  }
+}
+
+// ── Referencia de tokens/variables ───────────────────────────────────────
+
+.notif-plantillas__tokens {
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;
+  padding: $space-3 $space-4;
+  background-color: $color-surface-alt;
+  border: $border-width $border-style $color-border;
+}
+
+.notif-plantillas__tokens-label {
+  @include text-label-sm;
+  color: $color-text-secondary;
+}
+
+.notif-plantillas__tokens-lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-2 $space-5;
+
+  li {
+    @include text-body-sm;
+    color: $color-text-primary;
+  }
+
+  code {
+    font-family: monospace;
+    @include text-caption-md;
+    background-color: $color-gray-200;
+    padding: 0.1em 0.35em;
+    color: $color-text-primary;
+  }
+}
+
+// ── Lista de plantillas ───────────────────────────────────────────────────
+
+.notif-plantillas {
+  display: flex;
+  flex-direction: column;
+  gap: $space-5;
+}
+
+.notif-plantillas__lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: $space-1;
+}
+
+.notif-plantillas__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $space-2 $space-4;
+  border: $border-width $border-style $color-border;
+  background-color: $color-surface;
+
+  &--activo {
+    border-color: $color-gray-500;
+    background-color: $color-surface-alt;
+  }
+}
+
+.notif-plantillas__nombre {
+  @include text-body-md;
+  color: $color-text-primary;
+}
+
+.notif-plantillas__vacia {
+  @include text-body-sm;
+  color: $color-text-secondary;
+}
+
+.notif-plantillas__nueva-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: $space-4;
+}
+
+.notif-plantillas__nueva {
+  display: flex;
+  flex-direction: column;
+  gap: $space-4;
+  padding: $space-4;
+  border: $border-width $border-style $color-border;
+  background-color: $color-surface-alt;
+  max-width: 36rem;
+}
+
 // ── Advertencias del XLSX ─────────────────────────────────────────────────
 
 .notif-checkin__advertencias {
