@@ -1,10 +1,106 @@
 ---
 layout: base.njk
 title: Política de cookies
+description: Política de cookies de Stay Sidekick conforme a la LSSI-CE y el RGPD.
 section: legal
 ---
 
-<article class="l-container">
-  <h1>Política de cookies</h1>
-  <p class="u-text-secondary u-mt-4">Este documento está en elaboración.</p>
+{% import "macros/organisms.njk" as organisms %}
+
+<article class="l-container" style="padding-block: var(--space-16);">
+
+  {{ organisms.pageHeader('Política de cookies', 'Última actualización: mayo de 2026') }}
+
+  <section aria-labelledby="cookies-que-son">
+    <h2 id="cookies-que-son">1. ¿Qué son las cookies?</h2>
+    <p>
+      Las cookies son pequeños ficheros de texto que un sitio web almacena en el dispositivo
+      del usuario al visitarlo. Permiten que el sitio recuerde información sobre su visita,
+      como preferencias de idioma o el estado de sesión de un usuario autenticado.
+    </p>
+  </section>
+
+  <section aria-labelledby="cookies-declaracion">
+    <h2 id="cookies-declaracion">2. Declaración expresa sobre el uso de cookies</h2>
+    <p>
+      <strong>Stay Sidekick no utiliza cookies de seguimiento, cookies analíticas ni cookies
+      publicitarias de terceros.</strong>
+    </p>
+    <p>
+      No se integran servicios como Google Analytics, Facebook Pixel, Hotjar ni ningún otro
+      sistema de rastreo o perfilado de usuarios. Los únicos ficheros que pueden almacenarse
+      son cookies técnicas estrictamente necesarias para el funcionamiento del servicio.
+    </p>
+  </section>
+
+  <section aria-labelledby="cookies-tabla">
+    <h2 id="cookies-tabla">3. Cookies utilizadas</h2>
+    <p>
+      A continuación se detallan las cookies que pueden estar presentes al utilizar Stay Sidekick:
+    </p>
+    <div role="region" aria-label="Tabla de cookies" style="overflow-x: auto;">
+      <table style="width: 100%; border-collapse: collapse; margin-top: var(--space-4);">
+        <caption class="u-sr-only">Listado de cookies técnicas utilizadas en Stay Sidekick</caption>
+        <thead>
+          <tr>
+            <th scope="col" style="text-align: left; padding: var(--space-3); border-bottom: 2px solid currentColor;">Nombre</th>
+            <th scope="col" style="text-align: left; padding: var(--space-3); border-bottom: 2px solid currentColor;">Tipo</th>
+            <th scope="col" style="text-align: left; padding: var(--space-3); border-bottom: 2px solid currentColor;">Finalidad</th>
+            <th scope="col" style="text-align: left; padding: var(--space-3); border-bottom: 2px solid currentColor;">Duración</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding: var(--space-3); border-bottom: 1px solid var(--color-border, #e0e0e0);">
+              <code>session</code>
+            </td>
+            <td style="padding: var(--space-3); border-bottom: 1px solid var(--color-border, #e0e0e0);">Técnica / Sesión</td>
+            <td style="padding: var(--space-3); border-bottom: 1px solid var(--color-border, #e0e0e0);">
+              Mantiene la sesión autenticada del usuario en la plataforma.
+            </td>
+            <td style="padding: var(--space-3); border-bottom: 1px solid var(--color-border, #e0e0e0);">
+              Sesión (se elimina al cerrar el navegador)
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="margin-top: var(--space-4);" class="u-text-secondary">
+      Si en el futuro se añaden nuevas cookies, esta tabla se actualizará antes de su activación.
+    </p>
+  </section>
+
+  <section aria-labelledby="cookies-gestion">
+    <h2 id="cookies-gestion">4. Cómo gestionar o eliminar las cookies</h2>
+    <p>
+      Puede configurar su navegador para bloquear o eliminar cookies. Tenga en cuenta que
+      deshabilitar la cookie de sesión impedirá el acceso autenticado a la plataforma.
+    </p>
+    <ul>
+      <li>
+        <strong>Google Chrome:</strong> Ajustes → Privacidad y seguridad → Cookies y otros datos
+        de sitios.
+      </li>
+      <li>
+        <strong>Mozilla Firefox:</strong> Ajustes → Privacidad y seguridad → Cookies y datos del
+        sitio.
+      </li>
+      <li>
+        <strong>Safari:</strong> Preferencias → Privacidad → Gestionar datos de sitios web.
+      </li>
+      <li>
+        <strong>Microsoft Edge:</strong> Configuración → Privacidad, búsqueda y servicios →
+        Cookies y permisos del sitio.
+      </li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="cookies-contacto">
+    <h2 id="cookies-contacto">5. Contacto</h2>
+    <p>
+      Para cualquier consulta sobre esta política de cookies, puede contactar con nosotros en:
+      <a href="mailto:duran.utrerasergio2612@gmail.com">duran.utrerasergio2612@gmail.com</a>.
+    </p>
+  </section>
+
 </article>
