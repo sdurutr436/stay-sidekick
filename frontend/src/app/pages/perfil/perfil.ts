@@ -105,6 +105,16 @@ export class PerfilPageComponent implements OnInit {
     return null;
   });
 
+  // Notificaciones check-in tardío
+  readonly notifHoraCorte      = signal<string>('20:00');
+  readonly notifColNombre      = signal<string>('');
+  readonly notifColCheckin     = signal<string>('');
+  readonly notifColHoraLlegada = signal<string>('');
+  readonly notifColTelefono    = signal<string>('');
+  readonly notifColApartamento = signal<string>('');
+  readonly notifGuardando      = signal(false);
+  readonly notifAlerta         = signal<Alerta | null>(null);
+
   readonly pmsOpciones = [
     { value: 'smoobu',    label: 'Smoobu'    },
     { value: 'beds24',    label: 'Beds24'    },
@@ -134,6 +144,7 @@ export class PerfilPageComponent implements OnInit {
     this.cargarXlsxReservasColumnas();
     this.cargarHeatmapXlsxColumnas();
     this.cargarHeatmapUmbrales();
+    this.cargarNotifConfig();
 
     this.route.queryParamMap.subscribe(params => {
       if (params.get('google_conectado') === 'true') {
@@ -383,6 +394,51 @@ export class PerfilPageComponent implements OnInit {
       next: u => this.heatmapUmbrales.set(u),
     });
   }
+
+  private cargarNotifConfig(): void {
+    const headers = { Authorization: `Bearer ${this.auth.getToken() ?? ''}` };
+    this.http.get<{ ok: boolean; config: any }>(
+      '/api/perfil/notificaciones-tardio-config', { headers }
+    ).subscribe({
+      next: res => {
+        const c = res.config ?? {};
+        this.notifHoraCorte.set(c.hora_corte ?? '20:00');
+        this.notifColNombre.set(c.col_nombre ?? '');
+        this.notifColCheckin.set(c.col_checkin ?? '');
+        this.notifColHoraLlegada.set(c.col_hora_llegada ?? '');
+        this.notifColTelefono.set(c.col_telefono ?? '');
+        this.notifColApartamento.set(c.col_apartamento ?? '');
+      },
+    });
+  }
+
+  guardarNotifConfig(): void {
+    this.notifAlerta.set(null);
+    this.notifGuardando.set(true);
+    const headers = { Authorization: `Bearer ${this.auth.getToken() ?? ''}` };
+    this.http.put<{ ok: boolean; errors?: string[] }>(
+      '/api/perfil/notificaciones-tardio-config',
+      {
+        hora_corte:       this.notifHoraCorte(),
+        col_nombre:       this.notifColNombre(),
+        col_checkin:      this.notifColCheckin(),
+        col_hora_llegada: this.notifColHoraLlegada(),
+        col_telefono:     this.notifColTelefono(),
+        col_apartamento:  this.notifColApartamento(),
+      },
+      { headers }
+    ).subscribe({
+      next: res => {
+        if (res.ok) this.notifAlerta.set({ tipo: 'success', mensaje: 'Configuración guardada.' });
+        else this.notifAlerta.set({ tipo: 'error', mensaje: res.errors?.[0] ?? 'Error al guardar.' });
+        this.notifGuardando.set(false);
+      },
+      error: err => {
+        this.notifAlerta.set({ tipo: 'error', mensaje: err?.error?.errors?.[0] ?? 'Error al guardar.' });
+        this.notifGuardando.set(false);
+      },
+    });
+ }
 
   private cargarIntegraciones(): void {
     this.service.getIntegraciones().subscribe({

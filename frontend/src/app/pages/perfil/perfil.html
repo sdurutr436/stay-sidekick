@@ -441,6 +441,102 @@
 
   </app-panel-seccion>
 
+  <!-- ── Notificaciones de check-in tardío ─────────────────────────────── -->
+  @if (isAdmin()) {
+    <app-panel-seccion title="Notificaciones de check-in tard\u00edo" [divider]="true">
+
+      @if (notifAlerta()) {
+        <app-alert
+          [type]="notifAlerta()!.tipo"
+          [dismissible]="true"
+          (dismissed)="notifAlerta.set(null)"
+        >
+          {{ notifAlerta()!.mensaje }}
+        </app-alert>
+      }
+
+      <form class="perfil-form" (submit)="$event.preventDefault(); guardarNotifConfig()">
+
+        <app-form-field label="Hora de corte" for="notif-hora-corte">
+          <app-form-input
+            id="notif-hora-corte"
+            type="text"
+            placeholder="20:00"
+            [value]="notifHoraCorte()"
+            (valueChange)="notifHoraCorte.set($event)"
+          />
+          <p class="u-text-secondary u-mt-4">Formato HH:MM (ej. 20:00).</p>
+        </app-form-field>
+
+        <app-form-field label="Columna XLSX \u2014 Nombre del hu\u00e9sped" for="notif-col-nombre">
+          <app-form-input
+            id="notif-col-nombre"
+            type="text"
+            placeholder="A"
+            [value]="notifColNombre()"
+            (valueChange)="notifColNombre.set($event)"
+          />
+          <p class="u-text-secondary u-mt-4">Letra A-Z o AA-AZ. Vac\u00edo = detectar por cabecera.</p>
+        </app-form-field>
+
+        <app-form-field label="Columna XLSX \u2014 Fecha de check-in" for="notif-col-checkin">
+          <app-form-input
+            id="notif-col-checkin"
+            type="text"
+            placeholder="B"
+            [value]="notifColCheckin()"
+            (valueChange)="notifColCheckin.set($event)"
+          />
+          <p class="u-text-secondary u-mt-4">Letra A-Z o AA-AZ. Vac\u00edo = detectar por cabecera.</p>
+        </app-form-field>
+
+        <app-form-field label="Columna XLSX \u2014 Hora de llegada" for="notif-col-hora-llegada">
+          <app-form-input
+            id="notif-col-hora-llegada"
+            type="text"
+            placeholder="C"
+            [value]="notifColHoraLlegada()"
+            (valueChange)="notifColHoraLlegada.set($event)"
+          />
+          <p class="u-text-secondary u-mt-4">Letra A-Z o AA-AZ. Vac\u00edo = detectar por cabecera.</p>
+        </app-form-field>
+
+        <app-form-field label="Columna XLSX \u2014 Tel\u00e9fono" for="notif-col-telefono">
+          <app-form-input
+            id="notif-col-telefono"
+            type="text"
+            placeholder="D"
+            [value]="notifColTelefono()"
+            (valueChange)="notifColTelefono.set($event)"
+          />
+          <p class="u-text-secondary u-mt-4">Letra A-Z o AA-AZ. Vac\u00edo = detectar por cabecera.</p>
+        </app-form-field>
+
+        <app-form-field label="Columna XLSX \u2014 Apartamento" for="notif-col-apartamento">
+          <app-form-input
+            id="notif-col-apartamento"
+            type="text"
+            placeholder="E"
+            [value]="notifColApartamento()"
+            (valueChange)="notifColApartamento.set($event)"
+          />
+          <p class="u-text-secondary u-mt-4">Letra A-Z o AA-AZ. Vac\u00edo = detectar por cabecera.</p>
+        </app-form-field>
+
+        <app-button
+          type="submit"
+          variant="secondary"
+          size="md"
+          [disabled]="notifGuardando()"
+        >
+          {{ notifGuardando() ? 'Guardando\u2026' : 'Guardar configuraci\u00f3n' }}
+        </app-button>
+
+      </form>
+
+    </app-panel-seccion>
+  }
+
   <!-- ── Mapa de calor — Columnas XLSX (solo sin PMS) ─────────────────── -->
   @if (!integraciones()?.pms?.configurado) {
     <app-panel-seccion title="Mapa de calor — Columnas XLSX" [divider]="true">

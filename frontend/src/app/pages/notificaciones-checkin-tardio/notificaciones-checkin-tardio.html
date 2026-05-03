@@ -10,7 +10,30 @@
     <p class="notif-checkin__cargando" aria-live="polite">Cargando datos…</p>
   } @else {
 
-    <!-- ── Sección 1: Estado del día (PMS) ───────────────────────────── -->
+    <!-- ── Sección 0: Estado de la herramienta ──────────────────── -->
+    <app-panel-seccion title="Estado">
+      <div class="tarjetas-estado">
+
+        <app-tarjeta-estado label="Estado PMS">
+          <ng-container actions>
+            @if (pmsConfigurado()) {
+              <app-badge variant="solid">Conectado</app-badge>
+            } @else {
+              <app-badge variant="outline">Desconectado</app-badge>
+            }
+          </ng-container>
+        </app-tarjeta-estado>
+
+        <app-tarjeta-estado label="Hora de corte" [valor]="horaCortePerfil()">
+          <p class="u-text-secondary" actions-below>
+            Configurable en <a routerLink="/perfil">Perfil</a>
+          </p>
+        </app-tarjeta-estado>
+
+      </div>
+    </app-panel-seccion>
+
+    <!-- ── Sección 1: Check-ins de hoy (PMS) ─────────────────── -->
     <app-panel-seccion
       title="Check-ins de hoy"
       description="Reservas con entrada programada para hoy obtenidas desde tu PMS."
@@ -36,6 +59,8 @@
               <th scope="col">Apartamento</th>
               <th scope="col">Email</th>
               <th scope="col">Teléfono</th>
+              <th scope="col">Hora llegada</th>
+              <th scope="col">Dirección</th>
               <th scope="col">Checkout</th>
             </tr>
           </thead>
@@ -46,6 +71,8 @@
                 <td>{{ r.apartamento ?? '—' }}</td>
                 <td>{{ r.email ?? '—' }}</td>
                 <td>{{ r.telefono ?? '—' }}</td>
+                <td>{{ r.hora_llegada ?? '—' }}</td>
+                <td>{{ r.direccion ?? '—' }}</td>
                 <td>{{ r.checkout ?? '—' }}</td>
               </tr>
             }
@@ -127,6 +154,8 @@
                 <th scope="col">Apartamento</th>
                 <th scope="col">Email</th>
                 <th scope="col">Teléfono</th>
+                <th scope="col">Hora llegada</th>
+                <th scope="col">Dirección</th>
                 <th scope="col">Checkout</th>
               </tr>
             </thead>
@@ -137,6 +166,8 @@
                   <td>{{ r.apartamento ?? '—' }}</td>
                   <td>{{ r.email ?? '—' }}</td>
                   <td>{{ r.telefono ?? '—' }}</td>
+                  <td>{{ r.hora_llegada ?? '—' }}</td>
+                  <td>{{ r.direccion ?? '—' }}</td>
                   <td>{{ r.checkout ?? '—' }}</td>
                 </tr>
               }
@@ -152,40 +183,15 @@
       title="Maestro de apartamentos"
       description="Propiedades activas registradas en tu cuenta."
     >
-      @if (apartamentos().length === 0) {
-        <p class="notif-checkin__aviso" role="note">
-          No hay apartamentos registrados. Añádelos desde el Maestro de apartamentos.
-        </p>
-      } @else {
-        <ul class="notif-checkin__apt-list">
-          @for (apt of apartamentos(); track apt.id) {
-            <li class="notif-checkin__apt-item">
-              <span class="notif-checkin__apt-nombre">{{ apt.nombre }}</span>
-              @if (apt.ciudad) {
-                <span class="notif-checkin__apt-ciudad">{{ apt.ciudad }}</span>
-              }
-            </li>
-          }
-        </ul>
-      }
+      <p>{{ apartamentos().length }} apartamentos activos registrados.</p>
+      <a routerLink="/perfil" class="u-link">Ver Maestro de apartamentos</a>
     </app-panel-seccion>
 
     <!-- ── Sección 4: Enviar notificación ────────────────────────────── -->
     <app-panel-seccion
-      title="Enviar notificación"
-      description="Personaliza el mensaje y envíalo por email. Puedes generar una plantilla automática a partir de los check-ins cargados o escribir el tuyo propio."
+      title="Mensaje"
+      description="Genera una plantilla automática o escribe tu propio mensaje. Cópialo y pégalo en tu cliente de correo."
     >
-      <!-- Aviso Gmail fuera del body principal: usa [pre-body] -->
-      @if (!gmailConfigurado()) {
-        <div class="notif-checkin__gmail-aviso" role="alert" pre-body>
-          <p>
-            <strong>Gmail SMTP no configurado.</strong>
-            Para habilitar el envío de emails, añade
-            <code>GMAIL_USER</code> y <code>GMAIL_APP_PASSWORD</code>
-            en las variables de entorno del servidor.
-          </p>
-        </div>
-      }
 
       <div class="notif-form">
 
@@ -214,32 +220,11 @@
           }
         </div>
 
-        <!-- Destinatario -->
-        <div class="form-group">
-          <label class="form-label" for="notif-destinatario">Enviar a</label>
-          <input
-            id="notif-destinatario"
-            type="email"
-            class="form-input"
-            placeholder="correo@ejemplo.com"
-            [disabled]="!gmailConfigurado()"
-            [(ngModel)]="destinatario"
-            name="destinatario"
-          />
-        </div>
-
-        <!-- Asunto -->
-        <div class="form-group">
-          <label class="form-label" for="notif-asunto">Asunto</label>
-          <input
-            id="notif-asunto"
-            type="text"
-            class="form-input"
-            [disabled]="!gmailConfigurado()"
-            [(ngModel)]="asunto"
-            name="asunto"
-          />
-        </div>
+        <!-- Aviso: envío no disponible -->
+        <app-alert type="info">
+          El envío directo por Gmail estará disponible próximamente.
+          Copia el mensaje y pégalo en tu cliente de correo.
+        </app-alert>
 
         <!-- Mensaje (editable) con botón de copiar -->
         <div class="form-group">
@@ -263,37 +248,12 @@
                 id="notif-mensaje"
                 class="form-textarea notif-form__textarea"
                 placeholder="Escribe o genera el mensaje de notificación aquí…"
-                [attr.disabled]="!gmailConfigurado() ? '' : null"
                 [(ngModel)]="mensaje"
                 name="mensaje"
               ></textarea>
             </div>
           </div>
         </div>
-
-        <!-- Acciones envío -->
-        <div class="form-actions">
-          <app-button
-            variant="primary"
-            size="md"
-            [disabled]="!gmailConfigurado() || enviando() || !destinatario.trim() || !mensaje.trim()"
-            (click)="enviarNotificacion()"
-          >
-            @if (enviando()) { Enviando… } @else { Enviar notificación }
-          </app-button>
-        </div>
-
-        <!-- Feedback de envío -->
-        @if (estadoEnvio() === 'ok') {
-          <p class="notif-form__feedback notif-form__feedback--ok" role="status" aria-live="polite">
-            Email enviado correctamente.
-          </p>
-        }
-        @if (estadoEnvio() === 'error') {
-          <p class="notif-form__feedback notif-form__feedback--error" role="alert" aria-live="assertive">
-            {{ errorEnvio() }}
-          </p>
-        }
 
       </div>
     </app-panel-seccion>
