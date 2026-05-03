@@ -1,0 +1,40 @@
+{#
+  MACROS: MOLECULES
+  Espejo de los @Input() de los componentes Angular molecules.
+#}
+
+{# ── formField ────────────────────────────────────────────────────────────── #}
+{# labelFor: valor del atributo for del <label>.                              #}
+{# Usa {% call %} para el input/control interior.                             #}
+{% macro formField(label, labelFor, error='', hasError=false) %}
+  <div class="form-field{% if hasError %} form-field--error{% endif %}">
+    <label class="form-label" for="{{ labelFor }}">{{ label }}</label>
+    {{ caller() }}
+    {% if hasError and error %}
+      <p class="form-field__error">{{ error }}</p>
+    {% endif %}
+  </div>
+{% endmacro %}
+
+{# ── formInputIcon ────────────────────────────────────────────────────────── #}
+{# Usa {% call %} para pasar el icon <span> + <input> juntos.                 #}
+{% macro formInputIcon() %}
+  <div class="form-input-wrapper">
+    {{ caller() }}
+  </div>
+{% endmacro %}
+
+{# ── card ─────────────────────────────────────────────────────────────────── #}
+{% macro card(variant='default') %}
+  <article class="card{% if variant == 'horizontal' %} card--horizontal{% endif %}">
+    {{ caller() }}
+  </article>
+{% endmacro %}
+
+{# ── alert ────────────────────────────────────────────────────────────────── #}
+{# dismissible no añade botón de cierre — sin lógica JS en el sitio estático. #}
+{% macro alert(type='info', dismissible=false) %}
+  <div class="alert alert--{{ type }}" role="alert">
+    {{ caller() }}
+  </div>
+{% endmacro %}

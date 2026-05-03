@@ -28,12 +28,8 @@
 
     {# Acciones: sesión + CTA #}
     <nav class="header__actions" aria-label="Acciones de usuario">
-      <a href="/login" class="btn btn--secondary btn--md">
-        Iniciar sesión
-      </a>
-      <a href="/solicitud" class="btn btn--primary btn--md">
-        Presentar solicitud
-      </a>
+      {{ atoms.button('Iniciar sesión', '/login', 'secondary', 'md') }}
+      {{ atoms.button('Presentar solicitud', '/solicitud', 'primary', 'md') }}
     </nav>
 
   </div>

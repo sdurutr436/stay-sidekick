@@ -1,0 +1,14 @@
+{#
+  MACROS: ORGANISMS
+  Espejo de los @Input() de los componentes Angular organisms.
+#}
+
+{# ── pageHeader ───────────────────────────────────────────────────────────── #}
+{% macro pageHeader(title, subtitle='') %}
+  <div class="page-header">
+    <h1>{{ title }}</h1>
+    {% if subtitle %}
+      <p>{{ subtitle }}</p>
+    {% endif %}
+  </div>
+{% endmacro %}

@@ -4,6 +4,7 @@ title: Iniciar sesión
 description: Accede a tu panel de Stay Sidekick.
 section: login
 ---
+{% import "macros/atoms.njk" as atoms %}
 
 <section class="l-container">
   <section class="login-page">
@@ -72,9 +73,7 @@ section: login
 
       {# ── Enviar ──────────────────────────────────────────────────────── #}
       <div class="form-login__actions">
-        <button type="submit" class="btn btn--primary btn--md">
-          Iniciar sesión
-        </button>
+        {{ atoms.button('Iniciar sesión', '', 'primary', 'md', false, 'submit') }}
       </div>
 
       {# ── Pie — enlace a solicitud ─────────────────────────────────────── #}
