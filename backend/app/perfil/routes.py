@@ -1,13 +1,15 @@
 """Blueprint de perfil de usuario.
 
 Rutas (todas requieren JWT):
-- GET  /api/perfil                          → datos del usuario autenticado
-- PUT  /api/perfil/password                 → cambiar contraseña
-- GET  /api/perfil/integraciones            → estado de las integraciones de la empresa
-- PUT  /api/perfil/integraciones/pms        → actualizar integración PMS (solo admin)
-- PUT  /api/perfil/integraciones/ia         → actualizar integración IA (solo admin)
-- GET  /api/perfil/xlsx-apartamentos        → leer configuración de columnas XLSX
-- PUT  /api/perfil/xlsx-apartamentos        → guardar configuración de columnas XLSX (solo admin)
+- GET  /api/perfil                                    → datos del usuario autenticado
+- PUT  /api/perfil/password                           → cambiar contraseña
+- GET  /api/perfil/integraciones                      → estado de las integraciones de la empresa
+- PUT  /api/perfil/integraciones/pms                  → actualizar integración PMS (solo admin)
+- PUT  /api/perfil/integraciones/ia                   → actualizar integración IA (solo admin)
+- GET  /api/perfil/xlsx-apartamentos                  → leer configuración de columnas XLSX
+- PUT  /api/perfil/xlsx-apartamentos                  → guardar configuración de columnas XLSX (solo admin)
+- GET  /api/perfil/notificaciones-tardio-config       → leer config de notificaciones tardías (cualquier usuario)
+- PUT  /api/perfil/notificaciones-tardio-config       → guardar config de notificaciones tardías (solo admin)
 """
 
 import logging
@@ -116,6 +118,30 @@ def save_xlsx_apartamentos():
         return jsonify({"ok": False, "errors": ["Se esperaba un cuerpo JSON."]}), 400
 
     errors = service.save_xlsx_apartamentos_config(_empresa_id(), json_data)
+    if errors:
+        return jsonify({"ok": False, "errors": errors}), 422
+
+    return jsonify({"ok": True}), 200
+
+
+@perfil_bp.route("/api/perfil/notificaciones-tardio-config", methods=["GET"])
+@jwt_required
+def get_notif_tardio_config():
+    config = service.get_notif_tardio_config(_empresa_id())
+    return jsonify({"ok": True, "config": config}), 200
+
+
+@perfil_bp.route("/api/perfil/notificaciones-tardio-config", methods=["PUT"])
+@jwt_required
+def save_notif_tardio_config():
+    if not _is_admin():
+        return jsonify({"ok": False, "errors": ["Solo el administrador puede modificar esta configuración."]}), 403
+
+    json_data = request.get_json(silent=True)
+    if not json_data:
+        return jsonify({"ok": False, "errors": ["Se esperaba un cuerpo JSON."]}), 400
+
+    errors = service.save_notif_tardio_config(_empresa_id(), json_data)
     if errors:
         return jsonify({"ok": False, "errors": errors}), 422
 
