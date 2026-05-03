@@ -47,8 +47,8 @@ def get_status(empresa_id: str) -> dict:
         for a in apts
     ]
 
-    # Mapa id_externo -> Apartamento para cruce de dirección
-    apts_por_externo = {a.id_externo: a for a in apts if a.id_externo}
+    # Mapa id_externo normalizado -> Apartamento para cruce de nombre y dirección
+    apts_por_externo = {_norm_id(a.id_externo): a for a in apts if a.id_externo}
 
     config = perfil_repo.get_notif_tardio_config(empresa_id)
     hora_corte = config.get("hora_corte", "20:00")
@@ -128,9 +128,9 @@ def parse_checkins_xlsx(
         if r.hora_llegada and r.hora_llegada >= hora_corte
     ]
 
-    # Cruzar con maestro para dirección
+    # Cruzar con maestro para nombre y dirección
     apts = apt_repo.list_by_empresa(empresa_id)
-    apts_por_externo = {a.id_externo: a for a in apts if a.id_externo}
+    apts_por_externo = {_norm_id(a.id_externo): a for a in apts if a.id_externo}
 
     return [_reserva_a_dict(r, apts_por_externo) for r in tardias], errores
 
@@ -155,14 +155,31 @@ def enviar_notificacion(
 # ── Helpers privados ──────────────────────────────────────────────────────
 
 
+def _norm_id(valor: str) -> str:
+    """Normaliza un ID externo quitando llaves y espacios para comparación robusta.
+
+    Ejemplos: '{4}' → '4', '  4  ' → '4', '{APT-12}' → 'APT-12'.
+    """
+    s = str(valor).strip().strip("{}").strip()
+    try:
+        return str(int(s))   # '04' → '4'
+    except ValueError:
+        return s
+
+
 def _reserva_a_dict(r, apartamentos_por_externo: dict | None = None) -> dict:
     direccion = None
     nombre_apt = r.nombre_apartamento
-    if apartamentos_por_externo and r.id_apartamento_externo:
-        apt = apartamentos_por_externo.get(r.id_apartamento_externo)
-        if apt:
-            direccion = apt.direccion
-            nombre_apt = apt.nombre
+
+    if apartamentos_por_externo:
+        # Intentar cruce con id_apartamento_externo y con nombre_apartamento
+        # (el XLSX puede tener el ID del maestro en la columna de apartamento)
+        for candidato in filter(None, [r.id_apartamento_externo, r.nombre_apartamento]):
+            apt = apartamentos_por_externo.get(_norm_id(candidato))
+            if apt:
+                direccion = apt.direccion
+                nombre_apt = apt.nombre
+                break
     return {
         "nombre": r.nombre_raw,
         "apartamento": nombre_apt,
