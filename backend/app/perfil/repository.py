@@ -63,6 +63,34 @@ def save_xlsx_apartamentos_config(empresa_id: str, data: dict) -> None:
     db.session.commit()
 
 
+_NOTIF_TARDIO_DEFAULTS: dict = {
+    "hora_corte": "20:00",
+    "col_nombre": "",
+    "col_checkin": "",
+    "col_hora_llegada": "",
+    "col_telefono": "",
+    "col_apartamento": "",
+}
+
+
+def get_notif_tardio_config(empresa_id: str) -> dict:
+    empresa = db.session.query(Empresa).filter_by(id=empresa_id).first()
+    if not empresa:
+        return dict(_NOTIF_TARDIO_DEFAULTS)
+    return (empresa.configuracion or {}).get("notificaciones_tardias", dict(_NOTIF_TARDIO_DEFAULTS))
+
+
+def save_notif_tardio_config(empresa_id: str, data: dict) -> None:
+    empresa = db.session.query(Empresa).filter_by(id=empresa_id).first()
+    if not empresa:
+        return
+    config = dict(empresa.configuracion or {})
+    config["notificaciones_tardias"] = data
+    empresa.configuracion = config
+    flag_modified(empresa, "configuracion")
+    db.session.commit()
+
+
 def upsert_ia(empresa_id: str, proveedor: str, modelo: str | None, api_key_cifrada: str | None) -> None:
     ia = db.session.query(ConfiguracionIA).filter_by(empresa_id=empresa_id).first()
     if ia:
