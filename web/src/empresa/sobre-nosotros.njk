@@ -1,10 +1,84 @@
 ---
 layout: base.njk
 title: Sobre nosotros
+description: Conoce a Sergio Durán Utrera, el autor de Stay Sidekick.
 section: empresa
 ---
 
-<section class="l-container">
-  <h1>Sobre nosotros</h1>
-  <p class="u-text-secondary u-mt-4">Esta sección está en construcción.</p>
-</section>
+{% import "macros/atoms.njk" as atoms %}
+{% import "macros/organisms.njk" as organisms %}
+
+<div class="l-container" style="padding-block: var(--space-16);">
+
+  {{ organisms.pageHeader('Sobre nosotros', 'El proyecto y la persona detrás de Stay Sidekick.') }}
+
+  <section aria-labelledby="sobre-autor">
+    <div class="l-grid" style="margin-top: var(--space-8); align-items: start;">
+
+      {# Foto de perfil #}
+      <figure class="l-col-12 l-col-md-3" style="margin: 0;">
+        {# TODO: Añadir foto de perfil en /assets/img/sergio.jpg #}
+        <img
+          src="/assets/img/sergio.jpg"
+          alt="Foto de perfil de Sergio Durán Utrera"
+          style="width: 100%; aspect-ratio: 1/1; object-fit: cover; border: 1px solid var(--color-border, #e0e0e0);"
+          loading="lazy"
+          width="300"
+          height="300"
+        >
+      </figure>
+
+      {# Datos del autor #}
+      <div class="l-col-12 l-col-md-9">
+        <h2 id="sobre-autor">Sergio Durán Utrera</h2>
+        <p style="margin-top: var(--space-2);">
+          Estudiante de 2.º de DAW (Desarrollo de Aplicaciones Web) en el
+          <strong>IES Rafael Alberti, Cádiz</strong>.
+        </p>
+
+        <h3 style="margin-top: var(--space-6);">Experiencia previa</h3>
+        <p>
+          Antes de iniciar el ciclo formativo, trabajé durante <strong>2 años y 5 meses</strong>
+          como <strong>recepcionista en una empresa de gestión de apartamentos vacacionales</strong>.
+          Esa experiencia me permitió vivir de primera mano los flujos operativos reales:
+          coordinación de limpiezas, gestión de check-ins tardíos, comunicación con huéspedes
+          y el trabajo diario con PMS.
+        </p>
+
+        <h3 style="margin-top: var(--space-6);">El origen del proyecto</h3>
+        <p>
+          Stay Sidekick nació de la observación directa de tareas repetitivas que los PMS
+          no cubren bien: exportar contactos manualmente, detectar llegadas tardías sin
+          automatización, gestionar bases de datos de alojamientos en hojas de cálculo o
+          escribir el mismo mensaje de bienvenida una y otra vez con pequeñas variaciones.
+          Conversaciones con compañeros del sector operativo y de limpieza confirmaron que
+          estos problemas eran transversales a muchas empresas del sector.
+        </p>
+
+        <nav aria-label="Redes sociales y contacto de Sergio Durán Utrera" style="margin-top: var(--space-6);">
+          <ul style="list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: var(--space-4);">
+            <li>
+              <a href="https://github.com/sdurutr436" target="_blank" rel="noopener noreferrer"
+                 aria-label="Perfil de GitHub de Sergio Durán Utrera">
+                GitHub
+              </a>
+            </li>
+            <li>
+              <a href="https://www.linkedin.com/in/sergio-dur%C3%A1n-utrera/" target="_blank" rel="noopener noreferrer"
+                 aria-label="Perfil de LinkedIn de Sergio Durán Utrera">
+                LinkedIn
+              </a>
+            </li>
+            <li>
+              <a href="mailto:duran.utrerasergio2612@gmail.com">
+                duran.utrerasergio2612@gmail.com
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+
+    </div>
+  </section>
+
+</div>
