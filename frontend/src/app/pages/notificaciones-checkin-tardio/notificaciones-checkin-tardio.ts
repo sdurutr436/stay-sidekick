@@ -36,21 +36,6 @@ interface PlantillaNotif {
   contenido: string; // tokens: {NOMBRE} {APARTAMENTO} {HORA_LLEGADA} {DIRECCION}
 }
 
-// ── INICIO DATOS MOCK ──────────────────────────────────────────────────
-// TODO: reemplazar por GET /api/notificaciones/checkin-tardio/plantillas
-const MOCK_PLANTILLAS: PlantillaNotif[] = [
-  {
-    id: 'default',
-    nombre: 'Recordatorio estándar',
-    contenido:
-      'Estimado/a {NOMBRE},\n\nLe recordamos que su check-in en {APARTAMENTO} está programado para hoy.\n' +
-      'Hora prevista: {HORA_LLEGADA}\n' +
-      'Dirección: {DIRECCION}\n\n' +
-      'Si prevé llegar más tarde de lo habitual, le agradecemos que nos lo comunique.\n\nSaludos cordiales.',
-  },
-];
-// ── FIN DATOS MOCK ─────────────────────────────────────────────────────
-
 interface StatusResponse {
   ok: boolean;
   pms_configurado: boolean;
@@ -102,13 +87,13 @@ export class NotificacionesCheckinTardioPageComponent implements OnInit, OnDestr
   readonly hayCheckins = computed(() => this.todosCheckins().length > 0);
 
   // ── Plantillas ────────────────────────────────────────────────────────
-  // TODO: reemplazar MOCK_PLANTILLAS por llamada al backend
-  readonly plantillas = signal<PlantillaNotif[]>(MOCK_PLANTILLAS);
+  readonly plantillas = signal<PlantillaNotif[]>([]);
   readonly plantillaSeleccionada = signal<PlantillaNotif | null>(null);
   readonly panelNuevaPlantilla = signal(false);
   readonly nuevaPlantillaNombre = signal('');
   readonly nuevaPlantillaContenido = signal('');
   readonly guardandoPlantilla = signal(false);
+  readonly plantillaAlerta = signal<{ tipo: 'success' | 'error'; mensaje: string } | null>(null);
 
   // ── Notificación ──────────────────────────────────────────────────────
   mensaje = '';
@@ -120,6 +105,7 @@ export class NotificacionesCheckinTardioPageComponent implements OnInit, OnDestr
 
   ngOnInit(): void {
     this.cargarStatus();
+    this.cargarPlantillas();
   }
 
   ngOnDestroy(): void {
@@ -194,6 +180,44 @@ export class NotificacionesCheckinTardioPageComponent implements OnInit, OnDestr
   }
 
   // ── Plantillas ────────────────────────────────────────────────────────
+
+  private cargarPlantillas(): void {
+    this.http.get<{ ok: boolean; plantillas: PlantillaNotif[] }>(
+      '/api/notificaciones/checkin-tardio/plantillas'
+    ).subscribe({
+      next: res => this.plantillas.set(res.plantillas ?? []),
+    });
+  }
+
+  guardarNuevaPlantilla(): void {
+    const nombre = this.nuevaPlantillaNombre().trim();
+    const contenido = this.nuevaPlantillaContenido().trim();
+    if (!nombre || !contenido) return;
+
+    this.plantillaAlerta.set(null);
+    this.guardandoPlantilla.set(true);
+    this.http.post<{ ok: boolean; plantilla: PlantillaNotif; errors?: string[] }>(
+      '/api/notificaciones/checkin-tardio/plantillas',
+      { nombre, contenido }
+    ).subscribe({
+      next: res => {
+        if (res.ok) {
+          this.plantillas.update(list => [...list, res.plantilla]);
+          this.nuevaPlantillaNombre.set('');
+          this.nuevaPlantillaContenido.set('');
+          this.panelNuevaPlantilla.set(false);
+          this.plantillaAlerta.set({ tipo: 'success', mensaje: 'Plantilla guardada.' });
+        } else {
+          this.plantillaAlerta.set({ tipo: 'error', mensaje: res.errors?.[0] ?? 'Error al guardar.' });
+        }
+        this.guardandoPlantilla.set(false);
+      },
+      error: err => {
+        this.plantillaAlerta.set({ tipo: 'error', mensaje: err?.error?.errors?.[0] ?? 'Error al guardar.' });
+        this.guardandoPlantilla.set(false);
+      },
+    });
+  }
 
   usarPlantilla(p: PlantillaNotif): void {
     this.plantillaSeleccionada.set(p);
