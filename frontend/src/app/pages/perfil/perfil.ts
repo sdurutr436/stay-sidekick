@@ -61,11 +61,12 @@ export class PerfilPageComponent implements OnInit {
   readonly pmsAlerta     = signal<Alerta | null>(null);
 
   // IA
-  readonly iaProveedor  = signal('');
-  readonly iaModelo     = signal('');
-  readonly iaApiKey     = signal('');
-  readonly iaGuardando  = signal(false);
-  readonly iaAlerta     = signal<Alerta | null>(null);
+  readonly iaProveedor     = signal('');
+  readonly iaModelo        = signal('');
+  readonly iaApiKey        = signal('');
+  readonly iaGuardando     = signal(false);
+  readonly iaAlerta        = signal<Alerta | null>(null);
+  readonly iaApiKeyVisible = signal(false);
 
   // Google
   readonly googleGuardando = signal(false);
@@ -219,6 +220,10 @@ export class PerfilPageComponent implements OnInit {
         this.pmsGuardando.set(false);
       },
     });
+  }
+
+  toggleIaApiKeyVisible(): void {
+    this.iaApiKeyVisible.update(v => !v);
   }
 
   guardarIA(): void {

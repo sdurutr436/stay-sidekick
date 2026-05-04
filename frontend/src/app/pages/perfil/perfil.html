@@ -235,13 +235,23 @@
 
         <app-form-field label="API Key (opcional si usas el sistema)" for="ia-apikey">
           @if (isAdmin()) {
-            <app-form-input
-              id="ia-apikey"
-              type="password"
-              placeholder="Deja vacío para usar el sistema"
-              [value]="iaApiKey()"
-              (valueChange)="iaApiKey.set($event)"
-            />
+            <div class="perfil-page__apikey-wrap">
+              <app-form-input
+                id="ia-apikey"
+                [type]="iaApiKeyVisible() ? 'text' : 'password'"
+                placeholder="Deja vacío para usar el sistema"
+                [value]="iaApiKey()"
+                (valueChange)="iaApiKey.set($event)"
+              />
+              <button
+                type="button"
+                class="perfil-page__apikey-toggle"
+                (click)="toggleIaApiKeyVisible()"
+                [attr.aria-label]="iaApiKeyVisible() ? 'Ocultar API key' : 'Mostrar API key'"
+              >
+                {{ iaApiKeyVisible() ? 'Ocultar' : 'Mostrar' }}
+              </button>
+            </div>
           } @else {
             <input
               class="form-input"
