@@ -110,6 +110,13 @@
     text-align: center;
   }
 
+  // Selects de filtro (categoría e idioma) bajo el buscador
+  &__filtro {
+    border-top: none;
+    border-radius: 0;
+    width: 100%;
+  }
+
   // Botón "Nueva plantilla" (ancho completo, debajo del buscador)
   &__nueva-wrap {
     padding: $space-3;
@@ -168,6 +175,18 @@
     font-weight: $font-weight-heading;
   }
 
+  // Fila de idioma y categoría del editor (visible solo cuando isEditing)
+  &__meta {
+    display: flex;
+    gap: $space-3;
+    margin-bottom: $space-1;
+  }
+
+  &__meta-select {
+    flex: 1;
+    min-width: 0;
+  }
+
   // Barra de variables: dropdown buscable + botón insertar
   &__toolbar {
     display: flex;
@@ -205,6 +224,27 @@
     display: flex;
     align-items: center;
     gap: $space-3;
+  }
+
+  // Bloque de traducción: select de idioma + botón Traducir
+  &__traducir {
+    display: flex;
+    align-items: center;
+    gap: $space-3;
+    margin-top: $space-2;
+  }
+
+  &__traducir-select {
+    flex: 1;
+    min-width: 0;
+  }
+
+  // Indicador de uso de IA (solo cuando no hay BYOK)
+  &__uso-ia {
+    @include text-body-sm;
+    color: $color-text-secondary;
+    text-align: center;
+    margin-top: $space-2;
   }
 
   // Wrapper del botón copiar: position relative para anclar el span

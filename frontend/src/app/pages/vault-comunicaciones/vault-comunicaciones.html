@@ -22,6 +22,35 @@
         />
       </div>
 
+      <select
+        class="form-input vault-sidebar__filtro"
+        (change)="onFiltroCategoria($any($event.target).value)"
+        aria-label="Filtrar por categoría"
+      >
+        <option value="">Todas las categorías</option>
+        <option value="BIENVENIDA">Bienvenida</option>
+        <option value="INSTRUCCIONES">Instrucciones</option>
+        <option value="RECORDATORIO">Recordatorio</option>
+        <option value="CHECKIN_TARDIO">Check-in tardío</option>
+        <option value="CHECKOUT">Check-out</option>
+        <option value="INCIDENCIA">Incidencia</option>
+        <option value="GENERAL">General</option>
+      </select>
+
+      <select
+        class="form-input vault-sidebar__filtro"
+        (change)="onFiltroIdioma($any($event.target).value)"
+        aria-label="Filtrar por idioma"
+      >
+        <option value="">Todos los idiomas</option>
+        <option value="es">Español</option>
+        <option value="en">English</option>
+        <option value="fr">Français</option>
+        <option value="de">Deutsch</option>
+        <option value="it">Italiano</option>
+        <option value="pt">Português</option>
+      </select>
+
       <!-- Botón para crear una plantilla nueva -->
       <div class="vault-sidebar__nueva-wrap">
         <button
@@ -79,6 +108,39 @@
             aria-label="Nombre de la plantilla"
             maxlength="200"
           />
+        </div>
+      }
+
+      @if (isEditing()) {
+        <div class="vault-editor__meta">
+          <select
+            class="form-input vault-editor__meta-select"
+            [value]="editorIdioma()"
+            (change)="onEditorIdioma($any($event.target).value)"
+            aria-label="Idioma de la plantilla"
+          >
+            <option value="es">Español</option>
+            <option value="en">English</option>
+            <option value="fr">Français</option>
+            <option value="de">Deutsch</option>
+            <option value="it">Italiano</option>
+            <option value="pt">Português</option>
+          </select>
+          <select
+            class="form-input vault-editor__meta-select"
+            [value]="editorCategoria() ?? ''"
+            (change)="onEditorCategoria($any($event.target).value)"
+            aria-label="Categoría de la plantilla"
+          >
+            <option value="">Sin categoría</option>
+            <option value="BIENVENIDA">Bienvenida</option>
+            <option value="INSTRUCCIONES">Instrucciones</option>
+            <option value="RECORDATORIO">Recordatorio</option>
+            <option value="CHECKIN_TARDIO">Check-in tardío</option>
+            <option value="CHECKOUT">Check-out</option>
+            <option value="INCIDENCIA">Incidencia</option>
+            <option value="GENERAL">General</option>
+          </select>
         </div>
       }
 
@@ -216,6 +278,32 @@
               Refinar con IA
             }
           </app-button>
+          <div class="vault-editor__traducir">
+            <select
+              class="form-input vault-editor__traducir-select"
+              [value]="idiomaDestino() ?? ''"
+              (change)="onIdiomaDestino($any($event.target).value)"
+              [disabled]="!isEditing()"
+              aria-label="Idioma de destino para traducción"
+            >
+              <option value="">Traducir a…</option>
+              <option value="es">Español</option>
+              <option value="en">English</option>
+              <option value="fr">Français</option>
+              <option value="de">Deutsch</option>
+              <option value="it">Italiano</option>
+              <option value="pt">Português</option>
+            </select>
+            <app-button
+              variant="secondary"
+              size="md"
+              [disabled]="traduciendo() || !isEditing() || !idiomaDestino()"
+              title="Traduce el contenido del editor al idioma seleccionado. Consume créditos de IA."
+              (click)="traducirConIA()"
+            >
+              @if (traduciendo()) { Traduciendo… } @else { Traducir }
+            </app-button>
+          </div>
         </div>
 
         <!-- Lado derecho: copiar mensaje + confirmación + guardar -->
@@ -271,6 +359,14 @@
         </div>
 
       </div>
+
+      @if (!byokActivo() && usoIA()) {
+        <p class="vault-editor__uso-ia" aria-live="polite">
+          {{ usoIA()!.uso_hoy }}/{{ usoIA()!.limite_diario }} llamadas hoy
+          · {{ usoIA()!.uso_semana }}/{{ usoIA()!.limite_semanal }} esta semana
+        </p>
+      }
+
     </section>
 
   </div>
