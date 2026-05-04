@@ -212,57 +212,58 @@
 
       <form class="perfil-form" (submit)="$event.preventDefault(); guardarIA()">
 
-        <app-form-field label="Proveedor IA" for="ia-proveedor">
+        <app-form-field label="Proveedor de IA" for="ia-proveedor">
           <app-form-select
             id="ia-proveedor"
-            [options]="iaOpciones"
+            [options]="iaGrupoOpciones"
             [value]="iaProveedor()"
             [disabled]="!isAdmin()"
-            (valueChange)="iaProveedor.set($event)"
+            (valueChange)="onIaProveedorChange($event)"
           />
         </app-form-field>
 
-        <app-form-field label="Modelo" for="ia-modelo">
-          <app-form-input
-            id="ia-modelo"
-            type="text"
-            placeholder="ej. gemini-2.0-flash, gpt-4o…"
-            [value]="iaModelo()"
-            [disabled]="!isAdmin()"
-            (valueChange)="iaModelo.set($event)"
-          />
-        </app-form-field>
-
-        <app-form-field label="API Key (opcional si usas el sistema)" for="ia-apikey">
-          @if (isAdmin()) {
-            <div class="perfil-page__apikey-wrap">
-              <app-form-input
-                id="ia-apikey"
-                [type]="iaApiKeyVisible() ? 'text' : 'password'"
-                placeholder="Deja vacío para usar el sistema"
-                [value]="iaApiKey()"
-                (valueChange)="iaApiKey.set($event)"
-              />
-              <button
-                type="button"
-                class="perfil-page__apikey-toggle"
-                (click)="toggleIaApiKeyVisible()"
-                [attr.aria-label]="iaApiKeyVisible() ? 'Ocultar API key' : 'Mostrar API key'"
-              >
-                {{ iaApiKeyVisible() ? 'Ocultar' : 'Mostrar' }}
-              </button>
-            </div>
-          } @else {
-            <input
-              class="form-input"
-              type="text"
-              id="ia-apikey"
-              [value]="integraciones()?.ia?.configurado ? '••••••••••••••••' : 'Sin configurar'"
-              disabled
-              aria-label="API Key de IA — solo visible para el administrador"
+        @if (iaProveedor() !== 'default') {
+          <app-form-field label="Modelo" for="ia-modelo">
+            <app-form-select
+              id="ia-modelo"
+              [options]="iaModeloOpciones()"
+              [value]="iaModelo()"
+              [disabled]="!isAdmin()"
+              (valueChange)="iaModelo.set($event)"
             />
-          }
-        </app-form-field>
+          </app-form-field>
+
+          <app-form-field label="API Key" for="ia-apikey">
+            @if (isAdmin()) {
+              <div class="perfil-page__apikey-wrap">
+                <app-form-input
+                  id="ia-apikey"
+                  [type]="iaApiKeyVisible() ? 'text' : 'password'"
+                  placeholder="Tu API key del proveedor seleccionado"
+                  [value]="iaApiKey()"
+                  (valueChange)="iaApiKey.set($event)"
+                />
+                <button
+                  type="button"
+                  class="perfil-page__apikey-toggle"
+                  (click)="toggleIaApiKeyVisible()"
+                  [attr.aria-label]="iaApiKeyVisible() ? 'Ocultar API key' : 'Mostrar API key'"
+                >
+                  {{ iaApiKeyVisible() ? 'Ocultar' : 'Mostrar' }}
+                </button>
+              </div>
+            } @else {
+              <input
+                class="form-input"
+                type="text"
+                id="ia-apikey"
+                [value]="integraciones()?.ia?.configurado ? '••••••••••••••••' : 'Sin configurar'"
+                disabled
+                aria-label="API Key de IA — solo visible para el administrador"
+              />
+            }
+          </app-form-field>
+        }
 
         @if (isAdmin()) {
           <app-button
