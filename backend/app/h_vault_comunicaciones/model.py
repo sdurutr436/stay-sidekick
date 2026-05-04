@@ -1,7 +1,7 @@
-"""Modelos del Vault de comunicaciones: plantillas y mensajes generados."""
+"""Modelos del Vault de comunicaciones: plantillas, mensajes generados, uso IA y system prompts."""
 
 import uuid
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 
@@ -91,3 +91,39 @@ class MensajeGenerado(db.Model):
 
     def __repr__(self) -> str:
         return f"<MensajeGenerado plantilla={self.plantilla_id} modelo={self.modelo_ia}>"
+
+
+class AiUsageLog(db.Model):
+    """Registro de uso de IA por empresa, para controlar límites del free tier."""
+
+    __tablename__ = "ai_usage_log"
+
+    id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    empresa_id = db.Column(
+        UUID(as_uuid=True),
+        db.ForeignKey("empresas.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    accion = db.Column(db.String(20), nullable=False)
+    fecha = db.Column(db.Date, nullable=False, default=date.today)
+    tokens_usados = db.Column(db.Integer, nullable=True)
+
+    def __repr__(self) -> str:
+        return f"<AiUsageLog empresa={self.empresa_id} accion={self.accion!r} fecha={self.fecha}>"
+
+
+class SystemPrompt(db.Model):
+    """System prompts para el servicio de IA, editables desde el panel de admin."""
+
+    __tablename__ = "system_prompts"
+
+    nombre = db.Column(db.String(100), primary_key=True)
+    contenido = db.Column(db.Text, nullable=False)
+    updated_at = db.Column(
+        db.DateTime(timezone=True),
+        nullable=False,
+        default=lambda: datetime.now(timezone.utc),
+    )
+
+    def __repr__(self) -> str:
+        return f"<SystemPrompt nombre={self.nombre!r}>"
