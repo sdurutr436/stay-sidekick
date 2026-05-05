@@ -59,10 +59,7 @@
           [class.vault-sidebar__nueva-btn--activo]="isNueva()"
           (click)="nuevaPlantilla()"
         >
-          <svg class="svg svg--xs" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-            <line x1="8" y1="2" x2="8" y2="14" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
-            <line x1="2" y1="8" x2="14" y2="8" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
-          </svg>
+          <ng-icon name="phosphorPlus" size="16" aria-hidden="true" />
           Nueva plantilla
         </button>
       </div>
@@ -215,10 +212,7 @@
               aria-label="Cerrar panel de nueva variable"
               (click)="cerrarPanelNuevaVariable()"
             >
-              <svg class="svg svg--xs" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                <line x1="4" y1="4" x2="12" y2="12" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
-                <line x1="12" y1="4" x2="4" y2="12" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
-              </svg>
+              <ng-icon name="phosphorX" size="16" aria-hidden="true" />
             </button>
           </div>
         </div>
@@ -263,12 +257,7 @@
             (click)="refinarConIA()"
           >
             <span class="btn__icon" aria-hidden="true">
-              <!-- Icono: estrella/destellos IA -->
-              <svg class="svg svg--sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
-                <path d="M10 2l1.5 4.5L16 8l-4.5 1.5L10 14l-1.5-4.5L4 8l4.5-1.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
-                <line x1="16" y1="14" x2="18" y2="16" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
-                <circle cx="16" cy="14" r="1.5" stroke="currentColor" stroke-width="1"/>
-              </svg>
+              <ng-icon name="phosphorSparkle" size="20" />
             </span>
             @if (cargandoIA()) {
               Refinando…
@@ -319,10 +308,7 @@
               (click)="copiarMensaje()"
             >
               <span class="btn__icon" aria-hidden="true">
-                <svg class="svg svg--sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
-                  <rect x="7" y="3" width="10" height="13" stroke="currentColor" stroke-width="1.5"/>
-                  <rect x="3" y="6" width="10" height="13" stroke="currentColor" stroke-width="1.5" fill="white"/>
-                </svg>
+                <ng-icon name="phosphorCopy" size="20" />
               </span>
               Copiar mensaje
             </app-button>
@@ -342,11 +328,7 @@
             (click)="guardarPlantilla()"
           >
             <span class="btn__icon" aria-hidden="true">
-              <svg class="svg svg--sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
-                <rect x="4" y="2" width="12" height="16" stroke="currentColor" stroke-width="1.5"/>
-                <rect x="7" y="2" width="6" height="5" stroke="currentColor" stroke-width="1.5"/>
-                <rect x="5" y="11" width="10" height="5" stroke="currentColor" stroke-width="1.5"/>
-              </svg>
+              <ng-icon name="phosphorFloppyDisk" size="20" />
             </span>
             @if (guardando()) {
               Guardando…

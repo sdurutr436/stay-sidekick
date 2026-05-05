@@ -1,4 +1,5 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild, computed, inject, signal } from '@angular/core';
+import { NgIconComponent } from '@ng-icons/core';
 import { AlertComponent } from '../../components/molecules/alert/alert';
 import { ButtonComponent } from '../../components/atoms/button/button';
 import { DropdownBuscadorComponent, DropdownOption } from '../../components/molecules/dropdown-buscador/dropdown-buscador';
@@ -31,7 +32,7 @@ const COOLDOWN_SEGUNDOS = 60;
   templateUrl: './vault-comunicaciones.html',
   styleUrl: './vault-comunicaciones.scss',
   standalone: true,
-  imports: [PageHeaderComponent, ButtonComponent, AlertComponent, DropdownBuscadorComponent],
+  imports: [NgIconComponent, PageHeaderComponent, ButtonComponent, AlertComponent, DropdownBuscadorComponent],
 })
 export class VaultComunicacionesPageComponent implements OnInit, OnDestroy {
   private readonly vault  = inject(VaultService);
