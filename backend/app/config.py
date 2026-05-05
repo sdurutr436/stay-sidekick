@@ -63,6 +63,18 @@ class Config:
     # URL base del frontend (para los redirects post-OAuth)
     FRONTEND_BASE_URL: str = os.environ.get("FRONTEND_BASE_URL", "http://localhost:4200")
 
+    # IA — proveedor por defecto y límites del free tier
+    AI_DEFAULT_PROVIDER: str = os.environ.get("AI_DEFAULT_PROVIDER", "gemini")
+    AI_DEFAULT_MODEL: str = os.environ.get("AI_DEFAULT_MODEL", "gemini/gemini-2.0-flash")
+    AI_DEFAULT_API_KEY: str = os.environ.get("AI_DEFAULT_API_KEY", "")
+    AI_FREE_LIMIT_DAILY: int = int(os.environ.get("AI_FREE_LIMIT_DAILY", "100"))
+    AI_FREE_LIMIT_WEEKLY: int = int(os.environ.get("AI_FREE_LIMIT_WEEKLY", "500"))
+    AI_PROMPT_ADMIN_IPS: list[str] = [
+        ip.strip()
+        for ip in os.environ.get("AI_PROMPT_ADMIN_IPS", "127.0.0.1").split(",")
+        if ip.strip()
+    ]
+
     # PostgreSQL
     SQLALCHEMY_DATABASE_URI: str = os.environ.get(
         "DATABASE_URL",

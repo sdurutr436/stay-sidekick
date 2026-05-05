@@ -61,11 +61,12 @@ export class PerfilPageComponent implements OnInit {
   readonly pmsAlerta     = signal<Alerta | null>(null);
 
   // IA
-  readonly iaProveedor  = signal('');
-  readonly iaModelo     = signal('');
-  readonly iaApiKey     = signal('');
-  readonly iaGuardando  = signal(false);
-  readonly iaAlerta     = signal<Alerta | null>(null);
+  readonly iaProveedor     = signal('');
+  readonly iaModelo        = signal('');
+  readonly iaApiKey        = signal('');
+  readonly iaGuardando     = signal(false);
+  readonly iaAlerta        = signal<Alerta | null>(null);
+  readonly iaApiKeyVisible = signal(false);
 
   // Google
   readonly googleGuardando = signal(false);
@@ -122,12 +123,36 @@ export class PerfilPageComponent implements OnInit {
     { value: 'cloudbeds', label: 'Cloudbeds' },
   ];
 
-  readonly iaOpciones = [
-    { value: 'default', label: 'Sistema (Gemini compartido)'  },
-    { value: 'gemini',  label: 'Gemini (API propia)'          },
-    { value: 'openai',  label: 'OpenAI'                       },
-    { value: 'claude',  label: 'Claude (Anthropic)'           },
+  readonly iaGrupoOpciones = [
+    { value: 'default', label: 'Sistema (Gemini compartido)' },
+    { value: 'gemini',  label: 'Google — Gemini'             },
+    { value: 'openai',  label: 'OpenAI'                      },
+    { value: 'claude',  label: 'Anthropic — Claude'          },
   ];
+
+  readonly iaModelosPorProveedor: Record<string, { value: string; label: string }[]> = {
+    gemini: [
+      { value: 'gemini/gemini-2.0-flash', label: 'Gemini 2.0 Flash (rápido)'  },
+      { value: 'gemini/gemini-1.5-pro',   label: 'Gemini 1.5 Pro'             },
+      { value: 'gemini/gemini-1.5-flash', label: 'Gemini 1.5 Flash'           },
+    ],
+    openai: [
+      { value: 'gpt-4o',      label: 'GPT-4o'               },
+      { value: 'gpt-4o-mini', label: 'GPT-4o Mini (barato)' },
+      { value: 'gpt-4-turbo', label: 'GPT-4 Turbo'          },
+    ],
+    claude: [
+      { value: 'claude-sonnet-4-6',          label: 'Claude Sonnet 4.6'             },
+      { value: 'claude-opus-4-7',            label: 'Claude Opus 4.7'               },
+      { value: 'claude-haiku-4-5-20251001',  label: 'Claude Haiku 4.5 (barato)'     },
+      { value: 'claude-3-5-sonnet-20241022', label: 'Claude 3.5 Sonnet'             },
+      { value: 'claude-3-5-haiku-20241022',  label: 'Claude 3.5 Haiku (muy barato)' },
+    ],
+  };
+
+  readonly iaModeloOpciones = computed(() =>
+    this.iaModelosPorProveedor[this.iaProveedor()] ?? [],
+  );
 
   ngOnInit(): void {
     this.isAdmin.set(this.auth.isAdmin);
@@ -219,6 +244,16 @@ export class PerfilPageComponent implements OnInit {
         this.pmsGuardando.set(false);
       },
     });
+  }
+
+  onIaProveedorChange(value: string): void {
+    this.iaProveedor.set(value);
+    const primero = (this.iaModelosPorProveedor[value] ?? [])[0]?.value ?? '';
+    this.iaModelo.set(primero);
+  }
+
+  toggleIaApiKeyVisible(): void {
+    this.iaApiKeyVisible.update(v => !v);
   }
 
   guardarIA(): void {

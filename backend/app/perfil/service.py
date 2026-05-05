@@ -87,7 +87,11 @@ def actualizar_ia(empresa_id: str, json_data: dict) -> list[str]:
     except ValidationError as exc:
         return _flatten(exc.messages)
 
-    api_key_cifrada = encrypt(data["api_key"]) if data.get("api_key") else None
+    try:
+        api_key_cifrada = encrypt(data["api_key"]) if data.get("api_key") else None
+    except RuntimeError:
+        return ["El servidor no tiene configurada la clave de cifrado (FERNET_KEY). Contacta con el administrador."]
+
     repo.upsert_ia(empresa_id, data["proveedor"], data.get("modelo"), api_key_cifrada)
     return []
 
