@@ -11,16 +11,7 @@
     <div class="notif-checkin__estados">
 
       <app-tarjeta-estado label="Estado PMS" valor="">
-        <svg icon class="svg svg--xs" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-          @if (pmsConfigurado()) {
-            <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/>
-            <polyline points="5,8 7,10 11,6" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="square"/>
-          } @else {
-            <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/>
-            <line x1="8" y1="5" x2="8" y2="9" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
-            <circle cx="8" cy="11.5" r="0.75" fill="currentColor"/>
-          }
-        </svg>
+        <ng-icon icon [name]="pmsConfigurado() ? 'phosphorCheckCircle' : 'phosphorWarningCircle'" size="16" aria-hidden="true" />
         <ng-container actions>
           @if (pmsConfigurado()) {
             <app-badge variant="solid">Conectado</app-badge>
@@ -64,11 +55,7 @@
             />
             <app-button variant="secondary" size="md" (click)="xlsxInput.click()">
               <span class="btn__icon" aria-hidden="true">
-                <svg class="svg svg--sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
-                  <rect x="4" y="2" width="12" height="16" stroke="currentColor" stroke-width="1.5"/>
-                  <polyline points="7,9 10,6 13,9" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="square" stroke-linejoin="miter"/>
-                  <line x1="10" y1="6" x2="10" y2="14" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
-                </svg>
+                <ng-icon name="phosphorFileArrowUp" size="20" />
               </span>
               Seleccionar .xlsx
             </app-button>
@@ -216,10 +203,7 @@
               [class.notif-sidebar__nueva-btn--activo]="modoEditor() === 'nueva'"
               (click)="nuevaPlantilla()"
             >
-              <svg class="svg svg--xs" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                <line x1="8" y1="2" x2="8" y2="14" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
-                <line x1="2" y1="8" x2="14" y2="8" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
-              </svg>
+              <ng-icon name="phosphorPlus" size="16" aria-hidden="true" />
               Nueva plantilla
             </button>
           }
@@ -238,16 +222,10 @@
                   @if (isAdmin) {
                     <div class="notif-sidebar__item-acciones" (click)="$event.stopPropagation()">
                       <button type="button" class="notif-sidebar__item-btn" aria-label="Editar" (click)="iniciarEdicion(p)">
-                        <svg class="svg svg--xs" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                          <path d="M11 2l3 3-8 8H3v-3z" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linejoin="round"/>
-                        </svg>
+                        <ng-icon name="phosphorPencilSimple" size="16" aria-hidden="true" />
                       </button>
                       <button type="button" class="notif-sidebar__item-btn notif-sidebar__item-btn--danger" aria-label="Eliminar" (click)="eliminarPlantilla(p)">
-                        <svg class="svg svg--xs" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                          <polyline points="2,4 14,4" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
-                          <path d="M5 4V2h6v2" stroke="currentColor" stroke-width="1.5" fill="none"/>
-                          <rect x="3" y="4" width="10" height="10" stroke="currentColor" stroke-width="1.5"/>
-                        </svg>
+                        <ng-icon name="phosphorTrash" size="16" aria-hidden="true" />
                       </button>
                     </div>
                   }
@@ -284,12 +262,7 @@
             (click)="generarMensaje()"
           >
             <span class="btn__icon" aria-hidden="true">
-              <svg class="svg svg--sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
-                <rect x="3" y="3" width="14" height="14" stroke="currentColor" stroke-width="1.5"/>
-                <line x1="6" y1="7" x2="14" y2="7" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
-                <line x1="6" y1="10" x2="14" y2="10" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
-                <line x1="6" y1="13" x2="11" y2="13" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
-              </svg>
+              <ng-icon name="phosphorFileText" size="20" />
             </span>
             Generar automáticamente
           </app-button>
