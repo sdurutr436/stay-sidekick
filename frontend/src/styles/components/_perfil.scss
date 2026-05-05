@@ -37,6 +37,30 @@
     gap: $space-2;
   }
 
+  &__apikey-delete {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: $color-text-secondary;
+    cursor: pointer;
+    transition: color var(--transition-base);
+
+    &:hover {
+      color: $color-error;
+    }
+
+    &:focus-visible {
+      outline: 2px solid $color-gray-800;
+      outline-offset: 2px;
+    }
+  }
+
   &__apikey-toggle {
     flex-shrink: 0;
     padding: 0;
@@ -55,6 +79,43 @@
       outline: 2px solid $color-gray-800;
       outline-offset: 2px;
     }
+  }
+
+  // ── Modal de confirmación para borrar API key ─────────────────────────
+  &__ia-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.45);
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__ia-modal {
+    background: $color-surface;
+    border: $border-width $border-style $color-border;
+    padding: $space-6;
+    max-width: 24rem;
+    width: calc(100% - #{$space-8});
+    display: flex;
+    flex-direction: column;
+    gap: $space-4;
+  }
+
+  &__ia-modal-titulo {
+    @include text-h3;
+  }
+
+  &__ia-modal-desc {
+    @include text-body-md;
+    color: $color-text-secondary;
+  }
+
+  &__ia-modal-acciones {
+    display: flex;
+    gap: $space-3;
+    justify-content: flex-end;
   }
 
   // ── Sección de cierre de sesión ───────────────────────────────────────

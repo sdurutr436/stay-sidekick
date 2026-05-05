@@ -66,7 +66,9 @@ export class PerfilPageComponent implements OnInit {
   readonly iaApiKey        = signal('');
   readonly iaGuardando     = signal(false);
   readonly iaAlerta        = signal<Alerta | null>(null);
-  readonly iaApiKeyVisible = signal(false);
+  readonly iaApiKeyVisible    = signal(false);
+  readonly iaEliminarVisible  = signal(false);
+  readonly iaEliminando       = signal(false);
 
   // Google
   readonly googleGuardando = signal(false);
@@ -242,6 +244,32 @@ export class PerfilPageComponent implements OnInit {
       error: err => {
         this.pmsAlerta.set({ tipo: 'error', mensaje: err?.error?.errors?.[0] ?? 'Error al guardar el PMS.' });
         this.pmsGuardando.set(false);
+      },
+    });
+  }
+
+  confirmarEliminarApiKey(): void { this.iaEliminarVisible.set(true); }
+  cancelarEliminarApiKey():  void { this.iaEliminarVisible.set(false); }
+
+  eliminarApiKey(): void {
+    this.iaEliminando.set(true);
+    this.service.actualizarIA(this.iaProveedor(), this.iaModelo()).subscribe({
+      next: res => {
+        if (res.ok) {
+          this.iaApiKey.set('');
+          this.iaAlerta.set({ tipo: 'success', mensaje: 'API key eliminada. Se usará el sistema compartido.' });
+          this.iaEliminarVisible.set(false);
+          this.cargarIntegraciones();
+        } else {
+          this.iaAlerta.set({ tipo: 'error', mensaje: res.errors?.[0] ?? 'Error al eliminar la API key.' });
+          this.iaEliminarVisible.set(false);
+        }
+        this.iaEliminando.set(false);
+      },
+      error: err => {
+        this.iaAlerta.set({ tipo: 'error', mensaje: err?.error?.errors?.[0] ?? 'Error al eliminar la API key.' });
+        this.iaEliminarVisible.set(false);
+        this.iaEliminando.set(false);
       },
     });
   }

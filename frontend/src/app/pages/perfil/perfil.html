@@ -251,6 +251,20 @@
                 >
                   {{ iaApiKeyVisible() ? 'Ocultar' : 'Mostrar' }}
                 </button>
+                @if (integraciones()?.ia?.configurado) {
+                  <button
+                    type="button"
+                    class="perfil-page__apikey-delete"
+                    (click)="confirmarEliminarApiKey()"
+                    aria-label="Eliminar API key guardada"
+                    title="Eliminar API key guardada"
+                  >
+                    <svg class="svg svg--xs" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                      <line x1="4" y1="4" x2="12" y2="12" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
+                      <line x1="12" y1="4" x2="4" y2="12" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
+                    </svg>
+                  </button>
+                }
               </div>
             } @else {
               <input
@@ -277,6 +291,26 @@
         }
 
       </form>
+
+      @if (iaEliminarVisible()) {
+        <div class="perfil-page__ia-modal-overlay" (click)="cancelarEliminarApiKey()">
+          <div class="perfil-page__ia-modal" (click)="$event.stopPropagation()" role="dialog" aria-modal="true" aria-labelledby="ia-modal-titulo">
+            <p id="ia-modal-titulo" class="perfil-page__ia-modal-titulo">¿Eliminar API key?</p>
+            <p class="perfil-page__ia-modal-desc">
+              Se borrará la API key guardada. La IA pasará a usar el sistema compartido hasta que configures una nueva.
+            </p>
+            <div class="perfil-page__ia-modal-acciones">
+              <app-button variant="ghost" size="md" (click)="cancelarEliminarApiKey()">
+                Cancelar
+              </app-button>
+              <app-button variant="danger" size="md" [disabled]="iaEliminando()" (click)="eliminarApiKey()">
+                {{ iaEliminando() ? 'Eliminando…' : 'Eliminar' }}
+              </app-button>
+            </div>
+          </div>
+        </div>
+      }
+
     </section>
 
   </app-panel-seccion>
