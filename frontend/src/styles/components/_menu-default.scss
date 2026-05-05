@@ -1,0 +1,100 @@
+// =============================================================================
+// COMPONENTS: DASHBOARD (menu-default)
+// Página de inicio — barra de estado + grid de herramientas
+// =============================================================================
+
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: $space-8;
+  @include container;
+  padding-block: $space-8;
+
+  // ---------------------------------------------------------------------------
+  // Barra de estado de conexiones
+  // ---------------------------------------------------------------------------
+  &__estado {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $space-3;
+  }
+
+  &__chip {
+    display: inline-flex;
+    align-items: center;
+    gap: $space-2;
+    padding: $space-2 $space-4;
+    border: $border-width $border-style $color-border;
+    background: $color-surface;
+    @include text-body-sm;
+    color: $color-text-secondary;
+
+    ng-icon {
+      display: flex;
+      flex-shrink: 0;
+    }
+
+    &--ok {
+      border-color: $color-gray-700;
+      color: $color-text-primary;
+    }
+
+    &--off {
+      border-color: $color-border;
+      color: $color-text-disabled;
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Grid de herramientas
+  // ---------------------------------------------------------------------------
+  &__herramientas {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: $space-6;
+  }
+
+  &__card {
+    display: flex;
+    flex-direction: column;
+    gap: $space-3;
+    padding: $space-6;
+    border: $border-width $border-style $color-border;
+    background: $color-surface;
+    text-decoration: none;
+    color: $color-text-primary;
+    transition: border-color var(--transition-base), background-color var(--transition-base);
+    cursor: pointer;
+
+    &:hover {
+      background: $color-gray-100;
+      border-color: $color-border-strong;
+    }
+
+    &:focus-visible {
+      outline: 2px solid $color-gray-800;
+      outline-offset: -2px;
+    }
+  }
+
+  &__card-icon {
+    display: flex;
+    width: $svg-lg;
+    height: $svg-lg;
+    color: $color-text-secondary;
+
+    ng-icon {
+      display: flex;
+    }
+  }
+
+  &__card-nombre {
+    @include text-label-lg;
+    font-weight: $font-weight-heading;
+  }
+
+  &__card-desc {
+    @include text-body-sm;
+    color: $color-text-secondary;
+  }
+}
