@@ -1,10 +1,92 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import { NgIconComponent, provideIcons } from '@ng-icons/core';
+import {
+  phosphorBuildings,
+  phosphorAddressBook,
+  phosphorBellRinging,
+  phosphorFireSimple,
+  phosphorChatText,
+  phosphorGoogleLogo,
+  phosphorDatabase,
+  phosphorSparkle,
+} from '@ng-icons/phosphor-icons/regular';
 import { PageHeaderComponent } from '../../components/organisms/page-header/page-header';
+import { IntegracionesData, PerfilService } from '../../services/perfil.service';
+
+interface Herramienta {
+  id: string;
+  label: string;
+  descripcion: string;
+  route: string;
+  icon: string;
+}
+
+const HERRAMIENTAS: Herramienta[] = [
+  {
+    id: 'maestro-apartamentos',
+    label: 'Maestro de apartamentos',
+    descripcion: 'Gestiona el catálogo de apartamentos e importa datos desde XLSX.',
+    route: '/maestro-apartamentos',
+    icon: 'phosphorBuildings',
+  },
+  {
+    id: 'sincronizador-contactos',
+    label: 'Sincronizador de contactos',
+    descripcion: 'Sincroniza huéspedes con Google Contacts, formateando nombres y teléfonos.',
+    route: '/sincronizador-contactos',
+    icon: 'phosphorAddressBook',
+  },
+  {
+    id: 'notificaciones-checkin-tardio',
+    label: 'Notificaciones check-in tardío',
+    descripcion: 'Envía alertas para reservas con llegada tardía usando plantillas personalizables.',
+    route: '/notificaciones-checkin-tardio',
+    icon: 'phosphorBellRinging',
+  },
+  {
+    id: 'mapa-calor',
+    label: 'Mapa de calor',
+    descripcion: 'Visualiza la ocupación mensual en un mapa de calor de check-ins y check-outs.',
+    route: '/mapa-calor',
+    icon: 'phosphorFireSimple',
+  },
+  {
+    id: 'vault-comunicaciones',
+    label: 'Vault de comunicaciones',
+    descripcion: 'Biblioteca de plantillas de mensajes con refinado y traducción por IA.',
+    route: '/vault-comunicaciones',
+    icon: 'phosphorChatText',
+  },
+];
 
 @Component({
   selector: 'app-menu-default',
   templateUrl: './menu-default.html',
   standalone: true,
-  imports: [PageHeaderComponent],
+  imports: [RouterLink, NgIconComponent, PageHeaderComponent],
+  providers: [provideIcons({
+    phosphorBuildings,
+    phosphorAddressBook,
+    phosphorBellRinging,
+    phosphorFireSimple,
+    phosphorChatText,
+    phosphorGoogleLogo,
+    phosphorDatabase,
+    phosphorSparkle,
+  })],
 })
-export class MenuDefaultPageComponent {}
+export class MenuDefaultPageComponent implements OnInit {
+  private readonly perfilService = inject(PerfilService);
+
+  readonly integraciones = signal<IntegracionesData | null>(null);
+  readonly HERRAMIENTAS = HERRAMIENTAS;
+
+  ngOnInit(): void {
+    this.perfilService.getIntegraciones().subscribe({
+      next: (res) => {
+        if (res.ok) this.integraciones.set(res.data);
+      },
+    });
+  }
+}
