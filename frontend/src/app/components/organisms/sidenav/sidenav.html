@@ -20,17 +20,7 @@
             [attr.aria-current]="rla.isActive ? 'page' : null"
           >
             <span class="nav-sidenav__tool-icon" aria-hidden="true">
-              <svg
-                class="svg svg--md"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-              >
-                <rect x="2" y="2" width="20" height="20" fill="#d4d4d4"/>
-                <rect x="6" y="10" width="5" height="9" fill="#8c8c8c"/>
-                <rect x="13" y="6" width="5" height="13" fill="#8c8c8c"/>
-                <rect x="6" y="6" width="5" height="3" fill="#8c8c8c"/>
-              </svg>
+              <ng-icon [name]="tool.icon" size="20" />
             </span>
             <span class="nav-sidenav__tool-label">{{ tool.label }}</span>
           </a>
@@ -42,17 +32,7 @@
             [attr.aria-label]="sidenavService.isCollapsed() ? tool.label : null"
           >
             <span class="nav-sidenav__tool-icon" aria-hidden="true">
-              <svg
-                class="svg svg--md"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-              >
-                <rect x="2" y="2" width="20" height="20" fill="#d4d4d4"/>
-                <rect x="6" y="10" width="5" height="9" fill="#8c8c8c"/>
-                <rect x="13" y="6" width="5" height="13" fill="#8c8c8c"/>
-                <rect x="6" y="6" width="5" height="3" fill="#8c8c8c"/>
-              </svg>
+              <ng-icon [name]="tool.icon" size="20" />
             </span>
             <span class="nav-sidenav__tool-label">{{ tool.label }}</span>
           </a>
