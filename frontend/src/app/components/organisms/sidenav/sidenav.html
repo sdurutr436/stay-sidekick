@@ -5,43 +5,28 @@
   aria-label="Menú de herramientas"
 >
 
-  <!-- Lista de herramientas -->
   <ul class="nav-sidenav__tools" role="list">
     @for (tool of tools; track tool.id) {
       <li class="nav-sidenav__item">
-        @if (tool.route) {
-          <!-- Herramienta con ruta asignada — enlace activo con routerLink -->
-          <a
-            class="nav-sidenav__tool-link"
-            [routerLink]="tool.route"
-            routerLinkActive="nav-sidenav__tool-link--active"
-            #rla="routerLinkActive"
-            [attr.aria-label]="sidenavService.isCollapsed() ? tool.label : null"
-            [attr.aria-current]="rla.isActive ? 'page' : null"
-          >
-            <span class="nav-sidenav__tool-icon" aria-hidden="true">
-              <ng-icon [name]="tool.icon" size="20" />
-            </span>
-            <span class="nav-sidenav__tool-label">{{ tool.label }}</span>
-          </a>
-        } @else {
-          <!-- Herramienta placeholder — sin ruta todavía -->
-          <a
-            class="nav-sidenav__tool-link nav-sidenav__tool-link--disabled"
-            aria-disabled="true"
-            [attr.aria-label]="sidenavService.isCollapsed() ? tool.label : null"
-          >
-            <span class="nav-sidenav__tool-icon" aria-hidden="true">
-              <ng-icon [name]="tool.icon" size="20" />
-            </span>
-            <span class="nav-sidenav__tool-label">{{ tool.label }}</span>
-          </a>
-        }
+        <a
+          class="nav-sidenav__tool-link"
+          [class.nav-sidenav__tool-link--disabled]="!tool.route"
+          [routerLink]="tool.route"
+          routerLinkActive="nav-sidenav__tool-link--active"
+          #rla="routerLinkActive"
+          [attr.aria-label]="sidenavService.isCollapsed() ? tool.label : null"
+          [attr.aria-current]="rla.isActive ? 'page' : null"
+          [attr.aria-disabled]="!tool.route || null"
+        >
+          <span class="nav-sidenav__tool-icon" aria-hidden="true">
+            <ng-icon [name]="tool.icon" size="20" />
+          </span>
+          <span class="nav-sidenav__tool-label">{{ tool.label }}</span>
+        </a>
       </li>
     }
   </ul>
 
-  <!-- Footer: botón de colapso -->
   <footer class="nav-sidenav__footer">
     <button
       class="nav-sidenav__collapse-btn"
@@ -58,11 +43,9 @@
           fill="none"
         >
           @if (sidenavService.isCollapsed()) {
-            <!-- Doble chevron derecha — expandir -->
             <polyline points="5,4 11,10 5,16" stroke="#4a4a4a" stroke-width="2" fill="none" stroke-linecap="square" stroke-linejoin="miter"/>
             <polyline points="10,4 16,10 10,16" stroke="#4a4a4a" stroke-width="2" fill="none" stroke-linecap="square" stroke-linejoin="miter"/>
           } @else {
-            <!-- Doble chevron izquierda — colapsar -->
             <polyline points="15,4 9,10 15,16" stroke="#4a4a4a" stroke-width="2" fill="none" stroke-linecap="square" stroke-linejoin="miter"/>
             <polyline points="10,4 4,10 10,16" stroke="#4a4a4a" stroke-width="2" fill="none" stroke-linecap="square" stroke-linejoin="miter"/>
           }
