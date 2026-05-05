@@ -6,6 +6,7 @@ import { PerfilService, IntegracionesData } from '../../services/perfil.service'
 import { ApartamentosService } from '../../services/apartamentos.service';
 import { ContactosService } from '../../services/contactos.service';
 import { MapaCalorService, UmbralesCalor } from '../../services/mapa-calor.service';
+import { NgIconComponent } from '@ng-icons/core';
 import { PageHeaderComponent } from '../../components/organisms/page-header/page-header';
 import { PanelSeccionComponent } from '../../components/organisms/panel-seccion/panel-seccion';
 import { AlertComponent } from '../../components/molecules/alert/alert';
@@ -24,6 +25,7 @@ interface Alerta {
   templateUrl: './perfil.html',
   standalone: true,
   imports: [
+    NgIconComponent,
     PageHeaderComponent,
     PanelSeccionComponent,
     AlertComponent,
