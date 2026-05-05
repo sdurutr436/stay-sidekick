@@ -1,16 +1,6 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { NgIconComponent, provideIcons } from '@ng-icons/core';
-import {
-  phosphorBuildings,
-  phosphorAddressBook,
-  phosphorBellRinging,
-  phosphorFireSimple,
-  phosphorChatText,
-  phosphorGoogleLogo,
-  phosphorDatabase,
-  phosphorSparkle,
-} from '@ng-icons/phosphor-icons/regular';
+import { NgIconComponent } from '@ng-icons/core';
 import { PageHeaderComponent } from '../../components/organisms/page-header/page-header';
 import { IntegracionesData, PerfilService } from '../../services/perfil.service';
 
@@ -65,16 +55,6 @@ const HERRAMIENTAS: Herramienta[] = [
   templateUrl: './menu-default.html',
   standalone: true,
   imports: [RouterLink, NgIconComponent, PageHeaderComponent],
-  providers: [provideIcons({
-    phosphorBuildings,
-    phosphorAddressBook,
-    phosphorBellRinging,
-    phosphorFireSimple,
-    phosphorChatText,
-    phosphorGoogleLogo,
-    phosphorDatabase,
-    phosphorSparkle,
-  })],
 })
 export class MenuDefaultPageComponent implements OnInit {
   private readonly perfilService = inject(PerfilService);
