@@ -1,7 +1,79 @@
-<!-- Estado por defecto del panel cuando no hay herramienta seleccionada -->
-<div class="l-container">
+<div class="dashboard">
+
   <app-page-header
     title="Mis herramientas"
-    description="Selecciona una herramienta del menú lateral para empezar."
+    description="Panel de control de Stay Sidekick"
   />
+
+  @if (usuario) {
+    <p class="dashboard__user-info">{{ usuario.sub }} &middot; {{ usuario.rol === 'admin' ? 'Administrador' : 'Usuario' }}</p>
+  }
+
+  @if (sinConexiones()) {
+    <section class="dashboard__empty-state" aria-label="Primeros pasos">
+      <h2 class="dashboard__empty-title">Bienvenido a Stay Sidekick</h2>
+      <ol class="dashboard__empty-steps">
+        <li><a routerLink="/perfil">Conecta tu PMS o importa datos desde XLSX</a></li>
+        <li><a routerLink="/perfil">Vincula tu cuenta de Google Contacts</a></li>
+        <li><a routerLink="/perfil">Configura tu propia clave de IA (opcional)</a></li>
+      </ol>
+    </section>
+  } @else {
+    <section class="dashboard__estado" aria-label="Estado de conexiones">
+      @if (integraciones(); as datos) {
+        <span class="dashboard__chip" [class.dashboard__chip--ok]="datos.google.configurado" [class.dashboard__chip--off]="!datos.google.configurado">
+          <ng-icon name="phosphorGoogleLogo" size="16" aria-hidden="true" />
+          <span>Google</span>
+          <span>{{ datos.google.configurado ? 'Conectado' : 'No conectado' }}</span>
+        </span>
+
+        <span class="dashboard__chip" [class.dashboard__chip--ok]="datos.pms.configurado" [class.dashboard__chip--off]="!datos.pms.configurado">
+          <ng-icon name="phosphorDatabase" size="16" aria-hidden="true" />
+          <span>PMS</span>
+          <span>{{ datos.pms.configurado ? (datos.pms.proveedor ?? 'Conectado') : 'Sin PMS' }}</span>
+        </span>
+
+        <!-- IA sin configurar = sistema compartido, siempre funcional → chip--ok en ambos estados -->
+        <span class="dashboard__chip dashboard__chip--ok">
+          <ng-icon name="phosphorSparkle" size="16" aria-hidden="true" />
+          <span>IA</span>
+          <span>{{ datos.ia.configurado ? (datos.ia.modelo ?? datos.ia.proveedor ?? 'BYOK') : 'Sistema compartido' }}</span>
+        </span>
+
+        @if (usoIA(); as uso) {
+          <span class="dashboard__chip dashboard__chip--ok">
+            <ng-icon name="phosphorSparkle" size="16" aria-hidden="true" />
+            <span>IA · Sistema compartido · {{ uso.uso_hoy }}/{{ uso.limite_diario }} llamadas hoy</span>
+          </span>
+        }
+      }
+    </section>
+  }
+
+  <section class="dashboard__herramientas" aria-label="Herramientas disponibles">
+    @for (h of HERRAMIENTAS; track h.id) {
+      <a class="dashboard__card" [routerLink]="h.route">
+        <span class="dashboard__card-icon" aria-hidden="true">
+          <ng-icon [name]="h.icon" size="32" />
+        </span>
+        <span class="dashboard__card-nombre">{{ h.label }}</span>
+        <span class="dashboard__card-desc">{{ h.descripcion }}</span>
+        @if (h.id === 'maestro-apartamentos' && contadorApartamentos() !== null) {
+          <span class="dashboard__card-count">{{ contadorApartamentos() }} apartamentos</span>
+        }
+        @if (h.id === 'vault-comunicaciones' && contadorPlantillas() !== null) {
+          <span class="dashboard__card-count">{{ contadorPlantillas() }} plantillas activas</span>
+        }
+        @let estado = getEstadoHerramienta(h.id);
+        <span class="dashboard__card-badge dashboard__card-badge--{{ estado }}">
+          {{ estado === 'ok' ? 'Disponible' : estado === 'parcial' ? 'Limitado' : 'No disponible' }}
+        </span>
+      </a>
+    }
+  </section>
+
+  <footer class="dashboard__footer">
+    <a routerLink="/perfil"><app-button variant="ghost">Ir a Perfil →</app-button></a>
+  </footer>
+
 </div>

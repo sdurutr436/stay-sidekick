@@ -111,6 +111,11 @@ $sidenav-width-collapsed: 56px;
     display: flex;
     align-items: center;
     flex-shrink: 0;
+    color: inherit;
+
+    ng-icon {
+      display: flex;
+    }
   }
 
   &__tool-label {

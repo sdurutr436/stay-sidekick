@@ -1,6 +1,7 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
+import { NgIconComponent } from '@ng-icons/core';
 import { BadgeComponent } from '../../components/atoms/badge/badge';
 import { ButtonComponent } from '../../components/atoms/button/button';
 import { FormInputComponent } from '../../components/atoms/form-input/form-input';
@@ -41,6 +42,7 @@ const _FECHA_PREVIEW: Record<string, string> = {
   styleUrl: './sincronizador-contactos.scss',
   standalone: true,
   imports: [
+    NgIconComponent,
     PageHeaderComponent,
     ButtonComponent,
     BadgeComponent,
