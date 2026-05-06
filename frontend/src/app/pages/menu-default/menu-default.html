@@ -39,6 +39,13 @@
           <span>IA</span>
           <span>{{ datos.ia.configurado ? (datos.ia.modelo ?? datos.ia.proveedor ?? 'BYOK') : 'Sistema compartido' }}</span>
         </span>
+
+        @if (usoIA(); as uso) {
+          <span class="dashboard__chip dashboard__chip--ok">
+            <ng-icon name="phosphorSparkle" size="16" aria-hidden="true" />
+            <span>IA · Sistema compartido · {{ uso.uso_hoy }}/{{ uso.limite_diario }} llamadas hoy</span>
+          </span>
+        }
       }
     </section>
   }

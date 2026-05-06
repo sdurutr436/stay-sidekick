@@ -65,10 +65,12 @@ const HERRAMIENTAS: Herramienta[] = [
 export class MenuDefaultPageComponent implements OnInit {
   private readonly perfilService = inject(PerfilService);
   private readonly authService = inject(AuthService);
+  private readonly vaultService = inject(VaultService);
 
   readonly integraciones = signal<IntegracionesData | null>(null);
   readonly HERRAMIENTAS = HERRAMIENTAS;
   readonly usuario = this.authService.getUser();
+  readonly usoIA = signal<{ uso_hoy: number; limite_diario: number } | null>(null);
 
   readonly sinConexiones = computed(() => {
     const d = this.integraciones();
@@ -78,7 +80,16 @@ export class MenuDefaultPageComponent implements OnInit {
   ngOnInit(): void {
     this.perfilService.getIntegraciones().subscribe({
       next: (res) => {
-        if (res.ok) this.integraciones.set(res.data);
+        if (res.ok) {
+          this.integraciones.set(res.data);
+          if (!res.data.ia.configurado) {
+            this.vaultService.getUso().subscribe({
+              next: (uso) => {
+                if (uso.ok) this.usoIA.set({ uso_hoy: uso.uso_hoy, limite_diario: uso.limite_diario });
+              },
+            });
+          }
+        }
       },
     });
   }
