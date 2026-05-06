@@ -19,6 +19,35 @@
   }
 
   // ---------------------------------------------------------------------------
+  // Empty state guiado (sin integraciones configuradas)
+  // ---------------------------------------------------------------------------
+  &__empty-state {
+    padding: $space-8;
+    border: $border-width $border-style $color-border;
+    background: $color-surface;
+  }
+
+  &__empty-title {
+    @include text-label-lg;
+    font-weight: $font-weight-heading;
+    margin-block-end: $space-4;
+  }
+
+  &__empty-steps {
+    @include text-body-sm;
+    color: $color-text-secondary;
+    padding-inline-start: $space-6;
+    display: flex;
+    flex-direction: column;
+    gap: $space-2;
+
+    a {
+      color: $color-text-primary;
+      text-decoration: underline;
+    }
+  }
+
+  // ---------------------------------------------------------------------------
   // Barra de estado de conexiones
   // ---------------------------------------------------------------------------
   &__estado {

@@ -68,6 +68,11 @@ export class MenuDefaultPageComponent implements OnInit {
   readonly HERRAMIENTAS = HERRAMIENTAS;
   readonly usuario = this.authService.getUser();
 
+  readonly sinConexiones = computed(() => {
+    const d = this.integraciones();
+    return d !== null && !d.pms.configurado && !d.google.configurado && !d.ia.configurado;
+  });
+
   ngOnInit(): void {
     this.perfilService.getIntegraciones().subscribe({
       next: (res) => {
