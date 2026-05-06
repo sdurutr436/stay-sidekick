@@ -62,9 +62,11 @@ const HERRAMIENTAS: Herramienta[] = [
 })
 export class MenuDefaultPageComponent implements OnInit {
   private readonly perfilService = inject(PerfilService);
+  private readonly authService = inject(AuthService);
 
   readonly integraciones = signal<IntegracionesData | null>(null);
   readonly HERRAMIENTAS = HERRAMIENTAS;
+  readonly usuario = this.authService.getUser();
 
   ngOnInit(): void {
     this.perfilService.getIntegraciones().subscribe({

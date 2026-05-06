@@ -5,6 +5,10 @@
     description="Panel de control de Stay Sidekick"
   />
 
+  @if (usuario) {
+    <p class="dashboard__user-info">{{ usuario.sub }} &middot; {{ usuario.rol === 'admin' ? 'Administrador' : 'Usuario' }}</p>
+  }
+
   <section class="dashboard__estado" aria-label="Estado de conexiones">
     @if (integraciones(); as datos) {
       <span class="dashboard__chip" [class.dashboard__chip--ok]="datos.google.configurado" [class.dashboard__chip--off]="!datos.google.configurado">
