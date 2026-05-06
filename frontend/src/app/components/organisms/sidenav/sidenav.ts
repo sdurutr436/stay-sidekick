@@ -16,7 +16,6 @@ const TOOLS: Tool[] = [
   { id: 'notificaciones-checkin-tardio', label: 'Notificaciones check-in',    route: '/notificaciones-checkin-tardio', icon: 'phosphorBellRinging' },
   { id: 'mapa-calor',                    label: 'Mapa de calor',              route: '/mapa-calor',                    icon: 'phosphorFireSimple'  },
   { id: 'vault-comunicaciones',          label: 'Vault de comunicaciones',    route: '/vault-comunicaciones',          icon: 'phosphorChatText'    },
-  { id: 'perfil',                        label: 'Perfil',                     route: '/perfil',                        icon: 'phosphorUserCircle'  },
   // Herramienta interna de desarrollo, fuera de las 5 del panel de usuario
   { id: 'hoja-estilos',                  label: 'Hoja de estilos',            route: '/hoja-estilos',                  icon: 'phosphorSwatches'    },
 ];
