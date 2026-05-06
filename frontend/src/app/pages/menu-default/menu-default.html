@@ -58,6 +58,12 @@
         </span>
         <span class="dashboard__card-nombre">{{ h.label }}</span>
         <span class="dashboard__card-desc">{{ h.descripcion }}</span>
+        @if (h.id === 'maestro-apartamentos' && contadorApartamentos() !== null) {
+          <span class="dashboard__card-count">{{ contadorApartamentos() }} apartamentos</span>
+        }
+        @if (h.id === 'vault-comunicaciones' && contadorPlantillas() !== null) {
+          <span class="dashboard__card-count">{{ contadorPlantillas() }} plantillas activas</span>
+        }
         @let estado = getEstadoHerramienta(h.id);
         <span class="dashboard__card-badge dashboard__card-badge--{{ estado }}">
           {{ estado === 'ok' ? 'Disponible' : estado === 'parcial' ? 'Limitado' : 'No disponible' }}

@@ -66,11 +66,14 @@ export class MenuDefaultPageComponent implements OnInit {
   private readonly perfilService = inject(PerfilService);
   private readonly authService = inject(AuthService);
   private readonly vaultService = inject(VaultService);
+  private readonly apartamentosService = inject(ApartamentosService);
 
   readonly integraciones = signal<IntegracionesData | null>(null);
   readonly HERRAMIENTAS = HERRAMIENTAS;
   readonly usuario = this.authService.getUser();
   readonly usoIA = signal<{ uso_hoy: number; limite_diario: number } | null>(null);
+  readonly contadorApartamentos = signal<number | null>(null);
+  readonly contadorPlantillas = signal<number | null>(null);
 
   readonly sinConexiones = computed(() => {
     const d = this.integraciones();
@@ -90,6 +93,16 @@ export class MenuDefaultPageComponent implements OnInit {
             });
           }
         }
+      },
+    });
+
+    this.apartamentosService.listar().subscribe({
+      next: (apts) => this.contadorApartamentos.set(apts.length),
+    });
+
+    this.vaultService.getPlantillas().subscribe({
+      next: (res) => {
+        if (res.ok) this.contadorPlantillas.set(res.plantillas.length);
       },
     });
   }

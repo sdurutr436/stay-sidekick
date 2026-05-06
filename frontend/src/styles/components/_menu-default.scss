@@ -135,6 +135,12 @@
     color: $color-text-secondary;
   }
 
+  &__card-count {
+    @include text-body-sm;
+    color: $color-text-secondary;
+    font-variant-numeric: tabular-nums;
+  }
+
   &__card-badge {
     @include text-body-sm;
     align-self: flex-start;
