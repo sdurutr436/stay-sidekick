@@ -97,4 +97,12 @@
     @include text-body-sm;
     color: $color-text-secondary;
   }
+
+  // ---------------------------------------------------------------------------
+  // Footer con acceso a Perfil
+  // ---------------------------------------------------------------------------
+  &__footer {
+    display: flex;
+    justify-content: flex-end;
+  }
 }

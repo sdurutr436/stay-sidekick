@@ -1,8 +1,12 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { NgIconComponent } from '@ng-icons/core';
+import { ButtonComponent } from '../../components/atoms/button/button';
 import { PageHeaderComponent } from '../../components/organisms/page-header/page-header';
 import { IntegracionesData, PerfilService } from '../../services/perfil.service';
+import { AuthService } from '../../services/auth.service';
+import { VaultService } from '../../services/vault.service';
+import { ApartamentosService } from '../../services/apartamentos.service';
 
 interface Herramienta {
   id: string;
@@ -54,7 +58,7 @@ const HERRAMIENTAS: Herramienta[] = [
   selector: 'app-menu-default',
   templateUrl: './menu-default.html',
   standalone: true,
-  imports: [RouterLink, NgIconComponent, PageHeaderComponent],
+  imports: [RouterLink, NgIconComponent, PageHeaderComponent, ButtonComponent],
 })
 export class MenuDefaultPageComponent implements OnInit {
   private readonly perfilService = inject(PerfilService);
