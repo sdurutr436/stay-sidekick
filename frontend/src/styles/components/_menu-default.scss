@@ -135,6 +135,28 @@
     color: $color-text-secondary;
   }
 
+  &__card-badge {
+    @include text-body-sm;
+    align-self: flex-start;
+    padding: $space-1 $space-2;
+    border: $border-width $border-style $color-border;
+
+    &--ok {
+      border-color: $color-gray-700;
+      color: $color-text-primary;
+    }
+
+    &--parcial {
+      border-color: $color-border;
+      color: $color-text-secondary;
+    }
+
+    &--sin-conexion {
+      border-color: $color-border;
+      color: $color-text-disabled;
+    }
+  }
+
   // ---------------------------------------------------------------------------
   // Footer con acceso a Perfil
   // ---------------------------------------------------------------------------

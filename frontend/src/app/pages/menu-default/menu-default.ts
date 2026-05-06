@@ -14,6 +14,8 @@ interface Herramienta {
   descripcion: string;
   route: string;
   icon: string;
+  contador?: number;
+  estado?: 'ok' | 'parcial' | 'sin-conexion';
 }
 
 const HERRAMIENTAS: Herramienta[] = [
@@ -79,5 +81,13 @@ export class MenuDefaultPageComponent implements OnInit {
         if (res.ok) this.integraciones.set(res.data);
       },
     });
+  }
+
+  getEstadoHerramienta(id: string): 'ok' | 'parcial' | 'sin-conexion' {
+    const d = this.integraciones();
+    if (id === 'sincronizador-contactos') {
+      return (d?.google.configurado || d?.pms.configurado) ? 'ok' : 'parcial';
+    }
+    return 'ok';
   }
 }

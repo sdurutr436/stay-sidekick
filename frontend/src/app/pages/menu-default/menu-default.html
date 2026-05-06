@@ -51,6 +51,10 @@
         </span>
         <span class="dashboard__card-nombre">{{ h.label }}</span>
         <span class="dashboard__card-desc">{{ h.descripcion }}</span>
+        @let estado = getEstadoHerramienta(h.id);
+        <span class="dashboard__card-badge dashboard__card-badge--{{ estado }}">
+          {{ estado === 'ok' ? 'Disponible' : estado === 'parcial' ? 'Limitado' : 'No disponible' }}
+        </span>
       </a>
     }
   </section>
