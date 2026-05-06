@@ -1,0 +1,93 @@
+name: Docker Hub
+
+# Se dispara cada vez que uno de los tres CI termina en main.
+# El job `verificar` comprueba si los tres han completado con éxito
+# antes de dejar correr la publicación. Si alguno sigue en progreso
+# o ha fallado, la publicación se salta silenciosamente.
+on:
+  workflow_run:
+    workflows: [CI Angular, CI 11ty, CI Python]
+    types: [completed]
+    branches: [main]
+
+jobs:
+
+  verificar:
+    name: Comprobar que los tres CI han pasado
+    runs-on: ubuntu-latest
+    outputs:
+      todos-pasaron: ${{ steps.check.outputs.todos-pasaron }}
+
+    steps:
+      - id: check
+        name: Consultar estado de los CI para este commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          SHA="${{ github.event.workflow_run.head_sha }}"
+          TODOS=true
+
+          for WF in "CI Angular" "CI 11ty" "CI Python"; do
+            CONCLUSION=$(gh api "repos/${{ github.repository }}/actions/runs" \
+              --jq "[.workflow_runs[] | select(.name == \"$WF\" and .head_sha == \"$SHA\")][0].conclusion" \
+              | tr -d '"')
+
+            if [ "$CONCLUSION" = "success" ]; then
+              echo "✅  $WF"
+            else
+              echo "⏳  $WF — ${CONCLUSION:-en progreso}"
+              TODOS=false
+            fi
+          done
+
+          echo "todos-pasaron=$TODOS" >> $GITHUB_OUTPUT
+
+  publicar:
+    name: Construir y publicar imágenes
+    runs-on: ubuntu-latest
+    needs: verificar
+    if: needs.verificar.outputs.todos-pasaron == 'true'
+
+    env:
+      HUB_USER: ${{ secrets.DOCKERHUB_USERNAME }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      - id: meta
+        name: Extraer SHA corto
+        run: echo "sha=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+
+      - name: Login en Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Imagen backend
+        run: |
+          docker build -t $HUB_USER/stay-sidekick-backend:${{ steps.meta.outputs.sha }} ./backend
+          docker push $HUB_USER/stay-sidekick-backend:${{ steps.meta.outputs.sha }}
+
+      - name: Imagen frontend
+        run: |
+          docker build -t $HUB_USER/stay-sidekick-frontend:${{ steps.meta.outputs.sha }} ./frontend
+          docker push $HUB_USER/stay-sidekick-frontend:${{ steps.meta.outputs.sha }}
+
+      - name: Imagen web (11ty)
+        env:
+          TURNSTILE_SITE_KEY: ${{ secrets.TURNSTILE_SITE_KEY }}
+        run: |
+          docker build \
+            -f web/Dockerfile \
+            --build-arg TURNSTILE_SITE_KEY=$TURNSTILE_SITE_KEY \
+            -t $HUB_USER/stay-sidekick-web:${{ steps.meta.outputs.sha }} \
+            .
+          docker push $HUB_USER/stay-sidekick-web:${{ steps.meta.outputs.sha }}
+
+      - name: Imagen nginx
+        run: |
+          docker build -t $HUB_USER/stay-sidekick-nginx:${{ steps.meta.outputs.sha }} ./nginx
+          docker push $HUB_USER/stay-sidekick-nginx:${{ steps.meta.outputs.sha }}

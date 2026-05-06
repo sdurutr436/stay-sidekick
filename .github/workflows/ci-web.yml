@@ -1,0 +1,31 @@
+name: CI 11ty
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+
+  build:
+    name: 11ty build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Instalar dependencias
+        run: npm ci
+        working-directory: web
+
+      - name: Compilar sitio estático
+        run: npm run build
+        working-directory: web
+        env:
+          TURNSTILE_SITE_KEY: ''
