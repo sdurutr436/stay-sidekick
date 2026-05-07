@@ -53,8 +53,17 @@
     margin-top: $space-10;
     margin-inline: -$space-6;
     padding-inline: $space-6;
-    padding-bottom: $space-3;
-    scrollbar-width: thin;
+    padding-bottom: $space-1; // espacio mínimo al fondo del scroll
+    scrollbar-width: none;    // Firefox
+    cursor: grab;
+
+    &:active {
+      cursor: grabbing;
+    }
+
+    &::-webkit-scrollbar {
+      display: none; // Chrome / Safari / Edge
+    }
   }
 
   // 3 items completos + 4.º a la mitad visible
@@ -101,8 +110,16 @@
     list-style: none;
     padding: 0;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    grid-template-columns: repeat(4, 1fr); // máx 4 columnas; overflow fluye hacia abajo por la izquierda
     gap: $space-6;
+
+    @include respond-until('lg') {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @include respond-until('sm') {
+      grid-template-columns: 1fr;
+    }
   }
 
   .card {
