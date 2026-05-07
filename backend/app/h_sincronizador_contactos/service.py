@@ -23,7 +23,6 @@ from openpyxl import load_workbook
 from app.common.crypto import decrypt, encrypt
 from app.extensions import db
 from app.h_sincronizador_contactos.model import (
-    IntegracionGoogle,
     ORIGEN_GOOGLE_CONTACTS,
     ESTADO_EXITO,
     ESTADO_ERROR,

@@ -16,7 +16,7 @@ import secrets
 
 from functools import wraps
 
-from flask import request, jsonify, make_response
+from flask import request, jsonify
 
 logger = logging.getLogger(__name__)
 
