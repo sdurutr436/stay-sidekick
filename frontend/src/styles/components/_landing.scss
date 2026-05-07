@@ -44,36 +44,31 @@
     color: $color-text-secondary;
   }
 
-  // Rompe el padding del l-container para que el scroll llegue a los bordes
   &__carousel {
     display: flex;
+    flex-wrap: wrap;
     gap: $space-6;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
     margin-top: $space-10;
-    margin-inline: -$space-6;
-    padding-inline: $space-6;
-    padding-bottom: $space-1; // espacio mínimo al fondo del scroll
-    scrollbar-width: none;    // Firefox
-    cursor: grab;
 
-    &:active {
-      cursor: grabbing;
-    }
+    @include respond-until('md') {
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
 
-    &::-webkit-scrollbar {
-      display: none; // Chrome / Safari / Edge
+      &::-webkit-scrollbar {
+        display: none;
+      }
     }
   }
 
-  // 3 items completos + 4.º a la mitad visible
   &__item {
-    flex: 0 0 calc((100% - #{$space-6 * 3}) / 3.5);
+    flex: 1 1 calc(25% - #{$space-6 * 3 / 4});
     min-width: 0;
-    scroll-snap-align: start;
 
     @include respond-until('md') {
-      flex: 0 0 calc(100% - #{$space-6});
+      flex: 0 0 80%;
+      scroll-snap-align: start;
     }
   }
 
