@@ -1,17 +1,167 @@
 ---
 layout: base.njk
 title: Inicio
-description: Stay Sidekick — La plataforma para gestionar tus solicitudes de estancia.
+description: Stay Sidekick — La plataforma SaaS para gestionar alojamientos turísticos.
 ---
 {% import "macros/atoms.njk" as atoms %}
+{% import "macros/molecules.njk" as molecules %}
+{% import "macros/organisms.njk" as organisms %}
 
-<section class="l-container u-text-center" style="padding-block: var(--space-16);">
-  <h1>Stay Sidekick</h1>
-  <p class="u-text-secondary u-mt-4">
-    Página de inicio en construcción. Vuelve pronto.
-  </p>
-  <div class="l-flex l-flex--center l-flex--gap-3 u-mt-8">
-    {{ atoms.button('Presentar solicitud', '/app/solicitud', 'primary', 'lg') }}
-    {{ atoms.button('Iniciar sesión', '/app/login', 'secondary', 'lg') }}
+{# § 1 — HERO #}
+<section class="hero l-container" aria-labelledby="hero-heading">
+  <h1 id="hero-heading" class="hero__title">Gestiona tu alojamiento sin fricción</h1>
+  <p class="hero__subtitle">Stay Sidekick centraliza las herramientas que necesitas para operar de forma autónoma: contactos, ocupación, comunicaciones y solicitudes, todo en un solo lugar.</p>
+  <div class="l-flex l-flex--center l-flex--gap-3">
+    {{ atoms.button('Presentar solicitud', '/solicitud', 'primary', 'lg') }}
+    {{ atoms.button('Ver funcionalidades', '/producto/funcionalidades', 'secondary', 'lg') }}
   </div>
+</section>
+
+{# § 2 — SEPARADOR #}
+<hr class="landing-divider" aria-hidden="true" />
+
+{# § 3 — HERRAMIENTAS #}
+<section class="tools-showcase l-container" aria-labelledby="tools-heading">
+  <h2 id="tools-heading" class="tools-showcase__title">Herramientas pensadas para tu operativa</h2>
+  <p class="tools-showcase__desc">Explora en acción cada una de las funcionalidades incluidas en Stay Sidekick.</p>
+  <span class="sr-only">Esta sección contiene un carrusel con desplazamiento horizontal. Usa las teclas de flecha para navegar entre los elementos.</span>
+  <div class="tools-showcase__carousel" role="list">
+
+    <div class="tools-showcase__item" role="listitem">
+      <div class="tools-showcase__video-wrapper">
+        <!-- Sustituir src por el fichero de vídeo real de la herramienta mapa de calor -->
+        <video controls muted playsinline preload="none"
+               aria-label="Demostración de Mapa de calor de ocupación"
+               src="/assets/video/herramienta-1.mp4"
+               poster="/assets/img/video-poster/herramienta-1.jpg"
+               data-tool="mapa-calor">
+          <track kind="captions" src="" srclang="es" label="Subtítulos en español" />
+          <!-- Sustituir track src por el fichero de subtítulos real -->
+        </video>
+      </div>
+      <p class="tools-showcase__caption">Mapa de calor de ocupación</p>
+    </div>
+
+    <div class="tools-showcase__item" role="listitem">
+      <div class="tools-showcase__video-wrapper">
+        <!-- Sustituir src por el fichero de vídeo real del sincronizador de contactos -->
+        <video controls muted playsinline preload="none"
+               aria-label="Demostración de Sincronizador de contactos"
+               src="/assets/video/herramienta-2.mp4"
+               poster="/assets/img/video-poster/herramienta-2.jpg"
+               data-tool="sincronizador-contactos">
+          <track kind="captions" src="" srclang="es" label="Subtítulos en español" />
+          <!-- Sustituir track src por el fichero de subtítulos real -->
+        </video>
+      </div>
+      <p class="tools-showcase__caption">Sincronizador de contactos</p>
+    </div>
+
+    <div class="tools-showcase__item" role="listitem">
+      <div class="tools-showcase__video-wrapper">
+        <!-- Sustituir src por el fichero de vídeo real de notificaciones tardías -->
+        <video controls muted playsinline preload="none"
+               aria-label="Demostración de Notificaciones tardías"
+               src="/assets/video/herramienta-3.mp4"
+               poster="/assets/img/video-poster/herramienta-3.jpg"
+               data-tool="notificaciones-tardias">
+          <track kind="captions" src="" srclang="es" label="Subtítulos en español" />
+          <!-- Sustituir track src por el fichero de subtítulos real -->
+        </video>
+      </div>
+      <p class="tools-showcase__caption">Notificaciones tardías</p>
+    </div>
+
+    <div class="tools-showcase__item" role="listitem">
+      <div class="tools-showcase__video-wrapper">
+        <!-- Sustituir src por el fichero de vídeo real del vault de comunicaciones -->
+        <video controls muted playsinline preload="none"
+               aria-label="Demostración de Vault de comunicaciones"
+               src="/assets/video/herramienta-4.mp4"
+               poster="/assets/img/video-poster/herramienta-4.jpg"
+               data-tool="vault-comunicaciones">
+          <track kind="captions" src="" srclang="es" label="Subtítulos en español" />
+          <!-- Sustituir track src por el fichero de subtítulos real -->
+        </video>
+      </div>
+      <p class="tools-showcase__caption">Vault de comunicaciones</p>
+    </div>
+
+    <div class="tools-showcase__item" role="listitem">
+      <div class="tools-showcase__video-wrapper">
+        <!-- Sustituir src por el fichero de vídeo real del maestro de apartamentos -->
+        <video controls muted playsinline preload="none"
+               aria-label="Demostración de Maestro de apartamentos"
+               src="/assets/video/herramienta-5.mp4"
+               poster="/assets/img/video-poster/herramienta-5.jpg"
+               data-tool="maestro-apartamentos">
+          <track kind="captions" src="" srclang="es" label="Subtítulos en español" />
+          <!-- Sustituir track src por el fichero de subtítulos real -->
+        </video>
+      </div>
+      <p class="tools-showcase__caption">Maestro de apartamentos</p>
+    </div>
+
+  </div>
+</section>
+
+{# § 4 — SEPARADOR #}
+<hr class="landing-divider" aria-hidden="true" />
+
+{# § 5 — CLIENTES #}
+<section class="clients l-container" aria-labelledby="clients-heading">
+  <h2 id="clients-heading" class="clients__title">Alojamientos que confían en Stay Sidekick</h2>
+  <ul class="clients__grid" role="list">
+
+    <li role="listitem">
+      {% call molecules.card() %}
+        <figure class="clients__logo-wrapper">
+          <!-- Sustituir src por logo real y actualizar alt con nombre oficial -->
+          <img src="/assets/img/clientes/empresa-1.png"
+               alt="Logotipo de Cadiz 4 Rentals"
+               width="120" height="60" loading="lazy" />
+        </figure>
+        <h3 class="clients__name">Cadiz 4 Rentals</h3>
+        <span class="clients__location">Cádiz, España</span>
+      {% endcall %}
+    </li>
+
+    <li role="listitem">
+      {% call molecules.card() %}
+        <figure class="clients__logo-wrapper">
+          <!-- Sustituir src por logo real y actualizar alt con nombre oficial -->
+          <img src="/assets/img/clientes/empresa-2.png"
+               alt="Logotipo de Alquiler Vacacional Cádiz"
+               width="120" height="60" loading="lazy" />
+        </figure>
+        <h3 class="clients__name">Alquiler Vacacional Cádiz</h3>
+        <span class="clients__location">Cádiz, España</span>
+      {% endcall %}
+    </li>
+
+    <li role="listitem">
+      {% call molecules.card() %}
+        <figure class="clients__logo-wrapper">
+          <!-- Sustituir src por logo real y actualizar alt con nombre oficial -->
+          <img src="/assets/img/clientes/empresa-3.png"
+               alt="Logotipo de AC-Gestión"
+               width="120" height="60" loading="lazy" />
+        </figure>
+        <h3 class="clients__name">AC-Gestión</h3>
+        <span class="clients__location">Cádiz, España</span>
+      {% endcall %}
+    </li>
+
+  </ul>
+</section>
+
+{# § 6 — SEPARADOR #}
+<hr class="landing-divider" aria-hidden="true" />
+
+{# § 7 — CTA FINAL #}
+<section class="landing-cta l-container u-text-center" aria-labelledby="cta-heading">
+  <h2 id="cta-heading" class="landing-cta__title">Empieza a trabajar de forma más inteligente</h2>
+  <p class="landing-cta__desc">Únete a los alojamientos que ya gestionan sus operaciones con Stay Sidekick. El acceso es por solicitud.</p>
+  {{ atoms.button('Presentar solicitud', '/solicitud', 'primary', 'lg') }}
+  <p class="landing-cta__note">Sin permanencia. Sin tarjeta de crédito.</p>
 </section>

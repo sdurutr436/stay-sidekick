@@ -48,13 +48,26 @@ section: empresa
     <section class="web-page__prose" aria-labelledby="contacto-formulario-titulo">
       <h2 id="contacto-formulario-titulo">Enviar un mensaje</h2>
 
-      {# TODO: Conectar al endpoint serverless cuando esté disponible #}
+      {# Formulario conectado a POST /api/contacto — notificación por Discord #}
       <form
+        id="form-contacto"
         class="form-solicitud"
         method="post"
-        action=""
+        action="/api/contacto"
         novalidate
       >
+
+        {# ── Honeypot — oculto para usuarios, atrae bots ─────────────── #}
+        <div class="form-solicitud__honeypot" aria-hidden="true">
+          <label for="website">No rellenes este campo</label>
+          <input
+            type="text"
+            id="website"
+            name="website"
+            tabindex="-1"
+            autocomplete="off"
+          />
+        </div>
 
         <div class="form-solicitud__section">
           {% call molecules.formField('Nombre', 'contacto-nombre') %}
@@ -129,13 +142,34 @@ section: empresa
           {% endcall %}
         </div>
 
-        {# TODO: Insertar widget Turnstile aquí — ver docs/todo/turnstile.md #}
+        {# ── Turnstile ─────────────────────────────────────────────────── #}
+        <div class="form-solicitud__section">
+          <div
+            class="cf-turnstile"
+            data-sitekey="{{ config.turnstileSiteKey }}"
+            data-theme="light"
+            data-language="es"
+          ></div>
+        </div>
 
-        {{ atoms.button('Enviar mensaje', '', 'primary', 'md', false, 'submit') }}
+        <p id="contacto-feedback" class="form-solicitud__feedback" hidden></p>
+
+        {{ atoms.button('Enviar mensaje', '', 'primary', 'md', false, 'submit', 'contacto-submit-btn') }}
 
       </form>
+
+      <div id="form-contacto-exito" class="form-solicitud__exito" hidden>
+        <h2 class="form-solicitud__exito-titulo">¡Mensaje enviado!</h2>
+        <p class="form-solicitud__exito-texto">
+          Gracias por escribirnos. Nos pondremos en contacto contigo cuando podamos.
+          Recibirás un mensaje de confirmación en tu correo electrónico.
+        </p>
+      </div>
     </section>
 
   </div>
 
 </div>
+
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" defer></script>
+<script src="/assets/js/form-contacto.js" defer></script>

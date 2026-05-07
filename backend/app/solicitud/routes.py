@@ -32,7 +32,7 @@ def get_csrf_token():
     return response
 
 
-@solicitud_bp.route("/api/solicitud", methods=["POST"])
+@solicitud_bp.route("/api/contact", methods=["POST"])
 @limiter.limit(lambda: __import__("flask").current_app.config["RATE_LIMIT_CONTACT"])
 @csrf_protect
 def solicitud():
