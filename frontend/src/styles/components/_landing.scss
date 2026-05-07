@@ -22,7 +22,10 @@
 }
 
 // ── Divisor de secciones ──────────────────────────────────────────────────────
+// @include container para que quede alineado con el contenido, no full-viewport
 .landing-divider {
+  @include container;
+  display: block;
   border: none;
   border-top: $border-width $border-style $color-border;
   margin-block: 0;
