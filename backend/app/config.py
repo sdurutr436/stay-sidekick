@@ -35,6 +35,7 @@ class Config:
 
     # Discord
     DISCORD_WEBHOOK_URL: str = os.environ.get("DISCORD_WEBHOOK_URL", "")
+    DISCORD_WEBHOOK_CONTACT_URL: str = os.environ.get("DISCORD_WEBHOOK_CONTACT_URL", "")
 
     # JWT (para rutas autenticadas del panel)
     JWT_SECRET_KEY: str = os.environ["JWT_SECRET_KEY"]
