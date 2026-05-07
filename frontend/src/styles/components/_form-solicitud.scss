@@ -80,6 +80,26 @@
     display: flex;
     justify-content: flex-end;
   }
+
+  // -------------------------------------------------------------------------
+  // Panel de éxito — reemplaza al formulario tras envío correcto
+  // -------------------------------------------------------------------------
+  &__exito {
+    padding: $space-10 $space-8;
+    border: $border-width $border-style $color-border;
+    background-color: $color-surface-alt;
+    text-align: center;
+
+    &-titulo {
+      @include text-h3;
+      margin-bottom: $space-4;
+    }
+
+    &-texto {
+      @include text-body-md;
+      color: $color-text-secondary;
+    }
+  }
 }
 
 // -----------------------------------------------------------------------------

@@ -263,7 +263,8 @@ async function submitContacto(payload, csrfToken) {
 
       form.reset();
       if (typeof window.turnstile !== 'undefined') window.turnstile.reset();
-      showFeedback(feedbackEl, 'success', '¡Mensaje enviado! Te responderé lo antes posible.');
+      form.hidden = true;
+      document.getElementById('form-contacto-exito').hidden = false;
     } catch (err) {
       showFeedback(feedbackEl, 'error', err.message || 'Error al enviar el mensaje. Inténtalo de nuevo.');
     } finally {

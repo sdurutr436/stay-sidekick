@@ -46,29 +46,33 @@
 
   &__carousel {
     display: flex;
-    flex-wrap: wrap;
     gap: $space-6;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
     margin-top: $space-10;
+    margin-inline: -$space-6;
+    padding-inline: $space-6;
+    padding-bottom: $space-1;
+    scrollbar-width: none;
+    cursor: grab;
 
-    @include respond-until('md') {
-      flex-wrap: nowrap;
-      overflow-x: auto;
-      scroll-snap-type: x mandatory;
-      scrollbar-width: none;
+    &:active {
+      cursor: grabbing;
+    }
 
-      &::-webkit-scrollbar {
-        display: none;
-      }
+    &::-webkit-scrollbar {
+      display: none;
     }
   }
 
+  // 3 items completos + 4.º/5.º a la mitad visible
   &__item {
-    flex: 1 1 calc(25% - #{$space-6 * 3 / 4});
+    flex: 0 0 calc((100% - #{$space-6 * 3}) / 3.5);
     min-width: 0;
+    scroll-snap-align: start;
 
     @include respond-until('md') {
       flex: 0 0 80%;
-      scroll-snap-align: start;
     }
   }
 

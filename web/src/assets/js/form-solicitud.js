@@ -394,11 +394,8 @@ async function submitPayload(payload, csrfToken) {
       // Reinicia el widget de Turnstile si la API está disponible (global inyectado por Cloudflare)
       if (typeof window.turnstile !== 'undefined') window.turnstile.reset();
 
-      showFeedback(
-        feedbackEl,
-        'success',
-        '¡Solicitud enviada! Nos pondremos en contacto contigo pronto.'
-      );
+      form.hidden = true;
+      document.getElementById('form-solicitud-exito').hidden = false;
 
     } catch (err) {
       showFeedback(
