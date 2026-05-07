@@ -3,6 +3,7 @@
 import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild, WritableSignal, computed, inject, signal } from '@angular/core';
 import flatpickr from 'flatpickr';
 import { forkJoin, catchError, of } from 'rxjs';
+import { NgIconComponent } from '@ng-icons/core';
 import { BadgeComponent } from '../../components/atoms/badge/badge';
 import { ButtonComponent } from '../../components/atoms/button/button';
 import { AlertComponent } from '../../components/molecules/alert/alert';
@@ -18,6 +19,7 @@ import { MapaCalorService, DiaCalor, UmbralesCalor } from '../../services/mapa-c
   styleUrl: './mapa-calor.scss',
   standalone: true,
   imports: [
+    NgIconComponent,
     PageHeaderComponent,
     PanelSeccionComponent,
     BadgeComponent,

@@ -251,6 +251,17 @@
                 >
                   {{ iaApiKeyVisible() ? 'Ocultar' : 'Mostrar' }}
                 </button>
+                @if (integraciones()?.ia?.configurado) {
+                  <button
+                    type="button"
+                    class="perfil-page__apikey-delete"
+                    (click)="confirmarEliminarApiKey()"
+                    aria-label="Eliminar API key guardada"
+                    title="Eliminar API key guardada"
+                  >
+                    <ng-icon name="phosphorX" size="16" aria-hidden="true" />
+                  </button>
+                }
               </div>
             } @else {
               <input
@@ -277,6 +288,26 @@
         }
 
       </form>
+
+      @if (iaEliminarVisible()) {
+        <div class="perfil-page__ia-modal-overlay" (click)="cancelarEliminarApiKey()">
+          <div class="perfil-page__ia-modal" (click)="$event.stopPropagation()" role="dialog" aria-modal="true" aria-labelledby="ia-modal-titulo">
+            <p id="ia-modal-titulo" class="perfil-page__ia-modal-titulo">¿Eliminar API key?</p>
+            <p class="perfil-page__ia-modal-desc">
+              Se borrará la API key guardada. La IA pasará a usar el sistema compartido hasta que configures una nueva.
+            </p>
+            <div class="perfil-page__ia-modal-acciones">
+              <app-button variant="ghost" size="md" (click)="cancelarEliminarApiKey()">
+                Cancelar
+              </app-button>
+              <app-button variant="danger" size="md" [disabled]="iaEliminando()" (click)="eliminarApiKey()">
+                {{ iaEliminando() ? 'Eliminando…' : 'Eliminar' }}
+              </app-button>
+            </div>
+          </div>
+        </div>
+      }
+
     </section>
 
   </app-panel-seccion>

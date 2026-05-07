@@ -2,6 +2,7 @@ import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { forkJoin, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 
+import { NgIconComponent } from '@ng-icons/core';
 import { BadgeComponent } from '../../components/atoms/badge/badge';
 import { ButtonComponent } from '../../components/atoms/button/button';
 import { FormInputComponent } from '../../components/atoms/form-input/form-input';
@@ -41,6 +42,7 @@ function crearFila(): FilaEntrada {
   styleUrl: './maestro-apartamentos.scss',
   standalone: true,
   imports: [
+    NgIconComponent,
     PageHeaderComponent,
     ButtonComponent,
     FormInputComponent,

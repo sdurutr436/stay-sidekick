@@ -16,11 +16,7 @@
       [hasIcon]="true"
       [divider]="true"
     >
-      <svg title-icon class="svg svg--sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-        <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/>
-        <line x1="10" y1="9" x2="10" y2="14" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
-        <circle cx="10" cy="6.5" r="0.75" fill="currentColor"/>
-      </svg>
+      <ng-icon title-icon name="phosphorInfo" size="20" aria-hidden="true" />
 
       <div class="instrucciones-body">
         <p class="instrucciones-body__intro">
@@ -103,16 +99,7 @@
 
         <!-- Estado PMS -->
         <app-tarjeta-estado label="Estado PMS" valor="Cloudbeds">
-          <svg icon class="svg svg--xs" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-            @if (pmsConectado()) {
-              <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/>
-              <polyline points="5,8 7,10 11,6" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="square"/>
-            } @else {
-              <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/>
-              <line x1="8" y1="5" x2="8" y2="9" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
-              <circle cx="8" cy="11.5" r="0.75" fill="currentColor"/>
-            }
-          </svg>
+          <ng-icon icon [name]="pmsConectado() ? 'phosphorCheckCircle' : 'phosphorWarningCircle'" size="16" aria-hidden="true" />
           <ng-container actions>
             @if (pmsConectado()) {
               <app-badge variant="solid">Conectado</app-badge>
@@ -124,16 +111,7 @@
 
         <!-- Estado Google -->
         <app-tarjeta-estado label="Estado Google" valor="Contacts">
-          <svg icon class="svg svg--xs" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-            @if (googleConectado()) {
-              <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/>
-              <polyline points="5,8 7,10 11,6" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="square"/>
-            } @else {
-              <circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/>
-              <line x1="8" y1="5" x2="8" y2="9" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
-              <circle cx="8" cy="11.5" r="0.75" fill="currentColor"/>
-            }
-          </svg>
+          <ng-icon icon [name]="googleConectado() ? 'phosphorCheckCircle' : 'phosphorWarningCircle'" size="16" aria-hidden="true" />
           <ng-container actions>
             @if (googleConectado()) {
               <app-badge variant="solid">Conectado</app-badge>
@@ -150,12 +128,7 @@
           sub="En cola"
           [destacada]="true"
         >
-          <svg icon class="svg svg--xs" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-            <circle cx="6" cy="6" r="3" stroke="currentColor" stroke-width="1.5"/>
-            <path d="M1 14c0-2.5 2-4.5 5-4.5s5 2 5 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
-            <line x1="13" y1="5" x2="13" y2="11" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
-            <line x1="10" y1="8" x2="16" y2="8" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
-          </svg>
+          <ng-icon icon name="phosphorUserPlus" size="16" aria-hidden="true" />
         </app-tarjeta-estado>
 
       </div>
@@ -179,11 +152,7 @@
                   (click)="xlsxInput.click()"
                 >
                   <span class="btn__icon" aria-hidden="true">
-                    <svg class="svg svg--sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
-                      <rect x="4" y="2" width="12" height="16" stroke="currentColor" stroke-width="1.5"/>
-                      <polyline points="7,9 10,6 13,9" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="square" stroke-linejoin="miter"/>
-                      <line x1="10" y1="6" x2="10" y2="14" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
-                    </svg>
+                    <ng-icon name="phosphorFileArrowUp" size="20" />
                   </span>
                   Seleccionar XLSX
                 </app-button>
@@ -228,12 +197,7 @@
                     [value]="fechaDesde()"
                     (valueChange)="onFechaDesdeChange($event)"
                   >
-                    <svg class="svg svg--sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
-                      <rect x="3" y="4" width="14" height="13" stroke="currentColor" stroke-width="1.5"/>
-                      <line x1="3" y1="8" x2="17" y2="8" stroke="currentColor" stroke-width="1.5"/>
-                      <line x1="7" y1="2" x2="7" y2="5" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
-                      <line x1="13" y1="2" x2="13" y2="5" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
-                    </svg>
+                    <ng-icon name="phosphorCalendar" size="20" />
                   </app-form-input-icon>
                 </div>
 
@@ -246,12 +210,7 @@
                     [value]="fechaHasta()"
                     (valueChange)="onFechaHastaChange($event)"
                   >
-                    <svg class="svg svg--sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
-                      <rect x="3" y="4" width="14" height="13" stroke="currentColor" stroke-width="1.5"/>
-                      <line x1="3" y1="8" x2="17" y2="8" stroke="currentColor" stroke-width="1.5"/>
-                      <line x1="7" y1="2" x2="7" y2="5" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
-                      <line x1="13" y1="2" x2="13" y2="5" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/>
-                    </svg>
+                    <ng-icon name="phosphorCalendar" size="20" />
                   </app-form-input-icon>
                 </div>
               </div>
@@ -274,10 +233,7 @@
                 (click)="lanzarSync()"
               >
                 <span class="btn__icon" aria-hidden="true">
-                  <svg class="svg svg--sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
-                    <path d="M4 10a6 6 0 1 0 6-6" stroke="#fff" stroke-width="1.5" stroke-linecap="square"/>
-                    <polyline points="3,6 4,10 8,10" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="square" stroke-linejoin="miter"/>
-                  </svg>
+                  <ng-icon name="phosphorArrowsClockwise" size="20" />
                 </span>
                 @if (syncEnCurso()) { Sincronizando… } @else { Sincronizar PMS con Google }
               </app-button>
@@ -290,11 +246,7 @@
                 (click)="exportarCsv()"
               >
                 <span class="btn__icon" aria-hidden="true">
-                  <svg class="svg svg--sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
-                    <rect x="4" y="2" width="12" height="16" stroke="#fff" stroke-width="1.5"/>
-                    <polyline points="7,10 10,13 13,10" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="square" stroke-linejoin="miter"/>
-                    <line x1="10" y1="6" x2="10" y2="13" stroke="#fff" stroke-width="1.5" stroke-linecap="square"/>
-                  </svg>
+                  <ng-icon name="phosphorDownloadSimple" size="20" />
                 </span>
                 Descargar CSV
               </app-button>
@@ -307,10 +259,7 @@
                 (click)="lanzarXlsxSync()"
               >
                 <span class="btn__icon" aria-hidden="true">
-                  <svg class="svg svg--sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
-                    <path d="M4 10a6 6 0 1 0 6-6" stroke="#fff" stroke-width="1.5" stroke-linecap="square"/>
-                    <polyline points="3,6 4,10 8,10" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="square" stroke-linejoin="miter"/>
-                  </svg>
+                  <ng-icon name="phosphorArrowsClockwise" size="20" />
                 </span>
                 @if (xlsxEnCurso()) { Procesando… } @else { Sincronizar con Google }
               </app-button>
@@ -323,11 +272,7 @@
                 (click)="exportarXlsxCsv()"
               >
                 <span class="btn__icon" aria-hidden="true">
-                  <svg class="svg svg--sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none">
-                    <rect x="4" y="2" width="12" height="16" stroke="#fff" stroke-width="1.5"/>
-                    <polyline points="7,10 10,13 13,10" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="square" stroke-linejoin="miter"/>
-                    <line x1="10" y1="6" x2="10" y2="13" stroke="#fff" stroke-width="1.5" stroke-linecap="square"/>
-                  </svg>
+                  <ng-icon name="phosphorDownloadSimple" size="20" />
                 </span>
                 Descargar CSV
               </app-button>

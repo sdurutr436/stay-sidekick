@@ -2,6 +2,7 @@ import { Component, ElementRef, OnDestroy, OnInit, ViewChild, computed, inject, 
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
+import { NgIconComponent } from '@ng-icons/core';
 import { ButtonComponent } from '../../components/atoms/button/button';
 import { BadgeComponent } from '../../components/atoms/badge/badge';
 import { AlertComponent } from '../../components/molecules/alert/alert';
@@ -57,6 +58,7 @@ interface StatusResponse {
   styleUrl: './notificaciones-checkin-tardio.scss',
   standalone: true,
   imports: [
+    NgIconComponent,
     FormsModule, RouterLink,
     PageHeaderComponent, PanelSeccionComponent,
     ButtonComponent, AlertComponent, BadgeComponent,
