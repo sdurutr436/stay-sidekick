@@ -80,3 +80,59 @@ def send_discord_notification(clean_data: dict) -> bool:
     except requests.RequestException:
         logger.exception("Error al enviar notificación a Discord")
         return False
+
+
+def _build_contact_embed(clean_data: dict) -> dict:
+    """Construye el embed para el formulario de contacto personal."""
+    empresa = clean_data.get("empresa", "")
+    fields = [
+        {"name": "Nombre", "value": clean_data.get("nombre", "N/A"), "inline": True},
+        {"name": "Email", "value": clean_data.get("email", "N/A"), "inline": True},
+    ]
+    if empresa:
+        fields.append({"name": "Empresa", "value": empresa, "inline": True})
+    fields.append(
+        {"name": "Mensaje", "value": clean_data.get("mensaje", "(sin mensaje)") or "(sin mensaje)", "inline": False}
+    )
+
+    return {
+        "embeds": [
+            {
+                "title": "Nuevo mensaje de contacto",
+                "color": 0x57F287,  # Verde Discord
+                "fields": fields,
+                "footer": {"text": "Stay Sidekick — Formulario de contacto"},
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+            }
+        ]
+    }
+
+
+def send_discord_contact_notification(clean_data: dict) -> bool:
+    """Envía el mensaje del formulario de contacto al webhook de Discord.
+
+    Usa DISCORD_WEBHOOK_CONTACT_URL (canal separado del de solicitudes).
+    """
+    webhook_url = current_app.config.get("DISCORD_WEBHOOK_CONTACT_URL", "")
+
+    if not webhook_url:
+        logger.warning(
+            "Discord contact webhook no configurado (DISCORD_WEBHOOK_CONTACT_URL vacío). "
+            "La notificación no se enviará."
+        )
+        return False
+
+    payload = _build_contact_embed(clean_data)
+
+    try:
+        resp = requests.post(webhook_url, json=payload, timeout=_TIMEOUT)
+        resp.raise_for_status()
+        logger.info(
+            "Notificación de contacto enviada para: %s",
+            clean_data.get("email"),
+        )
+        return True
+
+    except requests.RequestException:
+        logger.exception("Error al enviar notificación de contacto a Discord")
+        return False
