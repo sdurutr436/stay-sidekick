@@ -35,6 +35,11 @@
 
   &__instrucciones {
     grid-row: 1 / 3;
+
+    .panel-seccion {
+      height: 100%;
+      box-sizing: border-box;
+    }
   }
 
   &__derecha {
@@ -137,10 +142,6 @@
   &__valor {
     @include text-h3;
     color: $color-text-primary;
-
-    &--grande {
-      @include text-h2;
-    }
   }
 
   &__sub {

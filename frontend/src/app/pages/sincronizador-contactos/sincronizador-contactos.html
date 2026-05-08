@@ -9,86 +9,61 @@
   <!-- Cuerpo: instrucciones + monitorización + acciones -->
   <div class="sincro-layout">
 
-    <!-- Columna izquierda: instrucciones de uso -->
-    <app-panel-seccion
-      title="Cómo usarlo"
-      class="sincro-layout__instrucciones"
-      [hasIcon]="true"
-      [divider]="true"
-    >
-      <ng-icon title-icon name="phosphorInfo" size="20" aria-hidden="true" />
+    <!-- Columna izquierda: formato de contacto -->
+    <app-panel-seccion title="Formato del nombre de contacto" class="sincro-layout__instrucciones" [divider]="true">
 
-      <div class="instrucciones-body">
-        <p class="instrucciones-body__intro">
-          El <strong>Sincronizador de Contactos</strong> te permite unificar la
-          información de los huéspedes. Las opciones cambian dinámicamente según
-          tus integraciones activas.
-        </p>
+      <p class="u-text-secondary u-mb-8">
+        Define cómo se formatea el nombre de cada contacto. Tokens disponibles:
+        <code>&#123;FECHA&#125;</code>, <code>&#123;APT&#125;</code>, <code>&#123;NOMBRE&#125;</code>.
+      </p>
 
-        <ol class="instrucciones-pasos">
-          @if (pmsConectado()) {
-            <li class="instrucciones-pasos__item">
-              <span class="instrucciones-pasos__num" aria-hidden="true">1</span>
-              <div class="instrucciones-pasos__content">
-                <strong>Elige el rango de fechas:</strong> Selecciona de cuándo
-                a cuándo quieres extraer los contactos directamente desde tu PMS.
-              </div>
-            </li>
-            @if (googleConectado()) {
-              <li class="instrucciones-pasos__item">
-                <span class="instrucciones-pasos__num" aria-hidden="true">2</span>
-                <div class="instrucciones-pasos__content">
-                  <strong>Sincroniza con Google:</strong> Haz clic en el botón
-                  de sincronización para enviar los contactos directamente a
-                  Google Contacts.
-                </div>
-              </li>
-            } @else {
-              <li class="instrucciones-pasos__item">
-                <span class="instrucciones-pasos__num" aria-hidden="true">2</span>
-                <div class="instrucciones-pasos__content">
-                  <strong>Descarga en CSV:</strong> Haz clic en el botón de
-                  descarga para exportar un CSV con el formato estandarizado
-                  listo para importar donde quieras.
-                </div>
-              </li>
-            }
-          } @else {
-            <li class="instrucciones-pasos__item">
-              <span class="instrucciones-pasos__num" aria-hidden="true">1</span>
-              <div class="instrucciones-pasos__content">
-                <strong>Sube tu archivo XLSX:</strong> Exporta las reservas desde
-                tu PMS a Excel y súbelas aquí.
-              </div>
-            </li>
-            @if (googleConectado()) {
-              <li class="instrucciones-pasos__item">
-                <span class="instrucciones-pasos__num" aria-hidden="true">2</span>
-                <div class="instrucciones-pasos__content">
-                  <strong>Sincroniza con Google:</strong> Los contactos del
-                  archivo se enviarán directamente a Google Contacts.
-                </div>
-              </li>
-            } @else {
-              <li class="instrucciones-pasos__item">
-                <span class="instrucciones-pasos__num" aria-hidden="true">2</span>
-                <div class="instrucciones-pasos__content">
-                  <strong>Descarga en CSV:</strong> Exporta un CSV con el
-                  formato estandarizado listo para importar donde quieras.
-                </div>
-              </li>
-            }
-          }
-          <li class="instrucciones-pasos__item">
-            <span class="instrucciones-pasos__num" aria-hidden="true">3</span>
-            <div class="instrucciones-pasos__content">
-              <strong>Verifica los nuevos contactos:</strong> Comprueba el
-              indicador a la derecha para ver cuántos contactos nuevos se
-              procesarán.
-            </div>
-          </li>
-        </ol>
-      </div>
+      @if (plantillaAlerta()) {
+        <app-alert
+          [type]="plantillaAlerta()!.tipo"
+          [dismissible]="true"
+          (dismissed)="plantillaAlerta.set(null)"
+        >
+          {{ plantillaAlerta()!.mensaje }}
+        </app-alert>
+      }
+
+      <form class="perfil-form" (submit)="$event.preventDefault(); guardarPlantilla()">
+
+        <app-form-field label="Plantilla" for="plantilla-input">
+          <app-form-input
+            id="plantilla-input"
+            type="text"
+            placeholder="{FECHA} - {APT} - {NOMBRE}"
+            [value]="plantillaInput()"
+            (valueChange)="plantillaInput.set($event)"
+          />
+        </app-form-field>
+
+        <app-form-field label="Formato de fecha" for="plantilla-formato-fecha">
+          <app-form-select
+            id="plantilla-formato-fecha"
+            [options]="formatoFechaOpciones"
+            [value]="formatoFechaInput()"
+            (valueChange)="formatoFechaInput.set($event)"
+          />
+        </app-form-field>
+
+        <div class="plantilla-preview">
+          <p class="plantilla-preview__label">Vista previa:</p>
+          <code class="plantilla-preview__valor">{{ previewNombre() }}</code>
+        </div>
+
+        <app-button
+          type="submit"
+          variant="secondary"
+          size="md"
+          [disabled]="guardandoPlantilla()"
+        >
+          {{ guardandoPlantilla() ? 'Guardando…' : 'Guardar formato' }}
+        </app-button>
+
+      </form>
+
     </app-panel-seccion>
 
     <!-- Columna derecha: monitorización + acciones -->
@@ -298,61 +273,85 @@
 
   </div>
 
-  <!-- Panel de configuración de formato de contacto -->
-  <app-panel-seccion title="Formato del nombre de contacto" [divider]="true">
+  <!-- Panel de instrucciones de uso -->
+  <app-panel-seccion
+    title="Cómo usarlo"
+    [hasIcon]="true"
+    [divider]="true"
+  >
+    <ng-icon title-icon name="phosphorInfo" size="20" aria-hidden="true" />
 
-    <p class="u-text-secondary u-mb-8">
-      Define cómo se formatea el nombre de cada contacto. Tokens disponibles:
-      <code>&#123;FECHA&#125;</code>, <code>&#123;APT&#125;</code>, <code>&#123;NOMBRE&#125;</code>.
-    </p>
+    <div class="instrucciones-body">
+      <p class="instrucciones-body__intro">
+        El <strong>Sincronizador de Contactos</strong> te permite unificar la
+        información de los huéspedes. Las opciones cambian dinámicamente según
+        tus integraciones activas.
+      </p>
 
-    @if (plantillaAlerta()) {
-      <app-alert
-        [type]="plantillaAlerta()!.tipo"
-        [dismissible]="true"
-        (dismissed)="plantillaAlerta.set(null)"
-      >
-        {{ plantillaAlerta()!.mensaje }}
-      </app-alert>
-    }
-
-    <form class="perfil-form" (submit)="$event.preventDefault(); guardarPlantilla()">
-
-      <app-form-field label="Plantilla" for="plantilla-input">
-        <app-form-input
-          id="plantilla-input"
-          type="text"
-          placeholder="{FECHA} - {APT} - {NOMBRE}"
-          [value]="plantillaInput()"
-          (valueChange)="plantillaInput.set($event)"
-        />
-      </app-form-field>
-
-      <app-form-field label="Formato de fecha" for="plantilla-formato-fecha">
-        <app-form-select
-          id="plantilla-formato-fecha"
-          [options]="formatoFechaOpciones"
-          [value]="formatoFechaInput()"
-          (valueChange)="formatoFechaInput.set($event)"
-        />
-      </app-form-field>
-
-      <div class="plantilla-preview">
-        <p class="plantilla-preview__label">Vista previa:</p>
-        <code class="plantilla-preview__valor">{{ previewNombre() }}</code>
-      </div>
-
-      <app-button
-        type="submit"
-        variant="secondary"
-        size="md"
-        [disabled]="guardandoPlantilla()"
-      >
-        {{ guardandoPlantilla() ? 'Guardando…' : 'Guardar formato' }}
-      </app-button>
-
-    </form>
-
+      <ol class="instrucciones-pasos">
+        @if (pmsConectado()) {
+          <li class="instrucciones-pasos__item">
+            <span class="instrucciones-pasos__num" aria-hidden="true">1</span>
+            <div class="instrucciones-pasos__content">
+              <strong>Elige el rango de fechas:</strong> Selecciona de cuándo
+              a cuándo quieres extraer los contactos directamente desde tu PMS.
+            </div>
+          </li>
+          @if (googleConectado()) {
+            <li class="instrucciones-pasos__item">
+              <span class="instrucciones-pasos__num" aria-hidden="true">2</span>
+              <div class="instrucciones-pasos__content">
+                <strong>Sincroniza con Google:</strong> Haz clic en el botón
+                de sincronización para enviar los contactos directamente a
+                Google Contacts.
+              </div>
+            </li>
+          } @else {
+            <li class="instrucciones-pasos__item">
+              <span class="instrucciones-pasos__num" aria-hidden="true">2</span>
+              <div class="instrucciones-pasos__content">
+                <strong>Descarga en CSV:</strong> Haz clic en el botón de
+                descarga para exportar un CSV con el formato estandarizado
+                listo para importar donde quieras.
+              </div>
+            </li>
+          }
+        } @else {
+          <li class="instrucciones-pasos__item">
+            <span class="instrucciones-pasos__num" aria-hidden="true">1</span>
+            <div class="instrucciones-pasos__content">
+              <strong>Sube tu archivo XLSX:</strong> Exporta las reservas desde
+              tu PMS a Excel y súbelas aquí.
+            </div>
+          </li>
+          @if (googleConectado()) {
+            <li class="instrucciones-pasos__item">
+              <span class="instrucciones-pasos__num" aria-hidden="true">2</span>
+              <div class="instrucciones-pasos__content">
+                <strong>Sincroniza con Google:</strong> Los contactos del
+                archivo se enviarán directamente a Google Contacts.
+              </div>
+            </li>
+          } @else {
+            <li class="instrucciones-pasos__item">
+              <span class="instrucciones-pasos__num" aria-hidden="true">2</span>
+              <div class="instrucciones-pasos__content">
+                <strong>Descarga en CSV:</strong> Exporta un CSV con el
+                formato estandarizado listo para importar donde quieras.
+              </div>
+            </li>
+          }
+        }
+        <li class="instrucciones-pasos__item">
+          <span class="instrucciones-pasos__num" aria-hidden="true">3</span>
+          <div class="instrucciones-pasos__content">
+            <strong>Verifica los nuevos contactos:</strong> Comprueba el
+            indicador a la derecha para ver cuántos contactos nuevos se
+            procesarán.
+          </div>
+        </li>
+      </ol>
+    </div>
   </app-panel-seccion>
 
 </div>
