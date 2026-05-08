@@ -20,6 +20,27 @@ interface Alerta {
   mensaje: string;
 }
 
+// A→1, B→2, …, Z→26, AA→27, …, ZZ→702. Vacío → 0 (detectar por cabecera).
+function colLetraANumero(letra: string): number {
+  const s = letra.toUpperCase().trim();
+  if (!s) return 0;
+  let n = 0;
+  for (const ch of s) n = n * 26 + (ch.charCodeAt(0) - 64);
+  return n;
+}
+
+// 0 → '' (vacío), 1→'A', 26→'Z', 27→'AA', …
+function colNumeroALetra(n: number): string {
+  if (!n || n <= 0) return '';
+  let result = '';
+  while (n > 0) {
+    const rem = (n - 1) % 26;
+    result = String.fromCharCode(65 + rem) + result;
+    n = Math.floor((n - 1) / 26);
+  }
+  return result;
+}
+
 @Component({
   selector: 'app-perfil-page',
   templateUrl: './perfil.html',
@@ -77,18 +98,18 @@ export class PerfilPageComponent implements OnInit {
   readonly googleAlerta    = signal<Alerta | null>(null);
 
   // XLSX — Configuración de columnas (maestro de apartamentos)
-  readonly xlsxColIdExterno = signal(0);
-  readonly xlsxColNombre    = signal(0);
-  readonly xlsxColDireccion = signal(0);
-  readonly xlsxColCiudad    = signal(0);
+  readonly xlsxColIdExterno = signal('');
+  readonly xlsxColNombre    = signal('');
+  readonly xlsxColDireccion = signal('');
+  readonly xlsxColCiudad    = signal('');
   readonly xlsxGuardando    = signal(false);
   readonly xlsxAlerta       = signal<Alerta | null>(null);
 
   // XLSX — Configuración de columnas (reservas de contactos)
-  readonly xlsxRColCheckin   = signal(0);
-  readonly xlsxRColNombre    = signal(0);
-  readonly xlsxRColTipologia = signal(0);
-  readonly xlsxRColTelefono  = signal(0);
+  readonly xlsxRColCheckin   = signal('');
+  readonly xlsxRColNombre    = signal('');
+  readonly xlsxRColTipologia = signal('');
+  readonly xlsxRColTelefono  = signal('');
   readonly xlsxReservasGuardando = signal(false);
   readonly xlsxReservasAlerta    = signal<Alerta | null>(null);
 
@@ -344,10 +365,10 @@ export class PerfilPageComponent implements OnInit {
     this.xlsxAlerta.set(null);
     this.xlsxGuardando.set(true);
     this.aptService.saveXlsxColumnas({
-      col_id_externo: this.xlsxColIdExterno(),
-      col_nombre:     this.xlsxColNombre(),
-      col_direccion:  this.xlsxColDireccion(),
-      col_ciudad:     this.xlsxColCiudad(),
+      col_id_externo: colLetraANumero(this.xlsxColIdExterno()),
+      col_nombre:     colLetraANumero(this.xlsxColNombre()),
+      col_direccion:  colLetraANumero(this.xlsxColDireccion()),
+      col_ciudad:     colLetraANumero(this.xlsxColCiudad()),
     }).subscribe({
       next: () => {
         this.xlsxAlerta.set({ tipo: 'success', mensaje: 'Configuración de columnas guardada.' });
@@ -365,10 +386,10 @@ export class PerfilPageComponent implements OnInit {
     this.xlsxReservasGuardando.set(true);
     this.contactosService.savePreferencias({
       xlsx_reservas: {
-        col_checkin:   this.xlsxRColCheckin(),
-        col_nombre:    this.xlsxRColNombre(),
-        col_tipologia: this.xlsxRColTipologia(),
-        col_telefono:  this.xlsxRColTelefono(),
+        col_checkin:   colLetraANumero(this.xlsxRColCheckin()),
+        col_nombre:    colLetraANumero(this.xlsxRColNombre()),
+        col_tipologia: colLetraANumero(this.xlsxRColTipologia()),
+        col_telefono:  colLetraANumero(this.xlsxRColTelefono()),
       },
     }).subscribe({
       next: () => {
@@ -423,10 +444,10 @@ export class PerfilPageComponent implements OnInit {
     this.aptService.getXlsxColumnas().subscribe({
       next: config => {
         if (config) {
-          this.xlsxColIdExterno.set(config.col_id_externo ?? 0);
-          this.xlsxColNombre.set(config.col_nombre ?? 0);
-          this.xlsxColDireccion.set(config.col_direccion ?? 0);
-          this.xlsxColCiudad.set(config.col_ciudad ?? 0);
+          this.xlsxColIdExterno.set(colNumeroALetra(config.col_id_externo ?? 0));
+          this.xlsxColNombre.set(colNumeroALetra(config.col_nombre ?? 0));
+          this.xlsxColDireccion.set(colNumeroALetra(config.col_direccion ?? 0));
+          this.xlsxColCiudad.set(colNumeroALetra(config.col_ciudad ?? 0));
         }
       },
     });
@@ -435,10 +456,10 @@ export class PerfilPageComponent implements OnInit {
   private cargarXlsxReservasColumnas(): void {
     this.contactosService.getPreferencias().subscribe({
       next: prefs => {
-        this.xlsxRColCheckin.set(prefs.xlsx_reservas?.col_checkin ?? 0);
-        this.xlsxRColNombre.set(prefs.xlsx_reservas?.col_nombre ?? 0);
-        this.xlsxRColTipologia.set(prefs.xlsx_reservas?.col_tipologia ?? 0);
-        this.xlsxRColTelefono.set(prefs.xlsx_reservas?.col_telefono ?? 0);
+        this.xlsxRColCheckin.set(colNumeroALetra(prefs.xlsx_reservas?.col_checkin ?? 0));
+        this.xlsxRColNombre.set(colNumeroALetra(prefs.xlsx_reservas?.col_nombre ?? 0));
+        this.xlsxRColTipologia.set(colNumeroALetra(prefs.xlsx_reservas?.col_tipologia ?? 0));
+        this.xlsxRColTelefono.set(colNumeroALetra(prefs.xlsx_reservas?.col_telefono ?? 0));
       },
     });
   }
