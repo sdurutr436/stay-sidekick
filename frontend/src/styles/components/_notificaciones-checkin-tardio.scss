@@ -21,16 +21,32 @@
   gap: $space-8;
 }
 
-// ── Tarjetas de estado ────────────────────────────────────────────────────
+// ── Meta-chips del header (PMS + hora de corte) ───────────────────────────
 
-.notif-checkin__estados {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: $space-4;
+.notif-checkin__header-meta {
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+  flex-shrink: 0;
+}
 
-  @include respond-until('sm') {
-    grid-template-columns: 1fr;
+.notif-checkin__meta-chip {
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+  padding: $space-1 $space-3;
+  border: $border-width $border-style $color-border;
+  @include text-caption-md;
+  color: $color-text-secondary;
+  white-space: nowrap;
+
+  &--ok {
+    color: $color-text-primary;
   }
+}
+
+.notif-checkin__xlsx-input {
+  display: none;
 }
 
 // ── Estado de carga ───────────────────────────────────────────────────────
@@ -40,44 +56,6 @@
   color: $color-text-secondary;
 }
 
-// ── Importación XLSX ──────────────────────────────────────────────────────
-
-.xlsx-import {
-  display: flex;
-  flex-direction: column;
-  gap: $space-4;
-
-  &__input {
-    display: none;
-  }
-
-  &__fila {
-    display: flex;
-    align-items: center;
-    gap: $space-3;
-    flex-wrap: wrap;
-  }
-
-  &__filename {
-    @include text-body-sm;
-    color: $color-text-secondary;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    max-width: 24ch;
-  }
-
-  &__limpiar {
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 0 $space-2;
-    @include text-body-sm;
-    color: $color-text-secondary;
-
-    &:hover { color: $color-text-primary; }
-  }
-}
 
 // ── Advertencias del XLSX ─────────────────────────────────────────────────
 

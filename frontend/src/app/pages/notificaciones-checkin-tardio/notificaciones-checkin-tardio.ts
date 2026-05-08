@@ -1,13 +1,10 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
-import { RouterLink } from '@angular/router';
 import { NgIconComponent } from '@ng-icons/core';
 import { ButtonComponent } from '../../components/atoms/button/button';
-import { BadgeComponent } from '../../components/atoms/badge/badge';
 import { AlertComponent } from '../../components/molecules/alert/alert';
 import { DropdownBuscadorComponent, DropdownOption } from '../../components/molecules/dropdown-buscador/dropdown-buscador';
-import { TarjetaEstadoComponent } from '../../components/molecules/tarjeta-estado/tarjeta-estado';
 import { PageHeaderComponent } from '../../components/organisms/page-header/page-header';
 import { PanelSeccionComponent } from '../../components/organisms/panel-seccion/panel-seccion';
 import { AuthService } from '../../services/auth.service';
@@ -59,10 +56,10 @@ interface StatusResponse {
   standalone: true,
   imports: [
     NgIconComponent,
-    FormsModule, RouterLink,
+    FormsModule,
     PageHeaderComponent, PanelSeccionComponent,
-    ButtonComponent, AlertComponent, BadgeComponent,
-    TarjetaEstadoComponent, DropdownBuscadorComponent,
+    ButtonComponent, AlertComponent,
+    DropdownBuscadorComponent,
   ],
 })
 export class NotificacionesCheckinTardioPageComponent implements OnInit, OnDestroy {

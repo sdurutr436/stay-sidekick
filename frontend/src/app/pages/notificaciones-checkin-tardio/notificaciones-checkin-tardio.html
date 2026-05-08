@@ -4,104 +4,72 @@
   <app-page-header
     title="Notificaciones de check-in tardíos"
     description="Genera recordatorios personalizados para huéspedes con check-in tardío."
-  />
+  >
+    @if (!cargando()) {
+      <div class="notif-checkin__header-meta">
+        <span class="notif-checkin__meta-chip" [class.notif-checkin__meta-chip--ok]="pmsConfigurado()">
+          <ng-icon [name]="pmsConfigurado() ? 'phosphorCheckCircle' : 'phosphorWarningCircle'" size="14" aria-hidden="true" />
+          {{ pmsConfigurado() ? 'PMS conectado' : 'Sin PMS' }}
+        </span>
+        <span class="notif-checkin__meta-chip">
+          Corte: {{ horaCortePerfil() }}
+        </span>
+      </div>
 
-  <!-- ── Tarjetas de estado ─────────────────────────────────────────── -->
-  @if (!cargando()) {
-    <div class="notif-checkin__estados">
-
-      <app-tarjeta-estado label="Estado PMS" valor="">
-        <ng-icon icon [name]="pmsConfigurado() ? 'phosphorCheckCircle' : 'phosphorWarningCircle'" size="16" aria-hidden="true" />
-        <ng-container actions>
-          @if (pmsConfigurado()) {
-            <app-badge variant="solid">Conectado</app-badge>
-          } @else {
-            <app-badge variant="outline">Sin PMS</app-badge>
-          }
-        </ng-container>
-      </app-tarjeta-estado>
-
-      <app-tarjeta-estado label="Hora de corte" [valor]="horaCortePerfil()">
-        <ng-container actions>
-          Configurable en <a routerLink="/perfil">Perfil</a>
-        </ng-container>
-      </app-tarjeta-estado>
-
-    </div>
-  }
+      @if (!pmsConfigurado()) {
+        <app-button variant="secondary" size="md" [disabled]="xlsxEnCurso()" (click)="xlsxInput.click()">
+          <span class="btn__icon" aria-hidden="true">
+            <ng-icon name="phosphorFileArrowUp" size="20" />
+          </span>
+          {{ xlsxEnCurso() ? 'Procesando…' : 'Importar XLSX' }}
+        </app-button>
+        <input
+          #xlsxInput
+          type="file"
+          accept=".xlsx"
+          class="notif-checkin__xlsx-input"
+          aria-hidden="true"
+          tabindex="-1"
+          (change)="onXlsxSeleccionado($event)"
+        />
+      }
+    }
+  </app-page-header>
 
   @if (cargando()) {
     <p class="notif-checkin__cargando" aria-live="polite">Cargando datos…</p>
   } @else {
 
-    <!-- ── Sección XLSX (solo sin PMS) ────────────────────────────────── -->
-    @if (!pmsConfigurado()) {
-      <app-panel-seccion title="Importar reservas del día (XLSX)">
-        <p class="u-text-secondary u-mb-8">
-          Exporta las reservas de hoy a Excel y súbelas. El archivo se procesa en servidor sin almacenarse (RGPD).
-          Columnas reconocidas: <code>nombre</code>, <code>telefono</code>, <code>checkin</code>,
-          <code>hora_llegada</code>, <code>apartamento</code>.
-        </p>
+    <!-- ── Feedback XLSX ──────────────────────────────────────────────────── -->
+    @if (xlsxAdvertencias().length > 0) {
+      <ul class="notif-checkin__advertencias" role="note" aria-label="Advertencias del archivo">
+        @for (w of xlsxAdvertencias(); track w) { <li>{{ w }}</li> }
+      </ul>
+    }
 
-        <div class="xlsx-import">
-          <div class="xlsx-import__fila">
-            <input
-              #xlsxInput
-              type="file"
-              accept=".xlsx"
-              class="xlsx-import__input"
-              aria-label="Seleccionar archivo Excel de reservas del día"
-              (change)="onXlsxSeleccionado($event)"
-            />
-            <app-button variant="secondary" size="md" (click)="xlsxInput.click()">
-              <span class="btn__icon" aria-hidden="true">
-                <ng-icon name="phosphorFileArrowUp" size="20" />
-              </span>
-              Seleccionar .xlsx
-            </app-button>
-
-            @if (xlsxArchivo()) {
-              @if (xlsxEnCurso()) {
-                <span class="xlsx-import__filename" aria-live="polite">Procesando…</span>
-              } @else {
-                <span class="xlsx-import__filename" aria-live="polite">{{ xlsxArchivo()!.name }}</span>
-                <button type="button" class="xlsx-import__limpiar" aria-label="Quitar archivo" (click)="limpiarXlsx()">✕</button>
-              }
-            }
-          </div>
-
-          @if (xlsxAdvertencias().length > 0) {
-            <ul class="notif-checkin__advertencias" role="note" aria-label="Advertencias del archivo">
-              @for (w of xlsxAdvertencias(); track w) { <li>{{ w }}</li> }
-            </ul>
+    @if (xlsxCheckins().length > 0) {
+      <table class="tabla-checkins" aria-label="Check-ins del XLSX">
+        <thead class="tabla-checkins__head">
+          <tr>
+            <th scope="col">Huésped</th>
+            <th scope="col">Apartamento</th>
+            <th scope="col">Teléfono</th>
+            <th scope="col">Hora llegada</th>
+            <th scope="col">Dirección</th>
+          </tr>
+        </thead>
+        <tbody class="tabla-checkins__body">
+          @for (r of xlsxCheckins(); track r.nombre) {
+            <tr>
+              <td>{{ r.nombre }}</td>
+              <td>{{ r.apartamento ?? '—' }}</td>
+              <td>{{ r.telefono ?? '—' }}</td>
+              <td>{{ r.hora_llegada ?? '—' }}</td>
+              <td>{{ r.direccion ?? '—' }}</td>
+            </tr>
           }
-
-          @if (xlsxCheckins().length > 0) {
-            <table class="tabla-checkins" aria-label="Check-ins del XLSX">
-              <thead class="tabla-checkins__head">
-                <tr>
-                  <th scope="col">Huésped</th>
-                  <th scope="col">Apartamento</th>
-                  <th scope="col">Teléfono</th>
-                  <th scope="col">Hora llegada</th>
-                  <th scope="col">Dirección</th>
-                </tr>
-              </thead>
-              <tbody class="tabla-checkins__body">
-                @for (r of xlsxCheckins(); track r.nombre) {
-                  <tr>
-                    <td>{{ r.nombre }}</td>
-                    <td>{{ r.apartamento ?? '—' }}</td>
-                    <td>{{ r.telefono ?? '—' }}</td>
-                    <td>{{ r.hora_llegada ?? '—' }}</td>
-                    <td>{{ r.direccion ?? '—' }}</td>
-                  </tr>
-                }
-              </tbody>
-            </table>
-          }
-        </div>
-      </app-panel-seccion>
+        </tbody>
+      </table>
     }
 
     <!-- ── 2 paneles: Plantillas | Mensaje ──────────────────────────────── -->
