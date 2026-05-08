@@ -98,6 +98,11 @@
       text-align: center;
       padding-inline: $space-2;
     }
+
+    &--acciones {
+      width: 8rem;
+      text-align: right;
+    }
   }
 
   // -------------------------------------------------------------------------
@@ -154,6 +159,12 @@
       font-family: monospace;
       @include text-caption-md;
       color: $color-text-secondary;
+    }
+
+    &--acciones {
+      width: 8rem;
+      text-align: right;
+      white-space: nowrap;
     }
   }
 
