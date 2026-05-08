@@ -5,6 +5,7 @@ import { catchError } from 'rxjs/operators';
 import { NgIconComponent } from '@ng-icons/core';
 import { AlertComponent } from '../../components/molecules/alert/alert';
 import { ConfirmInlineComponent } from '../../components/molecules/confirm-inline/confirm-inline';
+import { FormCheckboxComponent } from '../../components/atoms/form-checkbox/form-checkbox';
 import { FormFieldComponent } from '../../components/molecules/form-field/form-field';
 import { BadgeComponent } from '../../components/atoms/badge/badge';
 import { ButtonComponent } from '../../components/atoms/button/button';
@@ -28,6 +29,7 @@ import { AuthService } from '../../services/auth.service';
     ModalComponent,
     AlertComponent,
     ConfirmInlineComponent,
+    FormCheckboxComponent,
     FormFieldComponent,
     BadgeComponent,
     ButtonComponent,
@@ -57,13 +59,16 @@ export class GestionUsuariosPageComponent implements OnInit {
   readonly errorCreacion = signal<string | null>(null);
   readonly passwordTemporal = signal<string | null>(null);
 
-  // Confirmación de borrado
-  readonly confirmandoId = signal<string | null>(null);
-  readonly eliminando = signal(false);
-
-  // Reset de contraseña
-  readonly resetandoId = signal<string | null>(null);
-  readonly resetInfo = signal<{ id: string; password: string } | null>(null);
+  // Modal de edición de usuario
+  readonly usuarioEditando = signal<Usuario | null>(null);
+  readonly modalEdicionAbierto = signal(false);
+  readonly editRol = signal<string>('operativo');
+  readonly guardando = signal(false);
+  readonly errorEdicion = signal<string | null>(null);
+  readonly resetInfoEdicion = signal<string | null>(null);
+  readonly resetandoEnEdicion = signal(false);
+  readonly confirmandoEliminarEdicion = signal(false);
+  readonly eliminandoEdicion = signal(false);
 
   // Modal de nueva empresa (solo superadmin)
   readonly modalEmpresaAbierto = signal(false);
@@ -159,52 +164,70 @@ export class GestionUsuariosPageComponent implements OnInit {
     });
   }
 
-  pedirEliminar(id: string): void {
-    this.confirmandoId.set(id);
-    this.resetInfo.set(null);
+  abrirEdicion(u: Usuario): void {
+    this.usuarioEditando.set(u);
+    this.editRol.set(u.rol);
+    this.errorEdicion.set(null);
+    this.resetInfoEdicion.set(null);
+    this.confirmandoEliminarEdicion.set(false);
+    this.modalEdicionAbierto.set(true);
   }
 
-  cancelarEliminar(): void {
-    this.confirmandoId.set(null);
+  cerrarEdicion(): void {
+    this.modalEdicionAbierto.set(false);
+    this.usuarioEditando.set(null);
+    this.resetInfoEdicion.set(null);
+    this.confirmandoEliminarEdicion.set(false);
   }
 
-  confirmarEliminar(): void {
-    const id = this.confirmandoId();
-    if (!id) return;
-    this.eliminando.set(true);
-    this.service.eliminarUsuario(id, this._empresaIdActual()).subscribe({
-      next: () => {
-        this.eliminando.set(false);
-        this.confirmandoId.set(null);
-        this._cargar(this._empresaIdActual());
+  guardarEdicion(): void {
+    const u = this.usuarioEditando();
+    if (!u) return;
+    this.guardando.set(true);
+    this.errorEdicion.set(null);
+    this.service.editarRol(u.id, this.editRol(), this._empresaIdActual()).subscribe({
+      next: (updated) => {
+        this.guardando.set(false);
+        this.usuarios.update(lista => lista.map(x => x.id === updated.id ? updated : x));
+        this.cerrarEdicion();
       },
-      error: () => {
-        this.eliminando.set(false);
-        this.confirmandoId.set(null);
+      error: err => {
+        this.guardando.set(false);
+        this.errorEdicion.set(err?.error?.errors?.[0] ?? 'Error al guardar.');
       },
     });
   }
 
-  resetearPassword(id: string): void {
-    this.resetandoId.set(id);
-    this.resetInfo.set(null);
-    this.service.resetearPassword(id, this._empresaIdActual()).subscribe({
+  resetearPasswordEdicion(): void {
+    const u = this.usuarioEditando();
+    if (!u) return;
+    this.resetandoEnEdicion.set(true);
+    this.resetInfoEdicion.set(null);
+    this.service.resetearPassword(u.id, this._empresaIdActual()).subscribe({
       next: ({ password_temporal }) => {
-        this.resetandoId.set(null);
-        this.resetInfo.set({ id, password: password_temporal });
+        this.resetandoEnEdicion.set(false);
+        this.resetInfoEdicion.set(password_temporal);
       },
-      error: () => {
-        this.resetandoId.set(null);
+      error: () => { this.resetandoEnEdicion.set(false); },
+    });
+  }
+
+  confirmarEliminarEdicion(): void {
+    const u = this.usuarioEditando();
+    if (!u) return;
+    this.eliminandoEdicion.set(true);
+    this.service.eliminarUsuario(u.id, this._empresaIdActual()).subscribe({
+      next: () => {
+        this.eliminandoEdicion.set(false);
+        this._cargar(this._empresaIdActual());
+        this.cerrarEdicion();
       },
+      error: () => { this.eliminandoEdicion.set(false); },
     });
   }
 
   copiar(text: string): void {
     navigator.clipboard.writeText(text);
-  }
-
-  cerrarResetInfo(): void {
-    this.resetInfo.set(null);
   }
 
   rolLabel(rol: string): string {

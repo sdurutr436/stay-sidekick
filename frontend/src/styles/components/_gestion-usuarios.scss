@@ -8,11 +8,10 @@
   @include container;
   padding-block: 0;
 
-  &__empresa-selector {
+  &__empresa-toolbar {
     display: flex;
     align-items: center;
     gap: $space-3;
-    margin-block-end: $space-2;
   }
 
   &__empresa-label {
@@ -41,5 +40,29 @@
     display: flex;
     flex-direction: column;
     gap: $space-4;
+  }
+
+  &__roles {
+    display: flex;
+    flex-direction: column;
+    gap: $space-2;
+    padding-block-start: $space-1;
+  }
+
+  &__reset-section {
+    display: flex;
+    flex-direction: column;
+    gap: $space-3;
+    padding-block: $space-2;
+    border-block: $border-width $border-style $color-border;
+  }
+
+  &__reset-result {
+    display: flex;
+    align-items: center;
+    gap: $space-1;
+    flex-wrap: wrap;
+    @include text-body-sm;
+    color: $color-text-secondary;
   }
 }
