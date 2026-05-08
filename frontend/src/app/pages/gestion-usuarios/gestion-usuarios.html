@@ -5,6 +5,18 @@
     title="Gestión de usuarios"
     description="Administra los usuarios de tu empresa."
   >
+    @if (esSuperAdmin) {
+      <app-button
+        variant="secondary"
+        size="md"
+        (click)="abrirModalEmpresa()"
+      >
+        <span class="btn__icon" aria-hidden="true">
+          <ng-icon name="phosphorBuildings" size="20" />
+        </span>
+        Nueva empresa
+      </app-button>
+    }
     <app-button
       variant="primary"
       size="md"
@@ -184,4 +196,41 @@
     </div>
   }
 
+</app-modal>
+
+<!-- Modal: Nueva empresa (solo superadmin) -->
+<app-modal title="Nueva empresa" [open]="modalEmpresaAbierto()" (cerrar)="cerrarModalEmpresa()">
+  <div class="gestion-usuarios__form">
+    <app-form-field label="Nombre de la empresa" for="nueva-empresa-nombre">
+      <app-form-input
+        id="nueva-empresa-nombre"
+        type="text"
+        placeholder="Hotel Ejemplo S.L."
+        [value]="nuevaEmpresaNombre()"
+        ariaLabel="Nombre de la empresa"
+        (valueChange)="nuevaEmpresaNombre.set($event)"
+      />
+    </app-form-field>
+    <app-form-field label="Email de la empresa" for="nueva-empresa-email">
+      <app-form-input
+        id="nueva-empresa-email"
+        type="email"
+        placeholder="contacto@empresa.com"
+        [value]="nuevaEmpresaEmail()"
+        ariaLabel="Email de la empresa"
+        (valueChange)="nuevaEmpresaEmail.set($event)"
+      />
+    </app-form-field>
+    @if (errorCreacionEmpresa()) {
+      <app-alert type="error">{{ errorCreacionEmpresa() }}</app-alert>
+    }
+  </div>
+  <div modal-footer>
+    <app-button variant="primary" size="md" [disabled]="creandoEmpresa()" (click)="crearEmpresa()">
+      {{ creandoEmpresa() ? 'Creando…' : 'Crear empresa' }}
+    </app-button>
+    <app-button variant="ghost" size="md" [disabled]="creandoEmpresa()" (click)="cerrarModalEmpresa()">
+      Cancelar
+    </app-button>
+  </div>
 </app-modal>

@@ -21,6 +21,11 @@ export interface UsuarioCreatePayload {
   rol: string;
 }
 
+export interface EmpresaCreatePayload {
+  nombre: string;
+  email: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class GestionUsuariosService {
   private readonly http = inject(HttpClient);
@@ -63,5 +68,11 @@ export class GestionUsuariosService {
     return this.http
       .patch<{ ok: boolean; password_temporal: string }>(`/api/usuarios/${id}/resetear-password`, {}, { params: this._params(empresaId) })
       .pipe(map(res => ({ password_temporal: res.password_temporal })));
+  }
+
+  crearEmpresa(payload: EmpresaCreatePayload): Observable<EmpresaItem> {
+    return this.http
+      .post<{ ok: boolean; empresa: EmpresaItem }>('/api/empresas', payload)
+      .pipe(map(res => res.empresa));
   }
 }

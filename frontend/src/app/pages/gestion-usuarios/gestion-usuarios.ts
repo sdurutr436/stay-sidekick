@@ -13,7 +13,7 @@ import { FormSelectComponent } from '../../components/atoms/form-select/form-sel
 import { PageHeaderComponent } from '../../components/organisms/page-header/page-header';
 import { TablaCrudComponent } from '../../components/organisms/tabla-crud/tabla-crud';
 import { ModalComponent } from '../../components/organisms/modal/modal';
-import { GestionUsuariosService, EmpresaItem, Usuario } from '../../services/gestion-usuarios.service';
+import { GestionUsuariosService, EmpresaItem, Usuario, EmpresaCreatePayload } from '../../services/gestion-usuarios.service';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
@@ -64,6 +64,13 @@ export class GestionUsuariosPageComponent implements OnInit {
   // Reset de contraseña
   readonly resetandoId = signal<string | null>(null);
   readonly resetInfo = signal<{ id: string; password: string } | null>(null);
+
+  // Modal de nueva empresa (solo superadmin)
+  readonly modalEmpresaAbierto = signal(false);
+  readonly nuevaEmpresaNombre = signal('');
+  readonly nuevaEmpresaEmail = signal('');
+  readonly creandoEmpresa = signal(false);
+  readonly errorCreacionEmpresa = signal<string | null>(null);
 
   readonly totalUsuarios = computed(() => this.usuarios().length);
   readonly limiteAlcanzado = computed(() => this.totalUsuarios() >= this.maxUsuarios());
@@ -202,5 +209,38 @@ export class GestionUsuariosPageComponent implements OnInit {
 
   rolLabel(rol: string): string {
     return rol === 'admin' ? 'Admin' : 'Empleado';
+  }
+
+  abrirModalEmpresa(): void {
+    this.nuevaEmpresaNombre.set('');
+    this.nuevaEmpresaEmail.set('');
+    this.errorCreacionEmpresa.set(null);
+    this.modalEmpresaAbierto.set(true);
+  }
+
+  cerrarModalEmpresa(): void {
+    this.modalEmpresaAbierto.set(false);
+  }
+
+  crearEmpresa(): void {
+    const nombre = this.nuevaEmpresaNombre().trim();
+    const email = this.nuevaEmpresaEmail().trim();
+    if (!nombre) { this.errorCreacionEmpresa.set('El nombre es obligatorio.'); return; }
+    if (!email) { this.errorCreacionEmpresa.set('El email es obligatorio.'); return; }
+    this.creandoEmpresa.set(true);
+    this.errorCreacionEmpresa.set(null);
+    this.service.crearEmpresa({ nombre, email }).subscribe({
+      next: (empresa) => {
+        this.creandoEmpresa.set(false);
+        this.modalEmpresaAbierto.set(false);
+        this.empresas.update(lista => [...lista, empresa]);
+        this.empresaSeleccionadaId.set(empresa.id);
+        this._cargar(empresa.id);
+      },
+      error: err => {
+        this.creandoEmpresa.set(false);
+        this.errorCreacionEmpresa.set(err?.error?.errors?.[0] ?? 'Error al crear la empresa.');
+      },
+    });
   }
 }
