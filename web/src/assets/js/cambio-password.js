@@ -126,9 +126,11 @@ async function submitCambio(payload, token) {
 
     try {
       await submitCambio({ password_actual: actual, password_nueva: nueva }, token);
+      localStorage.removeItem('ss_token');
+      sessionStorage.removeItem('ss_token');
       form.hidden = true;
       exitoEl.hidden = false;
-      setTimeout(() => { window.location.href = '/menu'; }, 2000);
+      setTimeout(() => { window.location.href = '/login'; }, 2000);
     } catch (err) {
       showFeedback(feedbackEl, err.message || 'No se pudo cambiar la contraseña. Inténtalo de nuevo.');
     } finally {
