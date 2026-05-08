@@ -70,6 +70,17 @@ async function submitCambio(payload, token) {
   const token = localStorage.getItem('ss_token') || sessionStorage.getItem('ss_token');
   if (!token) { window.location.href = '/login'; return; }
 
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    if (!payload.debe_cambiar_password) {
+      window.location.href = '/menu';
+      return;
+    }
+  } catch {
+    window.location.href = '/login';
+    return;
+  }
+
   const form = document.getElementById('form-cambio-pwd');
   if (!form) return;
 
@@ -114,7 +125,7 @@ async function submitCambio(payload, token) {
     btn.textContent = 'Guardando…';
 
     try {
-      await submitCambio({ password_actual: actual, password_nueva: nueva, password_confirm: confirm }, token);
+      await submitCambio({ password_actual: actual, password_nueva: nueva }, token);
       form.hidden = true;
       exitoEl.hidden = false;
       setTimeout(() => { window.location.href = '/menu'; }, 2000);

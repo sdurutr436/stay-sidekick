@@ -4,9 +4,15 @@ import { AuthService } from '../services/auth.service';
 
 export const authGuard: CanActivateFn = () => {
   const auth = inject(AuthService);
-  if (auth.isLoggedIn()) return true;
+  if (!auth.isLoggedIn()) {
+    window.location.href = '/login?acceso=requerido';
+    return false;
+  }
 
-  // /login es una página 11ty fuera del router Angular
-  window.location.href = '/login?acceso=requerido';
-  return false;
+  if (auth.debeChangiarPassword) {
+    window.location.href = '/cambio-password';
+    return false;
+  }
+
+  return true;
 };

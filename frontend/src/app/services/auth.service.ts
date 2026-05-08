@@ -7,6 +7,7 @@ interface JwtPayload {
   empresa_id: string;
   rol: string;
   es_superadmin?: boolean;
+  debe_cambiar_password?: boolean;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -46,6 +47,10 @@ export class AuthService {
 
   get esSuperAdmin(): boolean {
     return this.getUser()?.es_superadmin === true;
+  }
+
+  get debeChangiarPassword(): boolean {
+    return this.getUser()?.debe_cambiar_password === true;
   }
 
   logout(): void {
