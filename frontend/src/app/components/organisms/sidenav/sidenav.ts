@@ -2,12 +2,14 @@ import { Component, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { NgIconComponent } from '@ng-icons/core';
 import { SidenavService } from '../../../services/sidenav.service';
+import { AuthService } from '../../../services/auth.service';
 
 interface Tool {
   id: string;
   label: string;
   route: string | null;
   icon: string;
+  adminOnly?: boolean;
 }
 
 const TOOLS: Tool[] = [
@@ -16,6 +18,7 @@ const TOOLS: Tool[] = [
   { id: 'notificaciones-checkin-tardio', label: 'Notificaciones check-in',    route: '/notificaciones-checkin-tardio', icon: 'phosphorBellRinging' },
   { id: 'mapa-calor',                    label: 'Mapa de calor',              route: '/mapa-calor',                    icon: 'phosphorFireSimple'  },
   { id: 'vault-comunicaciones',          label: 'Vault de comunicaciones',    route: '/vault-comunicaciones',          icon: 'phosphorChatText'    },
+  { id: 'gestion-usuarios',             label: 'Usuarios',                   route: '/gestion-usuarios',              icon: 'phosphorUsers',       adminOnly: true },
   // Herramienta interna de desarrollo, fuera de las 5 del panel de usuario
   { id: 'hoja-estilos',                  label: 'Hoja de estilos',            route: '/hoja-estilos',                  icon: 'phosphorSwatches'    },
 ];
@@ -29,5 +32,9 @@ const TOOLS: Tool[] = [
 })
 export class SidenavComponent {
   readonly sidenavService = inject(SidenavService);
-  readonly tools: Tool[] = TOOLS;
+  private readonly auth = inject(AuthService);
+
+  get visibleTools(): Tool[] {
+    return TOOLS.filter(t => !t.adminOnly || this.auth.isAdmin);
+  }
 }

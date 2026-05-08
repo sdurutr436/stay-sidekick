@@ -1,0 +1,174 @@
+<!-- Página: Gestión de usuarios -->
+<div class="gestion-usuarios">
+
+  <app-page-header
+    title="Gestión de usuarios"
+    description="Administra los usuarios de tu empresa."
+  >
+    <app-button
+      variant="primary"
+      size="md"
+      [disabled]="limiteAlcanzado()"
+      (click)="abrirModal()"
+    >
+      <span class="btn__icon" aria-hidden="true">
+        <ng-icon name="phosphorUserPlus" size="20" />
+      </span>
+      Nuevo usuario
+    </app-button>
+  </app-page-header>
+
+  @if (resetInfo()) {
+    <app-alert type="info" [dismissible]="true" (dismissed)="cerrarResetInfo()">
+      Contraseña temporal reseteada:
+      <strong class="gestion-usuarios__password-code">{{ resetInfo()!.password }}</strong>
+      <app-button variant="ghost" size="sm" (click)="copiar(resetInfo()!.password)">Copiar</app-button>
+    </app-alert>
+  }
+
+  <app-tabla-crud
+    searchPlaceholder="Buscar por email…"
+    [resultCount]="usuarios().length"
+  >
+    <span title>
+      {{ totalUsuarios() }} / {{ maxUsuarios() }} usuarios
+    </span>
+
+    <table class="tabla-crud__table" aria-label="Tabla de usuarios">
+      <thead>
+        <tr>
+          <th class="tabla-crud__th" scope="col">Email</th>
+          <th class="tabla-crud__th" scope="col">Rol</th>
+          <th class="tabla-crud__th" scope="col">Estado</th>
+          <th class="tabla-crud__th" scope="col">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+
+        @if (cargando()) {
+          @for (i of [1, 2, 3]; track i) {
+            <tr class="tabla-crud__row tabla-crud__row--skeleton">
+              <td class="tabla-crud__td"><span class="tabla-crud__skeleton"></span></td>
+              <td class="tabla-crud__td"><span class="tabla-crud__skeleton"></span></td>
+              <td class="tabla-crud__td"><span class="tabla-crud__skeleton"></span></td>
+              <td class="tabla-crud__td"><span class="tabla-crud__skeleton"></span></td>
+            </tr>
+          }
+        } @else if (error()) {
+          <tr>
+            <td class="tabla-crud__empty" colspan="4">
+              <app-alert type="error">{{ error() }}</app-alert>
+            </td>
+          </tr>
+        } @else if (usuarios().length === 0) {
+          <tr>
+            <td class="tabla-crud__empty" colspan="4">
+              <div class="tabla-crud__empty-inner">
+                <p class="tabla-crud__empty-title">No hay usuarios registrados todavía</p>
+              </div>
+            </td>
+          </tr>
+        } @else {
+          @for (u of usuarios(); track u.id) {
+            <tr class="tabla-crud__row">
+              <td class="tabla-crud__td">{{ u.email }}</td>
+              <td class="tabla-crud__td">
+                <app-badge [variant]="u.rol === 'admin' ? 'solid' : 'outline'">
+                  {{ rolLabel(u.rol) }}
+                </app-badge>
+              </td>
+              <td class="tabla-crud__td">
+                <app-badge [variant]="u.activo ? 'solid' : 'outline'">
+                  {{ u.activo ? 'Activo' : 'Inactivo' }}
+                </app-badge>
+              </td>
+              <td class="tabla-crud__td tabla-crud__td--acciones">
+                @if (confirmandoId() === u.id) {
+                  <app-confirm-inline
+                    [visible]="true"
+                    [cargando]="eliminando()"
+                    mensaje="¿Eliminar este usuario? Esta acción no se puede deshacer."
+                    (confirmado)="confirmarEliminar()"
+                    (cancelado)="cancelarEliminar()"
+                  />
+                } @else {
+                  <app-button
+                    variant="ghost"
+                    size="sm"
+                    [disabled]="resetandoId() === u.id"
+                    (click)="resetearPassword(u.id)"
+                  >
+                    {{ resetandoId() === u.id ? 'Reseteando…' : 'Resetear contraseña' }}
+                  </app-button>
+                  <app-button
+                    variant="ghost"
+                    size="sm"
+                    (click)="pedirEliminar(u.id)"
+                  >
+                    <ng-icon name="phosphorTrash" size="16" />
+                    Eliminar
+                  </app-button>
+                }
+              </td>
+            </tr>
+          }
+        }
+
+      </tbody>
+    </table>
+  </app-tabla-crud>
+
+</div>
+
+<!-- Modal: Nuevo usuario -->
+<app-modal title="Nuevo usuario" [open]="modalAbierto()" (cerrar)="cerrarModal()">
+
+  @if (passwordTemporal()) {
+    <app-alert type="info">
+      Usuario creado. Contraseña temporal (cópiala ahora, no se volverá a mostrar):
+      <strong class="gestion-usuarios__password-code">{{ passwordTemporal() }}</strong>
+    </app-alert>
+    <div class="gestion-usuarios__modal-copy">
+      <app-button variant="secondary" size="md" (click)="copiar(passwordTemporal()!)">
+        Copiar contraseña
+      </app-button>
+    </div>
+    <div modal-footer>
+      <app-button variant="primary" size="md" (click)="cerrarModal()">Cerrar</app-button>
+    </div>
+  } @else {
+    <div class="gestion-usuarios__form">
+      <app-form-field label="Correo electrónico" for="nuevo-email">
+        <app-form-input
+          id="nuevo-email"
+          type="email"
+          placeholder="usuario@empresa.com"
+          [value]="nuevoEmail()"
+          ariaLabel="Correo electrónico del nuevo usuario"
+          (valueChange)="nuevoEmail.set($event)"
+        />
+      </app-form-field>
+      <app-form-field label="Rol" for="nuevo-rol">
+        <app-form-select
+          id="nuevo-rol"
+          [value]="nuevoRol()"
+          [options]="rolesOpciones"
+          ariaLabel="Rol del nuevo usuario"
+          (valueChange)="nuevoRol.set($event)"
+        />
+      </app-form-field>
+      @if (errorCreacion()) {
+        <app-alert type="error">{{ errorCreacion() }}</app-alert>
+      }
+    </div>
+    <div modal-footer>
+      <app-button variant="primary" size="md" [disabled]="creando()" (click)="crear()">
+        {{ creando() ? 'Creando…' : 'Crear usuario' }}
+      </app-button>
+      <app-button variant="ghost" size="md" [disabled]="creando()" (click)="cerrarModal()">
+        Cancelar
+      </app-button>
+    </div>
+  }
+
+</app-modal>

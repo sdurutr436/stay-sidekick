@@ -6,7 +6,7 @@
 >
 
   <ul class="nav-sidenav__tools" role="list">
-    @for (tool of tools; track tool.id) {
+    @for (tool of visibleTools; track tool.id) {
       <li class="nav-sidenav__item">
         <a
           class="nav-sidenav__tool-link"

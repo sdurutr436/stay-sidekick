@@ -49,6 +49,13 @@ export const routes: Routes = [
         path: 'perfil',
         loadComponent: () => import('./pages/perfil/perfil').then(m => m.PerfilPageComponent),
       },
+      {
+        path: 'gestion-usuarios',
+        loadComponent: () =>
+          import('./pages/gestion-usuarios/gestion-usuarios').then(
+            m => m.GestionUsuariosPageComponent
+          ),
+      },
     ],
   },
   { path: '**', component: NotFoundComponent },

@@ -1,0 +1,27 @@
+.gestion-usuarios {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.gestion-usuarios__password-code {
+  display: inline-block;
+  margin: 0 var(--space-2);
+  padding: var(--space-1) var(--space-2);
+  background: var(--color-surface-raised);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  letter-spacing: 0.08em;
+}
+
+.gestion-usuarios__modal-copy {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--space-4);
+}
+
+.gestion-usuarios__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
