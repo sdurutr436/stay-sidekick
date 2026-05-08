@@ -1,0 +1,75 @@
+---
+layout: base.njk
+title: Cambiar contraseña
+description: Cambia tu contraseña de acceso.
+section: cambio-password
+---
+{% import "macros/atoms.njk" as atoms %}
+{% import "macros/molecules.njk" as molecules %}
+{% import "macros/organisms.njk" as organisms %}
+
+<section class="l-container">
+  <section class="login-page">
+
+    {{ organisms.pageHeader(
+      'Cambiar contraseña',
+      'Tu cuenta requiere un cambio de contraseña obligatorio antes de continuar.'
+    ) }}
+
+    <noscript>
+      {% call molecules.alert('warning') %}
+        Este formulario requiere JavaScript para funcionar. Actívalo en tu navegador y recarga la página.
+      {% endcall %}
+    </noscript>
+
+    <form class="form-cambio-pwd" id="form-cambio-pwd" novalidate>
+
+      {% call molecules.formField('Contraseña actual', 'pwd-actual') %}
+        <input
+          class="form-input"
+          type="password"
+          id="pwd-actual"
+          name="password_actual"
+          autocomplete="current-password"
+        />
+      {% endcall %}
+
+      {% call molecules.formField('Nueva contraseña', 'pwd-nueva') %}
+        <input
+          class="form-input"
+          type="password"
+          id="pwd-nueva"
+          name="password_nueva"
+          minlength="8"
+          autocomplete="new-password"
+        />
+      {% endcall %}
+
+      {% call molecules.formField('Confirmar nueva contraseña', 'pwd-confirm') %}
+        <input
+          class="form-input"
+          type="password"
+          id="pwd-confirm"
+          name="password_confirm"
+          autocomplete="new-password"
+        />
+      {% endcall %}
+
+      <div class="form-login__actions u-mt-8">
+        {{ atoms.button('Guardar nueva contraseña', '', 'primary', 'md', false, 'submit', 'pwd-submit-btn') }}
+      </div>
+
+      <div id="pwd-feedback" hidden role="status" aria-live="polite"></div>
+
+    </form>
+
+    <div id="pwd-exito" hidden class="u-text-center u-mt-8">
+      <p>Contraseña actualizada correctamente. Redirigiendo…</p>
+    </div>
+
+  </section>
+</section>
+
+{% block scripts %}
+<script src="/assets/js/cambio-password.js" defer></script>
+{% endblock %}
