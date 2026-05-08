@@ -5,6 +5,18 @@
     title="Gestión de usuarios"
     description="Administra los usuarios de tu empresa."
   >
+    @if (esSuperAdmin) {
+      <app-button
+        variant="secondary"
+        size="md"
+        (click)="abrirModalEmpresa()"
+      >
+        <span class="btn__icon" aria-hidden="true">
+          <ng-icon name="phosphorBuildings" size="20" />
+        </span>
+        Nueva empresa
+      </app-button>
+    }
     <app-button
       variant="primary"
       size="md"
@@ -18,14 +30,6 @@
     </app-button>
   </app-page-header>
 
-  @if (resetInfo()) {
-    <app-alert type="info" [dismissible]="true" (dismissed)="cerrarResetInfo()">
-      Contraseña temporal reseteada:
-      <strong class="gestion-usuarios__password-code">{{ resetInfo()!.password }}</strong>
-      <app-button variant="ghost" size="sm" (click)="copiar(resetInfo()!.password)">Copiar</app-button>
-    </app-alert>
-  }
-
   <app-tabla-crud
     searchPlaceholder="Buscar por email…"
     [resultCount]="usuarios().length"
@@ -34,13 +38,25 @@
       {{ totalUsuarios() }} / {{ maxUsuarios() }} usuarios
     </span>
 
+    @if (esSuperAdmin && empresasOpciones().length > 0) {
+      <div toolbar-actions class="gestion-usuarios__empresa-toolbar">
+        <span class="gestion-usuarios__empresa-label">Empresa:</span>
+        <app-form-select
+          id="empresa-selector"
+          [value]="empresaSeleccionadaId()"
+          [options]="empresasOpciones()"
+          ariaLabel="Seleccionar empresa"
+          (valueChange)="onEmpresaChange($event)"
+        />
+      </div>
+    }
+
     <table class="tabla-crud__table" aria-label="Tabla de usuarios">
       <thead>
         <tr>
           <th class="tabla-crud__th" scope="col">Email</th>
           <th class="tabla-crud__th" scope="col">Rol</th>
-          <th class="tabla-crud__th" scope="col">Estado</th>
-          <th class="tabla-crud__th" scope="col">Acciones</th>
+          <th class="tabla-crud__th tabla-crud__th--acciones" scope="col">Acciones</th>
         </tr>
       </thead>
       <tbody>
@@ -51,18 +67,17 @@
               <td class="tabla-crud__td"><span class="tabla-crud__skeleton"></span></td>
               <td class="tabla-crud__td"><span class="tabla-crud__skeleton"></span></td>
               <td class="tabla-crud__td"><span class="tabla-crud__skeleton"></span></td>
-              <td class="tabla-crud__td"><span class="tabla-crud__skeleton"></span></td>
             </tr>
           }
         } @else if (error()) {
           <tr>
-            <td class="tabla-crud__empty" colspan="4">
+            <td class="tabla-crud__empty" colspan="3">
               <app-alert type="error">{{ error() }}</app-alert>
             </td>
           </tr>
         } @else if (usuarios().length === 0) {
           <tr>
-            <td class="tabla-crud__empty" colspan="4">
+            <td class="tabla-crud__empty" colspan="3">
               <div class="tabla-crud__empty-inner">
                 <p class="tabla-crud__empty-title">No hay usuarios registrados todavía</p>
               </div>
@@ -77,38 +92,15 @@
                   {{ rolLabel(u.rol) }}
                 </app-badge>
               </td>
-              <td class="tabla-crud__td">
-                <app-badge [variant]="u.activo ? 'solid' : 'outline'">
-                  {{ u.activo ? 'Activo' : 'Inactivo' }}
-                </app-badge>
-              </td>
               <td class="tabla-crud__td tabla-crud__td--acciones">
-                @if (confirmandoId() === u.id) {
-                  <app-confirm-inline
-                    [visible]="true"
-                    [cargando]="eliminando()"
-                    mensaje="¿Eliminar este usuario? Esta acción no se puede deshacer."
-                    (confirmado)="confirmarEliminar()"
-                    (cancelado)="cancelarEliminar()"
-                  />
-                } @else {
-                  <app-button
-                    variant="ghost"
-                    size="sm"
-                    [disabled]="resetandoId() === u.id"
-                    (click)="resetearPassword(u.id)"
-                  >
-                    {{ resetandoId() === u.id ? 'Reseteando…' : 'Resetear contraseña' }}
-                  </app-button>
-                  <app-button
-                    variant="ghost"
-                    size="sm"
-                    (click)="pedirEliminar(u.id)"
-                  >
-                    <ng-icon name="phosphorTrash" size="16" />
-                    Eliminar
-                  </app-button>
-                }
+                <app-button
+                  variant="ghost"
+                  size="sm"
+                  (click)="abrirEdicion(u)"
+                >
+                  <ng-icon name="phosphorPencilSimple" size="16" />
+                  Editar
+                </app-button>
               </td>
             </tr>
           }
@@ -132,9 +124,6 @@
       <app-button variant="secondary" size="md" (click)="copiar(passwordTemporal()!)">
         Copiar contraseña
       </app-button>
-    </div>
-    <div modal-footer>
-      <app-button variant="primary" size="md" (click)="cerrarModal()">Cerrar</app-button>
     </div>
   } @else {
     <div class="gestion-usuarios__form">
@@ -161,14 +150,155 @@
         <app-alert type="error">{{ errorCreacion() }}</app-alert>
       }
     </div>
-    <div modal-footer>
+  }
+
+  <div modal-footer>
+    @if (passwordTemporal()) {
+      <app-button variant="primary" size="md" (click)="cerrarModal()">Cerrar</app-button>
+    } @else {
       <app-button variant="primary" size="md" [disabled]="creando()" (click)="crear()">
         {{ creando() ? 'Creando…' : 'Crear usuario' }}
       </app-button>
       <app-button variant="ghost" size="md" [disabled]="creando()" (click)="cerrarModal()">
         Cancelar
       </app-button>
-    </div>
-  }
+    }
+  </div>
 
 </app-modal>
+
+<!-- Modal: Editar usuario -->
+@if (usuarioEditando()) {
+  <app-modal
+    title="Editar usuario"
+    [open]="modalEdicionAbierto()"
+    (cerrar)="cerrarEdicion()"
+  >
+    <div class="gestion-usuarios__form">
+
+      <!-- Email (solo lectura) -->
+      <app-form-field label="Correo electrónico" for="edit-email">
+        <app-form-input
+          id="edit-email"
+          type="email"
+          [value]="usuarioEditando()!.email"
+          [disabled]="true"
+          ariaLabel="Email del usuario"
+          (valueChange)="$event"
+        />
+      </app-form-field>
+
+      <!-- Rol -->
+      <app-form-field label="Rol" for="edit-rol-operativo">
+        <div class="gestion-usuarios__roles">
+          <app-form-checkbox
+            [checked]="editRol() === 'operativo'"
+            ariaLabel="Empleado"
+            (checkedChange)="$event && editRol.set('operativo')"
+          >
+            Empleado
+          </app-form-checkbox>
+          <app-form-checkbox
+            [checked]="editRol() === 'admin'"
+            ariaLabel="Administrador"
+            (checkedChange)="$event && editRol.set('admin')"
+          >
+            Administrador
+          </app-form-checkbox>
+        </div>
+      </app-form-field>
+
+      <!-- Resetear contraseña -->
+      <div class="gestion-usuarios__reset-section">
+        <app-button
+          variant="secondary"
+          size="sm"
+          [disabled]="resetandoEnEdicion()"
+          (click)="resetearPasswordEdicion()"
+        >
+          {{ resetandoEnEdicion() ? 'Reseteando…' : 'Resetear contraseña' }}
+        </app-button>
+        @if (resetInfoEdicion()) {
+          <div class="gestion-usuarios__reset-result">
+            <span>Nueva contraseña temporal:</span>
+            <strong class="gestion-usuarios__password-code">{{ resetInfoEdicion() }}</strong>
+            <app-button variant="ghost" size="sm" (click)="copiar(resetInfoEdicion()!)">Copiar</app-button>
+          </div>
+        }
+      </div>
+
+      <!-- Eliminar -->
+      @if (confirmandoEliminarEdicion()) {
+        <app-confirm-inline
+          [visible]="true"
+          [cargando]="eliminandoEdicion()"
+          mensaje="¿Eliminar este usuario? Esta acción no se puede deshacer."
+          (confirmado)="confirmarEliminarEdicion()"
+          (cancelado)="confirmandoEliminarEdicion.set(false)"
+        />
+      } @else {
+        <div>
+          <app-button
+            variant="danger"
+            size="sm"
+            (click)="confirmandoEliminarEdicion.set(true)"
+          >
+            <ng-icon name="phosphorTrash" size="16" />
+            Eliminar usuario
+          </app-button>
+        </div>
+      }
+
+      @if (errorEdicion()) {
+        <app-alert type="error">{{ errorEdicion() }}</app-alert>
+      }
+    </div>
+
+    <div modal-footer>
+      <app-button variant="primary" size="md" [disabled]="guardando()" (click)="guardarEdicion()">
+        {{ guardando() ? 'Guardando…' : 'Guardar cambios' }}
+      </app-button>
+      <app-button variant="ghost" size="md" [disabled]="guardando()" (click)="cerrarEdicion()">
+        Cancelar
+      </app-button>
+    </div>
+  </app-modal>
+}
+
+<!-- Modal: Nueva empresa (solo superadmin) -->
+<app-modal title="Nueva empresa" [open]="modalEmpresaAbierto()" (cerrar)="cerrarModalEmpresa()">
+  <div class="gestion-usuarios__form">
+    <app-form-field label="Nombre de la empresa" for="nueva-empresa-nombre">
+      <app-form-input
+        id="nueva-empresa-nombre"
+        type="text"
+        placeholder="Hotel Ejemplo S.L."
+        [value]="nuevaEmpresaNombre()"
+        ariaLabel="Nombre de la empresa"
+        (valueChange)="nuevaEmpresaNombre.set($event)"
+      />
+    </app-form-field>
+    <app-form-field label="Email de la empresa" for="nueva-empresa-email">
+      <app-form-input
+        id="nueva-empresa-email"
+        type="email"
+        placeholder="contacto@empresa.com"
+        [value]="nuevaEmpresaEmail()"
+        ariaLabel="Email de la empresa"
+        (valueChange)="nuevaEmpresaEmail.set($event)"
+      />
+    </app-form-field>
+    @if (errorCreacionEmpresa()) {
+      <app-alert type="error">{{ errorCreacionEmpresa() }}</app-alert>
+    }
+  </div>
+  <div modal-footer>
+    <app-button variant="primary" size="md" [disabled]="creandoEmpresa()" (click)="crearEmpresa()">
+      {{ creandoEmpresa() ? 'Creando…' : 'Crear empresa' }}
+    </app-button>
+    <app-button variant="ghost" size="md" [disabled]="creandoEmpresa()" (click)="cerrarModalEmpresa()">
+      Cancelar
+    </app-button>
+  </div>
+</app-modal>
+

@@ -66,9 +66,43 @@ async function submitCambio(payload, token) {
   return body;
 }
 
+async function relogin(email, password) {
+  let csrfToken = null;
+  try {
+    const r = await fetch('/api/csrf-token', { credentials: 'same-origin', headers: { 'Accept': 'application/json' } });
+    if (r.ok) { const d = await r.json(); csrfToken = d.csrf_token || null; }
+  } catch { /* sin CSRF */ }
+
+  const headers = { 'Content-Type': 'application/json', 'Accept': 'application/json' };
+  if (csrfToken) headers['X-CSRF-Token'] = csrfToken;
+
+  const res = await fetch('/api/auth/login', {
+    method: 'POST',
+    credentials: 'same-origin',
+    headers,
+    body: JSON.stringify({ email, password, origen: 'web' }),
+  });
+  if (!res.ok) return null;
+  const data = await res.json();
+  return data.token || null;
+}
+
 (function init() {
   const token = localStorage.getItem('ss_token') || sessionStorage.getItem('ss_token');
   if (!token) { window.location.href = '/login'; return; }
+
+  let jwtEmail = null;
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    if (!payload.debe_cambiar_password) {
+      window.location.href = '/menu';
+      return;
+    }
+    jwtEmail = payload.sub || null;
+  } catch {
+    window.location.href = '/login';
+    return;
+  }
 
   const form = document.getElementById('form-cambio-pwd');
   if (!form) return;
@@ -114,10 +148,17 @@ async function submitCambio(payload, token) {
     btn.textContent = 'Guardando…';
 
     try {
-      await submitCambio({ password_actual: actual, password_nueva: nueva, password_confirm: confirm }, token);
+      await submitCambio({ password_actual: actual, password_nueva: nueva }, token);
+      const newToken = jwtEmail ? await relogin(jwtEmail, nueva) : null;
+      if (newToken) {
+        localStorage.setItem('ss_token', newToken);
+      } else {
+        localStorage.removeItem('ss_token');
+        sessionStorage.removeItem('ss_token');
+      }
       form.hidden = true;
       exitoEl.hidden = false;
-      setTimeout(() => { window.location.href = '/menu'; }, 2000);
+      setTimeout(() => { window.location.href = newToken ? '/menu' : '/login'; }, 2000);
     } catch (err) {
       showFeedback(feedbackEl, err.message || 'No se pudo cambiar la contraseña. Inténtalo de nuevo.');
     } finally {

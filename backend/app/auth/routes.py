@@ -57,11 +57,11 @@ def login():
         return jsonify({"ok": False, "errors": errors}), 422
 
     # Capa 2: verificación de credenciales y emisión de JWT
-    token, errors = authenticate_user(clean_data)
+    token, errors, debe_cambiar = authenticate_user(clean_data)
     if errors:
         return jsonify({"ok": False, "errors": errors}), 401
 
-    return jsonify({"ok": True, "token": token}), 200
+    return jsonify({"ok": True, "token": token, "debe_cambiar_password": debe_cambiar}), 200
 
 
 @auth_bp.route("/api/auth/verify", methods=["GET"])
