@@ -18,6 +18,19 @@
     </app-button>
   </app-page-header>
 
+  @if (esSuperAdmin && empresasOpciones().length > 0) {
+    <div class="gestion-usuarios__empresa-selector">
+      <span class="gestion-usuarios__empresa-label">Empresa:</span>
+      <app-form-select
+        id="empresa-selector"
+        [value]="empresaSeleccionadaId()"
+        [options]="empresasOpciones()"
+        ariaLabel="Seleccionar empresa"
+        (valueChange)="onEmpresaChange($event)"
+      />
+    </div>
+  }
+
   @if (resetInfo()) {
     <app-alert type="info" [dismissible]="true" (dismissed)="cerrarResetInfo()">
       Contraseña temporal reseteada:

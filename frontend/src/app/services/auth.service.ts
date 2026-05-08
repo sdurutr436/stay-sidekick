@@ -6,6 +6,7 @@ interface JwtPayload {
   user_id: string;
   empresa_id: string;
   rol: string;
+  es_superadmin?: boolean;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -41,6 +42,10 @@ export class AuthService {
 
   get isAdmin(): boolean {
     return this.getUser()?.rol === 'admin';
+  }
+
+  get esSuperAdmin(): boolean {
+    return this.getUser()?.es_superadmin === true;
   }
 
   logout(): void {

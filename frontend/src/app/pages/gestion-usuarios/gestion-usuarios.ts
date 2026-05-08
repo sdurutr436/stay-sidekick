@@ -1,4 +1,6 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { forkJoin, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 import { NgIconComponent } from '@ng-icons/core';
 import { AlertComponent } from '../../components/molecules/alert/alert';
@@ -11,7 +13,8 @@ import { FormSelectComponent } from '../../components/atoms/form-select/form-sel
 import { PageHeaderComponent } from '../../components/organisms/page-header/page-header';
 import { TablaCrudComponent } from '../../components/organisms/tabla-crud/tabla-crud';
 import { ModalComponent } from '../../components/organisms/modal/modal';
-import { GestionUsuariosService, Usuario } from '../../services/gestion-usuarios.service';
+import { GestionUsuariosService, EmpresaItem, Usuario } from '../../services/gestion-usuarios.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-gestion-usuarios',
@@ -34,6 +37,12 @@ import { GestionUsuariosService, Usuario } from '../../services/gestion-usuarios
 })
 export class GestionUsuariosPageComponent implements OnInit {
   private readonly service = inject(GestionUsuariosService);
+  private readonly auth = inject(AuthService);
+
+  readonly esSuperAdmin = this.auth.esSuperAdmin;
+
+  readonly empresas = signal<EmpresaItem[]>([]);
+  readonly empresaSeleccionadaId = signal<string>('');
 
   readonly usuarios = signal<Usuario[]>([]);
   readonly maxUsuarios = signal(4);
@@ -64,14 +73,37 @@ export class GestionUsuariosPageComponent implements OnInit {
     { value: 'admin', label: 'Administrador' },
   ];
 
+  readonly empresasOpciones = computed(() =>
+    this.empresas().map(e => ({ value: e.id, label: `${e.nombre} (${e.email})` }))
+  );
+
   ngOnInit(): void {
-    this._cargar();
+    if (this.esSuperAdmin) {
+      forkJoin({
+        empresas: this.service.getEmpresas().pipe(catchError(() => of([] as EmpresaItem[]))),
+      }).subscribe(({ empresas }) => {
+        this.empresas.set(empresas);
+        if (empresas.length > 0) {
+          this.empresaSeleccionadaId.set(empresas[0].id);
+          this._cargar(empresas[0].id);
+        } else {
+          this.cargando.set(false);
+        }
+      });
+    } else {
+      this._cargar();
+    }
   }
 
-  private _cargar(): void {
+  onEmpresaChange(id: string): void {
+    this.empresaSeleccionadaId.set(id);
+    this._cargar(id);
+  }
+
+  private _cargar(empresaId?: string): void {
     this.cargando.set(true);
     this.error.set(null);
-    this.service.getUsuarios().subscribe({
+    this.service.getUsuarios(empresaId).subscribe({
       next: ({ usuarios, max_usuarios }) => {
         this.usuarios.set(usuarios);
         this.maxUsuarios.set(max_usuarios);
@@ -82,6 +114,10 @@ export class GestionUsuariosPageComponent implements OnInit {
         this.cargando.set(false);
       },
     });
+  }
+
+  private _empresaIdActual(): string | undefined {
+    return this.esSuperAdmin ? this.empresaSeleccionadaId() || undefined : undefined;
   }
 
   abrirModal(): void {
@@ -105,11 +141,11 @@ export class GestionUsuariosPageComponent implements OnInit {
     }
     this.creando.set(true);
     this.errorCreacion.set(null);
-    this.service.crearUsuario({ email, rol: this.nuevoRol() }).subscribe({
+    this.service.crearUsuario({ email, rol: this.nuevoRol() }, this._empresaIdActual()).subscribe({
       next: ({ password_temporal }) => {
         this.creando.set(false);
         this.passwordTemporal.set(password_temporal);
-        this._cargar();
+        this._cargar(this._empresaIdActual());
       },
       error: err => {
         this.creando.set(false);
@@ -131,11 +167,11 @@ export class GestionUsuariosPageComponent implements OnInit {
     const id = this.confirmandoId();
     if (!id) return;
     this.eliminando.set(true);
-    this.service.eliminarUsuario(id).subscribe({
+    this.service.eliminarUsuario(id, this._empresaIdActual()).subscribe({
       next: () => {
         this.eliminando.set(false);
         this.confirmandoId.set(null);
-        this._cargar();
+        this._cargar(this._empresaIdActual());
       },
       error: () => {
         this.eliminando.set(false);
@@ -147,7 +183,7 @@ export class GestionUsuariosPageComponent implements OnInit {
   resetearPassword(id: string): void {
     this.resetandoId.set(id);
     this.resetInfo.set(null);
-    this.service.resetearPassword(id).subscribe({
+    this.service.resetearPassword(id, this._empresaIdActual()).subscribe({
       next: ({ password_temporal }) => {
         this.resetandoId.set(null);
         this.resetInfo.set({ id, password: password_temporal });
