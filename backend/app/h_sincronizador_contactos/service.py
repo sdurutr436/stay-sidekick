@@ -486,9 +486,11 @@ def _parse_xlsx_contactos(
             if tip_val is not None:
                 ids = _RE_IDS_TIP.findall(str(tip_val))
                 for id_tip in ids:
-                    apt = apt_repo.get_by_id_externo(empresa_id, id_tip)
+                    apt = apt_repo.get_by_id_pms(empresa_id, id_tip)
                     if apt:
                         apartamentos.append(apt.nombre)
+                    else:
+                        logger.warning("id_pms '%s' no encontrado en maestro de apartamentos", id_tip)
 
             registros.append({
                 "nombre": nombre,

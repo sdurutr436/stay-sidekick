@@ -316,8 +316,8 @@
   <app-panel-seccion title="Importación XLSX — Apartamentos" [divider]="true">
 
     <p class="u-text-secondary u-mb-8">
-      Indica el número de columna (1 = columna A) donde tu archivo XLSX tiene cada dato.
-      Si dejas un campo a 0, se intentará detectar la columna por el nombre de la cabecera.
+      Indica la letra de columna (A, B… o AA, AB…) donde tu archivo XLSX tiene cada dato.
+      Si dejas un campo vacío, se intentará detectar la columna por el nombre de la cabecera.
     </p>
 
     @if (!isAdmin()) {
@@ -341,44 +341,44 @@
       <app-form-field label="ID externo del apartamento*" for="xlsx-id-externo">
         <app-form-input
           id="xlsx-id-externo"
-          type="number"
-          placeholder="0 = detectar por cabecera"
-          [value]="xlsxColIdExterno().toString()"
+          type="text"
+          placeholder="ej. A"
+          [value]="xlsxColIdExterno()"
           [disabled]="!isAdmin()"
-          (valueChange)="xlsxColIdExterno.set(+$event || 0)"
+          (valueChange)="xlsxColIdExterno.set($event.toUpperCase())"
         />
       </app-form-field>
 
       <app-form-field label="Nombre del apartamento*" for="xlsx-nombre">
         <app-form-input
           id="xlsx-nombre"
-          type="number"
-          placeholder="0 = detectar por cabecera"
-          [value]="xlsxColNombre().toString()"
+          type="text"
+          placeholder="ej. B"
+          [value]="xlsxColNombre()"
           [disabled]="!isAdmin()"
-          (valueChange)="xlsxColNombre.set(+$event || 0)"
+          (valueChange)="xlsxColNombre.set($event.toUpperCase())"
         />
       </app-form-field>
 
       <app-form-field label="Dirección" for="xlsx-direccion">
         <app-form-input
           id="xlsx-direccion"
-          type="number"
-          placeholder="0 = detectar por cabecera"
-          [value]="xlsxColDireccion().toString()"
+          type="text"
+          placeholder="ej. C"
+          [value]="xlsxColDireccion()"
           [disabled]="!isAdmin()"
-          (valueChange)="xlsxColDireccion.set(+$event || 0)"
+          (valueChange)="xlsxColDireccion.set($event.toUpperCase())"
         />
       </app-form-field>
 
       <app-form-field label="Ciudad" for="xlsx-ciudad">
         <app-form-input
           id="xlsx-ciudad"
-          type="number"
-          placeholder="0 = detectar por cabecera"
-          [value]="xlsxColCiudad().toString()"
+          type="text"
+          placeholder="ej. D"
+          [value]="xlsxColCiudad()"
           [disabled]="!isAdmin()"
-          (valueChange)="xlsxColCiudad.set(+$event || 0)"
+          (valueChange)="xlsxColCiudad.set($event.toUpperCase())"
         />
       </app-form-field>
 
@@ -401,8 +401,8 @@
   <app-panel-seccion title="Importación XLSX — Reservas" [divider]="true">
 
     <p class="u-text-secondary u-mb-8">
-      Indica el número de columna (1 = columna A) donde tu archivo de reservas
-      tiene cada dato. Si dejas un campo a 0, se intentará detectar la columna
+      Indica la letra de columna (A, B… o AA, AB…) donde tu archivo de reservas
+      tiene cada dato. Si dejas un campo vacío, se intentará detectar la columna
       por el nombre de la cabecera.
     </p>
 
@@ -427,44 +427,44 @@
       <app-form-field label="Columna check-in" for="xlsx-r-checkin">
         <app-form-input
           id="xlsx-r-checkin"
-          type="number"
-          placeholder="0 = detectar por cabecera"
-          [value]="xlsxRColCheckin().toString()"
+          type="text"
+          placeholder="ej. A"
+          [value]="xlsxRColCheckin()"
           [disabled]="!isAdmin()"
-          (valueChange)="xlsxRColCheckin.set(+$event || 0)"
+          (valueChange)="xlsxRColCheckin.set($event.toUpperCase())"
         />
       </app-form-field>
 
       <app-form-field label="Columna nombre del huésped" for="xlsx-r-nombre">
         <app-form-input
           id="xlsx-r-nombre"
-          type="number"
-          placeholder="0 = detectar por cabecera"
-          [value]="xlsxRColNombre().toString()"
+          type="text"
+          placeholder="ej. B"
+          [value]="xlsxRColNombre()"
           [disabled]="!isAdmin()"
-          (valueChange)="xlsxRColNombre.set(+$event || 0)"
+          (valueChange)="xlsxRColNombre.set($event.toUpperCase())"
         />
       </app-form-field>
 
       <app-form-field label="Columna ID tipología" for="xlsx-r-tipologia">
         <app-form-input
           id="xlsx-r-tipologia"
-          type="number"
-          placeholder="0 = detectar por cabecera"
-          [value]="xlsxRColTipologia().toString()"
+          type="text"
+          placeholder="ej. C"
+          [value]="xlsxRColTipologia()"
           [disabled]="!isAdmin()"
-          (valueChange)="xlsxRColTipologia.set(+$event || 0)"
+          (valueChange)="xlsxRColTipologia.set($event.toUpperCase())"
         />
       </app-form-field>
 
       <app-form-field label="Columna teléfono" for="xlsx-r-telefono">
         <app-form-input
           id="xlsx-r-telefono"
-          type="number"
-          placeholder="0 = detectar por cabecera"
-          [value]="xlsxRColTelefono().toString()"
+          type="text"
+          placeholder="ej. D"
+          [value]="xlsxRColTelefono()"
           [disabled]="!isAdmin()"
-          (valueChange)="xlsxRColTelefono.set(+$event || 0)"
+          (valueChange)="xlsxRColTelefono.set($event.toUpperCase())"
         />
       </app-form-field>
 
