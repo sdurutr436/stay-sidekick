@@ -1,0 +1,45 @@
+// =============================================================================
+// COMPONENTS: GESTIÓN DE USUARIOS (página)
+// Estilos específicos del wrapper de la página de gestión de usuarios.
+// Los organismos internos (page-header, tabla-crud) tienen sus propios archivos.
+// =============================================================================
+
+.gestion-usuarios {
+  @include container;
+  padding-block: 0;
+
+  &__empresa-selector {
+    display: flex;
+    align-items: center;
+    gap: $space-3;
+    margin-block-end: $space-2;
+  }
+
+  &__empresa-label {
+    @include text-body-sm;
+    color: $color-text-secondary;
+    white-space: nowrap;
+  }
+
+  &__password-code {
+    display: inline-block;
+    margin: 0 $space-2;
+    padding: $space-1 $space-2;
+    background: $color-surface-alt;
+    border-radius: $border-radius-sm;
+    font-family: monospace;
+    letter-spacing: 0.08em;
+  }
+
+  &__modal-copy {
+    display: flex;
+    justify-content: center;
+    margin-block-start: $space-4;
+  }
+
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: $space-4;
+  }
+}
