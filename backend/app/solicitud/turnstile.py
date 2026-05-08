@@ -15,7 +15,7 @@ def verify_turnstile(token: str, remote_ip: str | None = None) -> bool:
 
     Returns True si Cloudflare confirma que el captcha es válido.
     """
-    secret = current_app.config["TURNSTILE_SECRET_KEY"]
+    secret = current_app.config["TURNSTILE_SECRET_KEY"].strip()
     url = current_app.config["TURNSTILE_VERIFY_URL"]
 
     payload = {
@@ -29,6 +29,13 @@ def verify_turnstile(token: str, remote_ip: str | None = None) -> bool:
         resp = requests.post(url, data=payload, timeout=_TIMEOUT_SECONDS)
         resp.raise_for_status()
         data = resp.json()
+    except requests.HTTPError as exc:
+        logger.error(
+            "Turnstile siteverify HTTP %s — respuesta: %s",
+            exc.response.status_code,
+            exc.response.text[:500],
+        )
+        return False
     except (requests.RequestException, ValueError):
         logger.exception("Error al verificar Turnstile")
         return False

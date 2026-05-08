@@ -12,6 +12,7 @@ No requiere sesión ni estado en el servidor.
 """
 
 import logging
+import os
 import secrets
 
 from functools import wraps
@@ -37,7 +38,7 @@ def set_csrf_cookie(response, token: str):
         value=token,
         httponly=False,       # JS necesita leerlo para la cabecera
         samesite="Strict",
-        secure=False,         # Cambiar a True en producción con HTTPS
+        secure=os.environ.get("FLASK_ENV", "production") != "development",
         max_age=3600,         # 1 hora
         path="/",
     )
