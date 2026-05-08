@@ -23,10 +23,12 @@ def find_user_by_email(email: str) -> dict | None:
     if user is None:
         return None
     return {
-        "id":            str(user.id),
-        "empresa_id":    str(user.empresa_id),
-        "email":         user.email,
-        "password_hash": user.password_hash,
-        "rol":           user.rol,
-        "is_active":     user.activo,
+        "id":                  str(user.id),
+        "empresa_id":          str(user.empresa_id),
+        "email":               user.email,
+        "password_hash":       user.password_hash,
+        "rol":                 user.rol,
+        "is_active":           user.activo,
+        "password_changed_at": user.password_changed_at,
+        "es_superadmin":       getattr(user, "es_superadmin", False) or False,
     }

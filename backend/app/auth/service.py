@@ -45,45 +45,43 @@ def sanitize_login_payload(json_data: dict) -> tuple[dict, list[str]]:
     return clean_data, []
 
 
-def authenticate_user(clean_data: dict) -> tuple[str | None, list[str]]:
+def authenticate_user(clean_data: dict) -> tuple[str | None, list[str], bool]:
     """Verifica las credenciales y emite un JWT si son válidas.
-
-    Parameters
-    ----------
-    clean_data:
-        Datos ya sanitizados por ``sanitize_login_payload``.
 
     Returns
     -------
-    tuple[str | None, list[str]]
-        (token_jwt, errores). Si ``errores`` está vacío, el token es válido.
+    tuple[str | None, list[str], bool]
+        (token_jwt, errores, debe_cambiar_password).
     """
     email    = clean_data["email"]
     password = clean_data["password"]
 
     user = find_user_by_email(email)
 
-    # Misma respuesta tanto si el email no existe como si la contraseña falla
-    # → no revelar información sobre qué campo es incorrecto
     if user is None or not user.get("is_active", False):
         logger.warning("Login fallido — usuario no encontrado o inactivo: %s", email)
-        return None, [_INVALID_CREDENTIALS_MSG]
+        return None, [_INVALID_CREDENTIALS_MSG], False
 
     if not verify_password(password, user["password_hash"]):
         logger.warning("Login fallido — contraseña incorrecta para: %s", email)
-        return None, [_INVALID_CREDENTIALS_MSG]
+        return None, [_INVALID_CREDENTIALS_MSG], False
+
+    pwd_changed_at = user.get("password_changed_at")
+    debe_cambiar = pwd_changed_at is None or pwd_changed_at.year <= 2000
 
     token = create_access_token(
         identity=email,
         extra_claims={
-            "user_id":   user["id"],
-            "empresa_id": user["empresa_id"],
-            "rol":        user["rol"],
+            "user_id":               user["id"],
+            "empresa_id":            user["empresa_id"],
+            "rol":                   user["rol"],
+            "es_superadmin":         user.get("es_superadmin", False),
+            "debe_cambiar_password": debe_cambiar,
         },
     )
 
     logger.info("Login correcto para: %s", email)
-    return token, []
+    return token, [], debe_cambiar
 
 
 def _flatten_errors(messages: dict) -> list[str]:
