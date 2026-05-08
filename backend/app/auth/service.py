@@ -58,6 +58,8 @@ def authenticate_user(clean_data: dict) -> tuple[str | None, list[str], bool]:
 
     user = find_user_by_email(email)
 
+    # Misma respuesta si el email no existe o la contraseña falla
+    # → no revelar si el correo está registrado
     if user is None or not user.get("is_active", False):
         logger.warning("Login fallido — usuario no encontrado o inactivo: %s", email)
         return None, [_INVALID_CREDENTIALS_MSG], False

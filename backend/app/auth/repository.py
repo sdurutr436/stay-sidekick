@@ -30,5 +30,5 @@ def find_user_by_email(email: str) -> dict | None:
         "rol":                 user.rol,
         "is_active":           user.activo,
         "password_changed_at": user.password_changed_at,
-        "es_superadmin":       getattr(user, "es_superadmin", False) or False,
+        "es_superadmin":       user.es_superadmin,
     }

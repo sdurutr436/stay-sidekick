@@ -1,5 +1,5 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
-import { forkJoin, of } from 'rxjs';
+import { of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
 import { NgIconComponent } from '@ng-icons/core';
@@ -79,9 +79,7 @@ export class GestionUsuariosPageComponent implements OnInit {
 
   ngOnInit(): void {
     if (this.esSuperAdmin) {
-      forkJoin({
-        empresas: this.service.getEmpresas().pipe(catchError(() => of([] as EmpresaItem[]))),
-      }).subscribe(({ empresas }) => {
+      this.service.getEmpresas().pipe(catchError(() => of([] as EmpresaItem[]))).subscribe(empresas => {
         this.empresas.set(empresas);
         if (empresas.length > 0) {
           this.empresaSeleccionadaId.set(empresas[0].id);
