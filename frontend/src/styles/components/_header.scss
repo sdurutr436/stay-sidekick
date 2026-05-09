@@ -86,15 +86,17 @@
 
   // -------------------------------------------------------------------------
   // Acciones — botones de la derecha
-  // En mobile (≤575px): solo icono; en tablet/desktop: solo texto
+  // Desktop: icono + texto; mobile (≤575px): solo icono
   // -------------------------------------------------------------------------
   &__actions {
     display: flex;
     align-items: center;
     gap: $space-3;
 
+    // Icono siempre visible — acompaña al texto en desktop
     .btn__icon-mobile {
-      display: none;
+      display: flex;
+      align-items: center;
     }
 
     @include respond-until('sm') {
@@ -102,12 +104,6 @@
 
       .btn__label {
         display: none;
-      }
-
-      .btn__icon-mobile {
-        display: flex;
-        align-items: center;
-        justify-content: center;
       }
 
       // Padding cuadrado cuando el botón muestra solo el icono
