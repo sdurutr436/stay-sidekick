@@ -10,7 +10,8 @@ propiedades (apartamentos), ver app/h_maestro_apartamentos/.
 """
 
 import logging
-from datetime import date, timedelta
+import re
+from datetime import date, datetime, timedelta
 
 import requests
 
@@ -19,6 +20,67 @@ from app.normalizador_pms.base import ReservaEstandar
 logger = logging.getLogger(__name__)
 
 _BASE_URL = "https://login.smoobu.com"
+
+
+def _to_iso(valor: str | None) -> str | None:
+    """Convierte cualquier formato de fecha de Smoobu a ISO 8601 (YYYY-MM-DD).
+
+    Formatos soportados: YYYY-MM-DD, DD.MM.YYYY, DD.MM.YY, DD/MM/YYYY,
+    DD/MM/YY, MM/DD/YY, DD-MM-YYYY, DD-MM-YY, YY-MM-DD.
+    """
+    if not valor:
+        return None
+    s = str(valor).strip()
+
+    if re.match(r"^\d{4}-\d{2}-\d{2}$", s):
+        return s
+
+    if re.match(r"^\d{1,2}\.\d{1,2}\.\d{4}$", s):
+        try:
+            return datetime.strptime(s, "%d.%m.%Y").date().isoformat()
+        except ValueError:
+            return None
+
+    if re.match(r"^\d{1,2}\.\d{1,2}\.\d{2}$", s):
+        try:
+            return datetime.strptime(s, "%d.%m.%y").date().isoformat()
+        except ValueError:
+            return None
+
+    if re.match(r"^\d{1,2}/\d{1,2}/\d{4}$", s):
+        a, b = int(s.split("/")[0]), int(s.split("/")[1])
+        fmt = "%m/%d/%Y" if a <= 12 and b > 12 else "%d/%m/%Y"
+        try:
+            return datetime.strptime(s, fmt).date().isoformat()
+        except ValueError:
+            return None
+
+    if re.match(r"^\d{1,2}/\d{1,2}/\d{2}$", s):
+        a, b = int(s.split("/")[0]), int(s.split("/")[1])
+        fmt = "%m/%d/%y" if a <= 12 and b > 12 else "%d/%m/%y"
+        try:
+            return datetime.strptime(s, fmt).date().isoformat()
+        except ValueError:
+            return None
+
+    if re.match(r"^\d{1,2}-\d{1,2}-\d{4}$", s):
+        try:
+            return datetime.strptime(s, "%d-%m-%Y").date().isoformat()
+        except ValueError:
+            return None
+
+    if re.match(r"^\d{2}-\d{2}-\d{2}$", s):
+        a = int(s.split("-")[0])
+        fmt = "%y-%m-%d" if a > 31 else "%d-%m-%y"
+        try:
+            return datetime.strptime(s, fmt).date().isoformat()
+        except ValueError:
+            return None
+
+    logger.warning("smoobu._to_iso: formato de fecha no reconocido: %r", s)
+    return None
+
+
 _TIMEOUT = 15
 _PAGE_SIZE = 100
 
@@ -128,8 +190,8 @@ class SmoobuReservationClient:
     @staticmethod
     def _normalize(booking: dict) -> ReservaEstandar | None:
         """Convierte un booking de Smoobu en ReservaEstandar."""
-        nombre = booking.get("firstName", "").strip()
-        apellido = booking.get("lastName", "").strip()
+        nombre = booking.get("firstname", "").strip()
+        apellido = booking.get("lastname", "").strip()
 
         if apellido and nombre:
             nombre_raw = f"{apellido}, {nombre}"
@@ -143,16 +205,17 @@ class SmoobuReservationClient:
         if not nombre_raw:
             return None
 
-        prop = booking.get("property") or {}
+        apt = booking.get("apartment") or {}
+        raw_phone = booking.get("phone") or None
+        telefono = re.sub(r"\((\+\d+)\)", r"\1", raw_phone) if raw_phone else None
 
-        # Smoobu devuelve el teléfono del huésped en el campo "phone" de la reserva.
         return ReservaEstandar(
             id_externo=str(booking.get("id", "")),
             nombre_raw=nombre_raw,
             email=booking.get("email") or None,
-            telefono=booking.get("phone") or None,
-            checkin=booking.get("arrivalDate") or None,
-            checkout=booking.get("departureDate") or None,
-            nombre_apartamento=prop.get("name") or None,
-            id_apartamento_externo=str(prop.get("id")) if prop.get("id") else None,
+            telefono=telefono,
+            checkin=_to_iso(booking.get("arrival")),
+            checkout=_to_iso(booking.get("departure")),
+            nombre_apartamento=apt.get("name") or None,
+            id_apartamento_externo=str(apt.get("id")) if apt.get("id") else None,
         )
