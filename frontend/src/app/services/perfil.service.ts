@@ -56,4 +56,12 @@ export class PerfilService {
       { headers: this.headers() },
     );
   }
+
+  eliminarPMS(): Observable<{ ok: boolean }> {
+    return this.http.delete<{ ok: boolean }>('/api/perfil/integraciones/pms', { headers: this.headers() });
+  }
+
+  eliminarIA(): Observable<{ ok: boolean }> {
+    return this.http.delete<{ ok: boolean }>('/api/perfil/integraciones/ia', { headers: this.headers() });
+  }
 }

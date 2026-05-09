@@ -79,6 +79,14 @@ $color-btn-secondary-border:    $color-gray-500;
 $color-btn-secondary-text:      $color-gray-800;
 
 // ---------------------------------------------------------------------------
+// Botones — danger (acciones destructivas)
+// ---------------------------------------------------------------------------
+$color-btn-danger-bg:        hsl(0, 72%, 51%);   // rojo vivo
+$color-btn-danger-bg-hover:  hsl(0, 72%, 44%);   // rojo oscuro hover
+$color-btn-danger-bg-active: hsl(0, 72%, 37%);   // rojo oscuro active
+$color-btn-danger-text:      $color-white;
+
+// ---------------------------------------------------------------------------
 // Badges
 // ---------------------------------------------------------------------------
 $color-badge-bg:   $color-gray-300;

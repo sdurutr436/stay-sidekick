@@ -4,15 +4,28 @@
 
       <!-- Col 1: Brand -->
       <div class="footer__brand">
-        <a href="/" class="logo" aria-label="Stay Sidekick — Ir a inicio">
+        <a href="/" aria-label="Stay Sidekick — Ir a inicio">
           <picture>
-            <source srcset="/img/stay-sidekick-big-logo.webp" type="image/webp">
+            <source
+              media="(max-width: 767px)"
+              srcset="/img/favicon/stay-sidekick-fav-icon-512x512.png"
+              type="image/png">
+            <source
+              srcset="/img/footer/stay-sidekick-512x256-light-mode.webp 512w,
+                      /img/footer/stay-sidekick-1024x576-light-mode.webp 1024w"
+              type="image/webp"
+              sizes="(max-width: 767px) 160px, 200px">
+            <source
+              srcset="/img/footer/stay-sidekick-512x256-light-mode.png 512w,
+                      /img/footer/stay-sidekick-1024x576-light-mode.png 1024w"
+              type="image/png"
+              sizes="(max-width: 767px) 160px, 200px">
             <img
               class="logo__img"
-              src="/img/stay-sidekick-big-logo.png"
+              src="/img/footer/stay-sidekick-512x256-light-mode.png"
               alt="Stay Sidekick"
-              width="1536"
-              height="1024"
+              width="512"
+              height="256"
               loading="lazy"
               decoding="async"
             >

@@ -65,11 +65,23 @@
 
     // En breakpoints intermedios ocupa ambas columnas para dar más espacio
     @include respond-until('xl') {
-      grid-column: 1 / -1;  // ocupa todo el ancho en tablet
+      grid-column: 1 / -1;
     }
 
     @include respond-from('xl') {
       grid-column: auto;
+    }
+
+    .logo__img {
+      height: 2.5rem;    // 40px
+      width: auto;
+      display: block;
+      max-width: 200px;
+
+      @include respond-until('sm') {
+        height: 2.5rem;  // favicon cuadrado — mismo alto, ajustará ancho automáticamente
+        max-width: 2.5rem;
+      }
     }
   }
 

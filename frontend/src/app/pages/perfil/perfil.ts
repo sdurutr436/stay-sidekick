@@ -78,24 +78,29 @@ export class PerfilPageComponent implements OnInit {
   readonly passwordAlerta    = signal<Alerta | null>(null);
 
   // PMS
-  readonly pmsProveedor  = signal('');
-  readonly pmsApiKey     = signal('');
-  readonly pmsGuardando  = signal(false);
-  readonly pmsAlerta     = signal<Alerta | null>(null);
+  readonly pmsProveedor         = signal('');
+  readonly pmsApiKey            = signal('');
+  readonly pmsGuardando         = signal(false);
+  readonly pmsEliminando        = signal(false);
+  readonly pmsConfirmarVisible  = signal(false);
+  readonly pmsAlerta            = signal<Alerta | null>(null);
 
   // IA
-  readonly iaProveedor     = signal('');
-  readonly iaModelo        = signal('');
-  readonly iaApiKey        = signal('');
-  readonly iaGuardando     = signal(false);
-  readonly iaAlerta        = signal<Alerta | null>(null);
-  readonly iaApiKeyVisible    = signal(false);
-  readonly iaEliminarVisible  = signal(false);
-  readonly iaEliminando       = signal(false);
+  readonly iaProveedor              = signal('');
+  readonly iaModelo                 = signal('');
+  readonly iaApiKey                 = signal('');
+  readonly iaGuardando              = signal(false);
+  readonly iaConfigEliminando       = signal(false);
+  readonly iaConfigConfirmarVisible = signal(false);
+  readonly iaAlerta                 = signal<Alerta | null>(null);
+  readonly iaApiKeyVisible          = signal(false);
+  readonly iaEliminarVisible        = signal(false);
+  readonly iaEliminando             = signal(false);
 
   // Google
-  readonly googleGuardando = signal(false);
-  readonly googleAlerta    = signal<Alerta | null>(null);
+  readonly googleGuardando        = signal(false);
+  readonly googleConfirmarVisible = signal(false);
+  readonly googleAlerta           = signal<Alerta | null>(null);
 
   // XLSX — Configuración de columnas (maestro de apartamentos)
   readonly xlsxColIdExterno = signal('');
@@ -271,6 +276,54 @@ export class PerfilPageComponent implements OnInit {
     });
   }
 
+  confirmarEliminarPMS():  void { this.pmsConfirmarVisible.set(true); }
+  cancelarEliminarPMS():   void { this.pmsConfirmarVisible.set(false); }
+
+  eliminarPMS(): void {
+    this.pmsConfirmarVisible.set(false);
+    this.pmsAlerta.set(null);
+    this.pmsEliminando.set(true);
+    this.service.eliminarPMS().subscribe({
+      next: () => {
+        this.pmsAlerta.set({ tipo: 'success', mensaje: 'Integración PMS eliminada.' });
+        this.pmsProveedor.set('');
+        this.pmsApiKey.set('');
+        this.pmsEliminando.set(false);
+        this.cargarIntegraciones();
+      },
+      error: err => {
+        this.pmsAlerta.set({ tipo: 'error', mensaje: err?.error?.errors?.[0] ?? 'Error al eliminar el PMS.' });
+        this.pmsEliminando.set(false);
+      },
+    });
+  }
+
+  confirmarDesconectarGoogle(): void { this.googleConfirmarVisible.set(true); }
+  cancelarDesconectarGoogle():  void { this.googleConfirmarVisible.set(false); }
+
+  confirmarEliminarIAConfig():  void { this.iaConfigConfirmarVisible.set(true); }
+  cancelarEliminarIAConfig():   void { this.iaConfigConfirmarVisible.set(false); }
+
+  eliminarIAConfig(): void {
+    this.iaConfigConfirmarVisible.set(false);
+    this.iaAlerta.set(null);
+    this.iaConfigEliminando.set(true);
+    this.service.eliminarIA().subscribe({
+      next: () => {
+        this.iaAlerta.set({ tipo: 'success', mensaje: 'Configuración de IA eliminada.' });
+        this.iaProveedor.set('default');
+        this.iaModelo.set('');
+        this.iaApiKey.set('');
+        this.iaConfigEliminando.set(false);
+        this.cargarIntegraciones();
+      },
+      error: err => {
+        this.iaAlerta.set({ tipo: 'error', mensaje: err?.error?.errors?.[0] ?? 'Error al eliminar la configuración de IA.' });
+        this.iaConfigEliminando.set(false);
+      },
+    });
+  }
+
   confirmarEliminarApiKey(): void { this.iaEliminarVisible.set(true); }
   cancelarEliminarApiKey():  void { this.iaEliminarVisible.set(false); }
 
@@ -345,6 +398,7 @@ export class PerfilPageComponent implements OnInit {
   }
 
   desconectarGoogle(): void {
+    this.googleConfirmarVisible.set(false);
     this.googleAlerta.set(null);
     this.googleGuardando.set(true);
     const headers = { Authorization: `Bearer ${this.auth.getToken() ?? ''}` };
