@@ -112,12 +112,6 @@ def generar_desde_pms():
     if desde > hasta:
         return jsonify({"ok": False, "errors": ["'desde' debe ser anterior o igual a 'hasta'."]}), 422
 
-    if desde < date.today():
-        return jsonify({
-            "ok": False,
-            "errors": ["No se puede generar un mapa de calor con fechas pasadas."],
-        }), 422
-
     dias, error = service.generar_desde_pms(_empresa_id(), desde, hasta)
     if error:
         return jsonify({"ok": False, "errors": [error]}), 400
