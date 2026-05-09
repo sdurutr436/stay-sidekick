@@ -62,6 +62,8 @@
 // Reutilizable en login, solicitud y cambio-password
 // -----------------------------------------------------------------------------
 .form-hero-layout {
+  padding-block: $space-12;
+
   @include respond-from('lg') {
     display: grid;
     grid-template-columns: 1fr 1fr;

@@ -9,7 +9,7 @@ module.exports = function (eleventyConfig) {
   // ---------------------------------------------------------------------------
   // Passthrough copy — archivos que se copian tal cual al output
   // ---------------------------------------------------------------------------
-  eleventyConfig.addPassthroughCopy("src/assets/images");
+  eleventyConfig.addPassthroughCopy("src/assets/img");
   eleventyConfig.addPassthroughCopy("src/assets/fonts");
   eleventyConfig.addPassthroughCopy("src/assets/js");
   // Nota: el CSS se compila directamente a _site/ por el proceso sass externo.
