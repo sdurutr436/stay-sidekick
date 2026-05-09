@@ -74,7 +74,7 @@ class LogSincronizacion(db.Model):
         nullable=False,
         index=True,
     )
-    # Origen del proceso: 'pms' | 'google_contacts' | 'xlsx'
+    # Origen del proceso: 'pms' | 'google_contacts' | 'xlsx' | 'heatmap_pms'
     origen = db.Column(db.String(50), nullable=False)
     # Resultado: 'exito' | 'error' | 'parcial'
     estado = db.Column(db.String(20), nullable=False)

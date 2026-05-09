@@ -7,9 +7,9 @@
   >
     @if (!cargando()) {
       <div class="notif-checkin__header-meta">
-        <span class="notif-checkin__meta-chip" [class.notif-checkin__meta-chip--ok]="pmsConfigurado()">
-          <ng-icon [name]="pmsConfigurado() ? 'phosphorCheckCircle' : 'phosphorWarningCircle'" size="14" aria-hidden="true" />
-          {{ pmsConfigurado() ? 'PMS conectado' : 'Sin PMS' }}
+        <span class="notif-checkin__meta-chip" [class.notif-checkin__meta-chip--ok]="pmsConfigurado() && !pmsError()">
+          <ng-icon [name]="pmsConfigurado() && !pmsError() ? 'phosphorCheckCircle' : 'phosphorWarningCircle'" size="14" aria-hidden="true" />
+          {{ pmsConfigurado() && !pmsError() ? 'PMS conectado' : pmsConfigurado() ? 'Error PMS' : 'Sin PMS' }}
         </span>
         <span class="notif-checkin__meta-chip">
           Corte: {{ horaCortePerfil() }}
@@ -39,6 +39,12 @@
   @if (cargando()) {
     <p class="notif-checkin__cargando" aria-live="polite">Cargando datos…</p>
   } @else {
+
+    @if (pmsError()) {
+      <app-alert type="warning" [dismissible]="true" (dismissed)="pmsError.set(null)">
+        {{ pmsError() }}
+      </app-alert>
+    }
 
     <!-- ── Feedback XLSX ──────────────────────────────────────────────────── -->
     @if (xlsxAdvertencias().length > 0) {
@@ -235,7 +241,9 @@
             Generar automáticamente
           </app-button>
           @if (!hayCheckins()) {
-            <p class="notif-form__hint">Carga check-ins desde el PMS o el XLSX.</p>
+            <p class="notif-form__hint">
+              {{ pmsConfigurado() ? 'Sin check-ins hoy en el PMS. Usa el botón XLSX para añadirlos.' : 'Importa un XLSX con los check-ins de hoy.' }}
+            </p>
           }
         </div>
 
