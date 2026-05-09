@@ -15,7 +15,8 @@
 
 .perfil-page {
   @include container;
-  padding-block: 0;
+  padding-block-start: $space-6;
+  padding-block-end: 0;
   display: flex;
   flex-direction: column;
   gap: $space-8;
