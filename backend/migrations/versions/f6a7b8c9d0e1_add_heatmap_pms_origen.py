@@ -14,7 +14,17 @@ depends_on = None
 
 
 def upgrade():
-    op.drop_constraint("logs_sincronizacion_origen_check", "logs_sincronizacion")
+    op.execute("""
+        DO $$ BEGIN
+            IF EXISTS (
+                SELECT 1 FROM pg_constraint
+                WHERE conname = 'logs_sincronizacion_origen_check'
+                AND conrelid = 'logs_sincronizacion'::regclass
+            ) THEN
+                ALTER TABLE logs_sincronizacion DROP CONSTRAINT logs_sincronizacion_origen_check;
+            END IF;
+        END $$;
+    """)
     op.create_check_constraint(
         "logs_sincronizacion_origen_check",
         "logs_sincronizacion",
@@ -23,7 +33,17 @@ def upgrade():
 
 
 def downgrade():
-    op.drop_constraint("logs_sincronizacion_origen_check", "logs_sincronizacion")
+    op.execute("""
+        DO $$ BEGIN
+            IF EXISTS (
+                SELECT 1 FROM pg_constraint
+                WHERE conname = 'logs_sincronizacion_origen_check'
+                AND conrelid = 'logs_sincronizacion'::regclass
+            ) THEN
+                ALTER TABLE logs_sincronizacion DROP CONSTRAINT logs_sincronizacion_origen_check;
+            END IF;
+        END $$;
+    """)
     op.create_check_constraint(
         "logs_sincronizacion_origen_check",
         "logs_sincronizacion",
