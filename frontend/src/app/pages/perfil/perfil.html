@@ -25,9 +25,7 @@
       </app-alert>
     }
 
-    <div class="form-hero-layout">
-
-      <form class="perfil-form" (submit)="$event.preventDefault(); guardarPassword()">
+    <form class="perfil-form" (submit)="$event.preventDefault(); guardarPassword()">
 
         <app-form-field label="Contraseña actual" for="pwd-actual">
           <app-form-input
@@ -69,24 +67,6 @@
         </app-button>
 
       </form>
-
-      <div class="form-hero-layout__img" aria-hidden="true">
-        <picture>
-          <source
-            srcset="/img/heroes/female-staff-giving-boarding-pass-businessman-1024x683.webp"
-            type="image/webp">
-          <img
-            src="/img/heroes/female-staff-giving-boarding-pass-businessman-1024x683.jpg"
-            alt=""
-            width="1024"
-            height="683"
-            loading="lazy"
-            decoding="async"
-          >
-        </picture>
-      </div>
-
-    </div>
 
   </app-panel-seccion>
 

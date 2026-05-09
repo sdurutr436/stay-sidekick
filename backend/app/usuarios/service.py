@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import secrets
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 from marshmallow import ValidationError
 
@@ -19,7 +19,9 @@ from app.usuarios.schemas import UsuarioCreateSchema, UsuarioPatchSchema
 _create_schema = UsuarioCreateSchema()
 _patch_schema = UsuarioPatchSchema()
 
-_FORCED_CHANGE_AT = datetime(2000, 1, 1, tzinfo=timezone.utc)
+def _forced_change_at() -> datetime:
+    """Contraseña con 60 días de antigüedad → fuerza cambio en el próximo login."""
+    return datetime.now(timezone.utc) - timedelta(days=60)
 
 
 def generar_password_temporal() -> str:
@@ -86,7 +88,7 @@ def crear_usuario(empresa_id: str, json_data: dict) -> tuple[dict | None, list[s
         email=email,
         rol=clean["rol"],
         password_hash=hash_password(password_temp),
-        password_changed_at=_FORCED_CHANGE_AT,
+        password_changed_at=_forced_change_at(),
     )
     db.session.commit()
 
@@ -138,7 +140,7 @@ def resetear_password(empresa_id: str, usuario_id: str) -> tuple[dict | None, li
     repository.update_usuario(
         u,
         password_hash=hash_password(password_temp),
-        password_changed_at=_FORCED_CHANGE_AT,
+        password_changed_at=_forced_change_at(),
     )
     db.session.commit()
     return {"password_temporal": password_temp}, []
