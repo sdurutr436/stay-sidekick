@@ -1,60 +1,135 @@
 // =============================================================================
 // SETTINGS: COLORES
-// Paleta wireframe — escala de grises
-// Los colores de marca se definirán cuando el diseño esté cerrado
+// Paleta Stay Sidekick — extraída del tema Tailwind (HSL)
+// Acromática con acento ámbar; incluye tokens de dark mode
 // =============================================================================
 
-// Escala base
-$color-white:     #ffffff;
-$color-gray-50:   #fafafa;
-$color-gray-100:  #f5f5f5;
-$color-gray-200:  #ebebeb;
-$color-gray-300:  #d4d4d4;
-$color-gray-400:  #b0b0b0;
-$color-gray-500:  #8c8c8c;
-$color-gray-600:  #6b6b6b;
-$color-gray-700:  #4a4a4a;
-$color-gray-800:  #2e2e2e;
-$color-gray-900:  #1a1a1a;
-$color-black:     #000000;
+// Puros
+$color-white: hsl(0, 0%, 100%);
+$color-black: hsl(0, 0%, 0%);
 
+// ---------------------------------------------------------------------------
+// Escala de grises — anclada a los valores del tema
+// ---------------------------------------------------------------------------
+$color-gray-50:  hsl(0, 0%, 97.6471%);   // background light
+$color-gray-100: hsl(0, 0%, 94.1176%);   // primary-foreground / sidebar light
+$color-gray-200: hsl(0, 0%, 89.0196%);   // muted light
+$color-gray-300: hsl(0, 0%, 87.0588%);   // secondary light
+$color-gray-350: hsl(0, 0%, 75.2941%);   // sidebar-border light
+$color-gray-400: hsl(0, 0%, 62.7451%);   // ring
+$color-gray-500: hsl(0, 0.8696%, 45.0980%);  // border (toque cálido mínimo)
+$color-gray-600: hsl(0, 0%, 37.6471%);   // primary
+$color-gray-700: hsl(0, 0%, 31.3725%);   // muted-foreground
+$color-gray-800: hsl(0, 0%, 22.7451%);   // foreground light
+$color-gray-900: hsl(0, 0%, 16.8627%);   // background dark
+$color-gray-950: hsl(0, 0%, 12.9412%);   // sidebar dark
+
+// ---------------------------------------------------------------------------
+// Acento — ámbar cálido
+// ---------------------------------------------------------------------------
+$color-accent:            hsl(47.4419, 64.1791%, 86.8627%);
+$color-accent-foreground: hsl(14.2105, 25.6757%, 29.0196%);
+
+// ---------------------------------------------------------------------------
+// Destructivo
+// ---------------------------------------------------------------------------
+$color-destructive:            hsl(0, 41.4894%, 63.1373%);
+$color-destructive-foreground: $color-white;
+
+// ---------------------------------------------------------------------------
 // Superficies
-$color-surface:        $color-white;
-$color-surface-alt:    $color-gray-50;
+// ---------------------------------------------------------------------------
+$color-surface:        $color-gray-50;
+$color-surface-card:   $color-white;
+$color-surface-alt:    $color-gray-100;
 $color-surface-raised: $color-white;
+$color-input:          $color-white;
 
+// ---------------------------------------------------------------------------
 // Bordes
-$color-border:        $color-gray-300;
-$color-border-strong: $color-gray-500;
+// ---------------------------------------------------------------------------
+$color-border:        $color-gray-500;
+$color-border-strong: $color-gray-700;
+$color-ring:          $color-gray-400;
 
+// ---------------------------------------------------------------------------
 // Texto
-$color-text-primary:     $color-gray-900;
-$color-text-secondary:   $color-gray-600;
+// ---------------------------------------------------------------------------
+$color-text-primary:     $color-gray-800;
+$color-text-secondary:   $color-gray-700;
 $color-text-disabled:    $color-gray-400;
 $color-text-inverse:     $color-white;
 $color-text-placeholder: $color-gray-400;
 
+// ---------------------------------------------------------------------------
 // Botones — primario
-$color-btn-primary-bg:        $color-gray-800;
-$color-btn-primary-bg-hover:  $color-gray-900;
-$color-btn-primary-bg-active: $color-black;
-$color-btn-primary-text:      $color-white;
+// ---------------------------------------------------------------------------
+$color-btn-primary-bg:        $color-gray-600;
+$color-btn-primary-bg-hover:  $color-gray-700;
+$color-btn-primary-bg-active: $color-gray-800;
+$color-btn-primary-text:      $color-gray-100;
 
+// ---------------------------------------------------------------------------
 // Botones — secundario
+// ---------------------------------------------------------------------------
 $color-btn-secondary-bg:        $color-white;
-$color-btn-secondary-bg-hover:  $color-gray-100;
+$color-btn-secondary-bg-hover:  $color-gray-50;
 $color-btn-secondary-bg-active: $color-gray-200;
-$color-btn-secondary-border:    $color-gray-800;
+$color-btn-secondary-border:    $color-gray-500;
 $color-btn-secondary-text:      $color-gray-800;
 
+// ---------------------------------------------------------------------------
 // Badges
-$color-badge-bg:   $color-gray-200;
+// ---------------------------------------------------------------------------
+$color-badge-bg:   $color-gray-300;
 $color-badge-text: $color-gray-700;
 
+// ---------------------------------------------------------------------------
 // Semánticos
+// ---------------------------------------------------------------------------
 $color-success: $color-gray-700;
-$color-error:   #c0392b;
+$color-error:   $color-destructive;
 
+// ---------------------------------------------------------------------------
+// Sidebar
+// ---------------------------------------------------------------------------
+$color-sidebar-bg:           $color-gray-100;
+$color-sidebar-foreground:   $color-gray-800;
+$color-sidebar-primary:      $color-gray-600;
+$color-sidebar-primary-fg:   $color-gray-100;
+$color-sidebar-accent:       $color-accent;
+$color-sidebar-accent-fg:    $color-accent-foreground;
+$color-sidebar-border:       $color-gray-350;
+
+// ---------------------------------------------------------------------------
 // Header
+// ---------------------------------------------------------------------------
 $color-header-bg:     $color-white;
-$color-header-border: $color-gray-200;
+$color-header-border: $color-gray-300;
+
+// ---------------------------------------------------------------------------
+// Dark mode
+// ---------------------------------------------------------------------------
+$color-dark-background:          $color-gray-900;
+$color-dark-card:                hsl(0, 0%, 20%);
+$color-dark-foreground:          hsl(0, 0%, 86.2745%);
+$color-dark-primary:             hsl(0, 0%, 69.0196%);
+$color-dark-primary-foreground:  $color-gray-900;
+$color-dark-secondary:           hsl(0, 0%, 35.2941%);
+$color-dark-secondary-foreground: hsl(0, 0%, 75.2941%);
+$color-dark-muted:               hsl(0, 0%, 27.0588%);
+$color-dark-muted-foreground:    $color-gray-400;
+$color-dark-accent:              hsl(0, 0%, 87.8431%);
+$color-dark-accent-foreground:   hsl(0, 0%, 20%);
+$color-dark-destructive:         hsl(0, 35.5932%, 76.8627%);
+$color-dark-destructive-fg:      $color-gray-900;
+$color-dark-border:              hsl(0, 0%, 30.9804%);
+$color-dark-input:               hsl(0, 0%, 20%);
+$color-dark-ring:                hsl(0, 0%, 75.2941%);
+$color-dark-sidebar:             $color-gray-950;
+$color-dark-sidebar-foreground:  hsl(0, 0%, 86.2745%);
+$color-dark-sidebar-primary:     hsl(0, 0%, 69.0196%);
+$color-dark-sidebar-primary-fg:  $color-gray-950;
+$color-dark-sidebar-accent:      hsl(0, 0%, 87.8431%);
+$color-dark-sidebar-accent-fg:   hsl(0, 0%, 20%);
+$color-dark-sidebar-border:      hsl(0, 0%, 30.9804%);
