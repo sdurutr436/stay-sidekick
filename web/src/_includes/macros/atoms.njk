@@ -5,15 +5,21 @@
 
 {# ── button ──────────────────────────────────────────────────────────────── #}
 {# Genera <a> si se pasa href, <button> si no.                               #}
-{% macro button(text, href='', variant='primary', size='md', disabled=false, type='button', id='') %}
+{% macro button(text, href='', variant='primary', size='md', disabled=false, type='button', id='', icon='') %}
   {% if href %}
     <a href="{{ href }}" class="btn btn--{{ variant }} btn--{{ size }}"
       {%- if id %} id="{{ id }}"{% endif %}
-      {%- if disabled %} aria-disabled="true" tabindex="-1"{% endif %}>{{ text }}</a>
+      {%- if disabled %} aria-disabled="true" tabindex="-1"{% endif %}>
+      {%- if icon %}<span class="btn__icon-mobile" aria-hidden="true">{{ icon | safe }}</span>{% endif %}
+      <span class="btn__label">{{ text }}</span>
+    </a>
   {% else %}
     <button type="{{ type }}" class="btn btn--{{ variant }} btn--{{ size }}"
       {%- if id %} id="{{ id }}"{% endif %}
-      {%- if disabled %} disabled{% endif %}>{{ text }}</button>
+      {%- if disabled %} disabled{% endif %}>
+      {%- if icon %}<span class="btn__icon-mobile" aria-hidden="true">{{ icon | safe }}</span>{% endif %}
+      <span class="btn__label">{{ text }}</span>
+    </button>
   {% endif %}
 {% endmacro %}
 

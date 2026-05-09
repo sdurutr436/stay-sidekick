@@ -7,9 +7,11 @@ section: login
 {% import "macros/atoms.njk" as atoms %}
 
 <section class="l-container">
-  <section class="login-page">
+  <div class="form-hero-layout">
 
-    <header class="login-page__intro">
+    <section class="login-page">
+
+      <header class="login-page__intro">
       <h1>Iniciar sesión</h1>
       <p class="u-text-secondary u-mt-4">
         Accede a tu panel de herramientas.
@@ -81,7 +83,25 @@ section: login
 
     </form>
 
-  </section>
+    </section>
+
+    <div class="form-hero-layout__img" aria-hidden="true">
+      <picture>
+        <source
+          srcset="/assets/img/heroes/female-staff-giving-boarding-pass-businessman-1024x683.webp"
+          type="image/webp">
+        <img
+          src="/assets/img/heroes/female-staff-giving-boarding-pass-businessman-1024x683.jpg"
+          alt=""
+          width="1024"
+          height="683"
+          loading="lazy"
+          decoding="async"
+        >
+      </picture>
+    </div>
+
+  </div>
 </section>
 
 {% block scripts %}
