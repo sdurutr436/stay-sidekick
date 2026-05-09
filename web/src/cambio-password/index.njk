@@ -9,7 +9,9 @@ section: cambio-password
 {% import "macros/organisms.njk" as organisms %}
 
 <section class="l-container">
-  <section class="login-page">
+  <div class="form-hero-layout">
+
+    <section class="login-page">
 
     {{ organisms.pageHeader(
       'Cambiar contraseña',
@@ -67,7 +69,25 @@ section: cambio-password
       <p>Contraseña actualizada correctamente. Redirigiendo…</p>
     </div>
 
-  </section>
+    </section>
+
+    <div class="form-hero-layout__img" aria-hidden="true">
+      <picture>
+        <source
+          srcset="/assets/img/heroes/male-receptionist-suit-offering-room-key-1024x1536.webp"
+          type="image/webp">
+        <img
+          src="/assets/img/heroes/male-receptionist-suit-offering-room-key-1024x1536.jpg"
+          alt=""
+          width="1024"
+          height="1536"
+          loading="lazy"
+          decoding="async"
+        >
+      </picture>
+    </div>
+
+  </div>
 </section>
 
 {% block scripts %}

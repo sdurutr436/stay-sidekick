@@ -9,22 +9,32 @@
 
       {# Col 1: Brand #}
       <div class="footer__brand">
-        <a href="/" class="logo" aria-label="{{ site.name }} — Inicio">
-          <div class="logo__icon">
-            <svg
-              class="svg svg--lg"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 32 32"
-              fill="none"
-              aria-hidden="true"
+        <a href="/" aria-label="{{ site.name }} — Ir a inicio">
+          <picture>
+            <source
+              media="(max-width: 767px)"
+              srcset="/assets/img/favicon/stay-sidekick-fav-icon-512x512.png"
+              type="image/png">
+            <source
+              srcset="/assets/img/footer/stay-sidekick-512x256-light-mode.webp 512w,
+                      /assets/img/footer/stay-sidekick-1024x576-light-mode.webp 1024w"
+              type="image/webp"
+              sizes="(max-width: 767px) 160px, 200px">
+            <source
+              srcset="/assets/img/footer/stay-sidekick-512x256-light-mode.png 512w,
+                      /assets/img/footer/stay-sidekick-1024x576-light-mode.png 1024w"
+              type="image/png"
+              sizes="(max-width: 767px) 160px, 200px">
+            <img
+              class="logo__img"
+              src="/assets/img/footer/stay-sidekick-512x256-light-mode.png"
+              alt="{{ site.name }}"
+              width="512"
+              height="256"
+              loading="lazy"
+              decoding="async"
             >
-              <rect x="2" y="2" width="28" height="28" rx="0" fill="#2e2e2e"/>
-              <rect x="8" y="14" width="6" height="12" fill="#ffffff"/>
-              <rect x="18" y="8" width="6" height="18" fill="#ffffff"/>
-              <rect x="8" y="8" width="6" height="4" fill="#ffffff"/>
-            </svg>
-          </div>
-          <span class="logo__name">{{ site.name }}</span>
+          </picture>
         </a>
         <p class="footer__description">
           Tu copiloto para gestionar alojamientos turísticos con autonomía y sin fricciones.

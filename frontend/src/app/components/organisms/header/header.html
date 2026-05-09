@@ -33,23 +33,34 @@
         </button>
       }
 
-      <!-- Brand: ícono + nombre app -->
-      <a routerLink="/" class="header__brand logo" aria-label="Stay Sidekick — Menú">
-        <div class="logo__icon">
-          <svg
-            class="svg svg--lg"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 32 32"
-            fill="none"
-            aria-hidden="true"
+      <!-- Brand: favicon en mobile (<768px), logo horizontal en tablet/desktop (≥768px) -->
+      <a routerLink="/" class="header__brand" aria-label="Stay Sidekick — Menú principal">
+        <picture>
+          <source
+            media="(max-width: 767px)"
+            srcset="/img/favicon/stay-sidekick-fav-icon-512x512.png"
+            type="image/png">
+          <source
+            srcset="/img/header/stay-sidekick-512x256-light-mode.webp 512w,
+                    /img/header/stay-sidekick-1024x576-light-mode.webp 1024w"
+            type="image/webp"
+            sizes="(max-width: 767px) 120px, 160px">
+          <source
+            srcset="/img/header/stay-sidekick-512x256-light-mode.png 512w,
+                    /img/header/stay-sidekick-1024x576-light-mode.png 1024w"
+            type="image/png"
+            sizes="(max-width: 767px) 120px, 160px">
+          <img
+            class="logo__img"
+            src="/img/header/stay-sidekick-512x256-light-mode.png"
+            alt="Stay Sidekick"
+            width="512"
+            height="256"
+            loading="eager"
+            decoding="async"
+            fetchpriority="high"
           >
-            <rect x="2"  y="2"  width="28" height="28" rx="0" fill="#2e2e2e"/>
-            <rect x="8"  y="14" width="6"  height="12" fill="#ffffff"/>
-            <rect x="18" y="8"  width="6"  height="18" fill="#ffffff"/>
-            <rect x="8"  y="8"  width="6"  height="4"  fill="#ffffff"/>
-          </svg>
-        </div>
-        <span class="logo__name">Stay Sidekick</span>
+        </picture>
       </a>
     </div>
 
@@ -57,15 +68,24 @@
     <nav class="header__actions" aria-label="Acciones de usuario">
       @if (auth.isLoggedIn()) {
         <a routerLink="/perfil" class="btn btn--secondary btn--md">
-          Perfil
+          <span class="btn__icon-mobile" aria-hidden="true">
+            <svg viewBox="0 0 256 256" fill="currentColor" width="20" height="20" xmlns="http://www.w3.org/2000/svg"><path d="M230.92,212c-15.23-26.33-38.7-45.21-66.09-54.16a72,72,0,1,0-73.66,0C63.78,166.78,40.31,185.66,25.08,212a8,8,0,1,0,13.85,8c18.84-32.56,52.14-52,89.07-52s70.23,19.44,89.07,52a8,8,0,1,0,13.85-8ZM72,96a56,56,0,1,1,56,56A56.06,56.06,0,0,1,72,96Z"/></svg>
+          </span>
+          <span class="btn__label">Perfil</span>
         </a>
       } @else {
         <a href="/login" class="btn btn--secondary btn--md">
-          Iniciar sesión
+          <span class="btn__icon-mobile" aria-hidden="true">
+            <svg viewBox="0 0 256 256" fill="currentColor" width="20" height="20" xmlns="http://www.w3.org/2000/svg"><path d="M230.92,212c-15.23-26.33-38.7-45.21-66.09-54.16a72,72,0,1,0-73.66,0C63.78,166.78,40.31,185.66,25.08,212a8,8,0,1,0,13.85,8c18.84-32.56,52.14-52,89.07-52s70.23,19.44,89.07,52a8,8,0,1,0,13.85-8ZM72,96a56,56,0,1,1,56,56A56.06,56.06,0,0,1,72,96Z"/></svg>
+          </span>
+          <span class="btn__label">Iniciar sesión</span>
         </a>
       }
       <a href="/solicitud" class="btn btn--primary btn--md">
-        Presentar solicitud
+        <span class="btn__icon-mobile" aria-hidden="true">
+          <svg viewBox="0 0 256 256" fill="currentColor" width="20" height="20" xmlns="http://www.w3.org/2000/svg"><path d="M221.66,133.66l-72,72a8,8,0,0,1-11.32-11.32L196.69,136H40a8,8,0,0,1,0-16H196.69L138.34,61.66a8,8,0,0,1,11.32-11.32l72,72A8,8,0,0,1,221.66,133.66Z"/></svg>
+        </span>
+        <span class="btn__label">Presentar solicitud</span>
       </a>
     </nav>
 

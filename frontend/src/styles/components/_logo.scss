@@ -11,6 +11,14 @@
   text-decoration: none;
   color: $color-text-primary;
 
+  &__img {
+    height: 2.25rem;
+    width: auto;
+    display: block;
+    object-fit: contain;
+    flex-shrink: 0;
+  }
+
   &__icon {
     display: flex;
     align-items: center;

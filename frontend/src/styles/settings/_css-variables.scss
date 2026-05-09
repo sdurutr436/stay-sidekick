@@ -1,12 +1,15 @@
 // =============================================================================
 // SETTINGS: CSS CUSTOM PROPERTIES
-// Expone variables SCSS como tokens CSS nativos.
+// Expone la paleta como tokens CSS nativos para uso en templates y JS.
 // Importar después del resto de archivos de settings.
 // =============================================================================
 
 :root {
   // Tipografía
   --font-family-base:      #{$font-family-base};
+  --font-sans:             Archivo, ui-sans-serif, sans-serif, system-ui;
+  --font-serif:            "Times New Roman", Times, serif;
+  --font-mono:             "Courier New", Courier, monospace;
 
   --font-size-display-2xl: #{$font-size-display-2xl};
   --font-size-display-xl:  #{$font-size-display-xl};
@@ -28,14 +31,6 @@
   --font-weight-body:    #{$font-weight-body};
   --font-weight-caption: #{$font-weight-caption};
 
-  // Colores
-  --color-surface:        #{$color-surface};
-  --color-surface-alt:    #{$color-surface-alt};
-  --color-border:         #{$color-border};
-  --color-text-primary:   #{$color-text-primary};
-  --color-text-secondary: #{$color-text-secondary};
-  --color-text-inverse:   #{$color-text-inverse};
-
   // Espaciado
   --space-2: #{$space-2};
   --space-4: #{$space-4};
@@ -49,4 +44,91 @@
   // Transiciones
   --transition-base: 150ms ease;
   --transition-slow: 300ms ease;
+
+  // Radio
+  --radius:    0.625rem;
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  // Letter-spacing
+  --tracking-normal: 0.5px;
+
+  // Sombras
+  --shadow-2xs: 1px 4px 5px 0px hsl(0 0% 0% / 0.01);
+  --shadow-xs:  1px 4px 5px 0px hsl(0 0% 0% / 0.01);
+  --shadow-sm:  1px 4px 5px 0px hsl(0 0% 0% / 0.03), 1px 1px 2px -1px hsl(0 0% 0% / 0.03);
+  --shadow:     1px 4px 5px 0px hsl(0 0% 0% / 0.03), 1px 1px 2px -1px hsl(0 0% 0% / 0.03);
+  --shadow-md:  1px 4px 5px 0px hsl(0 0% 0% / 0.03), 1px 2px 4px -1px hsl(0 0% 0% / 0.03);
+  --shadow-lg:  1px 4px 5px 0px hsl(0 0% 0% / 0.03), 1px 4px 6px -1px hsl(0 0% 0% / 0.03);
+  --shadow-xl:  1px 4px 5px 0px hsl(0 0% 0% / 0.03), 1px 8px 10px -1px hsl(0 0% 0% / 0.03);
+  --shadow-2xl: 1px 4px 5px 0px hsl(0 0% 0% / 0.07);
+
+  // Colores — light mode
+  --background:          hsl(0 0% 97.6471%);
+  --foreground:          hsl(0 0% 22.7451%);
+  --card:                hsl(0 0% 100%);
+  --card-foreground:     hsl(0 0% 22.7451%);
+  --popover:             hsl(0 0% 100%);
+  --popover-foreground:  hsl(0 0% 22.7451%);
+  --primary:             hsl(0 0% 37.6471%);
+  --primary-foreground:  hsl(0 0% 94.1176%);
+  --secondary:           hsl(0 0% 87.0588%);
+  --secondary-foreground: hsl(0 0% 22.7451%);
+  --muted:               hsl(0 0% 89.0196%);
+  --muted-foreground:    hsl(0 0% 31.3725%);
+  --accent:              hsl(47.4419 64.1791% 86.8627%);
+  --accent-foreground:   hsl(14.2105 25.6757% 29.0196%);
+  --destructive:         hsl(0 41.4894% 63.1373%);
+  --destructive-foreground: hsl(0 0% 100%);
+  --border:              hsl(0 0.8696% 45.0980%);
+  --input:               hsl(0 0% 100%);
+  --ring:                hsl(0 0% 62.7451%);
+  --sidebar:             hsl(0 0% 94.1176%);
+  --sidebar-foreground:  hsl(0 0% 22.7451%);
+  --sidebar-primary:     hsl(0 0% 37.6471%);
+  --sidebar-primary-foreground: hsl(0 0% 94.1176%);
+  --sidebar-accent:      hsl(47.4419 64.1791% 86.8627%);
+  --sidebar-accent-foreground: hsl(14.2105 25.6757% 29.0196%);
+  --sidebar-border:      hsl(0 0% 75.2941%);
+  --sidebar-ring:        hsl(0 0% 62.7451%);
+
+  // Aliases semánticos (compat con componentes existentes)
+  --color-surface:        var(--background);
+  --color-surface-alt:    var(--primary-foreground);
+  --color-border:         var(--border);
+  --color-text-primary:   var(--foreground);
+  --color-text-secondary: var(--muted-foreground);
+  --color-text-inverse:   hsl(0 0% 100%);
+}
+
+.dark {
+  --background:          hsl(0 0% 16.8627%);
+  --foreground:          hsl(0 0% 86.2745%);
+  --card:                hsl(0 0% 20%);
+  --card-foreground:     hsl(0 0% 86.2745%);
+  --popover:             hsl(0 0% 20%);
+  --popover-foreground:  hsl(0 0% 86.2745%);
+  --primary:             hsl(0 0% 69.0196%);
+  --primary-foreground:  hsl(0 0% 16.8627%);
+  --secondary:           hsl(0 0% 35.2941%);
+  --secondary-foreground: hsl(0 0% 75.2941%);
+  --muted:               hsl(0 0% 27.0588%);
+  --muted-foreground:    hsl(0 0% 62.7451%);
+  --accent:              hsl(0 0% 87.8431%);
+  --accent-foreground:   hsl(0 0% 20%);
+  --destructive:         hsl(0 35.5932% 76.8627%);
+  --destructive-foreground: hsl(0 0% 16.8627%);
+  --border:              hsl(0 0% 30.9804%);
+  --input:               hsl(0 0% 20%);
+  --ring:                hsl(0 0% 75.2941%);
+  --sidebar:             hsl(0 0% 12.9412%);
+  --sidebar-foreground:  hsl(0 0% 86.2745%);
+  --sidebar-primary:     hsl(0 0% 69.0196%);
+  --sidebar-primary-foreground: hsl(0 0% 12.9412%);
+  --sidebar-accent:      hsl(0 0% 87.8431%);
+  --sidebar-accent-foreground: hsl(0 0% 20%);
+  --sidebar-border:      hsl(0 0% 30.9804%);
+  --sidebar-ring:        hsl(0 0% 75.2941%);
 }

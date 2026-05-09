@@ -91,6 +91,20 @@ def save_notif_tardio_config(empresa_id: str, data: dict) -> None:
     db.session.commit()
 
 
+def delete_pms(empresa_id: str) -> None:
+    pms = db.session.query(ConfiguracionPMS).filter_by(empresa_id=empresa_id).first()
+    if pms:
+        db.session.delete(pms)
+        db.session.commit()
+
+
+def delete_ia(empresa_id: str) -> None:
+    ia = db.session.query(ConfiguracionIA).filter_by(empresa_id=empresa_id).first()
+    if ia:
+        db.session.delete(ia)
+        db.session.commit()
+
+
 def upsert_ia(empresa_id: str, proveedor: str, modelo: str | None, api_key_cifrada: str | None) -> None:
     ia = db.session.query(ConfiguracionIA).filter_by(empresa_id=empresa_id).first()
     if ia:

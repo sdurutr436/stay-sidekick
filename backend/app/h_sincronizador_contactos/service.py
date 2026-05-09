@@ -265,6 +265,11 @@ def sync_contacts(empresa_id: str, json_data: dict) -> tuple[dict | None, str | 
 
 def export_csv(empresa_id: str, json_data: dict) -> tuple[bytes | None, str | None]:
     """Genera el CSV de contactos en formato Google para importación manual."""
+    try:
+        params = _sync_schema.load(json_data)
+    except ValidationError:
+        return None, "Parámetros de fecha inválidos."
+
     pms_config = apt_repo.get_pms_config(empresa_id)
     if not pms_config or not pms_config.api_key_cifrada:
         return None, "No hay configuración de PMS."
@@ -275,11 +280,11 @@ def export_csv(empresa_id: str, json_data: dict) -> tuple[bytes | None, str | No
 
     try:
         pms_client = build_pms_client(pms_config.proveedor, api_key_pms, pms_config.endpoint)
-        desde_str = json_data.get("desde")
-        hasta_str = json_data.get("hasta")
+        desde = params.get("desde")
+        hasta = params.get("hasta")
         reservas = pms_client.fetch_reservations(
-            desde=desde_str.isoformat() if desde_str else None,
-            hasta=hasta_str.isoformat() if hasta_str else None,
+            desde=desde.isoformat() if desde else None,
+            hasta=hasta.isoformat() if hasta else None,
         )
     except (requests.RequestException, NotImplementedError) as exc:
         return None, f"Error al obtener reservas del PMS: {exc}"

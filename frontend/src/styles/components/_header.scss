@@ -63,30 +63,60 @@
   }
 
   // -------------------------------------------------------------------------
-  // Brand — logo + nombre
+  // Brand — logo responsive (favicon en mobile, horizontal en tablet/desktop)
   // -------------------------------------------------------------------------
   &__brand {
     display: flex;
     align-items: center;
+
+    .logo__img {
+      height: 2.25rem;   // 36px — margen cómodo en el header de 64px
+      width: auto;
+      display: block;
+
+      @include respond-until('md') {
+        height: 1.75rem; // 28px en tablet (header de 56px)
+      }
+
+      @include respond-until('sm') {
+        height: 2rem;    // 32px en mobile — favicon cuadrado
+      }
+    }
   }
 
   // -------------------------------------------------------------------------
   // Acciones — botones de la derecha
+  // Desktop: icono + texto; mobile (≤575px): solo icono
   // -------------------------------------------------------------------------
   &__actions {
     display: flex;
     align-items: center;
     gap: $space-3;
+
+    // Icono siempre visible — acompaña al texto en desktop
+    .btn__icon-mobile {
+      display: flex;
+      align-items: center;
+    }
+
+    @include respond-until('sm') {
+      gap: $space-2;
+
+      .btn__label {
+        display: none;
+      }
+
+      // Padding cuadrado cuando el botón muestra solo el icono
+      .btn--md {
+        padding: $space-2;
+      }
+    }
   }
 
   // -------------------------------------------------------------------------
-  // Responsivo — mobile
+  // Responsivo — breakpoint md (tablets)
   // -------------------------------------------------------------------------
   @include respond-until('md') {
     height: $header-height-mobile;
-
-    &__actions {
-      gap: $space-2;
-    }
   }
 }

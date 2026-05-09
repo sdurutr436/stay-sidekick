@@ -100,6 +100,24 @@ def actualizar_ia():
     return jsonify({"ok": True}), 200
 
 
+@perfil_bp.route("/api/perfil/integraciones/pms", methods=["DELETE"])
+@jwt_required
+def eliminar_pms():
+    if not _is_admin():
+        return jsonify({"ok": False, "errors": ["Solo el administrador puede modificar las integraciones."]}), 403
+    service.eliminar_pms(_empresa_id())
+    return jsonify({"ok": True}), 200
+
+
+@perfil_bp.route("/api/perfil/integraciones/ia", methods=["DELETE"])
+@jwt_required
+def eliminar_ia():
+    if not _is_admin():
+        return jsonify({"ok": False, "errors": ["Solo el administrador puede modificar las integraciones."]}), 403
+    service.eliminar_ia(_empresa_id())
+    return jsonify({"ok": True}), 200
+
+
 @perfil_bp.route("/api/perfil/xlsx-apartamentos", methods=["GET"])
 @jwt_required
 def get_xlsx_apartamentos():
