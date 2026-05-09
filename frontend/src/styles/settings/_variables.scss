@@ -18,21 +18,22 @@ $space-12:  3rem;     // 48px
 $space-16:  4rem;     // 64px
 
 // -----------------------------------------------------------------------------
-// Bordes — wireframe: blocky (sin redondeo)
+// Bordes
 // -----------------------------------------------------------------------------
 $border-width:           1px;
 $border-style:           solid;
 $border-radius-none:     0;
-$border-radius-sm:       2px;
-$border-radius-md:       4px;
-$border-radius-lg:       8px;
-$border-radius-default:  $border-radius-none;
+$border-radius-sm:       calc(0.625rem - 4px);  // var(--radius-sm)
+$border-radius-md:       calc(0.625rem - 2px);  // var(--radius-md)
+$border-radius-lg:       0.625rem;              // var(--radius)
+$border-radius-xl:       calc(0.625rem + 4px);  // var(--radius-xl)
+$border-radius-default:  $border-radius-lg;
 
 // -----------------------------------------------------------------------------
-// Sombras (mínimas en wireframe)
+// Sombras
 // -----------------------------------------------------------------------------
-$shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.08);
-$shadow-md: 0 2px 8px rgba(0, 0, 0, 0.12);
+$shadow-sm: 1px 4px 5px 0px hsla(0, 0%, 0%, 0.03), 1px 1px 2px -1px hsla(0, 0%, 0%, 0.03);
+$shadow-md: 1px 4px 5px 0px hsla(0, 0%, 0%, 0.03), 1px 2px 4px -1px hsla(0, 0%, 0%, 0.03);
 
 // -----------------------------------------------------------------------------
 // Contenedor

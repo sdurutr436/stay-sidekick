@@ -33,23 +33,21 @@
         </button>
       }
 
-      <!-- Brand: ícono + nombre app -->
-      <a routerLink="/" class="header__brand logo" aria-label="Stay Sidekick — Menú">
-        <div class="logo__icon">
-          <svg
-            class="svg svg--lg"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 32 32"
-            fill="none"
-            aria-hidden="true"
+      <!-- Brand: logotipo -->
+      <a routerLink="/" class="header__brand logo" aria-label="Stay Sidekick — Menú principal">
+        <picture>
+          <source srcset="/img/stay-sidekick-big-logo.webp" type="image/webp">
+          <img
+            class="logo__img"
+            src="/img/stay-sidekick-big-logo.png"
+            alt="Stay Sidekick"
+            width="1536"
+            height="1024"
+            loading="eager"
+            decoding="async"
+            fetchpriority="high"
           >
-            <rect x="2"  y="2"  width="28" height="28" rx="0" fill="#2e2e2e"/>
-            <rect x="8"  y="14" width="6"  height="12" fill="#ffffff"/>
-            <rect x="18" y="8"  width="6"  height="18" fill="#ffffff"/>
-            <rect x="8"  y="8"  width="6"  height="4"  fill="#ffffff"/>
-          </svg>
-        </div>
-        <span class="logo__name">Stay Sidekick</span>
+        </picture>
       </a>
     </div>
 
