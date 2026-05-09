@@ -126,7 +126,7 @@
             id="pms-proveedor"
             [options]="pmsOpciones"
             [value]="pmsProveedor()"
-            [disabled]="!isAdmin()"
+            [disabled]="!isAdmin() || !!integraciones()?.pms?.configurado"
             (valueChange)="pmsProveedor.set($event)"
           />
         </app-form-field>
@@ -138,6 +138,7 @@
               type="password"
               placeholder="Introduce la API Key del PMS"
               [value]="pmsApiKey()"
+              [disabled]="!!integraciones()?.pms?.configurado"
               (valueChange)="pmsApiKey.set($event)"
             />
           } @else {
@@ -153,17 +154,48 @@
         </app-form-field>
 
         @if (isAdmin()) {
-          <app-button
-            type="submit"
-            variant="secondary"
-            size="md"
-            [disabled]="pmsGuardando() || !pmsProveedor() || !pmsApiKey()"
-          >
-            {{ pmsGuardando() ? 'Guardando…' : 'Guardar PMS' }}
-          </app-button>
+          <div class="perfil-page__btn-row">
+            <app-button
+              type="submit"
+              variant="secondary"
+              size="md"
+              [disabled]="pmsGuardando() || !pmsProveedor() || !pmsApiKey() || !!integraciones()?.pms?.configurado"
+            >
+              <ng-icon name="phosphorFloppyDisk" size="16" aria-hidden="true" />
+              {{ pmsGuardando() ? 'Guardando…' : 'Guardar PMS' }}
+            </app-button>
+            <app-button
+              type="button"
+              variant="danger"
+              size="md"
+              [disabled]="pmsEliminando() || !integraciones()?.pms?.configurado"
+              (click)="confirmarEliminarPMS()"
+            >
+              <ng-icon name="phosphorTrash" size="16" aria-hidden="true" />
+              {{ pmsEliminando() ? 'Eliminando…' : 'Eliminar PMS' }}
+            </app-button>
+          </div>
         }
 
       </form>
+
+      @if (pmsConfirmarVisible()) {
+        <div class="perfil-page__ia-modal-overlay" (click)="cancelarEliminarPMS()">
+          <div class="perfil-page__ia-modal" (click)="$event.stopPropagation()" role="dialog" aria-modal="true" aria-labelledby="pms-modal-titulo">
+            <p id="pms-modal-titulo" class="perfil-page__ia-modal-titulo">¿Eliminar integración PMS?</p>
+            <p class="perfil-page__ia-modal-desc">
+              Se desconectará el PMS y todas las herramientas dejarán de sincronizar datos automáticamente.
+            </p>
+            <div class="perfil-page__ia-modal-acciones">
+              <app-button variant="ghost" size="md" (click)="cancelarEliminarPMS()">Cancelar</app-button>
+              <app-button variant="danger" size="md" [disabled]="pmsEliminando()" (click)="eliminarPMS()">
+                {{ pmsEliminando() ? 'Eliminando…' : 'Eliminar' }}
+              </app-button>
+            </div>
+          </div>
+        </div>
+      }
+
     </section>
 
     <!-- Google -->
@@ -185,26 +217,45 @@
       </p>
 
       @if (isAdmin()) {
-        @if (integraciones()?.google?.configurado) {
-          <app-button
-            variant="danger"
-            size="md"
-            [disabled]="googleGuardando()"
-            (click)="desconectarGoogle()"
-          >
-            {{ googleGuardando() ? 'Desconectando…' : 'Desconectar Google' }}
-          </app-button>
-        } @else {
+        <div class="perfil-page__btn-row">
           <app-button
             variant="secondary"
             size="md"
-            [disabled]="googleGuardando()"
+            [disabled]="googleGuardando() || !!integraciones()?.google?.configurado"
             (click)="conectarGoogle()"
           >
-            {{ googleGuardando() ? 'Redirigiendo…' : 'Conectar Google Contacts' }}
+            <ng-icon name="phosphorGoogleLogo" size="16" aria-hidden="true" />
+            {{ googleGuardando() && !integraciones()?.google?.configurado ? 'Redirigiendo…' : 'Conectar Google Contacts' }}
           </app-button>
-        }
+          <app-button
+            variant="danger"
+            size="md"
+            [disabled]="googleGuardando() || !integraciones()?.google?.configurado"
+            (click)="confirmarDesconectarGoogle()"
+          >
+            <ng-icon name="phosphorX" size="16" aria-hidden="true" />
+            {{ googleGuardando() && !!integraciones()?.google?.configurado ? 'Desconectando…' : 'Desconectar Google' }}
+          </app-button>
+        </div>
       }
+
+      @if (googleConfirmarVisible()) {
+        <div class="perfil-page__ia-modal-overlay" (click)="cancelarDesconectarGoogle()">
+          <div class="perfil-page__ia-modal" (click)="$event.stopPropagation()" role="dialog" aria-modal="true" aria-labelledby="google-modal-titulo">
+            <p id="google-modal-titulo" class="perfil-page__ia-modal-titulo">¿Desconectar Google Contacts?</p>
+            <p class="perfil-page__ia-modal-desc">
+              Se revocarán los permisos de acceso. El sincronizador de contactos dejará de funcionar hasta que vuelvas a conectar.
+            </p>
+            <div class="perfil-page__ia-modal-acciones">
+              <app-button variant="ghost" size="md" (click)="cancelarDesconectarGoogle()">Cancelar</app-button>
+              <app-button variant="danger" size="md" [disabled]="googleGuardando()" (click)="desconectarGoogle()">
+                {{ googleGuardando() ? 'Desconectando…' : 'Desconectar' }}
+              </app-button>
+            </div>
+          </div>
+        </div>
+      }
+
     </section>
 
     <!-- IA -->
@@ -237,7 +288,7 @@
             id="ia-proveedor"
             [options]="iaGrupoOpciones"
             [value]="iaProveedor()"
-            [disabled]="!isAdmin()"
+            [disabled]="!isAdmin() || !!integraciones()?.ia?.proveedor"
             (valueChange)="onIaProveedorChange($event)"
           />
         </app-form-field>
@@ -297,15 +348,45 @@
         }
 
         @if (isAdmin()) {
-          <app-button
-            type="submit"
-            variant="secondary"
-            size="md"
-            [disabled]="iaGuardando() || !iaProveedor()"
-          >
-            {{ iaGuardando() ? 'Guardando…' : 'Guardar configuración IA' }}
-          </app-button>
+          <div class="perfil-page__btn-row">
+            <app-button
+              type="submit"
+              variant="secondary"
+              size="md"
+              [disabled]="iaGuardando() || !iaProveedor()"
+            >
+              <ng-icon name="phosphorFloppyDisk" size="16" aria-hidden="true" />
+              {{ iaGuardando() ? 'Guardando…' : 'Guardar configuración IA' }}
+            </app-button>
+            <app-button
+              type="button"
+              variant="danger"
+              size="md"
+              [disabled]="iaConfigEliminando() || !integraciones()?.ia?.proveedor"
+              (click)="confirmarEliminarIAConfig()"
+            >
+              <ng-icon name="phosphorTrash" size="16" aria-hidden="true" />
+              {{ iaConfigEliminando() ? 'Eliminando…' : 'Eliminar IA' }}
+            </app-button>
+          </div>
         }
+
+      @if (iaConfigConfirmarVisible()) {
+        <div class="perfil-page__ia-modal-overlay" (click)="cancelarEliminarIAConfig()">
+          <div class="perfil-page__ia-modal" (click)="$event.stopPropagation()" role="dialog" aria-modal="true" aria-labelledby="ia-config-modal-titulo">
+            <p id="ia-config-modal-titulo" class="perfil-page__ia-modal-titulo">¿Eliminar configuración de IA?</p>
+            <p class="perfil-page__ia-modal-desc">
+              Se eliminará el proveedor y la API key. El sistema volverá a usar el modelo compartido por defecto.
+            </p>
+            <div class="perfil-page__ia-modal-acciones">
+              <app-button variant="ghost" size="md" (click)="cancelarEliminarIAConfig()">Cancelar</app-button>
+              <app-button variant="danger" size="md" [disabled]="iaConfigEliminando()" (click)="eliminarIAConfig()">
+                {{ iaConfigEliminando() ? 'Eliminando…' : 'Eliminar' }}
+              </app-button>
+            </div>
+          </div>
+        </div>
+      }
 
       </form>
 

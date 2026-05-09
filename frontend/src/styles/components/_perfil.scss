@@ -82,6 +82,13 @@
     }
   }
 
+  // ── Fila de botones en par (guardar + eliminar) ───────────────────────
+  &__btn-row {
+    display: flex;
+    gap: $space-3;
+    flex-wrap: wrap;
+  }
+
   // ── Modal de confirmación para borrar API key ─────────────────────────
   &__ia-modal-overlay {
     position: fixed;
@@ -136,6 +143,7 @@
   // Alertas, botones y párrafos de descripción siempre a ancho completo
   > app-alert,
   > app-button,
+  > .perfil-page__btn-row,
   > p,
   > section {
     grid-column: 1 / -1;
