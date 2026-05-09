@@ -1,6 +1,7 @@
 """Servicio de autenticación — sanitización, validación y verificación de credenciales."""
 
 import logging
+from datetime import datetime, timedelta, timezone
 
 from marshmallow import ValidationError
 
@@ -69,7 +70,10 @@ def authenticate_user(clean_data: dict) -> tuple[str | None, list[str], bool]:
         return None, [_INVALID_CREDENTIALS_MSG], False
 
     pwd_changed_at = user.get("password_changed_at")
-    debe_cambiar = pwd_changed_at is None or pwd_changed_at.year <= 2000
+    if pwd_changed_at is None or pwd_changed_at.year <= 2000:
+        debe_cambiar = True
+    else:
+        debe_cambiar = (datetime.now(timezone.utc) - pwd_changed_at) > timedelta(days=30)
 
     token = create_access_token(
         identity=email,
