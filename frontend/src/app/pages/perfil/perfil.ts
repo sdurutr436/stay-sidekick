@@ -78,26 +78,29 @@ export class PerfilPageComponent implements OnInit {
   readonly passwordAlerta    = signal<Alerta | null>(null);
 
   // PMS
-  readonly pmsProveedor  = signal('');
-  readonly pmsApiKey     = signal('');
-  readonly pmsGuardando  = signal(false);
-  readonly pmsEliminando = signal(false);
-  readonly pmsAlerta     = signal<Alerta | null>(null);
+  readonly pmsProveedor         = signal('');
+  readonly pmsApiKey            = signal('');
+  readonly pmsGuardando         = signal(false);
+  readonly pmsEliminando        = signal(false);
+  readonly pmsConfirmarVisible  = signal(false);
+  readonly pmsAlerta            = signal<Alerta | null>(null);
 
   // IA
-  readonly iaProveedor          = signal('');
-  readonly iaModelo             = signal('');
-  readonly iaApiKey             = signal('');
-  readonly iaGuardando          = signal(false);
-  readonly iaConfigEliminando   = signal(false);
-  readonly iaAlerta             = signal<Alerta | null>(null);
-  readonly iaApiKeyVisible      = signal(false);
-  readonly iaEliminarVisible    = signal(false);
-  readonly iaEliminando         = signal(false);
+  readonly iaProveedor              = signal('');
+  readonly iaModelo                 = signal('');
+  readonly iaApiKey                 = signal('');
+  readonly iaGuardando              = signal(false);
+  readonly iaConfigEliminando       = signal(false);
+  readonly iaConfigConfirmarVisible = signal(false);
+  readonly iaAlerta                 = signal<Alerta | null>(null);
+  readonly iaApiKeyVisible          = signal(false);
+  readonly iaEliminarVisible        = signal(false);
+  readonly iaEliminando             = signal(false);
 
   // Google
-  readonly googleGuardando = signal(false);
-  readonly googleAlerta    = signal<Alerta | null>(null);
+  readonly googleGuardando        = signal(false);
+  readonly googleConfirmarVisible = signal(false);
+  readonly googleAlerta           = signal<Alerta | null>(null);
 
   // XLSX — Configuración de columnas (maestro de apartamentos)
   readonly xlsxColIdExterno = signal('');
@@ -273,7 +276,11 @@ export class PerfilPageComponent implements OnInit {
     });
   }
 
+  confirmarEliminarPMS():  void { this.pmsConfirmarVisible.set(true); }
+  cancelarEliminarPMS():   void { this.pmsConfirmarVisible.set(false); }
+
   eliminarPMS(): void {
+    this.pmsConfirmarVisible.set(false);
     this.pmsAlerta.set(null);
     this.pmsEliminando.set(true);
     this.service.eliminarPMS().subscribe({
@@ -291,7 +298,14 @@ export class PerfilPageComponent implements OnInit {
     });
   }
 
+  confirmarDesconectarGoogle(): void { this.googleConfirmarVisible.set(true); }
+  cancelarDesconectarGoogle():  void { this.googleConfirmarVisible.set(false); }
+
+  confirmarEliminarIAConfig():  void { this.iaConfigConfirmarVisible.set(true); }
+  cancelarEliminarIAConfig():   void { this.iaConfigConfirmarVisible.set(false); }
+
   eliminarIAConfig(): void {
+    this.iaConfigConfirmarVisible.set(false);
     this.iaAlerta.set(null);
     this.iaConfigEliminando.set(true);
     this.service.eliminarIA().subscribe({
@@ -384,6 +398,7 @@ export class PerfilPageComponent implements OnInit {
   }
 
   desconectarGoogle(): void {
+    this.googleConfirmarVisible.set(false);
     this.googleAlerta.set(null);
     this.googleGuardando.set(true);
     const headers = { Authorization: `Bearer ${this.auth.getToken() ?? ''}` };

@@ -149,7 +149,7 @@
               variant="danger"
               size="md"
               [disabled]="pmsEliminando() || !integraciones()?.pms?.configurado"
-              (click)="eliminarPMS()"
+              (click)="confirmarEliminarPMS()"
             >
               <ng-icon name="phosphorTrash" size="16" aria-hidden="true" />
               {{ pmsEliminando() ? 'Eliminando…' : 'Eliminar PMS' }}
@@ -158,6 +158,24 @@
         }
 
       </form>
+
+      @if (pmsConfirmarVisible()) {
+        <div class="perfil-page__ia-modal-overlay" (click)="cancelarEliminarPMS()">
+          <div class="perfil-page__ia-modal" (click)="$event.stopPropagation()" role="dialog" aria-modal="true" aria-labelledby="pms-modal-titulo">
+            <p id="pms-modal-titulo" class="perfil-page__ia-modal-titulo">¿Eliminar integración PMS?</p>
+            <p class="perfil-page__ia-modal-desc">
+              Se desconectará el PMS y todas las herramientas dejarán de sincronizar datos automáticamente.
+            </p>
+            <div class="perfil-page__ia-modal-acciones">
+              <app-button variant="ghost" size="md" (click)="cancelarEliminarPMS()">Cancelar</app-button>
+              <app-button variant="danger" size="md" [disabled]="pmsEliminando()" (click)="eliminarPMS()">
+                {{ pmsEliminando() ? 'Eliminando…' : 'Eliminar' }}
+              </app-button>
+            </div>
+          </div>
+        </div>
+      }
+
     </section>
 
     <!-- Google -->
@@ -193,13 +211,31 @@
             variant="danger"
             size="md"
             [disabled]="googleGuardando() || !integraciones()?.google?.configurado"
-            (click)="desconectarGoogle()"
+            (click)="confirmarDesconectarGoogle()"
           >
             <ng-icon name="phosphorX" size="16" aria-hidden="true" />
             {{ googleGuardando() && !!integraciones()?.google?.configurado ? 'Desconectando…' : 'Desconectar Google' }}
           </app-button>
         </div>
       }
+
+      @if (googleConfirmarVisible()) {
+        <div class="perfil-page__ia-modal-overlay" (click)="cancelarDesconectarGoogle()">
+          <div class="perfil-page__ia-modal" (click)="$event.stopPropagation()" role="dialog" aria-modal="true" aria-labelledby="google-modal-titulo">
+            <p id="google-modal-titulo" class="perfil-page__ia-modal-titulo">¿Desconectar Google Contacts?</p>
+            <p class="perfil-page__ia-modal-desc">
+              Se revocarán los permisos de acceso. El sincronizador de contactos dejará de funcionar hasta que vuelvas a conectar.
+            </p>
+            <div class="perfil-page__ia-modal-acciones">
+              <app-button variant="ghost" size="md" (click)="cancelarDesconectarGoogle()">Cancelar</app-button>
+              <app-button variant="danger" size="md" [disabled]="googleGuardando()" (click)="desconectarGoogle()">
+                {{ googleGuardando() ? 'Desconectando…' : 'Desconectar' }}
+              </app-button>
+            </div>
+          </div>
+        </div>
+      }
+
     </section>
 
     <!-- IA -->
@@ -307,13 +343,30 @@
               variant="danger"
               size="md"
               [disabled]="iaConfigEliminando() || !integraciones()?.ia?.proveedor"
-              (click)="eliminarIAConfig()"
+              (click)="confirmarEliminarIAConfig()"
             >
               <ng-icon name="phosphorTrash" size="16" aria-hidden="true" />
               {{ iaConfigEliminando() ? 'Eliminando…' : 'Eliminar IA' }}
             </app-button>
           </div>
         }
+
+      @if (iaConfigConfirmarVisible()) {
+        <div class="perfil-page__ia-modal-overlay" (click)="cancelarEliminarIAConfig()">
+          <div class="perfil-page__ia-modal" (click)="$event.stopPropagation()" role="dialog" aria-modal="true" aria-labelledby="ia-config-modal-titulo">
+            <p id="ia-config-modal-titulo" class="perfil-page__ia-modal-titulo">¿Eliminar configuración de IA?</p>
+            <p class="perfil-page__ia-modal-desc">
+              Se eliminará el proveedor y la API key. El sistema volverá a usar el modelo compartido por defecto.
+            </p>
+            <div class="perfil-page__ia-modal-acciones">
+              <app-button variant="ghost" size="md" (click)="cancelarEliminarIAConfig()">Cancelar</app-button>
+              <app-button variant="danger" size="md" [disabled]="iaConfigEliminando()" (click)="eliminarIAConfig()">
+                {{ iaConfigEliminando() ? 'Eliminando…' : 'Eliminar' }}
+              </app-button>
+            </div>
+          </div>
+        </div>
+      }
 
       </form>
 
