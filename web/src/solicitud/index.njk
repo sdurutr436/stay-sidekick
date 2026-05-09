@@ -6,9 +6,11 @@ section: solicitud
 ---
 
 <section class="l-container">
-  <section class="solicitud-page">
+  <div class="form-hero-layout">
 
-    <header class="solicitud-page__intro">
+    <section class="solicitud-page">
+
+      <header class="solicitud-page__intro">
       <h1>Presentar solicitud</h1>
       <p class="u-text-secondary u-mt-4">
         Rellena el formulario para ponerte en contacto con nosotros.
@@ -19,7 +21,25 @@ section: solicitud
 
     {% include "partials/form-solicitud.njk" %}
 
-  </section>
+    </section>
+
+    <div class="form-hero-layout__img" aria-hidden="true">
+      <picture>
+        <source
+          srcset="/assets/img/heroes/traveller-calling-hotel-concierge-1024x1536.webp"
+          type="image/webp">
+        <img
+          src="/assets/img/heroes/traveller-calling-hotel-concierge-1024x1536.jpg"
+          alt=""
+          width="1024"
+          height="1536"
+          loading="lazy"
+          decoding="async"
+        >
+      </picture>
+    </div>
+
+  </div>
 </section>
 
 {% block scripts %}

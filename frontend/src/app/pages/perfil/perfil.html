@@ -25,48 +25,68 @@
       </app-alert>
     }
 
-    <form class="perfil-form" (submit)="$event.preventDefault(); guardarPassword()">
+    <div class="form-hero-layout">
 
-      <app-form-field label="Contraseña actual" for="pwd-actual">
-        <app-form-input
-          id="pwd-actual"
-          type="password"
-          placeholder="Contraseña actual"
-          [value]="passwordActual()"
-          (valueChange)="passwordActual.set($event)"
-        />
-      </app-form-field>
+      <form class="perfil-form" (submit)="$event.preventDefault(); guardarPassword()">
 
-      <app-form-field label="Nueva contraseña" for="pwd-nueva">
-        <app-form-input
-          id="pwd-nueva"
-          type="password"
-          placeholder="Mínimo 8 caracteres"
-          [value]="passwordNueva()"
-          (valueChange)="passwordNueva.set($event)"
-        />
-      </app-form-field>
+        <app-form-field label="Contraseña actual" for="pwd-actual">
+          <app-form-input
+            id="pwd-actual"
+            type="password"
+            placeholder="Contraseña actual"
+            [value]="passwordActual()"
+            (valueChange)="passwordActual.set($event)"
+          />
+        </app-form-field>
 
-      <app-form-field label="Confirmar contraseña" for="pwd-confirm">
-        <app-form-input
-          id="pwd-confirm"
-          type="password"
-          placeholder="Repite la nueva contraseña"
-          [value]="passwordConfirm()"
-          (valueChange)="passwordConfirm.set($event)"
-        />
-      </app-form-field>
+        <app-form-field label="Nueva contraseña" for="pwd-nueva">
+          <app-form-input
+            id="pwd-nueva"
+            type="password"
+            placeholder="Mínimo 8 caracteres"
+            [value]="passwordNueva()"
+            (valueChange)="passwordNueva.set($event)"
+          />
+        </app-form-field>
 
-      <app-button
-        type="submit"
-        variant="primary"
-        size="md"
-        [disabled]="passwordGuardando() || !passwordActual() || !passwordNueva() || !passwordConfirm()"
-      >
-        {{ passwordGuardando() ? 'Guardando…' : 'Cambiar contraseña' }}
-      </app-button>
+        <app-form-field label="Confirmar contraseña" for="pwd-confirm">
+          <app-form-input
+            id="pwd-confirm"
+            type="password"
+            placeholder="Repite la nueva contraseña"
+            [value]="passwordConfirm()"
+            (valueChange)="passwordConfirm.set($event)"
+          />
+        </app-form-field>
 
-    </form>
+        <app-button
+          type="submit"
+          variant="primary"
+          size="md"
+          [disabled]="passwordGuardando() || !passwordActual() || !passwordNueva() || !passwordConfirm()"
+        >
+          {{ passwordGuardando() ? 'Guardando…' : 'Cambiar contraseña' }}
+        </app-button>
+
+      </form>
+
+      <div class="form-hero-layout__img" aria-hidden="true">
+        <picture>
+          <source
+            srcset="/img/heroes/female-staff-giving-boarding-pass-businessman-1024x683.webp"
+            type="image/webp">
+          <img
+            src="/img/heroes/female-staff-giving-boarding-pass-businessman-1024x683.jpg"
+            alt=""
+            width="1024"
+            height="683"
+            loading="lazy"
+            decoding="async"
+          >
+        </picture>
+      </div>
+
+    </div>
 
   </app-panel-seccion>
 
