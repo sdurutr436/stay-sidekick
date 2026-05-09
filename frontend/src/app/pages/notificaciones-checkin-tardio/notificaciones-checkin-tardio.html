@@ -16,21 +16,23 @@
         </span>
       </div>
 
-      <app-button variant="secondary" size="md" [disabled]="xlsxEnCurso()" (click)="xlsxInput.click()">
-        <span class="btn__icon" aria-hidden="true">
-          <ng-icon name="phosphorFileArrowUp" size="20" />
-        </span>
-        {{ xlsxEnCurso() ? 'Procesando…' : 'Importar XLSX' }}
-      </app-button>
-      <input
-        #xlsxInput
-        type="file"
-        accept=".xlsx"
-        class="notif-checkin__xlsx-input"
-        aria-hidden="true"
-        tabindex="-1"
-        (change)="onXlsxSeleccionado($event)"
-      />
+      @if (!pmsConfigurado()) {
+        <app-button variant="secondary" size="md" [disabled]="xlsxEnCurso()" (click)="xlsxInput.click()">
+          <span class="btn__icon" aria-hidden="true">
+            <ng-icon name="phosphorFileArrowUp" size="20" />
+          </span>
+          {{ xlsxEnCurso() ? 'Procesando…' : 'Importar XLSX' }}
+        </app-button>
+        <input
+          #xlsxInput
+          type="file"
+          accept=".xlsx"
+          class="notif-checkin__xlsx-input"
+          aria-hidden="true"
+          tabindex="-1"
+          (change)="onXlsxSeleccionado($event)"
+        />
+      }
     }
   </app-page-header>
 
