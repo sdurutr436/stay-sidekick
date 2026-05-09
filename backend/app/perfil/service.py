@@ -96,6 +96,14 @@ def actualizar_ia(empresa_id: str, json_data: dict) -> list[str]:
     return []
 
 
+def eliminar_pms(empresa_id: str) -> None:
+    repo.delete_pms(empresa_id)
+
+
+def eliminar_ia(empresa_id: str) -> None:
+    repo.delete_ia(empresa_id)
+
+
 def get_xlsx_apartamentos_config(empresa_id: str) -> dict:
     return repo.get_xlsx_apartamentos_config(empresa_id)
 
