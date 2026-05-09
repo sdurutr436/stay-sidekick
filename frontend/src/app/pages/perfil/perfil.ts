@@ -81,17 +81,19 @@ export class PerfilPageComponent implements OnInit {
   readonly pmsProveedor  = signal('');
   readonly pmsApiKey     = signal('');
   readonly pmsGuardando  = signal(false);
+  readonly pmsEliminando = signal(false);
   readonly pmsAlerta     = signal<Alerta | null>(null);
 
   // IA
-  readonly iaProveedor     = signal('');
-  readonly iaModelo        = signal('');
-  readonly iaApiKey        = signal('');
-  readonly iaGuardando     = signal(false);
-  readonly iaAlerta        = signal<Alerta | null>(null);
-  readonly iaApiKeyVisible    = signal(false);
-  readonly iaEliminarVisible  = signal(false);
-  readonly iaEliminando       = signal(false);
+  readonly iaProveedor          = signal('');
+  readonly iaModelo             = signal('');
+  readonly iaApiKey             = signal('');
+  readonly iaGuardando          = signal(false);
+  readonly iaConfigEliminando   = signal(false);
+  readonly iaAlerta             = signal<Alerta | null>(null);
+  readonly iaApiKeyVisible      = signal(false);
+  readonly iaEliminarVisible    = signal(false);
+  readonly iaEliminando         = signal(false);
 
   // Google
   readonly googleGuardando = signal(false);
@@ -267,6 +269,43 @@ export class PerfilPageComponent implements OnInit {
       error: err => {
         this.pmsAlerta.set({ tipo: 'error', mensaje: err?.error?.errors?.[0] ?? 'Error al guardar el PMS.' });
         this.pmsGuardando.set(false);
+      },
+    });
+  }
+
+  eliminarPMS(): void {
+    this.pmsAlerta.set(null);
+    this.pmsEliminando.set(true);
+    this.service.eliminarPMS().subscribe({
+      next: () => {
+        this.pmsAlerta.set({ tipo: 'success', mensaje: 'Integración PMS eliminada.' });
+        this.pmsProveedor.set('');
+        this.pmsApiKey.set('');
+        this.pmsEliminando.set(false);
+        this.cargarIntegraciones();
+      },
+      error: err => {
+        this.pmsAlerta.set({ tipo: 'error', mensaje: err?.error?.errors?.[0] ?? 'Error al eliminar el PMS.' });
+        this.pmsEliminando.set(false);
+      },
+    });
+  }
+
+  eliminarIAConfig(): void {
+    this.iaAlerta.set(null);
+    this.iaConfigEliminando.set(true);
+    this.service.eliminarIA().subscribe({
+      next: () => {
+        this.iaAlerta.set({ tipo: 'success', mensaje: 'Configuración de IA eliminada.' });
+        this.iaProveedor.set('default');
+        this.iaModelo.set('');
+        this.iaApiKey.set('');
+        this.iaConfigEliminando.set(false);
+        this.cargarIntegraciones();
+      },
+      error: err => {
+        this.iaAlerta.set({ tipo: 'error', mensaje: err?.error?.errors?.[0] ?? 'Error al eliminar la configuración de IA.' });
+        this.iaConfigEliminando.set(false);
       },
     });
   }

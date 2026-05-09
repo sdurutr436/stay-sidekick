@@ -106,7 +106,7 @@
             id="pms-proveedor"
             [options]="pmsOpciones"
             [value]="pmsProveedor()"
-            [disabled]="!isAdmin()"
+            [disabled]="!isAdmin() || !!integraciones()?.pms?.configurado"
             (valueChange)="pmsProveedor.set($event)"
           />
         </app-form-field>
@@ -118,6 +118,7 @@
               type="password"
               placeholder="Introduce la API Key del PMS"
               [value]="pmsApiKey()"
+              [disabled]="!!integraciones()?.pms?.configurado"
               (valueChange)="pmsApiKey.set($event)"
             />
           } @else {
@@ -133,14 +134,27 @@
         </app-form-field>
 
         @if (isAdmin()) {
-          <app-button
-            type="submit"
-            variant="secondary"
-            size="md"
-            [disabled]="pmsGuardando() || !pmsProveedor() || !pmsApiKey()"
-          >
-            {{ pmsGuardando() ? 'Guardando…' : 'Guardar PMS' }}
-          </app-button>
+          <div class="perfil-page__btn-row">
+            <app-button
+              type="submit"
+              variant="secondary"
+              size="md"
+              [disabled]="pmsGuardando() || !pmsProveedor() || !pmsApiKey() || !!integraciones()?.pms?.configurado"
+            >
+              <ng-icon name="phosphorFloppyDisk" size="16" aria-hidden="true" />
+              {{ pmsGuardando() ? 'Guardando…' : 'Guardar PMS' }}
+            </app-button>
+            <app-button
+              type="button"
+              variant="danger"
+              size="md"
+              [disabled]="pmsEliminando() || !integraciones()?.pms?.configurado"
+              (click)="eliminarPMS()"
+            >
+              <ng-icon name="phosphorTrash" size="16" aria-hidden="true" />
+              {{ pmsEliminando() ? 'Eliminando…' : 'Eliminar PMS' }}
+            </app-button>
+          </div>
         }
 
       </form>
@@ -165,25 +179,26 @@
       </p>
 
       @if (isAdmin()) {
-        @if (integraciones()?.google?.configurado) {
-          <app-button
-            variant="danger"
-            size="md"
-            [disabled]="googleGuardando()"
-            (click)="desconectarGoogle()"
-          >
-            {{ googleGuardando() ? 'Desconectando…' : 'Desconectar Google' }}
-          </app-button>
-        } @else {
+        <div class="perfil-page__btn-row">
           <app-button
             variant="secondary"
             size="md"
-            [disabled]="googleGuardando()"
+            [disabled]="googleGuardando() || !!integraciones()?.google?.configurado"
             (click)="conectarGoogle()"
           >
-            {{ googleGuardando() ? 'Redirigiendo…' : 'Conectar Google Contacts' }}
+            <ng-icon name="phosphorGoogleLogo" size="16" aria-hidden="true" />
+            {{ googleGuardando() && !integraciones()?.google?.configurado ? 'Redirigiendo…' : 'Conectar Google Contacts' }}
           </app-button>
-        }
+          <app-button
+            variant="danger"
+            size="md"
+            [disabled]="googleGuardando() || !integraciones()?.google?.configurado"
+            (click)="desconectarGoogle()"
+          >
+            <ng-icon name="phosphorX" size="16" aria-hidden="true" />
+            {{ googleGuardando() && !!integraciones()?.google?.configurado ? 'Desconectando…' : 'Desconectar Google' }}
+          </app-button>
+        </div>
       }
     </section>
 
@@ -217,7 +232,7 @@
             id="ia-proveedor"
             [options]="iaGrupoOpciones"
             [value]="iaProveedor()"
-            [disabled]="!isAdmin()"
+            [disabled]="!isAdmin() || !!integraciones()?.ia?.proveedor"
             (valueChange)="onIaProveedorChange($event)"
           />
         </app-form-field>
@@ -277,14 +292,27 @@
         }
 
         @if (isAdmin()) {
-          <app-button
-            type="submit"
-            variant="secondary"
-            size="md"
-            [disabled]="iaGuardando() || !iaProveedor()"
-          >
-            {{ iaGuardando() ? 'Guardando…' : 'Guardar configuración IA' }}
-          </app-button>
+          <div class="perfil-page__btn-row">
+            <app-button
+              type="submit"
+              variant="secondary"
+              size="md"
+              [disabled]="iaGuardando() || !iaProveedor()"
+            >
+              <ng-icon name="phosphorFloppyDisk" size="16" aria-hidden="true" />
+              {{ iaGuardando() ? 'Guardando…' : 'Guardar configuración IA' }}
+            </app-button>
+            <app-button
+              type="button"
+              variant="danger"
+              size="md"
+              [disabled]="iaConfigEliminando() || !integraciones()?.ia?.proveedor"
+              (click)="eliminarIAConfig()"
+            >
+              <ng-icon name="phosphorTrash" size="16" aria-hidden="true" />
+              {{ iaConfigEliminando() ? 'Eliminando…' : 'Eliminar IA' }}
+            </app-button>
+          </div>
         }
 
       </form>
