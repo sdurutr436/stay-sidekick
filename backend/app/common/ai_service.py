@@ -88,7 +88,7 @@ def _registrar_uso(empresa_id: str, accion: str, tokens: int | None) -> None:
 
 
 _FALLBACK_MODELS: dict[str, str] = {
-    "gemini": "gemini/gemini-2.0-flash",
+    "gemini": "gemini/gemini-2.5-flash",
     "openai": "gpt-4o-mini",
     "claude": "claude-3-5-haiku-20241022",
 }
@@ -118,6 +118,7 @@ def _call_litellm(
             {"role": "user", "content": user_message},
         ],
         "timeout": 55,
+        "num_retries": 0,
     }
     if api_key:
         kwargs["api_key"] = api_key
@@ -149,6 +150,10 @@ _TRADUCIR_DEFAULT = (
 )
 
 
+def _rate_limit_code(config_ia: ConfiguracionIA | None) -> str:
+    return "RATE_LIMIT_BYOK" if _is_byok(config_ia) else "RATE_LIMIT_SYSTEM"
+
+
 def mejorar(contenido: str, idioma: str, empresa_id: str) -> str:
     config_ia = _get_config_ia(empresa_id)
     if not _is_byok(config_ia):
@@ -157,7 +162,10 @@ def mejorar(contenido: str, idioma: str, empresa_id: str) -> str:
     system_prompt = get_system_prompt("vault_mejorar", _MEJORAR_DEFAULT)
     model, api_key = _litellm_params(config_ia)
     user_message = f"Idioma: {idioma}\n\n{contenido}"
-    texto, tokens = _call_litellm(model, api_key, system_prompt, user_message)
+    try:
+        texto, tokens = _call_litellm(model, api_key, system_prompt, user_message)
+    except litellm.RateLimitError:
+        raise ValueError(_rate_limit_code(config_ia))
     _registrar_uso(empresa_id, "mejorar", tokens)
     return texto
 
@@ -170,6 +178,9 @@ def traducir(contenido: str, idioma_destino: str, empresa_id: str) -> str:
     system_prompt = get_system_prompt("vault_traducir", _TRADUCIR_DEFAULT)
     model, api_key = _litellm_params(config_ia)
     user_message = f"Idioma destino: {idioma_destino}\n\n{contenido}"
-    texto, tokens = _call_litellm(model, api_key, system_prompt, user_message)
+    try:
+        texto, tokens = _call_litellm(model, api_key, system_prompt, user_message)
+    except litellm.RateLimitError:
+        raise ValueError(_rate_limit_code(config_ia))
     _registrar_uso(empresa_id, "traducir", tokens)
     return texto

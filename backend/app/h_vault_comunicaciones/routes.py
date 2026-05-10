@@ -70,6 +70,16 @@ def _handle_ia_error(exc: Exception):
                 "ok": False,
                 "errors": ["Has alcanzado el límite semanal de IA. Configura tu API key en Perfil > IA."],
             }), 429
+        if msg == "RATE_LIMIT_SYSTEM":
+            return jsonify({
+                "ok": False,
+                "errors": ["El proveedor de IA del sistema ha alcanzado su límite de tráfico. Inténtalo en unos minutos o configura tu propia API key en Perfil > IA."],
+            }), 429
+        if msg == "RATE_LIMIT_BYOK":
+            return jsonify({
+                "ok": False,
+                "errors": ["Tu proveedor de IA ha rechazado la petición por exceso de tráfico. Inténtalo en unos minutos."],
+            }), 429
     if isinstance(exc, TimeoutError):
         return jsonify({"ok": False, "errors": ["El servicio de IA tardó demasiado. Inténtalo de nuevo."]}), 504
     logger.exception("Error inesperado conectando con el servicio de IA")
