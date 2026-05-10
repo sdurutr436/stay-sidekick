@@ -281,7 +281,11 @@ async function submitPayload(payload, csrfToken) {
     radio.addEventListener('change', function () {
       const visible = this.value === 'true';
       conditional.classList.toggle('form-solicitud__conditional--visible', visible);
-      conditional.setAttribute('aria-hidden', String(!visible));
+      if (visible) {
+        conditional.removeAttribute('aria-hidden');
+      } else {
+        conditional.setAttribute('aria-hidden', 'true');
+      }
     });
   });
 
