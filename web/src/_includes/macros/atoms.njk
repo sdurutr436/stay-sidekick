@@ -5,6 +5,14 @@
 
 {# ── button ──────────────────────────────────────────────────────────────── #}
 {# Genera <a> si se pasa href, <button> si no.                               #}
+{# @param {String}  text              Texto del botón. Requerido.            #}
+{# @param {String}  [href='']         URL destino; si está vacío genera <button>. #}
+{# @param {String}  [variant='primary'] Variante visual: primary | secondary | ghost. #}
+{# @param {String}  [size='md']       Tamaño: sm | md | lg.                  #}
+{# @param {Boolean} [disabled=false]  Estado deshabilitado.                  #}
+{# @param {String}  [type='button']   Tipo de button: button | submit | reset. #}
+{# @param {String}  [id='']           Atributo id del elemento raíz.         #}
+{# @param {String}  [icon='']         SVG inline opcional para icono móvil.  #}
 {% macro button(text, href='', variant='primary', size='md', disabled=false, type='button', id='', icon='') %}
   {% if href %}
     <a href="{{ href }}" class="btn btn--{{ variant }} btn--{{ size }}"
@@ -25,6 +33,8 @@
 
 {# ── icon ─────────────────────────────────────────────────────────────────── #}
 {# Usa {% call %} para pasar el SVG inline como contenido.                    #}
+{# @param {String} [size='sm']   Tamaño del SVG: xs | sm | md | lg.          #}
+{# @param {String} [label='']    aria-label; si vacío aplica aria-hidden.     #}
 {% macro icon(size='sm', label='') %}
   <span class="svg svg--{{ size }}"
     {%- if label %} aria-label="{{ label }}"{% else %} aria-hidden="true"{% endif %}>
@@ -33,6 +43,8 @@
 {% endmacro %}
 
 {# ── badge ────────────────────────────────────────────────────────────────── #}
+{# @param {String} text              Texto de la etiqueta. Requerido.        #}
+{# @param {String} [variant='default'] Variante de color de la etiqueta.     #}
 {% macro badge(text, variant='default') %}
   <span class="badge badge--{{ variant }}">{{ text }}</span>
 {% endmacro %}

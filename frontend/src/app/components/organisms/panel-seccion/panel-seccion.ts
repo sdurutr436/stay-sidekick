@@ -1,10 +1,11 @@
-import { Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 
 @Component({
   selector: 'app-panel-seccion',
   templateUrl: './panel-seccion.html',
   styleUrl: './panel-seccion.scss',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PanelSeccionComponent {
   @Input() title = '';

@@ -24,7 +24,7 @@
 
       <select
         class="form-input vault-sidebar__filtro"
-        (change)="onFiltroCategoria($any($event.target).value)"
+        (change)="onFiltroCategoria(selectValue($event))"
         aria-label="Filtrar por categoría"
       >
         <option value="">Todas las categorías</option>
@@ -39,7 +39,7 @@
 
       <select
         class="form-input vault-sidebar__filtro"
-        (change)="onFiltroIdioma($any($event.target).value)"
+        (change)="onFiltroIdioma(selectValue($event))"
         aria-label="Filtrar por idioma"
       >
         <option value="">Todos los idiomas</option>
@@ -113,7 +113,7 @@
           <select
             class="form-input vault-editor__meta-select"
             [value]="editorIdioma()"
-            (change)="onEditorIdioma($any($event.target).value)"
+            (change)="onEditorIdioma(selectValue($event))"
             aria-label="Idioma de la plantilla"
           >
             <option value="es">Español</option>
@@ -126,7 +126,7 @@
           <select
             class="form-input vault-editor__meta-select"
             [value]="editorCategoria() ?? ''"
-            (change)="onEditorCategoria($any($event.target).value)"
+            (change)="onEditorCategoria(selectValue($event))"
             aria-label="Categoría de la plantilla"
           >
             <option value="">Sin categoría</option>
@@ -271,7 +271,7 @@
             <select
               class="form-input vault-editor__traducir-select"
               [value]="idiomaDestino() ?? ''"
-              (change)="onIdiomaDestino($any($event.target).value)"
+              (change)="onIdiomaDestino(selectValue($event))"
               [disabled]="!isEditing()"
               aria-label="Idioma de destino para traducción"
             >

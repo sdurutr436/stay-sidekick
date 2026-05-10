@@ -1,4 +1,5 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
@@ -18,6 +19,15 @@ import { FormSelectComponent } from '../../components/atoms/form-select/form-sel
 interface Alerta {
   tipo: 'success' | 'error';
   mensaje: string;
+}
+
+interface NotifTardioConfig {
+  hora_corte: string;
+  col_nombre: string;
+  col_checkin: string;
+  col_hora_llegada: string;
+  col_telefono: string;
+  col_apartamento: string;
 }
 
 // A→1, B→2, …, Z→26, AA→27, …, ZZ→702. Vacío → 0 (detectar por cabecera).
@@ -62,8 +72,9 @@ export class PerfilPageComponent implements OnInit {
   private  readonly aptService        = inject(ApartamentosService);
   private  readonly contactosService  = inject(ContactosService);
   private  readonly mapaCalorService  = inject(MapaCalorService);
-  private  readonly http  = inject(HttpClient);
-  private  readonly route = inject(ActivatedRoute);
+  private  readonly http        = inject(HttpClient);
+  private  readonly route       = inject(ActivatedRoute);
+  private  readonly destroyRef  = inject(DestroyRef);
 
   readonly email             = signal('');
   readonly passwordChangedAt = signal<string | null>(null);
@@ -201,7 +212,7 @@ export class PerfilPageComponent implements OnInit {
     this.cargarHeatmapUmbrales();
     this.cargarNotifConfig();
 
-    this.route.queryParamMap.subscribe(params => {
+    this.route.queryParamMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
       if (params.get('google_conectado') === 'true') {
         this.googleAlerta.set({ tipo: 'success', mensaje: 'Google Contacts conectado correctamente.' });
         this.cargarIntegraciones();
@@ -537,17 +548,17 @@ export class PerfilPageComponent implements OnInit {
 
   private cargarNotifConfig(): void {
     const headers = { Authorization: `Bearer ${this.auth.getToken() ?? ''}` };
-    this.http.get<{ ok: boolean; config: any }>(
+    this.http.get<{ ok: boolean; config: NotifTardioConfig | null }>(
       '/api/perfil/notificaciones-tardio-config', { headers }
     ).subscribe({
       next: res => {
-        const c = res.config ?? {};
-        this.notifHoraCorte.set(c.hora_corte ?? '20:00');
-        this.notifColNombre.set(c.col_nombre ?? '');
-        this.notifColCheckin.set(c.col_checkin ?? '');
-        this.notifColHoraLlegada.set(c.col_hora_llegada ?? '');
-        this.notifColTelefono.set(c.col_telefono ?? '');
-        this.notifColApartamento.set(c.col_apartamento ?? '');
+        const c = res.config;
+        this.notifHoraCorte.set(c?.hora_corte ?? '20:00');
+        this.notifColNombre.set(c?.col_nombre ?? '');
+        this.notifColCheckin.set(c?.col_checkin ?? '');
+        this.notifColHoraLlegada.set(c?.col_hora_llegada ?? '');
+        this.notifColTelefono.set(c?.col_telefono ?? '');
+        this.notifColApartamento.set(c?.col_apartamento ?? '');
       },
     });
   }

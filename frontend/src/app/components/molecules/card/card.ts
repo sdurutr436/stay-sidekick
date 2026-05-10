@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 
 type CardVariant = 'default' | 'horizontal';
 
@@ -7,6 +7,7 @@ type CardVariant = 'default' | 'horizontal';
   templateUrl: './card.html',
   styleUrl: './card.scss',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CardComponent {
   @Input() variant: CardVariant = 'default';

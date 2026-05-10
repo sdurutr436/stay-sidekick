@@ -1,10 +1,11 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 
 @Component({
   selector: 'app-form-input',
   templateUrl: './form-input.html',
   styleUrl: './form-input.scss',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FormInputComponent {
   @Input() id = '';
@@ -13,6 +14,7 @@ export class FormInputComponent {
   @Input() value = '';
   @Input() disabled = false;
   @Input() ariaLabel = '';
+  @Input() ariaDescribedby = '';
 
   @Output() valueChange = new EventEmitter<string>();
 

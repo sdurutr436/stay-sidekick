@@ -6,6 +6,10 @@
 {# ── formField ────────────────────────────────────────────────────────────── #}
 {# labelFor: valor del atributo for del <label>.                              #}
 {# Usa {% call %} para el input/control interior.                             #}
+{# @param {String}  label             Texto del <label>. Requerido.          #}
+{# @param {String}  labelFor          Valor del atributo for. Requerido.     #}
+{# @param {String}  [error='']        Mensaje de error a mostrar.            #}
+{# @param {Boolean} [hasError=false]  Si true aplica clase form-field--error. #}
 {% macro formField(label, labelFor, error='', hasError=false) %}
   <div class="form-field{% if hasError %} form-field--error{% endif %}">
     <label class="form-label" for="{{ labelFor }}">{{ label }}</label>
@@ -18,6 +22,7 @@
 
 {# ── formInputIcon ────────────────────────────────────────────────────────── #}
 {# Usa {% call %} para pasar el icon <span> + <input> juntos.                 #}
+{# Sin parámetros: todo el contenido se pasa como caller().                   #}
 {% macro formInputIcon() %}
   <div class="form-input-wrapper">
     {{ caller() }}
@@ -25,6 +30,7 @@
 {% endmacro %}
 
 {# ── card ─────────────────────────────────────────────────────────────────── #}
+{# @param {String} [variant='default'] Variante de disposición: default | horizontal. #}
 {% macro card(variant='default') %}
   <article class="card{% if variant == 'horizontal' %} card--horizontal{% endif %}">
     {{ caller() }}
@@ -33,6 +39,8 @@
 
 {# ── alert ────────────────────────────────────────────────────────────────── #}
 {# dismissible no añade botón de cierre — sin lógica JS en el sitio estático. #}
+{# @param {String}  [type='info']        Tipo de alerta: info | warning | error | success. #}
+{# @param {Boolean} [dismissible=false]  Reservado; el botón de cierre lo gestiona JS. #}
 {% macro alert(type='info', dismissible=false) %}
   <div class="alert alert--{{ type }}" role="alert">
     {{ caller() }}

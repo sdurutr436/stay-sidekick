@@ -6,6 +6,16 @@
     description="Exporta o sincroniza los datos de los huéspedes con tus herramientas externas."
   />
 
+  @if (errorAlerta()) {
+    <app-alert
+      [type]="errorAlerta()!.tipo"
+      [dismissible]="true"
+      (dismissed)="errorAlerta.set(null)"
+    >
+      {{ errorAlerta()!.mensaje }}
+    </app-alert>
+  }
+
   <!-- Cuerpo: instrucciones + monitorización + acciones -->
   <div class="sincro-layout">
 

@@ -159,10 +159,11 @@
                     placeholder="Nombre*"
                     [value]="fila.nombre"
                     [ariaLabel]="'Nombre del apartamento'"
+                    [ariaDescribedby]="fila.errores.nombre ? 'nombre-' + fila.id + '-error' : ''"
                     (valueChange)="actualizarFila(fila.id, 'nombre', $event)"
                   />
                   @if (fila.errores.nombre) {
-                    <span class="tabla-crud__error">El nombre es obligatorio.</span>
+                    <span [id]="'nombre-' + fila.id + '-error'" class="tabla-crud__error">El nombre es obligatorio.</span>
                   }
                 </td>
                 <td class="tabla-crud__td">
