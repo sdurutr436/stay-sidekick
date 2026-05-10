@@ -17,6 +17,7 @@ import logging
 from flask import Blueprint, g, jsonify, request
 
 from app.security.jwt import jwt_required
+from app.security.require_rol import require_rol
 from app.perfil import service
 
 logger = logging.getLogger(__name__)
@@ -30,10 +31,6 @@ def _user_id() -> str:
 
 def _empresa_id() -> str:
     return g.jwt_claims["empresa_id"]
-
-
-def _is_admin() -> bool:
-    return g.jwt_claims.get("rol") == "admin"
 
 
 @perfil_bp.route("/api/perfil", methods=["GET"])
@@ -67,11 +64,8 @@ def get_integraciones():
 
 
 @perfil_bp.route("/api/perfil/integraciones/pms", methods=["PUT"])
-@jwt_required
+@require_rol("admin")
 def actualizar_pms():
-    if not _is_admin():
-        return jsonify({"ok": False, "errors": ["Solo el administrador puede modificar las integraciones."]}), 403
-
     json_data = request.get_json(silent=True)
     if not json_data:
         return jsonify({"ok": False, "errors": ["Se esperaba un cuerpo JSON."]}), 400
@@ -84,11 +78,8 @@ def actualizar_pms():
 
 
 @perfil_bp.route("/api/perfil/integraciones/ia", methods=["PUT"])
-@jwt_required
+@require_rol("admin")
 def actualizar_ia():
-    if not _is_admin():
-        return jsonify({"ok": False, "errors": ["Solo el administrador puede modificar las integraciones."]}), 403
-
     json_data = request.get_json(silent=True)
     if not json_data:
         return jsonify({"ok": False, "errors": ["Se esperaba un cuerpo JSON."]}), 400
@@ -101,19 +92,15 @@ def actualizar_ia():
 
 
 @perfil_bp.route("/api/perfil/integraciones/pms", methods=["DELETE"])
-@jwt_required
+@require_rol("admin")
 def eliminar_pms():
-    if not _is_admin():
-        return jsonify({"ok": False, "errors": ["Solo el administrador puede modificar las integraciones."]}), 403
     service.eliminar_pms(_empresa_id())
     return jsonify({"ok": True}), 200
 
 
 @perfil_bp.route("/api/perfil/integraciones/ia", methods=["DELETE"])
-@jwt_required
+@require_rol("admin")
 def eliminar_ia():
-    if not _is_admin():
-        return jsonify({"ok": False, "errors": ["Solo el administrador puede modificar las integraciones."]}), 403
     service.eliminar_ia(_empresa_id())
     return jsonify({"ok": True}), 200
 
@@ -126,11 +113,8 @@ def get_xlsx_apartamentos():
 
 
 @perfil_bp.route("/api/perfil/xlsx-apartamentos", methods=["PUT"])
-@jwt_required
+@require_rol("admin")
 def save_xlsx_apartamentos():
-    if not _is_admin():
-        return jsonify({"ok": False, "errors": ["Solo el administrador puede modificar esta configuración."]}), 403
-
     json_data = request.get_json(silent=True)
     if not json_data:
         return jsonify({"ok": False, "errors": ["Se esperaba un cuerpo JSON."]}), 400
@@ -150,11 +134,8 @@ def get_notif_tardio_config():
 
 
 @perfil_bp.route("/api/perfil/notificaciones-tardio-config", methods=["PUT"])
-@jwt_required
+@require_rol("admin")
 def save_notif_tardio_config():
-    if not _is_admin():
-        return jsonify({"ok": False, "errors": ["Solo el administrador puede modificar esta configuración."]}), 403
-
     json_data = request.get_json(silent=True)
     if not json_data:
         return jsonify({"ok": False, "errors": ["Se esperaba un cuerpo JSON."]}), 400
