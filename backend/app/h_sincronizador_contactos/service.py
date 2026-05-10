@@ -197,8 +197,8 @@ def sync_contacts(empresa_id: str, json_data: dict) -> tuple[dict | None, str | 
         desde_str = json_data.get("desde")
         hasta_str = json_data.get("hasta")
         reservas = pms_client.fetch_reservations(
-            desde=desde_str.isoformat() if desde_str else None,
-            hasta=hasta_str.isoformat() if hasta_str else None,
+            desde=desde_str or None,
+            hasta=hasta_str or None,
         )
     except (requests.RequestException, NotImplementedError) as exc:
         logger.error("Error al obtener reservas del PMS: %s", exc)
