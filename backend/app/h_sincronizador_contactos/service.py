@@ -58,11 +58,16 @@ _sync_schema = SyncRangoSchema()
 # ── OAuth 2.0 ────────────────────────────────────────────────────────────
 
 
-def build_oauth_url(empresa_id: str) -> tuple[str, str]:
+def _oauth_serializer():
+    from itsdangerous import URLSafeTimedSerializer
+    return URLSafeTimedSerializer(current_app.config["SECRET_KEY"], salt="google-oauth")
+
+
+def build_oauth_url(empresa_id: str) -> str:
     """Genera la URL de autorización de Google OAuth 2.0."""
     client_id = current_app.config["GOOGLE_CLIENT_ID"]
     redirect_uri = current_app.config["GOOGLE_REDIRECT_URI"]
-    state = secrets.token_urlsafe(32)
+    state = _oauth_serializer().dumps({"e": empresa_id, "n": secrets.token_urlsafe(8)})
 
     params = {
         "client_id": client_id,
@@ -74,7 +79,20 @@ def build_oauth_url(empresa_id: str) -> tuple[str, str]:
         "state": state,
     }
     query = urlencode(params)
-    return f"{_GOOGLE_AUTH_URL}?{query}", state
+    return f"{_GOOGLE_AUTH_URL}?{query}"
+
+
+_OAUTH_STATE_TTL = 600  # 10 minutos
+
+
+def verify_oauth_state(state: str) -> str | None:
+    """Verifica el state firmado y no caducado; devuelve empresa_id o None."""
+    from itsdangerous import BadSignature, SignatureExpired
+    try:
+        data = _oauth_serializer().loads(state, max_age=_OAUTH_STATE_TTL)
+        return data.get("e")
+    except (BadSignature, SignatureExpired):
+        return None
 
 
 def exchange_code_for_tokens(code: str, empresa_id: str) -> tuple[bool, str | None]:
@@ -197,8 +215,8 @@ def sync_contacts(empresa_id: str, json_data: dict) -> tuple[dict | None, str | 
         desde_str = json_data.get("desde")
         hasta_str = json_data.get("hasta")
         reservas = pms_client.fetch_reservations(
-            desde=desde_str.isoformat() if desde_str else None,
-            hasta=hasta_str.isoformat() if hasta_str else None,
+            desde=desde_str or None,
+            hasta=hasta_str or None,
         )
     except (requests.RequestException, NotImplementedError) as exc:
         logger.error("Error al obtener reservas del PMS: %s", exc)
