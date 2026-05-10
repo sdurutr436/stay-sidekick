@@ -59,8 +59,8 @@ _sync_schema = SyncRangoSchema()
 
 
 def _oauth_serializer():
-    from itsdangerous import URLSafeSerializer
-    return URLSafeSerializer(current_app.config["SECRET_KEY"], salt="google-oauth")
+    from itsdangerous import URLSafeTimedSerializer
+    return URLSafeTimedSerializer(current_app.config["SECRET_KEY"], salt="google-oauth")
 
 
 def build_oauth_url(empresa_id: str) -> str:
@@ -82,13 +82,16 @@ def build_oauth_url(empresa_id: str) -> str:
     return f"{_GOOGLE_AUTH_URL}?{query}"
 
 
+_OAUTH_STATE_TTL = 600  # 10 minutos
+
+
 def verify_oauth_state(state: str) -> str | None:
-    """Verifica el state firmado y devuelve empresa_id, o None si es inválido."""
-    from itsdangerous import BadSignature
+    """Verifica el state firmado y no caducado; devuelve empresa_id o None."""
+    from itsdangerous import BadSignature, SignatureExpired
     try:
-        data = _oauth_serializer().loads(state)
+        data = _oauth_serializer().loads(state, max_age=_OAUTH_STATE_TTL)
         return data.get("e")
-    except BadSignature:
+    except (BadSignature, SignatureExpired):
         return None
 
 
