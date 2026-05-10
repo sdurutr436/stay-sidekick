@@ -66,7 +66,7 @@ class Config:
 
     # IA — proveedor por defecto y límites del free tier
     AI_DEFAULT_PROVIDER: str = os.environ.get("AI_DEFAULT_PROVIDER", "gemini")
-    AI_DEFAULT_MODEL: str = os.environ.get("AI_DEFAULT_MODEL", "gemini/gemini-2.0-flash")
+    AI_DEFAULT_MODEL: str = os.environ.get("AI_DEFAULT_MODEL", "gemini/gemini-2.5-flash")
     AI_DEFAULT_API_KEY: str = os.environ.get("AI_DEFAULT_API_KEY", "")
     AI_FREE_LIMIT_DAILY: int = int(os.environ.get("AI_FREE_LIMIT_DAILY", "100"))
     AI_FREE_LIMIT_WEEKLY: int = int(os.environ.get("AI_FREE_LIMIT_WEEKLY", "500"))
