@@ -5,6 +5,8 @@
 
 {# ── pageHeader ───────────────────────────────────────────────────────────── #}
 {# Espejo de app-page-header: estructura BEM completa para _page-header.scss  #}
+{# @param {String} title           Título principal de la página. Requerido. #}
+{# @param {String} [subtitle='']   Subtítulo descriptivo opcional.           #}
 {% macro pageHeader(title, subtitle='') %}
   <div class="page-header">
     <div class="page-header__start">
