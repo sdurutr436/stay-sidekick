@@ -20,13 +20,8 @@ class Empresa(db.Model):
     password_hash = db.Column(db.String(255), nullable=False)  # bcrypt
     ciudad = db.Column(db.String(100), nullable=True)
 
-    # Herramientas activas: {heatmap: bool, late_checkin: bool,
-    #                        google_contacts: bool, vault: bool}
-    herramientas_activas = db.Column(JSONB, nullable=False, default=dict)
-
-    # Configuración operativa parametrizable por empresa:
-    # hora_limite_checkin_tardio, idioma_defecto, formato_nombre_contacto, etc.
-    configuracion = db.Column(JSONB, nullable=False, default=dict)
+    herramientas_activas = db.Column(JSONB, nullable=False, default=dict)  # {heatmap, late_checkin, google_contacts, vault} → bool
+    configuracion = db.Column(JSONB, nullable=False, default=dict)  # hora_limite_checkin_tardio, idioma_defecto, max_usuarios, etc.
 
     activa = db.Column(db.Boolean, nullable=False, default=True)
     created_at = db.Column(

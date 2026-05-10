@@ -32,8 +32,8 @@ class Usuario(db.Model):
     password_hash = db.Column(db.String(255), nullable=False)  # bcrypt
     rol = db.Column(db.String(20), nullable=False, default=ROL_OPERATIVO)
     activo = db.Column(db.Boolean, nullable=False, default=True)
-    es_superadmin = db.Column(db.Boolean, nullable=False, default=False)
-    password_changed_at = db.Column(db.DateTime(timezone=True), nullable=True)
+    es_superadmin = db.Column(db.Boolean, nullable=False, default=False)  # acceso global transversal a todas las empresas
+    password_changed_at = db.Column(db.DateTime(timezone=True), nullable=True)  # NULL = nunca cambió; antigüedad >60d fuerza cambio en login
     created_at = db.Column(
         db.DateTime(timezone=True),
         nullable=False,
