@@ -10,7 +10,7 @@ class UsuarioResponseSchema(Schema):
     email = fields.Email(dump_only=True)
     rol = fields.Str(dump_only=True)
     activo = fields.Bool(dump_only=True)
-    created_at = fields.DateTime(dump_only=True)
+    created_at = fields.Str(dump_only=True, allow_none=True)  # ya viene como ISO string desde _to_dict()
     # password_hash excluido: no se declara → nunca aparece en el dump
 
 
