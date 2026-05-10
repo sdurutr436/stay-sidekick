@@ -58,11 +58,16 @@ _sync_schema = SyncRangoSchema()
 # ── OAuth 2.0 ────────────────────────────────────────────────────────────
 
 
-def build_oauth_url(empresa_id: str) -> tuple[str, str]:
+def _oauth_serializer():
+    from itsdangerous import URLSafeSerializer
+    return URLSafeSerializer(current_app.config["SECRET_KEY"], salt="google-oauth")
+
+
+def build_oauth_url(empresa_id: str) -> str:
     """Genera la URL de autorización de Google OAuth 2.0."""
     client_id = current_app.config["GOOGLE_CLIENT_ID"]
     redirect_uri = current_app.config["GOOGLE_REDIRECT_URI"]
-    state = secrets.token_urlsafe(32)
+    state = _oauth_serializer().dumps({"e": empresa_id, "n": secrets.token_urlsafe(8)})
 
     params = {
         "client_id": client_id,
@@ -74,7 +79,17 @@ def build_oauth_url(empresa_id: str) -> tuple[str, str]:
         "state": state,
     }
     query = urlencode(params)
-    return f"{_GOOGLE_AUTH_URL}?{query}", state
+    return f"{_GOOGLE_AUTH_URL}?{query}"
+
+
+def verify_oauth_state(state: str) -> str | None:
+    """Verifica el state firmado y devuelve empresa_id, o None si es inválido."""
+    from itsdangerous import BadSignature
+    try:
+        data = _oauth_serializer().loads(state)
+        return data.get("e")
+    except BadSignature:
+        return None
 
 
 def exchange_code_for_tokens(code: str, empresa_id: str) -> tuple[bool, str | None]:
