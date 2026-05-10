@@ -36,14 +36,14 @@ export class VaultService {
 
   mejorar(plantillaId: string, contenido: string, idioma: string): Observable<{ ok: boolean; contenido: string }> {
     return this.http.post<{ ok: boolean; contenido: string }>(
-      `/api/vault/plantillas/${plantillaId}/mejorar`,
+      `/api/vault/plantillas/${plantillaId}/mejoras`,
       { contenido, idioma },
     );
   }
 
   traducir(plantillaId: string, contenido: string, idiomaDestino: string): Observable<{ ok: boolean; contenido: string }> {
     return this.http.post<{ ok: boolean; contenido: string }>(
-      `/api/vault/plantillas/${plantillaId}/traducir`,
+      `/api/vault/plantillas/${plantillaId}/traducciones`,
       { contenido, idioma_destino: idiomaDestino },
     );
   }

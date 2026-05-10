@@ -66,7 +66,7 @@ export class GestionUsuariosService {
 
   resetearPassword(id: string, empresaId?: string): Observable<{ password_temporal: string }> {
     return this.http
-      .patch<{ ok: boolean; password_temporal: string }>(`/api/usuarios/${id}/resetear-password`, {}, { params: this._params(empresaId) })
+      .patch<{ ok: boolean; password_temporal: string }>(`/api/usuarios/${id}/contrasena`, {}, { params: this._params(empresaId) })
       .pipe(map(res => ({ password_temporal: res.password_temporal })));
   }
 

@@ -64,7 +64,7 @@ def login():
     return jsonify({"ok": True, "token": token, "debe_cambiar_password": debe_cambiar}), 200
 
 
-@auth_bp.route("/api/auth/verify", methods=["GET"])
+@auth_bp.route("/api/auth/validacion", methods=["GET"])
 def verify_token():
     """Endpoint interno para auth_request de Nginx. No invocar desde el cliente.
 
