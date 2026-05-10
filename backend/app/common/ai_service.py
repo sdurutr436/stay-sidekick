@@ -88,7 +88,7 @@ def _registrar_uso(empresa_id: str, accion: str, tokens: int | None) -> None:
 
 
 _FALLBACK_MODELS: dict[str, str] = {
-    "gemini": "gemini/gemini-2.0-flash",
+    "gemini": "gemini/gemini-2.5-flash",
     "openai": "gpt-4o-mini",
     "claude": "claude-3-5-haiku-20241022",
 }
