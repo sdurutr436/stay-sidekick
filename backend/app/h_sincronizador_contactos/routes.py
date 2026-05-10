@@ -15,7 +15,7 @@ Rutas (todas requieren JWT excepto el callback OAuth):
 
 import logging
 
-from flask import Blueprint, g, jsonify, redirect, request, session
+from flask import Blueprint, g, jsonify, redirect, request
 
 from app.extensions import limiter
 from app.security.jwt import jwt_required
@@ -51,9 +51,7 @@ def google_auth():
     if not _is_admin():
         return jsonify({"ok": False, "errors": ["Solo el administrador puede conectar Google."]}), 403
 
-    url, state = service.build_oauth_url(_empresa_id())
-    session["google_oauth_state"] = state
-    session["google_oauth_empresa_id"] = _empresa_id()
+    url = service.build_oauth_url(_empresa_id())
     return jsonify({"ok": True, "url": url}), 200
 
 
@@ -67,14 +65,13 @@ def google_callback():
         logger.warning("OAuth Google denegado por el usuario: %s", error)
         return redirect(_frontend_url("/menu/perfil?google_error=acceso_denegado"))
 
-    expected_state = session.pop("google_oauth_state", None)
-    empresa_id = session.pop("google_oauth_empresa_id", None)
+    empresa_id = service.verify_oauth_state(state) if state else None
 
-    if not state or state != expected_state:
+    if not empresa_id:
         logger.warning("OAuth Google: state inválido (posible CSRF)")
         return redirect(_frontend_url("/menu/perfil?google_error=estado_invalido"))
 
-    if not code or not empresa_id:
+    if not code:
         return redirect(_frontend_url("/menu/perfil?google_error=codigo_invalido"))
 
     exito, error_msg = service.exchange_code_for_tokens(code, empresa_id)
