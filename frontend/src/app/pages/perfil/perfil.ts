@@ -1,4 +1,5 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
@@ -62,8 +63,9 @@ export class PerfilPageComponent implements OnInit {
   private  readonly aptService        = inject(ApartamentosService);
   private  readonly contactosService  = inject(ContactosService);
   private  readonly mapaCalorService  = inject(MapaCalorService);
-  private  readonly http  = inject(HttpClient);
-  private  readonly route = inject(ActivatedRoute);
+  private  readonly http        = inject(HttpClient);
+  private  readonly route       = inject(ActivatedRoute);
+  private  readonly destroyRef  = inject(DestroyRef);
 
   readonly email             = signal('');
   readonly passwordChangedAt = signal<string | null>(null);
@@ -201,7 +203,7 @@ export class PerfilPageComponent implements OnInit {
     this.cargarHeatmapUmbrales();
     this.cargarNotifConfig();
 
-    this.route.queryParamMap.subscribe(params => {
+    this.route.queryParamMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
       if (params.get('google_conectado') === 'true') {
         this.googleAlerta.set({ tipo: 'success', mensaje: 'Google Contacts conectado correctamente.' });
         this.cargarIntegraciones();

@@ -1,4 +1,5 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 import { NgIconComponent } from '@ng-icons/core';
@@ -58,8 +59,9 @@ const _FECHA_PREVIEW: Record<string, string> = {
 })
 export class SincronizadorContactosPageComponent implements OnInit {
 
-  private readonly http = inject(HttpClient);
-  private readonly route = inject(ActivatedRoute);
+  private readonly http             = inject(HttpClient);
+  private readonly route            = inject(ActivatedRoute);
+  private readonly destroyRef       = inject(DestroyRef);
   private readonly contactosService = inject(ContactosService);
 
   // ── Estado PMS ──────────────────────────────────────────────────────────
@@ -122,7 +124,7 @@ export class SincronizadorContactosPageComponent implements OnInit {
   // ── Ciclo de vida ─────────────────────────────────────────────────────────
 
   ngOnInit(): void {
-    this.route.queryParams.subscribe(params => {
+    this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
       if (params['google_conectado'] === 'true') {
         this.cargarEstadoGoogle();
       }
