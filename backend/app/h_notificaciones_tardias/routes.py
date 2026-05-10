@@ -35,7 +35,8 @@ def _empresa_id() -> str:
 @notificaciones_bp.route("/api/notificaciones/checkin-tardio/status", methods=["GET"])
 @jwt_required
 def get_status():
-    data = service.get_status(_empresa_id())
+    fecha = request.args.get("fecha") or None
+    data = service.get_status(_empresa_id(), fecha=fecha)
     return jsonify({"ok": True, **data}), 200
 
 
