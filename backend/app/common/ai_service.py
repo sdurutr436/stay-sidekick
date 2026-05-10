@@ -118,6 +118,7 @@ def _call_litellm(
             {"role": "user", "content": user_message},
         ],
         "timeout": 55,
+        "num_retries": 0,
     }
     if api_key:
         kwargs["api_key"] = api_key
