@@ -98,7 +98,7 @@ describe('GestionUsuariosService', () => {
     it('debería retornar la contraseña temporal al resetear', () => {
       let result: { password_temporal: string } | undefined;
       service.resetearPassword('u1').subscribe(r => (result = r));
-      const req = httpTesting.expectOne(r => r.url === '/api/usuarios/u1/resetear-password');
+      const req = httpTesting.expectOne(r => r.url === '/api/usuarios/u1/contrasena');
       expect(req.request.method).toBe('PATCH');
       req.flush({ ok: true, password_temporal: 'newtemp456' });
       expect(result?.password_temporal).toBe('newtemp456');
@@ -107,7 +107,7 @@ describe('GestionUsuariosService', () => {
     it('debería propagar error 500', () => {
       let err: unknown;
       service.resetearPassword('u1').subscribe({ error: e => (err = e) });
-      httpTesting.expectOne(r => r.url === '/api/usuarios/u1/resetear-password').flush('Error', { status: 500, statusText: 'Internal Server Error' });
+      httpTesting.expectOne(r => r.url === '/api/usuarios/u1/contrasena').flush('Error', { status: 500, statusText: 'Internal Server Error' });
       expect(err).toBeTruthy();
     });
   });

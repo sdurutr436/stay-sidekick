@@ -19,6 +19,7 @@ from flask import Blueprint, g, jsonify, redirect, request
 
 from app.extensions import limiter
 from app.security.jwt import jwt_required
+from app.security.require_rol import require_rol
 from app.h_sincronizador_contactos import service
 
 logger = logging.getLogger(__name__)
@@ -32,10 +33,6 @@ def _empresa_id() -> str:
     return g.jwt_claims["empresa_id"]
 
 
-def _is_admin() -> bool:
-    return g.jwt_claims.get("rol") == "admin"
-
-
 def _frontend_url(path: str) -> str:
     from flask import current_app
     base = current_app.config.get("FRONTEND_BASE_URL", _FRONTEND_BASE)
@@ -46,11 +43,8 @@ def _frontend_url(path: str) -> str:
 
 
 @contactos_bp.route("/api/contactos/google/auth", methods=["GET"])
-@jwt_required
+@require_rol("admin")
 def google_auth():
-    if not _is_admin():
-        return jsonify({"ok": False, "errors": ["Solo el administrador puede conectar Google."]}), 403
-
     url = service.build_oauth_url(_empresa_id())
     return jsonify({"ok": True, "url": url}), 200
 
@@ -90,11 +84,8 @@ def google_status():
 
 
 @contactos_bp.route("/api/contactos/google/conexion", methods=["DELETE"])
-@jwt_required
+@require_rol("admin")
 def google_disconnect():
-    if not _is_admin():
-        return jsonify({"ok": False, "errors": ["Solo el administrador puede desconectar Google."]}), 403
-
     error = service.disconnect_google(_empresa_id())
     if error:
         return jsonify({"ok": False, "errors": [error]}), 404

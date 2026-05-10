@@ -87,7 +87,7 @@ describe('VaultService', () => {
     it('debería enviar el contenido para mejora y retornar el texto mejorado', () => {
       let result: { ok: boolean; contenido: string } | undefined;
       service.mejorar('p1', 'texto original', 'es').subscribe(r => (result = r));
-      const req = httpTesting.expectOne('/api/vault/plantillas/p1/mejorar');
+      const req = httpTesting.expectOne('/api/vault/plantillas/p1/mejoras');
       expect(req.request.method).toBe('POST');
       expect(req.request.body).toEqual({ contenido: 'texto original', idioma: 'es' });
       req.flush({ ok: true, contenido: 'texto mejorado' });
@@ -97,7 +97,7 @@ describe('VaultService', () => {
     it('debería propagar error 500 en mejora de IA', () => {
       let err: unknown;
       service.mejorar('p1', 'texto', 'es').subscribe({ error: e => (err = e) });
-      httpTesting.expectOne('/api/vault/plantillas/p1/mejorar').flush('Error', { status: 500, statusText: 'Internal Server Error' });
+      httpTesting.expectOne('/api/vault/plantillas/p1/mejoras').flush('Error', { status: 500, statusText: 'Internal Server Error' });
       expect(err).toBeTruthy();
     });
   });
@@ -106,7 +106,7 @@ describe('VaultService', () => {
     it('debería enviar el contenido para traducción y retornar el texto traducido', () => {
       let result: { ok: boolean; contenido: string } | undefined;
       service.traducir('p1', 'hola', 'en').subscribe(r => (result = r));
-      const req = httpTesting.expectOne('/api/vault/plantillas/p1/traducir');
+      const req = httpTesting.expectOne('/api/vault/plantillas/p1/traducciones');
       expect(req.request.body).toEqual({ contenido: 'hola', idioma_destino: 'en' });
       req.flush({ ok: true, contenido: 'hello' });
       expect(result?.contenido).toBe('hello');

@@ -16,6 +16,7 @@ from flask import Blueprint, g, jsonify, request
 
 from app.extensions import limiter
 from app.security.jwt import jwt_required
+from app.security.require_rol import require_rol
 from app.h_mapa_de_calor import service
 
 logger = logging.getLogger(__name__)
@@ -25,10 +26,6 @@ heatmap_bp = Blueprint("heatmap", __name__)
 
 def _empresa_id() -> str:
     return g.jwt_claims["empresa_id"]
-
-
-def _is_admin() -> bool:
-    return g.jwt_claims.get("rol") == "admin"
 
 
 def _parse_date(value: str | None, campo: str) -> tuple[date | None, str | None]:
@@ -52,11 +49,8 @@ def get_umbrales():
 
 
 @heatmap_bp.route("/api/heatmap/umbrales", methods=["PUT"])
-@jwt_required
+@require_rol("admin")
 def save_umbrales():
-    if not _is_admin():
-        return jsonify({"ok": False, "errors": ["Acceso restringido a administradores."]}), 403
-
     json_data = request.get_json(silent=True)
     if not json_data:
         return jsonify({"ok": False, "errors": ["Se esperaba un cuerpo JSON."]}), 400
@@ -78,11 +72,8 @@ def get_config_xlsx():
 
 
 @heatmap_bp.route("/api/heatmap/config-xlsx", methods=["PUT"])
-@jwt_required
+@require_rol("admin")
 def save_config_xlsx():
-    if not _is_admin():
-        return jsonify({"ok": False, "errors": ["Acceso restringido a administradores."]}), 403
-
     json_data = request.get_json(silent=True)
     if not json_data:
         return jsonify({"ok": False, "errors": ["Se esperaba un cuerpo JSON."]}), 400
