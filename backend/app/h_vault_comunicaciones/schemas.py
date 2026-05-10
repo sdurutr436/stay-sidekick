@@ -3,6 +3,15 @@
 from marshmallow import Schema, fields, validate
 
 _IDIOMAS = ("es", "en", "fr", "de", "it", "pt")
+
+
+class PlantillaResponseSchema(Schema):
+    id = fields.Str(dump_only=True)
+    nombre = fields.Str(dump_only=True)
+    contenido = fields.Str(dump_only=True)
+    idioma = fields.Str(dump_only=True)
+    categoria = fields.Str(dump_only=True, allow_none=True)
+    activa = fields.Bool(dump_only=True)
 _CATEGORIAS = (
     "BIENVENIDA",
     "INSTRUCCIONES",
