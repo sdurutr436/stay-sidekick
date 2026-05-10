@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 # ── Status ────────────────────────────────────────────────────────────────
 
 
-def get_status(empresa_id: str) -> dict:
+def get_status(empresa_id: str, fecha: str | None = None) -> dict:
     """Devuelve el estado de la herramienta para la empresa.
 
     Incluye:
@@ -66,7 +66,10 @@ def get_status(empresa_id: str) -> dict:
                 client = build_pms_client(
                     pms_config.proveedor, api_key, pms_config.endpoint
                 )
-                hoy = date.today().isoformat()
+                try:
+                    hoy = date.fromisoformat(fecha).isoformat() if fecha else date.today().isoformat()
+                except ValueError:
+                    hoy = date.today().isoformat()
                 reservas = client.fetch_reservations(desde=hoy, hasta=hoy)
                 reservas_pms = [_reserva_a_dict(r, apts_por_externo) for r in reservas]
             except Exception as exc:

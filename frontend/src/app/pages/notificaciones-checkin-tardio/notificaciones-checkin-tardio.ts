@@ -138,7 +138,9 @@ export class NotificacionesCheckinTardioPageComponent implements OnInit, OnDestr
 
   private cargarStatus(): void {
     this.cargando.set(true);
-    this.http.get<StatusResponse>('/api/notificaciones/checkin-tardio/status').subscribe({
+    const d = new Date();
+    const fechaLocal = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    this.http.get<StatusResponse>(`/api/notificaciones/checkin-tardio/status?fecha=${fechaLocal}`).subscribe({
       next: res => {
         this.pmsConfigurado.set(res.pms_configurado);
         this.horaCortePerfil.set(res.hora_corte ?? '20:00');
