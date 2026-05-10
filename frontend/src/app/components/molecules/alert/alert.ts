@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 
 type AlertType = 'success' | 'error' | 'warning' | 'info';
 
@@ -7,6 +7,7 @@ type AlertType = 'success' | 'error' | 'warning' | 'info';
   templateUrl: './alert.html',
   styleUrl: './alert.scss',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AlertComponent {
   @Input() type: AlertType = 'info';

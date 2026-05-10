@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 
 type BadgeVariant = 'default' | 'outline' | 'solid';
 
@@ -7,6 +7,7 @@ type BadgeVariant = 'default' | 'outline' | 'solid';
   templateUrl: './badge.html',
   styleUrl: './badge.scss',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BadgeComponent {
   @Input() variant: BadgeVariant = 'default';

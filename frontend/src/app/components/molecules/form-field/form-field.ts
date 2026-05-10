@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { FormLabelComponent } from '../../atoms/form-label/form-label';
 
 @Component({
@@ -7,6 +7,7 @@ import { FormLabelComponent } from '../../atoms/form-label/form-label';
   styleUrl: './form-field.scss',
   standalone: true,
   imports: [FormLabelComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FormFieldComponent {
   @Input() label = '';

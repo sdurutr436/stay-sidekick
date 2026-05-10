@@ -1,10 +1,11 @@
-import { Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 
 @Component({
   selector: 'app-tarjeta-estado',
   templateUrl: './tarjeta-estado.html',
   styleUrl: './tarjeta-estado.scss',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TarjetaEstadoComponent {
   @Input() label = '';

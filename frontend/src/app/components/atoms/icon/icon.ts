@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 
 type IconSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
@@ -7,6 +7,7 @@ type IconSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
   templateUrl: './icon.html',
   styleUrl: './icon.scss',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class IconComponent {
   @Input() size: IconSize = 'sm';

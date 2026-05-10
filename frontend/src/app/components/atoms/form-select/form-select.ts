@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 
 interface SelectOption {
   value: string;
@@ -10,6 +10,7 @@ interface SelectOption {
   templateUrl: './form-select.html',
   styleUrl: './form-select.scss',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FormSelectComponent {
   @Input() id = '';
