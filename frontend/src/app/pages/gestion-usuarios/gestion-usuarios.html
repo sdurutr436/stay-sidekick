@@ -127,13 +127,14 @@
     </div>
   } @else {
     <div class="gestion-usuarios__form">
-      <app-form-field label="Correo electrónico" for="nuevo-email">
+      <app-form-field label="Correo electrónico" for="nuevo-email" [hasError]="!!errorCreacion()" [error]="errorCreacion() ?? ''">
         <app-form-input
           id="nuevo-email"
           type="email"
           placeholder="usuario@empresa.com"
           [value]="nuevoEmail()"
           ariaLabel="Correo electrónico del nuevo usuario"
+          [ariaDescribedby]="errorCreacion() ? 'nuevo-email-error' : ''"
           (valueChange)="nuevoEmail.set($event)"
         />
       </app-form-field>

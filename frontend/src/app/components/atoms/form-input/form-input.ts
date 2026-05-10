@@ -13,6 +13,7 @@ export class FormInputComponent {
   @Input() value = '';
   @Input() disabled = false;
   @Input() ariaLabel = '';
+  @Input() ariaDescribedby = '';
 
   @Output() valueChange = new EventEmitter<string>();
 

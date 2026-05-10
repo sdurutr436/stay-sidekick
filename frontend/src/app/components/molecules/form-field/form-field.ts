@@ -17,4 +17,8 @@ export class FormFieldComponent {
   get fieldClasses(): string {
     return this.hasError ? 'form-field form-field--error' : 'form-field';
   }
+
+  get errorId(): string {
+    return this.for + '-error';
+  }
 }
