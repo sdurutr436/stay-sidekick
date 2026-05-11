@@ -18,6 +18,7 @@
   </app-page-header>
 
   <!-- Panel de control -->
+  <section class="calor-contenido">
   <app-panel-seccion title="Configuración" [divider]="true" [hasIcon]="true">
     <ng-icon title-icon name="phosphorCalendar" size="20" aria-hidden="true" />
 
@@ -204,6 +205,7 @@
 
     </div>
   </app-panel-seccion>
+  </section>
 
   <!-- Alerta de error de API -->
   @if (error()) {
