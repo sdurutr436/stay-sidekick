@@ -94,21 +94,6 @@
     <!-- Columna derecha: monitorización + acciones -->
     <div class="sincro-layout__derecha">
 
-      <!-- Tarjetas de estado -->
-      <div class="tarjetas-estado">
-
-        <!-- Nuevos contactos -->
-        <app-tarjeta-estado
-          label="Nuevos contactos"
-          [valor]="'+' + nuevosContactos()"
-          sub="En cola"
-          [destacada]="true"
-        >
-          <ng-icon icon name="phosphorUserPlus" size="16" aria-hidden="true" />
-        </app-tarjeta-estado>
-
-      </div>
-
       <!-- Bloque de acciones -->
       <app-panel-seccion title="Acciones" class="sincro-layout__acciones">
 
