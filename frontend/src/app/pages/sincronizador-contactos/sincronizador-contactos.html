@@ -8,7 +8,18 @@
   <app-page-header
     title="Sincronizador de contactos"
     description="Exporta o sincroniza los datos de los huéspedes con tus herramientas externas."
-  />
+  >
+    <div class="meta-chip-group">
+      <span class="meta-chip" [class.meta-chip--ok]="pmsConectado()">
+        <ng-icon [name]="pmsConectado() ? 'phosphorCheckCircle' : 'phosphorWarningCircle'" size="14" aria-hidden="true" />
+        {{ pmsConectado() ? 'PMS conectado' : 'Sin PMS' }}
+      </span>
+      <span class="meta-chip" [class.meta-chip--ok]="googleConectado()">
+        <ng-icon [name]="googleConectado() ? 'phosphorCheckCircle' : 'phosphorWarningCircle'" size="14" aria-hidden="true" />
+        {{ googleConectado() ? 'Google conectado' : 'Google desconectado' }}
+      </span>
+    </div>
+  </app-page-header>
 
   @if (errorAlerta()) {
     <app-alert
@@ -85,30 +96,6 @@
 
       <!-- Tarjetas de estado -->
       <div class="tarjetas-estado">
-
-        <!-- Estado PMS -->
-        <app-tarjeta-estado label="Estado PMS" valor="Cloudbeds">
-          <ng-icon icon [name]="pmsConectado() ? 'phosphorCheckCircle' : 'phosphorWarningCircle'" size="16" aria-hidden="true" />
-          <ng-container actions>
-            @if (pmsConectado()) {
-              <app-badge variant="solid">Conectado</app-badge>
-            } @else {
-              <app-badge variant="outline">Desconectado</app-badge>
-            }
-          </ng-container>
-        </app-tarjeta-estado>
-
-        <!-- Estado Google -->
-        <app-tarjeta-estado label="Estado Google" valor="Contacts">
-          <ng-icon icon [name]="googleConectado() ? 'phosphorCheckCircle' : 'phosphorWarningCircle'" size="16" aria-hidden="true" />
-          <ng-container actions>
-            @if (googleConectado()) {
-              <app-badge variant="solid">Conectado</app-badge>
-            } @else {
-              <app-badge variant="outline">Desconectado</app-badge>
-            }
-          </ng-container>
-        </app-tarjeta-estado>
 
         <!-- Nuevos contactos -->
         <app-tarjeta-estado

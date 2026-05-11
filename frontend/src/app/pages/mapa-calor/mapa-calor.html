@@ -8,7 +8,14 @@
   <app-page-header
     title="Mapa de calor"
     description="Visualiza la distribución de check-ins y check-outs en el período seleccionado."
-  />
+  >
+    <div class="meta-chip-group">
+      <span class="meta-chip" [class.meta-chip--ok]="pmsActivo()">
+        <ng-icon [name]="pmsActivo() ? 'phosphorCheckCircle' : 'phosphorWarningCircle'" size="14" aria-hidden="true" />
+        {{ pmsActivo() ? 'PMS' + (pmsProveedor() ? ': ' + pmsProveedor() : ' conectado') : 'Sin PMS' }}
+      </span>
+    </div>
+  </app-page-header>
 
   <!-- Panel de control -->
   <app-panel-seccion title="Configuración" [divider]="true" [hasIcon]="true">
@@ -16,16 +23,7 @@
 
     <div class="mapa-calor__control">
 
-      <!-- Badge PMS (caso A) -->
-      @if (pmsActivo()) {
-        <div class="mapa-calor__control-badge">
-          <app-badge variant="solid">
-            PMS conectado{{ pmsProveedor() ? ': ' + pmsProveedor() : '' }}
-          </app-badge>
-        </div>
-      }
-
-      <!-- Instrucciones XLSX (caso B) -->
+      <!-- Instrucciones XLSX (caso B, sin PMS) -->
       @if (!pmsActivo()) {
         <div class="instrucciones-body">
           <p class="instrucciones-body__intro">

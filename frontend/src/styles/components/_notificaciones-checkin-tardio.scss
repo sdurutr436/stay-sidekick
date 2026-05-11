@@ -22,27 +22,8 @@
 
 // ── Meta-chips del header (PMS + hora de corte) ───────────────────────────
 
-.notif-checkin__header-meta {
-  display: flex;
-  align-items: center;
-  gap: $space-2;
-  flex-shrink: 0;
-}
-
-.notif-checkin__meta-chip {
-  display: flex;
-  align-items: center;
-  gap: $space-2;
-  padding: $space-1 $space-3;
-  border: $border-width $border-style $color-border;
-  @include text-caption-md;
-  color: $color-text-secondary;
-  white-space: nowrap;
-
-  &--ok {
-    color: $color-text-primary;
-  }
-}
+// notif-checkin__header-meta y notif-checkin__meta-chip migrados a
+// .meta-chip-group / .meta-chip en _page-header.scss
 
 .notif-checkin__xlsx-input {
   display: none;
