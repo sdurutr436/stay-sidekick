@@ -39,23 +39,10 @@
   50%       { opacity: 0.4; }
 }
 
-// -----------------------------------------------------------------------------
-// Sidenav — entrada desde la izquierda en móvil
-// -----------------------------------------------------------------------------
-@keyframes sidenav-enter {
-  from { transform: translateX(-100%); }
-  to   { transform: translateX(0); }
-}
-
-.a-sidenav-enter {
-  animation: sidenav-enter var(--transition-slow) ease both;
-}
-
 // Respetar preferencia de movimiento reducido
 @media (prefers-reduced-motion: reduce) {
   .a-fade-in,
-  .a-slide-down,
-  .a-sidenav-enter {
+  .a-slide-down {
     animation: none;
   }
 }
