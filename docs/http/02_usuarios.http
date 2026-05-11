@@ -1,0 +1,97 @@
+# ============================================================
+# Usuarios — CRUD de usuarios de empresa (requiere rol admin)
+# ============================================================
+
+### 1. Listar usuarios de la empresa
+GET {{base}}/api/usuarios
+Authorization: Bearer {{token}}
+
+###
+
+### 2. Crear usuario operativo
+POST {{base}}/api/usuarios
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "email": "operario@empresa.com",
+  "rol": "operativo"
+}
+
+###
+
+### 3. Crear usuario administrador
+POST {{base}}/api/usuarios
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "email": "admin2@empresa.com",
+  "rol": "admin"
+}
+
+###
+
+### 4. Crear usuario con email inválido → 422
+POST {{base}}/api/usuarios
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "email": "no-es-un-email",
+  "rol": "operativo"
+}
+
+###
+
+### 5. Crear usuario con rol inválido → 422
+POST {{base}}/api/usuarios
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "email": "nuevo@empresa.com",
+  "rol": "superusuario"
+}
+
+###
+
+### 6. Editar rol de usuario
+# Sustituir <uuid> por el id del usuario creado
+PATCH {{base}}/api/usuarios/<uuid>
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "rol": "admin"
+}
+
+###
+
+### 7. Resetear contraseña de usuario → devuelve password_temporal
+PATCH {{base}}/api/usuarios/<uuid>/contrasena
+Authorization: Bearer {{token}}
+
+###
+
+### 8. Resetear contraseña de usuario inexistente → 404
+PATCH {{base}}/api/usuarios/00000000-0000-0000-0000-000000000000/contrasena
+Authorization: Bearer {{token}}
+
+###
+
+### 9. Eliminar usuario
+DELETE {{base}}/api/usuarios/<uuid>
+Authorization: Bearer {{token}}
+
+###
+
+### 10. Sin token → 401
+GET {{base}}/api/usuarios
+
+###
+
+### 11. Con token de operativo → 403
+# (usar token de un usuario con rol=operativo)
+GET {{base}}/api/usuarios
+Authorization: Bearer {{token_operativo}}

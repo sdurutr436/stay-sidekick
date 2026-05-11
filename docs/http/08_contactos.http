@@ -1,0 +1,147 @@
+# ============================================================
+# Contactos — Sincronización Google Contacts
+# ============================================================
+
+### 1. Generar URL OAuth de Google (solo admin)
+GET {{base}}/api/contactos/google/auth
+Authorization: Bearer {{token}}
+
+###
+
+### 2. URL OAuth con token operativo → 403
+GET {{base}}/api/contactos/google/auth
+Authorization: Bearer {{token_operativo}}
+
+###
+
+### 3. Estado de la conexión Google
+GET {{base}}/api/contactos/google/status
+Authorization: Bearer {{token}}
+
+###
+
+### 4. Desconectar cuenta Google (solo admin)
+DELETE {{base}}/api/contactos/google/conexion
+Authorization: Bearer {{token}}
+
+###
+
+### 5. Leer preferencias de sincronización
+GET {{base}}/api/contactos/preferencias
+Authorization: Bearer {{token}}
+
+###
+
+### 6. Guardar preferencias
+PUT {{base}}/api/contactos/preferencias
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "plantilla": "{FECHA} — {NOMBRE} ({APT})",
+  "separador_apt": " / ",
+  "formato_fecha_salida": "DD/MM/YYYY"
+}
+
+###
+
+### 7. Sincronizar reservas PMS → Google Contacts
+POST {{base}}/api/contactos/sincronizacion
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "desde": "2026-05-01",
+  "hasta": "2026-05-31"
+}
+
+###
+
+### 8. Sincronizar sin PMS configurado → 400
+POST {{base}}/api/contactos/sincronizacion
+Authorization: Bearer {{token_sin_pms}}
+Content-Type: application/json
+
+{
+  "desde": "2026-05-01",
+  "hasta": "2026-05-31"
+}
+
+###
+
+### 9. Exportar CSV desde PMS (sin Google)
+POST {{base}}/api/contactos/exportacion/csv
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "desde": "2026-05-01",
+  "hasta": "2026-05-31"
+}
+
+###
+
+### 10. Sincronizar desde XLSX → Google Contacts (multipart)
+POST {{base}}/api/contactos/xlsx/sincronizacion
+Authorization: Bearer {{token}}
+Content-Type: multipart/form-data; boundary=----Boundary
+
+------Boundary
+Content-Disposition: form-data; name="file"; filename="reservas.xlsx"
+Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+
+< ./reservas_ejemplo.xlsx
+------Boundary--
+
+###
+
+### 11. Exportar CSV desde XLSX (sin Google)
+POST {{base}}/api/contactos/xlsx/exportacion/csv
+Authorization: Bearer {{token}}
+Content-Type: multipart/form-data; boundary=----Boundary
+
+------Boundary
+Content-Disposition: form-data; name="file"; filename="reservas.xlsx"
+Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+
+< ./reservas_ejemplo.xlsx
+------Boundary--
+
+###
+
+### 12. Exportar CSV sin archivo → 400
+POST {{base}}/api/contactos/xlsx/exportacion/csv
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{}
+
+###
+
+### 13. Empresas — listar (solo superadmin)
+GET {{base}}/api/empresas
+Authorization: Bearer {{token_superadmin}}
+
+###
+
+### 14. Crear empresa (solo superadmin)
+POST {{base}}/api/empresas
+Authorization: Bearer {{token_superadmin}}
+Content-Type: application/json
+
+{
+  "nombre": "Hotel Nuevo S.L.",
+  "email": "admin@hotel-nuevo.com"
+}
+
+###
+
+### 15. Crear empresa con email duplicado → 409
+POST {{base}}/api/empresas
+Authorization: Bearer {{token_superadmin}}
+Content-Type: application/json
+
+{
+  "nombre": "Hotel Nuevo S.L. Copia",
+  "email": "admin@hotel-nuevo.com"
+}

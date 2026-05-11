@@ -1,0 +1,68 @@
+# ============================================================
+# Auth — Autenticación y verificación de token
+# ============================================================
+
+### 1. Obtener token CSRF (paso previo al login)
+GET {{base}}/api/csrf-token
+
+###
+
+### 2. Login correcto — devuelve JWT
+# Copiar el valor de "token" en la variable {{token}} del entorno
+POST {{base}}/api/auth/login
+Content-Type: application/json
+X-CSRF-Token: {{csrf}}
+
+{
+  "email": "admin@empresa.com",
+  "password": "contraseña_admin"
+}
+
+###
+
+### 3. Login con credenciales incorrectas → 401
+POST {{base}}/api/auth/login
+Content-Type: application/json
+X-CSRF-Token: {{csrf}}
+
+{
+  "email": "admin@empresa.com",
+  "password": "password_mal"
+}
+
+###
+
+### 4. Login sin cuerpo JSON → 400
+POST {{base}}/api/auth/login
+Content-Type: text/plain
+X-CSRF-Token: {{csrf}}
+
+no-json
+
+###
+
+### 5. Login sin CSRF → 403
+POST {{base}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@empresa.com",
+  "password": "contraseña_admin"
+}
+
+###
+
+### 6. Validar token JWT (endpoint interno Nginx)
+GET {{base}}/api/auth/validacion
+Authorization: Bearer {{token}}
+
+###
+
+### 7. Validar con token inválido → 401
+GET {{base}}/api/auth/validacion
+Authorization: Bearer token.invalido.aqui
+
+###
+
+### 8. Healthcheck
+GET {{base}}/api/health
