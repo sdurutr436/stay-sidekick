@@ -1,0 +1,15 @@
+# ============================================================
+# Variables compartidas — Stay Sidekick API
+# Copiar los valores obtenidos del login en las variables de
+# entorno del workspace de VS Code (settings.json):
+#
+#   "rest-client.environmentVariables": {
+#     "local": {
+#       "base": "http://localhost:5000",
+#       "token": "<JWT del login>",
+#       "csrf": "<valor de la cookie csrf_token>"
+#     }
+#   }
+#
+# Seleccionar entorno: Ctrl+Alt+E → local
+# ============================================================

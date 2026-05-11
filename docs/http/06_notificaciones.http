@@ -1,0 +1,103 @@
+# ============================================================
+# Notificaciones — Check-ins tardíos
+# ============================================================
+
+### 1. Estado del módulo (PMS + apartamentos + hora_corte)
+# Incluir fecha local del navegador para evitar desfase UTC
+GET {{base}}/api/notificaciones/checkin-tardio/status?fecha=2026-05-11
+Authorization: Bearer {{token}}
+
+###
+
+### 2. Estado sin fecha (usa date.today() del servidor)
+GET {{base}}/api/notificaciones/checkin-tardio/status
+Authorization: Bearer {{token}}
+
+###
+
+### 3. Estado sin token → 401
+GET {{base}}/api/notificaciones/checkin-tardio/status
+
+###
+
+### 4. Listar plantillas de check-in tardío
+GET {{base}}/api/notificaciones/checkin-tardio/plantillas
+Authorization: Bearer {{token}}
+
+###
+
+### 5. Crear plantilla de notificación
+POST {{base}}/api/notificaciones/checkin-tardio/plantillas
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "nombre": "Aviso llegada tarde",
+  "contenido": "Estimado/a {NOMBRE},\n\nNos han informado que su llegada a {APARTAMENTO} será tarde.\nHora prevista: {HORA_LLEGADA}\nDirección: {DIRECCION}\n\nEstaremos pendientes. Saludos."
+}
+
+###
+
+### 6. Crear plantilla sin nombre → 400
+POST {{base}}/api/notificaciones/checkin-tardio/plantillas
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "contenido": "Plantilla sin nombre"
+}
+
+###
+
+### 7. Actualizar plantilla de notificación
+# Sustituir <uuid> por el id de la plantilla
+PUT {{base}}/api/notificaciones/checkin-tardio/plantillas/<uuid>
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "nombre": "Aviso llegada tarde — v2",
+  "contenido": "Hola {NOMBRE}, te esperamos en {APARTAMENTO} a las {HORA_LLEGADA}."
+}
+
+###
+
+### 8. Actualizar plantilla inexistente → 404
+PUT {{base}}/api/notificaciones/checkin-tardio/plantillas/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "nombre": "X",
+  "contenido": "Y"
+}
+
+###
+
+### 9. Eliminar plantilla
+DELETE {{base}}/api/notificaciones/checkin-tardio/plantillas/<uuid>
+Authorization: Bearer {{token}}
+
+###
+
+### 10. Parsear XLSX de checkins (multipart)
+# Requiere archivo .xlsx con columnas de nombre, checkin y hora_llegada
+POST {{base}}/api/notificaciones/checkin-tardio/checkins
+Authorization: Bearer {{token}}
+Content-Type: multipart/form-data; boundary=----Boundary
+
+------Boundary
+Content-Disposition: form-data; name="file"; filename="checkins.xlsx"
+Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+
+< ./checkins_ejemplo.xlsx
+------Boundary--
+
+###
+
+### 11. Parsear XLSX sin archivo → 400
+POST {{base}}/api/notificaciones/checkin-tardio/checkins
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{}

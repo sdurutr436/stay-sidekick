@@ -59,7 +59,9 @@ def create_app(config_class: type = Config) -> Flask:
     from app.perfil.routes import perfil_bp                                  # noqa: E402
     from app.h_mapa_de_calor.routes import heatmap_bp                        # noqa: E402
     from app.contact.routes import contact_bp                                # noqa: E402
+    from app.docs.routes import docs_bp                                      # noqa: E402
     app.register_blueprint(solicitud_bp)
+    app.register_blueprint(docs_bp)
     app.register_blueprint(auth_bp)
     app.register_blueprint(empresas_bp)
     app.register_blueprint(usuarios_bp)

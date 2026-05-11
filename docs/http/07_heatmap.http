@@ -1,0 +1,114 @@
+# ============================================================
+# Heatmap — Mapa de calor de check-ins/checkouts
+# ============================================================
+
+### 1. Generar mapa de calor desde PMS
+GET {{base}}/api/heatmap?desde=2026-05-01&hasta=2026-05-31
+Authorization: Bearer {{token}}
+
+###
+
+### 2. Rango con desde > hasta → 422
+GET {{base}}/api/heatmap?desde=2026-05-31&hasta=2026-05-01
+Authorization: Bearer {{token}}
+
+###
+
+### 3. Fecha con formato inválido → 422
+GET {{base}}/api/heatmap?desde=31-05-2026&hasta=2026-05-31
+Authorization: Bearer {{token}}
+
+###
+
+### 4. Parámetro hasta ausente → 422
+GET {{base}}/api/heatmap?desde=2026-05-01
+Authorization: Bearer {{token}}
+
+###
+
+### 5. Leer umbrales de intensidad
+GET {{base}}/api/heatmap/umbrales
+Authorization: Bearer {{token}}
+
+###
+
+### 6. Guardar umbrales (solo admin)
+PUT {{base}}/api/heatmap/umbrales
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "nivel1": 3,
+  "nivel2": 6,
+  "nivel3": 10
+}
+
+###
+
+### 7. Guardar umbrales con token operativo → 403
+PUT {{base}}/api/heatmap/umbrales
+Authorization: Bearer {{token_operativo}}
+Content-Type: application/json
+
+{
+  "nivel1": 3,
+  "nivel2": 6,
+  "nivel3": 10
+}
+
+###
+
+### 8. Leer configuración de columnas XLSX
+GET {{base}}/api/heatmap/config-xlsx
+Authorization: Bearer {{token}}
+
+###
+
+### 9. Guardar configuración de columnas XLSX (solo admin)
+PUT {{base}}/api/heatmap/config-xlsx
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "col_fecha": "A",
+  "col_apartamento": "B"
+}
+
+###
+
+### 10. Generar heatmap desde XLSX (multipart)
+POST {{base}}/api/heatmap/xlsx
+Authorization: Bearer {{token}}
+Content-Type: multipart/form-data; boundary=----Boundary
+
+------Boundary
+Content-Disposition: form-data; name="desde"
+
+2026-05-01
+------Boundary
+Content-Disposition: form-data; name="hasta"
+
+2026-05-31
+------Boundary
+Content-Disposition: form-data; name="checkins"; filename="checkins.xlsx"
+Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+
+< ./checkins_ejemplo.xlsx
+------Boundary--
+
+###
+
+### 11. XLSX sin campo checkins → 400
+POST {{base}}/api/heatmap/xlsx
+Authorization: Bearer {{token}}
+Content-Type: multipart/form-data; boundary=----Boundary
+
+------Boundary
+Content-Disposition: form-data; name="desde"
+
+2026-05-01
+------Boundary
+Content-Disposition: form-data; name="hasta"
+
+2026-05-31
+------Boundary--

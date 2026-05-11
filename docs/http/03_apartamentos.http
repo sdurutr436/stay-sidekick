@@ -1,0 +1,116 @@
+# ============================================================
+# Apartamentos — Maestro de alojamientos
+# ============================================================
+
+### 1. Listar apartamentos activos
+GET {{base}}/api/apartamentos
+Authorization: Bearer {{token}}
+
+###
+
+### 2. Crear apartamento manual
+POST {{base}}/api/apartamentos
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "nombre": "Apartamento Sol 101",
+  "ciudad": "Sevilla",
+  "direccion": "Calle Sol, 101, 1ºA",
+  "id_externo": "APT101"
+}
+
+###
+
+### 3. Crear apartamento sin nombre → 422
+POST {{base}}/api/apartamentos
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "ciudad": "Sevilla"
+}
+
+###
+
+### 4. Detalle de apartamento
+# Sustituir <uuid> por el id devuelto en la creación
+GET {{base}}/api/apartamentos/<uuid>
+Authorization: Bearer {{token}}
+
+###
+
+### 5. Detalle de apartamento inexistente → 404
+GET {{base}}/api/apartamentos/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{token}}
+
+###
+
+### 6. Actualizar apartamento
+PUT {{base}}/api/apartamentos/<uuid>
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "nombre": "Apartamento Sol 101 — Renovado",
+  "ciudad": "Sevilla",
+  "direccion": "Calle Sol, 101, 2ºB"
+}
+
+###
+
+### 7. Soft-delete de apartamento
+DELETE {{base}}/api/apartamentos/<uuid>
+Authorization: Bearer {{token}}
+
+###
+
+### 8. Sincronizar desde Smoobu (requiere PMS configurado)
+POST {{base}}/api/apartamentos/sincronizacion/smoobu
+Authorization: Bearer {{token}}
+
+###
+
+### 9. Sincronizar sin PMS configurado → 400
+# (empresa sin configuracion_pms)
+POST {{base}}/api/apartamentos/sincronizacion/smoobu
+Authorization: Bearer {{token_sin_pms}}
+
+###
+
+### 10. Leer configuración PMS
+GET {{base}}/api/apartamentos/pms
+Authorization: Bearer {{token}}
+
+###
+
+### 11. Guardar configuración PMS
+PUT {{base}}/api/apartamentos/pms
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "proveedor": "smoobu",
+  "api_key": "sk-smoobu-test-key-123"
+}
+
+###
+
+### 12. Eliminar configuración PMS
+DELETE {{base}}/api/apartamentos/pms
+Authorization: Bearer {{token}}
+
+###
+
+### 13. Preview de importación XLSX (multipart)
+# Requiere archivo .xlsx real con cabeceras reconocidas
+POST {{base}}/api/apartamentos/importacion/preview
+Authorization: Bearer {{token}}
+Content-Type: multipart/form-data; boundary=----Boundary
+
+------Boundary
+Content-Disposition: form-data; name="file"; filename="apartamentos.xlsx"
+Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+
+< ./apartamentos_ejemplo.xlsx
+------Boundary--
