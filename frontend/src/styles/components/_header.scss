@@ -102,12 +102,12 @@
     @include respond-until('sm') {
       gap: $space-2;
 
-      .btn__label {
+      // Solo el CTA principal oculta el texto en móvil; el botón de sesión/perfil mantiene el label
+      .btn--primary .btn__label {
         display: none;
       }
 
-      // Padding cuadrado cuando el botón muestra solo el icono
-      .btn--md {
+      .btn--primary.btn--md {
         padding: $space-2;
       }
     }
