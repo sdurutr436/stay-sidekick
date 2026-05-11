@@ -30,23 +30,21 @@ $sidenav-width-collapsed: 56px;
   background-color: $color-surface;
   border-right: $border-width $border-style $color-border;
   overflow: hidden;
+  // Oculto fuera de pantalla por defecto; --open lo trae de vuelta en todos los tamaños
+  transform: translateX(-100%);
   transition: width var(--transition-slow), transform var(--transition-slow);
 
   // En móvil el header es más bajo — corregir top y height para evitar el hueco
   @include respond-until('md') {
     top: $header-height-mobile;
     height: calc(100vh - #{$header-height-mobile});
-    // Oculto fuera de pantalla por defecto; se muestra con --open
-    transform: translateX(-100%);
   }
 
   // -------------------------------------------------------------------------
-  // Estado abierto en móvil — desliza desde la izquierda
+  // Estado abierto — visible en todos los tamaños
   // -------------------------------------------------------------------------
   &--open {
-    @include respond-until('md') {
-      transform: translateX(0);
-    }
+    transform: translateX(0);
   }
 
   // -------------------------------------------------------------------------
