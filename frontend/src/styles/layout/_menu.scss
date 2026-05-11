@@ -16,6 +16,22 @@
   min-height: calc(100vh - #{$header-height});
 
   // -------------------------------------------------------------------------
+  // Backdrop — solo en móvil cuando el sidenav está abierto
+  // -------------------------------------------------------------------------
+  &__backdrop {
+    display: none;
+
+    @include respond-until('md') {
+      display: block;
+      position: fixed;
+      inset: 0;
+      z-index: $z-sidenav - 1; // por encima del contenido, por debajo del sidenav y header
+      background: rgba(0, 0, 0, 0.4);
+      animation: fade-in var(--transition-slow) ease both;
+    }
+  }
+
+  // -------------------------------------------------------------------------
   // Sidenav — contenedor de layout; el <nav> interno aporta el landmark ARIA.
   // No ocupa espacio en el flujo: el nav-sidenav usa position: fixed.
   // -------------------------------------------------------------------------
