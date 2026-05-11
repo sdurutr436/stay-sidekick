@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { ButtonComponent } from '../../components/atoms/button/button';
 
 interface DsSection {
   id: string;
@@ -20,7 +19,7 @@ const SECTIONS: DsSection[] = [
   templateUrl: './hoja-estilos.html',
   styleUrl: './hoja-estilos.scss',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive, RouterOutlet, ButtonComponent],
+  imports: [RouterLink, RouterLinkActive, RouterOutlet],
 })
 export class HojaEstilosPageComponent {
   readonly sections: DsSection[] = SECTIONS;
