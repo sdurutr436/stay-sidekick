@@ -1,17 +1,21 @@
 <!-- Página: Notificaciones de check-in tardíos -->
 <div class="notif-checkin">
 
+  <div>
+    <a routerLink="/" class="btn btn--ghost btn--md">← Menú</a>
+  </div>
+
   <app-page-header
     title="Notificaciones de check-in tardíos"
     description="Genera recordatorios personalizados para huéspedes con check-in tardío."
   >
     @if (!cargando()) {
-      <div class="notif-checkin__header-meta">
-        <span class="notif-checkin__meta-chip" [class.notif-checkin__meta-chip--ok]="pmsConfigurado() && !pmsError()">
+      <div class="meta-chip-group">
+        <span class="meta-chip" [class.meta-chip--ok]="pmsConfigurado() && !pmsError()">
           <ng-icon [name]="pmsConfigurado() && !pmsError() ? 'phosphorCheckCircle' : 'phosphorWarningCircle'" size="14" aria-hidden="true" />
           {{ pmsConfigurado() && !pmsError() ? 'PMS conectado' : pmsConfigurado() ? 'Error PMS' : 'Sin PMS' }}
         </span>
-        <span class="notif-checkin__meta-chip">
+        <span class="meta-chip">
           Corte: {{ horaCortePerfil() }}
         </span>
       </div>

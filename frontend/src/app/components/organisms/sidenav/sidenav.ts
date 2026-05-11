@@ -19,8 +19,8 @@ const TOOLS: Tool[] = [
   { id: 'mapa-calor',                    label: 'Mapa de calor',              route: '/mapa-calor',                    icon: 'phosphorFireSimple'  },
   { id: 'vault-comunicaciones',          label: 'Vault de comunicaciones',    route: '/vault-comunicaciones',          icon: 'phosphorChatText'    },
   { id: 'gestion-usuarios',             label: 'Usuarios',                   route: '/gestion-usuarios',              icon: 'phosphorUsers',       adminOnly: true },
-  // Herramienta interna de desarrollo, fuera de las 5 del panel de usuario
-  { id: 'hoja-estilos',                  label: 'Hoja de estilos',            route: '/hoja-estilos',                  icon: 'phosphorSwatches'    },
+  // Solo visible para admins — hoja de estilos interna de desarrollo
+  { id: 'hoja-estilos', label: 'Hoja de estilos', route: '/hoja-estilos', icon: 'phosphorSwatches', adminOnly: true },
 ];
 
 @Component({

@@ -23,7 +23,6 @@
   @include container;
   display: flex;
   flex-direction: column;
-  gap: $space-8;
   padding-block: 0; // El padding vertical lo gestiona menu-layout__content
 }
 

@@ -21,7 +21,16 @@
   padding-block: 0;
   display: flex;
   flex-direction: column;
-  gap: $space-8;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Contenedor interior: agrupa sincro-layout + "Cómo usarlo"
+// ─────────────────────────────────────────────────────────────────────────────
+.sincro-contenido {
+  display: flex;
+  flex-direction: column;
+  padding-block: $space-1;
+  gap: $space-4;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

@@ -1,7 +1,7 @@
 import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { HttpClient } from '@angular/common/http';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { PerfilService, IntegracionesData } from '../../services/perfil.service';
 import { ApartamentosService } from '../../services/apartamentos.service';
@@ -56,6 +56,7 @@ function colNumeroALetra(n: number): string {
   templateUrl: './perfil.html',
   standalone: true,
   imports: [
+    RouterLink,
     NgIconComponent,
     PageHeaderComponent,
     PanelSeccionComponent,

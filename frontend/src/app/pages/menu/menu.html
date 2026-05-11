@@ -1,12 +1,19 @@
 <!-- Layout de página de menú: sidenav lateral + contenido principal -->
 <div class="menu-layout">
 
-  <!-- Sidenav lateral (abre/cierra con el botón hamburguesa del header) -->
+  <!-- Backdrop — sombrea el contenido en móvil cuando el sidenav está abierto -->
   @if (sidenavService.isOpen()) {
-    <div class="menu-layout__sidenav">
-      <app-sidenav />
-    </div>
+    <div
+      class="menu-layout__backdrop"
+      aria-hidden="true"
+      (click)="sidenavService.toggle()"
+    ></div>
   }
+
+  <!-- Sidenav lateral — siempre en DOM, visible/oculto vía CSS en móvil -->
+  <div class="menu-layout__sidenav">
+    <app-sidenav />
+  </div>
 
   <!-- Área de contenido principal — renderiza la herramienta activa -->
   <div class="menu-layout__content">

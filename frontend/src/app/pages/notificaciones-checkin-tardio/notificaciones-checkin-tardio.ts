@@ -1,4 +1,5 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild, computed, inject, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { NgIconComponent } from '@ng-icons/core';
@@ -55,6 +56,7 @@ interface StatusResponse {
   styleUrl: './notificaciones-checkin-tardio.scss',
   standalone: true,
   imports: [
+    RouterLink,
     NgIconComponent,
     FormsModule,
     PageHeaderComponent, PanelSeccionComponent,

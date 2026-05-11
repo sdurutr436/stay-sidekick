@@ -1,4 +1,5 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { forkJoin, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 
@@ -42,6 +43,7 @@ function crearFila(): FilaEntrada {
   styleUrl: './maestro-apartamentos.scss',
   standalone: true,
   imports: [
+    RouterLink,
     NgIconComponent,
     PageHeaderComponent,
     ButtonComponent,

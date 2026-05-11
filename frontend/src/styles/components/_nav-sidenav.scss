@@ -30,7 +30,22 @@ $sidenav-width-collapsed: 56px;
   background-color: $color-surface;
   border-right: $border-width $border-style $color-border;
   overflow: hidden;
-  transition: width var(--transition-slow);
+  // Oculto fuera de pantalla por defecto; --open lo trae de vuelta en todos los tamaños
+  transform: translateX(-100%);
+  transition: width var(--transition-slow), transform var(--transition-slow);
+
+  // En móvil el header es más bajo — corregir top y height para evitar el hueco
+  @include respond-until('md') {
+    top: $header-height-mobile;
+    height: calc(100vh - #{$header-height-mobile});
+  }
+
+  // -------------------------------------------------------------------------
+  // Estado abierto — visible en todos los tamaños
+  // -------------------------------------------------------------------------
+  &--open {
+    transform: translateX(0);
+  }
 
   // -------------------------------------------------------------------------
   // Estado colapsado — solo iconos, sin etiquetas
@@ -50,6 +65,7 @@ $sidenav-width-collapsed: 56px;
     .nav-sidenav__collapse-btn {
       justify-content: center;
       padding-inline: 0;
+      gap: 0; // evita gap residual junto al label colapsado
     }
   }
 

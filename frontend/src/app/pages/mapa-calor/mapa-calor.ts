@@ -1,6 +1,7 @@
 // Date picker: flatpickr — elegido por ser ligero, sin Material Design,
 // con CSS completamente sobreescribible y compatible con cualquier versión de Angular.
 import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild, WritableSignal, computed, inject, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import flatpickr from 'flatpickr';
 import { forkJoin, catchError, of } from 'rxjs';
 import { NgIconComponent } from '@ng-icons/core';
@@ -19,6 +20,7 @@ import { MapaCalorService, DiaCalor, UmbralesCalor } from '../../services/mapa-c
   styleUrl: './mapa-calor.scss',
   standalone: true,
   imports: [
+    RouterLink,
     NgIconComponent,
     PageHeaderComponent,
     PanelSeccionComponent,

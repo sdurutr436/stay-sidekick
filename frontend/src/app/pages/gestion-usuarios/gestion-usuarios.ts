@@ -1,4 +1,5 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
@@ -23,6 +24,7 @@ import { AuthService } from '../../services/auth.service';
   styleUrl: './gestion-usuarios.scss',
   standalone: true,
   imports: [
+    RouterLink,
     NgIconComponent,
     PageHeaderComponent,
     TablaCrudComponent,
