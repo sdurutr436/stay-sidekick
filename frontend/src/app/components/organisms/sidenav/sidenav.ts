@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { NgIconComponent } from '@ng-icons/core';
 import { SidenavService } from '../../../services/sidenav.service';
@@ -34,7 +34,5 @@ export class SidenavComponent {
   readonly sidenavService = inject(SidenavService);
   private readonly auth = inject(AuthService);
 
-  get visibleTools(): Tool[] {
-    return TOOLS.filter(t => !t.adminOnly || this.auth.isAdmin);
-  }
+  readonly visibleTools = computed(() => TOOLS.filter(t => !t.adminOnly || this.auth.isAdmin));
 }

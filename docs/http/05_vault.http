@@ -1,0 +1,151 @@
+# ============================================================
+# Vault — Plantillas de comunicación e IA
+# ============================================================
+
+### 1. Listar todas las plantillas
+GET {{base}}/api/vault/plantillas
+Authorization: Bearer {{token}}
+
+###
+
+### 2. Filtrar por categoría e idioma
+GET {{base}}/api/vault/plantillas?categoria=BIENVENIDA&idioma=es
+Authorization: Bearer {{token}}
+
+###
+
+### 3. Crear plantilla en español
+POST {{base}}/api/vault/plantillas
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "nombre": "Bienvenida estándar ES",
+  "contenido": "Estimado/a {NOMBRE},\n\nBienvenido/a a {APARTAMENTO}. Su check-in está confirmado.\n\nSaludos.",
+  "idioma": "es",
+  "categoria": "BIENVENIDA"
+}
+
+###
+
+### 4. Crear plantilla en inglés
+POST {{base}}/api/vault/plantillas
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "nombre": "Welcome message EN",
+  "contenido": "Dear {NOMBRE},\n\nWelcome to {APARTAMENTO}. Your check-in is confirmed.\n\nBest regards.",
+  "idioma": "en",
+  "categoria": "BIENVENIDA"
+}
+
+###
+
+### 5. Crear plantilla sin nombre → 422
+POST {{base}}/api/vault/plantillas
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "contenido": "Contenido sin nombre"
+}
+
+###
+
+### 6. Actualizar plantilla
+# Sustituir <uuid> por el id de la plantilla creada
+PUT {{base}}/api/vault/plantillas/<uuid>
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "nombre": "Bienvenida estándar ES — v2",
+  "contenido": "Estimado/a {NOMBRE},\n\nBienvenido/a a {APARTAMENTO}.\nDirección: {DIRECCION}\n\nSaludos.",
+  "idioma": "es",
+  "categoria": "BIENVENIDA"
+}
+
+###
+
+### 7. Actualizar plantilla inexistente → 404
+PUT {{base}}/api/vault/plantillas/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "nombre": "No existe",
+  "contenido": "..."
+}
+
+###
+
+### 8. Mejorar plantilla con IA
+POST {{base}}/api/vault/plantillas/<uuid>/mejoras
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "contenido": "Hola {NOMBRE}, estás en {APARTAMENTO}.",
+  "idioma": "es"
+}
+
+###
+
+### 9. Mejorar plantilla inexistente → 404
+POST {{base}}/api/vault/plantillas/00000000-0000-0000-0000-000000000000/mejoras
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "contenido": "hola",
+  "idioma": "es"
+}
+
+###
+
+### 10. Traducir plantilla al inglés
+POST {{base}}/api/vault/plantillas/<uuid>/traducciones
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "contenido": "Estimado {NOMBRE}, bienvenido a {APARTAMENTO}.",
+  "idioma_destino": "en"
+}
+
+###
+
+### 11. Traducir a idioma inválido → 422
+POST {{base}}/api/vault/plantillas/<uuid>/traducciones
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "contenido": "Hola",
+  "idioma_destino": "chino"
+}
+
+###
+
+### 12. Ver uso de IA (diario y semanal)
+GET {{base}}/api/ai/uso
+Authorization: Bearer {{token}}
+
+###
+
+### 13. Ver config IA enmascarada (solo admin)
+GET {{base}}/api/ai/config
+Authorization: Bearer {{token}}
+
+###
+
+### 14. Config IA con token operativo → 403
+GET {{base}}/api/ai/config
+Authorization: Bearer {{token_operativo}}
+
+###
+
+### 15. Eliminar plantilla (soft-delete)
+DELETE {{base}}/api/vault/plantillas/<uuid>
+Authorization: Bearer {{token}}

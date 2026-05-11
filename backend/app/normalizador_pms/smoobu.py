@@ -209,6 +209,15 @@ class SmoobuReservationClient:
         raw_phone = booking.get("phone") or None
         telefono = re.sub(r"\((\+\d+)\)", r"\1", raw_phone) if raw_phone else None
 
+        # Smoobu no garantiza hora de llegada; algunos canales la incluyen
+        hora_llegada: str | None = None
+        raw_hora = booking.get("check_in_time") or booking.get("checkInTime")
+        if raw_hora:
+            s = str(raw_hora).strip()
+            m = re.match(r"^(\d{1,2}):(\d{2})", s)
+            if m:
+                hora_llegada = f"{int(m.group(1)):02d}:{m.group(2)}"
+
         return ReservaEstandar(
             id_externo=str(booking.get("id", "")),
             nombre_raw=nombre_raw,
@@ -218,4 +227,5 @@ class SmoobuReservationClient:
             checkout=_to_iso(booking.get("departure")),
             nombre_apartamento=apt.get("name") or None,
             id_apartamento_externo=str(apt.get("id")) if apt.get("id") else None,
+            hora_llegada=hora_llegada,
         )

@@ -5,8 +5,8 @@ Rutas (todas requieren JWT salvo los endpoints de admin por IP):
 - POST   /api/vault/plantillas                          → crear plantilla
 - PUT    /api/vault/plantillas/<id>                     → actualizar plantilla
 - DELETE /api/vault/plantillas/<id>                     → soft-delete
-- POST   /api/vault/plantillas/<id>/mejorar             → mejorar con IA
-- POST   /api/vault/plantillas/<id>/traducir            → traducir con IA
+- POST   /api/vault/plantillas/<id>/mejoras             → mejorar con IA
+- POST   /api/vault/plantillas/<id>/traducciones        → traducir con IA
 - GET    /api/ai/uso                                    → contadores de uso IA
 - GET    /api/ai/config                                 → config IA enmascarada (solo admin)
 - GET    /api/admin/system-prompts/<nombre>             → leer system prompt (solo IP whitelist)
@@ -26,11 +26,13 @@ from app.h_vault_comunicaciones.schemas import (
     ActualizarPlantillaSchema,
     CrearPlantillaSchema,
     MejorarSchema,
+    PlantillaResponseSchema,
     TraducirSchema,
 )
 from app.perfil.model import ConfiguracionIA
 from app.security.ip_whitelist import require_admin_ip
 from app.security.jwt import jwt_required
+from app.security.require_rol import require_rol
 
 logger = logging.getLogger(__name__)
 
@@ -40,14 +42,12 @@ _crear_schema = CrearPlantillaSchema()
 _actualizar_schema = ActualizarPlantillaSchema()
 _mejorar_schema = MejorarSchema()
 _traducir_schema = TraducirSchema()
+_plantilla_response = PlantillaResponseSchema()
+_plantillas_response = PlantillaResponseSchema(many=True)
 
 
 def _empresa_id() -> str:
     return g.jwt_claims["empresa_id"]
-
-
-def _is_admin() -> bool:
-    return g.jwt_claims.get("rol") == "admin"
 
 
 def _flatten(messages: dict) -> list[str]:
@@ -95,7 +95,7 @@ def list_plantillas():
     categoria = request.args.get("categoria") or None
     idioma = request.args.get("idioma") or None
     plantillas = service.list_plantillas(_empresa_id(), categoria, idioma)
-    return jsonify({"ok": True, "plantillas": plantillas}), 200
+    return jsonify({"ok": True, "plantillas": _plantillas_response.dump(plantillas)}), 200
 
 
 @h_vault_comunicaciones_bp.route("/api/vault/plantillas", methods=["POST"])
@@ -107,7 +107,7 @@ def crear_plantilla():
         return jsonify({"ok": False, "errors": _flatten(errors)}), 422
     data = _crear_schema.load(body)
     plantilla = service.crear_plantilla(_empresa_id(), data)
-    return jsonify({"ok": True, "plantilla": plantilla}), 201
+    return jsonify({"ok": True, "plantilla": _plantilla_response.dump(plantilla)}), 201
 
 
 @h_vault_comunicaciones_bp.route("/api/vault/plantillas/<uuid:plantilla_id>", methods=["PUT"])
@@ -121,7 +121,7 @@ def actualizar_plantilla(plantilla_id):
     plantilla, error = service.actualizar_plantilla(str(plantilla_id), _empresa_id(), data)
     if error:
         return jsonify({"ok": False, "errors": [error]}), 404
-    return jsonify({"ok": True, "plantilla": plantilla}), 200
+    return jsonify({"ok": True, "plantilla": _plantilla_response.dump(plantilla)}), 200
 
 
 @h_vault_comunicaciones_bp.route("/api/vault/plantillas/<uuid:plantilla_id>", methods=["DELETE"])
@@ -136,7 +136,7 @@ def eliminar_plantilla(plantilla_id):
 # ── IA — mejorar / traducir ───────────────────────────────────────────────────
 
 
-@h_vault_comunicaciones_bp.route("/api/vault/plantillas/<uuid:plantilla_id>/mejorar", methods=["POST"])
+@h_vault_comunicaciones_bp.route("/api/vault/plantillas/<uuid:plantilla_id>/mejoras", methods=["POST"])
 @jwt_required
 def mejorar_plantilla(plantilla_id):
     if not service.get_plantilla(str(plantilla_id), _empresa_id()):
@@ -156,7 +156,7 @@ def mejorar_plantilla(plantilla_id):
     return jsonify({"ok": True, "contenido": contenido}), 200
 
 
-@h_vault_comunicaciones_bp.route("/api/vault/plantillas/<uuid:plantilla_id>/traducir", methods=["POST"])
+@h_vault_comunicaciones_bp.route("/api/vault/plantillas/<uuid:plantilla_id>/traducciones", methods=["POST"])
 @jwt_required
 def traducir_plantilla(plantilla_id):
     if not service.get_plantilla(str(plantilla_id), _empresa_id()):
@@ -187,11 +187,8 @@ def get_uso():
 
 
 @h_vault_comunicaciones_bp.route("/api/ai/config", methods=["GET"])
-@jwt_required
+@require_rol("admin")
 def get_ai_config():
-    if not _is_admin():
-        return jsonify({"ok": False, "errors": ["Solo el administrador puede ver esta información."]}), 403
-
     config_ia = db.session.query(ConfiguracionIA).filter_by(empresa_id=_empresa_id()).first()
     if not config_ia:
         return jsonify({"ok": True, "data": {"configurado": False, "proveedor": None, "modelo": None, "api_key_masked": None}}), 200

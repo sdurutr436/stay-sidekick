@@ -39,3 +39,22 @@
 
 // 8. Animations — keyframes y clases de animación
 @import 'styles/animations/index';
+
+.skip-link {
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  z-index: 9999;
+  padding: 0.5rem 1rem;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  font-weight: 600;
+  transform: translateY(-200%);
+  transition: transform var(--transition-base);
+
+  &:focus {
+    transform: translateY(0);
+  }
+}

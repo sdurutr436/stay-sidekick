@@ -312,6 +312,10 @@ export class VaultComunicacionesPageComponent implements OnInit, OnDestroy {
     });
   }
 
+  selectValue(event: Event): string {
+    return (event.target as HTMLSelectElement).value;
+  }
+
   onFiltroCategoria(value: string): void { this.filtroCategoria.set(value || null); }
   onFiltroIdioma(value: string):    void { this.filtroIdioma.set(value    || null); }
   onIdiomaDestino(value: string):   void { this.idiomaDestino.set(value   || null); }

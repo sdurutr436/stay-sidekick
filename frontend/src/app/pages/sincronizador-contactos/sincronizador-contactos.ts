@@ -1,4 +1,5 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 import { NgIconComponent } from '@ng-icons/core';
@@ -58,8 +59,9 @@ const _FECHA_PREVIEW: Record<string, string> = {
 })
 export class SincronizadorContactosPageComponent implements OnInit {
 
-  private readonly http = inject(HttpClient);
-  private readonly route = inject(ActivatedRoute);
+  private readonly http             = inject(HttpClient);
+  private readonly route            = inject(ActivatedRoute);
+  private readonly destroyRef       = inject(DestroyRef);
   private readonly contactosService = inject(ContactosService);
 
   // ── Estado PMS ──────────────────────────────────────────────────────────
@@ -95,6 +97,7 @@ export class SincronizadorContactosPageComponent implements OnInit {
   readonly separadorApt      = signal(PREFS_CONTACTOS_DEFECTO.separador_apt);
   readonly guardandoPlantilla = signal(false);
   readonly plantillaAlerta    = signal<Alerta | null>(null);
+  readonly errorAlerta        = signal<Alerta | null>(null);
 
   readonly previewNombre = computed(() => {
     const plantilla = this.plantillaInput();
@@ -122,12 +125,18 @@ export class SincronizadorContactosPageComponent implements OnInit {
   // ── Ciclo de vida ─────────────────────────────────────────────────────────
 
   ngOnInit(): void {
-    this.route.queryParams.subscribe(params => {
+    this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
       if (params['google_conectado'] === 'true') {
         this.cargarEstadoGoogle();
       }
       if (params['google_error']) {
-        console.error('[sincronizador-contactos] Error OAuth Google:', params['google_error']);
+        const mensajes: Record<string, string> = {
+          acceso_denegado: 'Acceso denegado por Google.',
+          estado_invalido: 'Error de seguridad en el proceso OAuth. Inténtalo de nuevo.',
+          codigo_invalido: 'Código OAuth inválido.',
+          token_fallido:   'No se pudieron obtener los tokens de Google.',
+        };
+        this.errorAlerta.set({ tipo: 'error', mensaje: mensajes[params['google_error']] ?? 'Error al conectar con Google.' });
       }
     });
 
@@ -146,7 +155,7 @@ export class SincronizadorContactosPageComponent implements OnInit {
         this.googleConectado.set(res.google.conectado);
         this.ultimoSync.set(res.google.ultimo_sync ?? null);
       },
-      error: err => console.error('[sincronizador-contactos] Error al obtener estado Google:', err),
+      error: () => this.errorAlerta.set({ tipo: 'error', mensaje: 'Error al obtener el estado de Google Contacts.' }),
     });
   }
 
@@ -166,7 +175,7 @@ export class SincronizadorContactosPageComponent implements OnInit {
         this.formatoFechaInput.set(prefs.formato_fecha_salida);
         this.separadorApt.set(prefs.separador_apt);
       },
-      error: err => console.error('[sincronizador-contactos] Error al obtener preferencias:', err),
+      error: () => this.errorAlerta.set({ tipo: 'error', mensaje: 'Error al cargar las preferencias.' }),
     });
   }
 
@@ -232,7 +241,7 @@ export class SincronizadorContactosPageComponent implements OnInit {
       },
       error: err => {
         this.syncEnCurso.set(false);
-        console.error('[sincronizador-contactos] Error en sync:', err);
+        this.errorAlerta.set({ tipo: 'error', mensaje: err?.error?.errors?.[0] ?? 'Error durante la sincronización.' });
       },
     });
   }
@@ -240,7 +249,7 @@ export class SincronizadorContactosPageComponent implements OnInit {
   exportarCsv(): void {
     this.http.post('/api/contactos/exportacion/csv', this._parseFechasPayload(), { responseType: 'blob' }).subscribe({
       next: blob => this._descargarBlob(blob, 'contactos_google.csv'),
-      error: err => console.error('[sincronizador-contactos] Error al exportar CSV:', err),
+      error: err => this.errorAlerta.set({ tipo: 'error', mensaje: err?.error?.errors?.[0] ?? 'Error al exportar el CSV.' }),
     });
   }
 
@@ -272,7 +281,7 @@ export class SincronizadorContactosPageComponent implements OnInit {
       },
       error: err => {
         this.xlsxEnCurso.set(false);
-        console.error('[sincronizador-contactos] Error en XLSX sync:', err);
+        this.errorAlerta.set({ tipo: 'error', mensaje: err?.error?.errors?.[0] ?? 'Error durante la sincronización del XLSX.' });
       },
     });
   }
@@ -286,7 +295,7 @@ export class SincronizadorContactosPageComponent implements OnInit {
 
     this.http.post('/api/contactos/xlsx/exportacion/csv', form, { responseType: 'blob' }).subscribe({
       next: blob => this._descargarBlob(blob, 'contactos_google.csv'),
-      error: err => console.error('[sincronizador-contactos] Error al exportar CSV desde XLSX:', err),
+      error: err => this.errorAlerta.set({ tipo: 'error', mensaje: err?.error?.errors?.[0] ?? 'Error al exportar el CSV desde XLSX.' }),
     });
   }
 

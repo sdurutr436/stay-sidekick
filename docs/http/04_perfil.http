@@ -1,0 +1,150 @@
+# ============================================================
+# Perfil — Datos del usuario e integraciones de empresa
+# ============================================================
+
+### 1. Datos del usuario autenticado
+GET {{base}}/api/perfil
+Authorization: Bearer {{token}}
+
+###
+
+### 2. Cambiar contraseña propia
+PUT {{base}}/api/perfil/password
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "password_actual": "contraseña_actual",
+  "password_nuevo": "nueva_contraseña_segura"
+}
+
+###
+
+### 3. Cambiar contraseña con actual incorrecta → 422
+PUT {{base}}/api/perfil/password
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "password_actual": "password_incorrecto",
+  "password_nuevo": "nueva_contraseña"
+}
+
+###
+
+### 4. Estado de todas las integraciones (PMS, IA, Google)
+GET {{base}}/api/perfil/integraciones
+Authorization: Bearer {{token}}
+
+###
+
+### 5. Actualizar integración PMS (solo admin)
+PUT {{base}}/api/perfil/integraciones/pms
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "proveedor": "smoobu",
+  "api_key": "sk-smoobu-test-key-abc123"
+}
+
+###
+
+### 6. Actualizar integración PMS con operativo → 403
+PUT {{base}}/api/perfil/integraciones/pms
+Authorization: Bearer {{token_operativo}}
+Content-Type: application/json
+
+{
+  "proveedor": "smoobu",
+  "api_key": "sk-test"
+}
+
+###
+
+### 7. Eliminar integración PMS (solo admin)
+DELETE {{base}}/api/perfil/integraciones/pms
+Authorization: Bearer {{token}}
+
+###
+
+### 8. Actualizar integración IA con clave propia (BYOK)
+PUT {{base}}/api/perfil/integraciones/ia
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "proveedor": "openai",
+  "api_key": "sk-openai-test-key-xyz",
+  "modelo": "gpt-4o"
+}
+
+###
+
+### 9. Usar IA del sistema (sin clave propia)
+PUT {{base}}/api/perfil/integraciones/ia
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "proveedor": "default"
+}
+
+###
+
+### 10. Eliminar integración IA
+DELETE {{base}}/api/perfil/integraciones/ia
+Authorization: Bearer {{token}}
+
+###
+
+### 11. Leer configuración de columnas XLSX de apartamentos
+GET {{base}}/api/perfil/xlsx-apartamentos
+Authorization: Bearer {{token}}
+
+###
+
+### 12. Guardar configuración de columnas XLSX (solo admin)
+PUT {{base}}/api/perfil/xlsx-apartamentos
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "col_id_externo": 0,
+  "col_nombre": 1,
+  "col_direccion": 2,
+  "col_ciudad": 3
+}
+
+###
+
+### 13. Leer configuración de notificaciones tardías
+GET {{base}}/api/perfil/notificaciones-tardio-config
+Authorization: Bearer {{token}}
+
+###
+
+### 14. Guardar configuración de notificaciones tardías (solo admin)
+PUT {{base}}/api/perfil/notificaciones-tardio-config
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "hora_corte": "20:00",
+  "col_nombre": "A",
+  "col_checkin": "B",
+  "col_hora_llegada": "C",
+  "col_telefono": "D",
+  "col_apartamento": "E"
+}
+
+###
+
+### 15. Hora de corte con formato inválido → 422
+PUT {{base}}/api/perfil/notificaciones-tardio-config
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "hora_corte": "25:99"
+}

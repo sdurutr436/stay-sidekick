@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { ButtonComponent } from '../../atoms/button/button';
 
 @Component({
@@ -7,6 +7,7 @@ import { ButtonComponent } from '../../atoms/button/button';
   styleUrl: './confirm-inline.scss',
   standalone: true,
   imports: [ButtonComponent],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ConfirmInlineComponent {
   @Input() mensaje = '¿Confirmar acción?';

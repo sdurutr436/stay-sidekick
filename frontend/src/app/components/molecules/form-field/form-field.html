@@ -4,6 +4,6 @@
   }
   <ng-content />
   @if (hasError && error) {
-    <p class="form-field__error">{{ error }}</p>
+    <p class="form-field__error" [id]="errorId">{{ error }}</p>
   }
 </div>

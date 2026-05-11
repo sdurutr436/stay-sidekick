@@ -5,6 +5,15 @@ from marshmallow import Schema, ValidationError, fields, pre_load, validates
 from app.usuarios.model import ROLES_VALIDOS
 
 
+class UsuarioResponseSchema(Schema):
+    id = fields.Str(dump_only=True)
+    email = fields.Email(dump_only=True)
+    rol = fields.Str(dump_only=True)
+    activo = fields.Bool(dump_only=True)
+    created_at = fields.Str(dump_only=True, allow_none=True)  # ya viene como ISO string desde _to_dict()
+    # password_hash excluido: no se declara → nunca aparece en el dump
+
+
 class UsuarioCreateSchema(Schema):
     email = fields.String(required=True)
     rol = fields.String(required=True)

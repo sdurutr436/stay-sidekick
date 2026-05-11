@@ -8,6 +8,27 @@
 // lo que ganan la cascada con igual especificidad sin necesitar !important.
 // =============================================================================
 
+// Skip link — WCAG 2.4.1
+.skip-link {
+  position: absolute;
+  top: $space-2;
+  left: $space-2;
+  z-index: 9999;
+  padding: $space-2 $space-4;
+  background-color: $color-surface;
+  color: $color-text-primary;
+  border: $border-width $border-style $color-border;
+  border-radius: 4px;
+  font-weight: $font-weight-heading;
+  text-decoration: none;
+  transform: translateY(-200%);
+  transition: transform 0.15s ease;
+
+  &:focus-visible {
+    transform: translateY(0);
+  }
+}
+
 // Visibilidad
 [hidden]            { display: none; }
 .u-hidden           { display: none; }

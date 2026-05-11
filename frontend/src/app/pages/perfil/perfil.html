@@ -47,12 +47,13 @@
           />
         </app-form-field>
 
-        <app-form-field label="Confirmar contraseña" for="pwd-confirm">
+        <app-form-field label="Confirmar contraseña" for="pwd-confirm" [hasError]="passwordAlerta()?.tipo === 'error'" [error]="passwordAlerta()?.mensaje ?? ''">
           <app-form-input
             id="pwd-confirm"
             type="password"
             placeholder="Repite la nueva contraseña"
             [value]="passwordConfirm()"
+            [ariaDescribedby]="passwordAlerta()?.tipo === 'error' ? 'pwd-confirm-error' : ''"
             (valueChange)="passwordConfirm.set($event)"
           />
         </app-form-field>

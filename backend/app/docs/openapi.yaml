@@ -1,0 +1,1928 @@
+openapi: 3.0.3
+info:
+  title: Stay Sidekick API
+  version: 1.0.0
+  description: |
+    API REST del sistema de gestión hotelera Stay Sidekick.
+
+    ## Autenticación
+    La mayoría de endpoints requieren un JWT en la cabecera `Authorization: Bearer <token>`.
+    El token se obtiene en `POST /api/auth/login`.
+
+    Los endpoints de escritura también exigen el **CSRF Double-Submit Cookie**:
+    obten el token en `GET /api/csrf-token` y envíalo en la cabecera `X-CSRF-Token`.
+
+    ## Roles
+    - **operativo** — acceso a herramientas, solo lectura de configuración.
+    - **admin** — gestión completa de la empresa (usuarios, integraciones, configuración).
+    - **superadmin** — acceso transversal a todas las empresas.
+
+servers:
+  - url: http://localhost:5000
+    description: Desarrollo local (Docker)
+  - url: https://nginx-sidekick.railway.app
+    description: Producción (Railway)
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    CsrfToken:
+      type: apiKey
+      in: header
+      name: X-CSRF-Token
+
+  schemas:
+    Ok:
+      type: object
+      properties:
+        ok:
+          type: boolean
+          example: true
+
+    Error:
+      type: object
+      properties:
+        ok:
+          type: boolean
+          example: false
+        errors:
+          type: array
+          items:
+            type: string
+
+    Usuario:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        rol:
+          type: string
+          enum: [admin, operativo]
+        activo:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+
+    Empresa:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        nombre:
+          type: string
+        email:
+          type: string
+          format: email
+
+    Apartamento:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        id_pms:
+          type: string
+          nullable: true
+        id_externo:
+          type: string
+          nullable: true
+        nombre:
+          type: string
+        direccion:
+          type: string
+          nullable: true
+        ciudad:
+          type: string
+          nullable: true
+        pms_origen:
+          type: string
+          nullable: true
+          enum: [smoobu, manual, xlsx]
+        activo:
+          type: boolean
+
+    PlantillaVault:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        nombre:
+          type: string
+        contenido:
+          type: string
+        idioma:
+          type: string
+          enum: [es, en, fr, de, it, pt]
+        categoria:
+          type: string
+          nullable: true
+          enum: [BIENVENIDA, INSTRUCCIONES, RECORDATORIO, CHECKIN_TARDIO, CHECKOUT, INCIDENCIA, GENERAL]
+        activa:
+          type: boolean
+
+    CheckinHoy:
+      type: object
+      properties:
+        nombre:
+          type: string
+        apartamento:
+          type: string
+          nullable: true
+        email:
+          type: string
+          nullable: true
+        telefono:
+          type: string
+          nullable: true
+        checkin:
+          type: string
+          format: date
+          nullable: true
+        checkout:
+          type: string
+          format: date
+          nullable: true
+        hora_llegada:
+          type: string
+          nullable: true
+          example: "21:30"
+        direccion:
+          type: string
+          nullable: true
+
+tags:
+  - name: Auth
+    description: Autenticación y verificación de token
+  - name: Usuarios
+    description: Gestión de usuarios de empresa (admin/superadmin)
+  - name: Empresas
+    description: Gestión de empresas (solo superadmin)
+  - name: Apartamentos
+    description: Maestro de alojamientos, sincronización PMS e importación XLSX
+  - name: Perfil
+    description: Datos del usuario autenticado e integraciones de empresa
+  - name: Vault
+    description: Plantillas de comunicación y mejora/traducción con IA
+  - name: Notificaciones
+    description: Check-ins tardíos — estado, parseo XLSX y plantillas
+  - name: Contactos
+    description: Sincronización de contactos con Google Contacts
+  - name: Heatmap
+    description: Mapa de calor de check-ins/checkouts
+  - name: Solicitud
+    description: Formulario público de contacto y emisión de CSRF token
+
+paths:
+
+  # ── Auth ──────────────────────────────────────────────────────────────────
+
+  /api/auth/login:
+    post:
+      tags: [Auth]
+      summary: Autenticar usuario
+      description: Verifica credenciales y devuelve un JWT HS256 si son correctas.
+      security:
+        - CsrfToken: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Login correcto
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  token:
+                    type: string
+                  debe_cambiar_password:
+                    type: boolean
+        '400':
+          description: Cuerpo JSON ausente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Credenciales incorrectas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Token CSRF inválido o ausente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          description: Errores de validación del payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: Rate limit superado (10/hour por IP)
+
+  /api/auth/validacion:
+    get:
+      tags: [Auth]
+      summary: Validar token JWT (uso interno Nginx auth_request)
+      description: |
+        Endpoint interno para `auth_request` de Nginx.
+        Devuelve 200 si el JWT del header `Authorization` es válido, 401 en cualquier otro caso.
+        **No invocar desde clientes externos.**
+      responses:
+        '200':
+          description: Token válido
+        '401':
+          description: Token ausente, inválido o expirado
+
+  # ── CSRF / Solicitud ──────────────────────────────────────────────────────
+
+  /api/csrf-token:
+    get:
+      tags: [Solicitud]
+      summary: Obtener token CSRF
+      description: Emite y devuelve el token CSRF en una cookie `csrf_token`.
+      responses:
+        '200':
+          description: Token emitido
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  csrf_token:
+                    type: string
+
+  /api/contact:
+    post:
+      tags: [Solicitud]
+      summary: Formulario público de contacto
+      description: Procesa el formulario de solicitud con validación CSRF, honeypot y captcha Turnstile.
+      security:
+        - CsrfToken: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [nombre, email, mensaje]
+              properties:
+                nombre:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                mensaje:
+                  type: string
+                cf_turnstile_response:
+                  type: string
+                  description: Token de verificación Cloudflare Turnstile
+      responses:
+        '200':
+          description: Solicitud procesada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ok'
+        '422':
+          description: Errores de validación
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  # ── Empresas ──────────────────────────────────────────────────────────────
+
+  /api/empresas:
+    get:
+      tags: [Empresas]
+      summary: Listar todas las empresas
+      description: Solo accesible para superadmin.
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Lista de empresas
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  empresas:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Empresa'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+    post:
+      tags: [Empresas]
+      summary: Crear empresa
+      description: Solo accesible para superadmin.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [nombre, email]
+              properties:
+                nombre:
+                  type: string
+                  maxLength: 200
+                email:
+                  type: string
+                  format: email
+      responses:
+        '201':
+          description: Empresa creada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  empresa:
+                    $ref: '#/components/schemas/Empresa'
+        '409':
+          description: Email ya registrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  # ── Usuarios ──────────────────────────────────────────────────────────────
+
+  /api/usuarios:
+    get:
+      tags: [Usuarios]
+      summary: Listar usuarios de la empresa
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: empresa_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+          description: Solo disponible para superadmin
+      responses:
+        '200':
+          description: Lista de usuarios
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  usuarios:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Usuario'
+                  max_usuarios:
+                    type: integer
+
+    post:
+      tags: [Usuarios]
+      summary: Crear usuario
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, rol]
+              properties:
+                email:
+                  type: string
+                  format: email
+                rol:
+                  type: string
+                  enum: [admin, operativo]
+      responses:
+        '201':
+          description: Usuario creado con contraseña temporal
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  usuario:
+                    $ref: '#/components/schemas/Usuario'
+                  password_temporal:
+                    type: string
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /api/usuarios/{usuario_id}:
+    delete:
+      tags: [Usuarios]
+      summary: Eliminar usuario
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/UsuarioId'
+      responses:
+        '200':
+          description: Usuario eliminado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ok'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    patch:
+      tags: [Usuarios]
+      summary: Editar rol de usuario
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/UsuarioId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [rol]
+              properties:
+                rol:
+                  type: string
+                  enum: [admin, operativo]
+      responses:
+        '200':
+          description: Rol actualizado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  usuario:
+                    $ref: '#/components/schemas/Usuario'
+
+  /api/usuarios/{usuario_id}/contrasena:
+    patch:
+      tags: [Usuarios]
+      summary: Resetear contraseña de usuario
+      description: Genera una nueva contraseña temporal y fuerza cambio en el próximo login.
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/UsuarioId'
+      responses:
+        '200':
+          description: Contraseña reseteada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  password_temporal:
+                    type: string
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # ── Apartamentos ──────────────────────────────────────────────────────────
+
+  /api/apartamentos:
+    get:
+      tags: [Apartamentos]
+      summary: Listar apartamentos activos
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Lista de apartamentos
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  apartamentos:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Apartamento'
+
+    post:
+      tags: [Apartamentos]
+      summary: Crear apartamento manual
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [nombre]
+              properties:
+                nombre:
+                  type: string
+                ciudad:
+                  type: string
+                direccion:
+                  type: string
+                id_externo:
+                  type: string
+      responses:
+        '201':
+          description: Apartamento creado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  apartamento:
+                    $ref: '#/components/schemas/Apartamento'
+
+  /api/apartamentos/{apartamento_id}:
+    get:
+      tags: [Apartamentos]
+      summary: Detalle de apartamento
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ApartamentoId'
+      responses:
+        '200':
+          description: Apartamento encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  apartamento:
+                    $ref: '#/components/schemas/Apartamento'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags: [Apartamentos]
+      summary: Actualizar apartamento
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ApartamentoId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nombre:
+                  type: string
+                ciudad:
+                  type: string
+                direccion:
+                  type: string
+      responses:
+        '200':
+          description: Apartamento actualizado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  apartamento:
+                    $ref: '#/components/schemas/Apartamento'
+
+    delete:
+      tags: [Apartamentos]
+      summary: Soft-delete de apartamento
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ApartamentoId'
+      responses:
+        '200':
+          description: Apartamento desactivado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ok'
+
+  /api/apartamentos/sincronizacion/smoobu:
+    post:
+      tags: [Apartamentos]
+      summary: Sincronizar apartamentos desde Smoobu
+      description: Hace upsert de todas las propiedades del PMS Smoobu configurado (10/hour).
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Sincronización completada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  resultado:
+                    type: object
+                    properties:
+                      total:
+                        type: integer
+                      nuevos:
+                        type: integer
+                      actualizados:
+                        type: integer
+        '400':
+          description: PMS no configurado o error de conexión
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /api/apartamentos/importacion:
+    post:
+      tags: [Apartamentos]
+      summary: Importar apartamentos desde XLSX
+      description: Importa (upsert) apartamentos desde un archivo Excel (20/hour).
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Importación completada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  resultado:
+                    type: object
+                    properties:
+                      total:
+                        type: integer
+                      nuevos:
+                        type: integer
+                      actualizados:
+                        type: integer
+                  warnings:
+                    type: array
+                    items:
+                      type: string
+
+  /api/apartamentos/importacion/preview:
+    post:
+      tags: [Apartamentos]
+      summary: Preview de importación XLSX
+      description: Muestra qué cambiaría sin confirmar la importación (30/hour).
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Preview generado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  preview:
+                    type: object
+                    properties:
+                      nuevos:
+                        type: array
+                        items:
+                          type: object
+                      actualizados:
+                        type: array
+                        items:
+                          type: object
+                      sin_cambios:
+                        type: array
+                        items:
+                          type: object
+                      errores:
+                        type: array
+                        items:
+                          type: string
+
+  /api/apartamentos/pms:
+    get:
+      tags: [Apartamentos]
+      summary: Leer configuración PMS activa
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Configuración PMS (sin exponer api_key)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  config:
+                    nullable: true
+                    type: object
+                    properties:
+                      proveedor:
+                        type: string
+                        enum: [smoobu, beds24, hostaway, cloudbeds]
+                      activo:
+                        type: boolean
+                      ultimo_sync:
+                        type: string
+                        format: date-time
+                        nullable: true
+
+    put:
+      tags: [Apartamentos]
+      summary: Crear o actualizar configuración PMS
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [proveedor, api_key]
+              properties:
+                proveedor:
+                  type: string
+                  enum: [smoobu, beds24, hostaway, cloudbeds]
+                api_key:
+                  type: string
+      responses:
+        '200':
+          description: Configuración guardada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ok'
+
+    delete:
+      tags: [Apartamentos]
+      summary: Eliminar configuración PMS
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Configuración eliminada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ok'
+
+  # ── Perfil ────────────────────────────────────────────────────────────────
+
+  /api/perfil:
+    get:
+      tags: [Perfil]
+      summary: Datos del usuario autenticado
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Datos del perfil
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  data:
+                    type: object
+
+  /api/perfil/password:
+    put:
+      tags: [Perfil]
+      summary: Cambiar contraseña propia
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [password_actual, password_nuevo]
+              properties:
+                password_actual:
+                  type: string
+                password_nuevo:
+                  type: string
+                  minLength: 8
+      responses:
+        '200':
+          description: Contraseña actualizada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ok'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /api/perfil/integraciones:
+    get:
+      tags: [Perfil]
+      summary: Estado de las integraciones de la empresa
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Estado de PMS, IA y Google
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  data:
+                    type: object
+
+  /api/perfil/integraciones/pms:
+    put:
+      tags: [Perfil]
+      summary: Actualizar integración PMS (admin)
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [proveedor, api_key]
+              properties:
+                proveedor:
+                  type: string
+                api_key:
+                  type: string
+      responses:
+        '200':
+          description: PMS actualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ok'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+    delete:
+      tags: [Perfil]
+      summary: Eliminar integración PMS (admin)
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: PMS eliminado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ok'
+
+  /api/perfil/integraciones/ia:
+    put:
+      tags: [Perfil]
+      summary: Actualizar integración IA (admin)
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [proveedor]
+              properties:
+                proveedor:
+                  type: string
+                  enum: [default, gemini, openai, claude]
+                api_key:
+                  type: string
+                modelo:
+                  type: string
+      responses:
+        '200':
+          description: IA actualizada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ok'
+
+    delete:
+      tags: [Perfil]
+      summary: Eliminar integración IA (admin)
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: IA eliminada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ok'
+
+  /api/perfil/xlsx-apartamentos:
+    get:
+      tags: [Perfil]
+      summary: Leer configuración de columnas XLSX de apartamentos
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Configuración de columnas
+          content:
+            application/json:
+              schema:
+                type: object
+
+    put:
+      tags: [Perfil]
+      summary: Guardar configuración de columnas XLSX (admin)
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                col_id_externo:
+                  type: integer
+                col_nombre:
+                  type: integer
+                col_direccion:
+                  type: integer
+                col_ciudad:
+                  type: integer
+      responses:
+        '200':
+          description: Configuración guardada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ok'
+
+  /api/perfil/notificaciones-tardio-config:
+    get:
+      tags: [Perfil]
+      summary: Leer configuración de notificaciones tardías
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Configuración
+          content:
+            application/json:
+              schema:
+                type: object
+
+    put:
+      tags: [Perfil]
+      summary: Guardar configuración de notificaciones tardías (admin)
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                hora_corte:
+                  type: string
+                  pattern: '^([01]\d|2[0-3]):[0-5]\d$'
+                  example: "20:00"
+                col_nombre:
+                  type: string
+                col_checkin:
+                  type: string
+                col_hora_llegada:
+                  type: string
+                col_telefono:
+                  type: string
+                col_apartamento:
+                  type: string
+      responses:
+        '200':
+          description: Configuración guardada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ok'
+
+  # ── Vault ─────────────────────────────────────────────────────────────────
+
+  /api/vault/plantillas:
+    get:
+      tags: [Vault]
+      summary: Listar plantillas de comunicación
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: categoria
+          in: query
+          schema:
+            type: string
+            enum: [BIENVENIDA, INSTRUCCIONES, RECORDATORIO, CHECKIN_TARDIO, CHECKOUT, INCIDENCIA, GENERAL]
+        - name: idioma
+          in: query
+          schema:
+            type: string
+            enum: [es, en, fr, de, it, pt]
+      responses:
+        '200':
+          description: Lista de plantillas
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  plantillas:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PlantillaVault'
+
+    post:
+      tags: [Vault]
+      summary: Crear plantilla
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [nombre, contenido]
+              properties:
+                nombre:
+                  type: string
+                  maxLength: 200
+                contenido:
+                  type: string
+                idioma:
+                  type: string
+                  enum: [es, en, fr, de, it, pt]
+                  default: es
+                categoria:
+                  type: string
+                  enum: [BIENVENIDA, INSTRUCCIONES, RECORDATORIO, CHECKIN_TARDIO, CHECKOUT, INCIDENCIA, GENERAL]
+                  nullable: true
+      responses:
+        '201':
+          description: Plantilla creada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  plantilla:
+                    $ref: '#/components/schemas/PlantillaVault'
+
+  /api/vault/plantillas/{plantilla_id}:
+    put:
+      tags: [Vault]
+      summary: Actualizar plantilla
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PlantillaId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [nombre, contenido]
+              properties:
+                nombre:
+                  type: string
+                contenido:
+                  type: string
+                idioma:
+                  type: string
+                categoria:
+                  type: string
+                  nullable: true
+      responses:
+        '200':
+          description: Plantilla actualizada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  plantilla:
+                    $ref: '#/components/schemas/PlantillaVault'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags: [Vault]
+      summary: Eliminar plantilla (soft-delete)
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PlantillaId'
+      responses:
+        '200':
+          description: Plantilla eliminada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ok'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/vault/plantillas/{plantilla_id}/mejoras:
+    post:
+      tags: [Vault]
+      summary: Mejorar plantilla con IA
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PlantillaId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [contenido, idioma]
+              properties:
+                contenido:
+                  type: string
+                idioma:
+                  type: string
+                  enum: [es, en, fr, de, it, pt]
+      responses:
+        '200':
+          description: Texto mejorado por IA
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  contenido:
+                    type: string
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          description: Límite de IA alcanzado
+
+  /api/vault/plantillas/{plantilla_id}/traducciones:
+    post:
+      tags: [Vault]
+      summary: Traducir plantilla con IA
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PlantillaId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [contenido, idioma_destino]
+              properties:
+                contenido:
+                  type: string
+                idioma_destino:
+                  type: string
+                  enum: [es, en, fr, de, it, pt]
+      responses:
+        '200':
+          description: Texto traducido
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  contenido:
+                    type: string
+        '429':
+          description: Límite de IA alcanzado
+
+  /api/ai/uso:
+    get:
+      tags: [Vault]
+      summary: Contadores de uso de IA
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Uso diario y semanal
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  uso_hoy:
+                    type: integer
+                  uso_semana:
+                    type: integer
+                  limite_diario:
+                    type: integer
+                  limite_semanal:
+                    type: integer
+
+  /api/ai/config:
+    get:
+      tags: [Vault]
+      summary: Configuración de IA enmascarada (admin)
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Proveedor, modelo y api_key enmascarada
+          content:
+            application/json:
+              schema:
+                type: object
+
+  # ── Notificaciones ────────────────────────────────────────────────────────
+
+  /api/notificaciones/checkin-tardio/status:
+    get:
+      tags: [Notificaciones]
+      summary: Estado del módulo de notificaciones tardías
+      description: Devuelve apartamentos, reservas PMS de hoy y hora de corte configurada.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: fecha
+          in: query
+          description: Fecha local del cliente en formato YYYY-MM-DD (evita desfase UTC)
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Estado del módulo
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  pms_configurado:
+                    type: boolean
+                  hora_corte:
+                    type: string
+                    example: "20:00"
+                  pms_error:
+                    type: string
+                    nullable: true
+                  apartamentos:
+                    type: array
+                    items:
+                      type: object
+                  reservas_pms:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CheckinHoy'
+
+  /api/notificaciones/checkin-tardio/checkins:
+    post:
+      tags: [Notificaciones]
+      summary: Parsear XLSX de check-ins tardíos
+      description: Procesa en memoria, no persiste (RGPD). Devuelve solo reservas con hora >= hora_corte (20/hour).
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Check-ins tardíos extraídos
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  checkins:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CheckinHoy'
+                  warnings:
+                    type: array
+                    items:
+                      type: string
+
+  /api/notificaciones/checkin-tardio/plantillas:
+    get:
+      tags: [Notificaciones]
+      summary: Listar plantillas de check-in tardío
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Lista de plantillas
+          content:
+            application/json:
+              schema:
+                type: object
+
+    post:
+      tags: [Notificaciones]
+      summary: Crear plantilla de check-in tardío
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [nombre, contenido]
+              properties:
+                nombre:
+                  type: string
+                contenido:
+                  type: string
+      responses:
+        '201':
+          description: Plantilla creada
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /api/notificaciones/checkin-tardio/plantillas/{plantilla_id}:
+    put:
+      tags: [Notificaciones]
+      summary: Actualizar plantilla de check-in tardío
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PlantillaId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [nombre, contenido]
+              properties:
+                nombre:
+                  type: string
+                contenido:
+                  type: string
+      responses:
+        '200':
+          description: Plantilla actualizada
+          content:
+            application/json:
+              schema:
+                type: object
+
+    delete:
+      tags: [Notificaciones]
+      summary: Eliminar plantilla de check-in tardío
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PlantillaId'
+      responses:
+        '200':
+          description: Plantilla eliminada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ok'
+
+  # ── Contactos Google ──────────────────────────────────────────────────────
+
+  /api/contactos/google/auth:
+    get:
+      tags: [Contactos]
+      summary: Generar URL de autorización OAuth de Google (admin)
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: URL de redirección OAuth
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  url:
+                    type: string
+
+  /api/contactos/google/callback:
+    get:
+      tags: [Contactos]
+      summary: Callback OAuth de Google (intercambio de código)
+      description: Recibe el código de autorización de Google y redirige al frontend.
+      parameters:
+        - name: code
+          in: query
+          schema:
+            type: string
+        - name: state
+          in: query
+          schema:
+            type: string
+        - name: error
+          in: query
+          schema:
+            type: string
+      responses:
+        '302':
+          description: Redirección al frontend con resultado
+
+  /api/contactos/google/status:
+    get:
+      tags: [Contactos]
+      summary: Estado de la conexión con Google Contacts
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Estado de la integración
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /api/contactos/google/conexion:
+    delete:
+      tags: [Contactos]
+      summary: Desconectar cuenta Google (admin)
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Desconectado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ok'
+
+  /api/contactos/preferencias:
+    get:
+      tags: [Contactos]
+      summary: Obtener preferencias de sincronización
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Preferencias
+          content:
+            application/json:
+              schema:
+                type: object
+
+    put:
+      tags: [Contactos]
+      summary: Guardar preferencias de sincronización
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Preferencias guardadas
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /api/contactos/sincronizacion:
+    post:
+      tags: [Contactos]
+      summary: Sincronizar reservas PMS → Google Contacts (10/hour)
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                desde:
+                  type: string
+                  format: date
+                hasta:
+                  type: string
+                  format: date
+      responses:
+        '200':
+          description: Sincronización completada
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /api/contactos/exportacion/csv:
+    post:
+      tags: [Contactos]
+      summary: Exportar contactos PMS como CSV para importación manual (20/hour)
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                desde:
+                  type: string
+                  format: date
+                hasta:
+                  type: string
+                  format: date
+      responses:
+        '200':
+          description: Archivo CSV
+          content:
+            text/csv:
+              schema:
+                type: string
+
+  /api/contactos/xlsx/sincronizacion:
+    post:
+      tags: [Contactos]
+      summary: Sincronizar XLSX → Google Contacts (10/hour)
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Sincronización completada
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /api/contactos/xlsx/exportacion/csv:
+    post:
+      tags: [Contactos]
+      summary: Exportar contactos XLSX como CSV (20/hour)
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Archivo CSV
+          content:
+            text/csv:
+              schema:
+                type: string
+
+  # ── Heatmap ───────────────────────────────────────────────────────────────
+
+  /api/heatmap:
+    get:
+      tags: [Heatmap]
+      summary: Generar mapa de calor desde PMS
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: desde
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: hasta
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: Días con intensidades de check-in/checkout
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  dias:
+                    type: array
+                    items:
+                      type: object
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /api/heatmap/xlsx:
+    post:
+      tags: [Heatmap]
+      summary: Generar mapa de calor desde XLSX (30/hour)
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [checkins, desde, hasta]
+              properties:
+                checkins:
+                  type: string
+                  format: binary
+                checkouts:
+                  type: string
+                  format: binary
+                  description: Opcional
+                desde:
+                  type: string
+                  format: date
+                hasta:
+                  type: string
+                  format: date
+      responses:
+        '200':
+          description: Días con intensidades
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /api/heatmap/umbrales:
+    get:
+      tags: [Heatmap]
+      summary: Leer umbrales de intensidad
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Umbrales nivel1, nivel2, nivel3
+          content:
+            application/json:
+              schema:
+                type: object
+
+    put:
+      tags: [Heatmap]
+      summary: Guardar umbrales de intensidad (admin)
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nivel1:
+                  type: integer
+                nivel2:
+                  type: integer
+                nivel3:
+                  type: integer
+      responses:
+        '200':
+          description: Umbrales guardados
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /api/heatmap/config-xlsx:
+    get:
+      tags: [Heatmap]
+      summary: Leer configuración de columnas XLSX del heatmap
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Configuración de columnas
+          content:
+            application/json:
+              schema:
+                type: object
+
+    put:
+      tags: [Heatmap]
+      summary: Guardar configuración de columnas XLSX (admin)
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Configuración guardada
+          content:
+            application/json:
+              schema:
+                type: object
+
+  # ── Health ────────────────────────────────────────────────────────────────
+
+  /api/health:
+    get:
+      tags: [Solicitud]
+      summary: Healthcheck
+      responses:
+        '200':
+          description: Servicio operativo
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+
+# ── Respuestas comunes ────────────────────────────────────────────────────
+
+  responses: {}
+
+components:
+  parameters:
+    UsuarioId:
+      name: usuario_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+
+    ApartamentoId:
+      name: apartamento_id
+      in: path
+      required: true
+      schema:
+        type: string
+
+    PlantillaId:
+      name: plantilla_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+
+  responses:
+    Unauthorized:
+      description: Token JWT ausente o inválido
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    Forbidden:
+      description: El rol del usuario no tiene permisos suficientes
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    NotFound:
+      description: Recurso no encontrado
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    ValidationError:
+      description: Error de validación del cuerpo de la petición
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'

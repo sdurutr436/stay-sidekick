@@ -45,13 +45,10 @@
     }
 
     @include respond-until('md') {
-      grid-template-columns: repeat(2, 1fr);
-      gap: $space-6;
-    }
-
-    @include respond-until('sm') {
       grid-template-columns: 1fr;
       gap: $space-6;
+      justify-items: center;
+      text-align: center;
     }
   }
 
@@ -72,6 +69,10 @@
       grid-column: auto;
     }
 
+    @include respond-until('md') {
+      align-items: center;
+    }
+
     .logo__img {
       height: 2.5rem;    // 40px
       width: auto;
@@ -79,7 +80,7 @@
       max-width: 200px;
 
       @include respond-until('sm') {
-        height: 2.5rem;  // favicon cuadrado — mismo alto, ajustará ancho automáticamente
+        height: 2.5rem;
         max-width: 2.5rem;
       }
     }
@@ -110,6 +111,10 @@
     display: flex;
     flex-direction: column;
     gap: $space-2;
+
+    @include respond-until('md') {
+      align-items: center;
+    }
   }
 
   &__nav-item {

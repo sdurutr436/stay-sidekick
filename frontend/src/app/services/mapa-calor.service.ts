@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 
 export interface DiaCalor {
@@ -30,8 +30,9 @@ export class MapaCalorService {
   private readonly http = inject(HttpClient);
 
   generarDesdePms(desde: string, hasta: string): Observable<MapaCalorResponse> {
+    const params = new HttpParams().set('desde', desde).set('hasta', hasta);
     return this.http.get<{ ok: boolean; dias: DiaCalor[] }>(
-      `/api/heatmap?desde=${desde}&hasta=${hasta}`
+      '/api/heatmap', { params }
     ).pipe(map(res => ({ dias: res.dias })));
   }
 
