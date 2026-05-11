@@ -7,7 +7,7 @@ Rutas (públicas):
 
 import os
 
-from flask import Blueprint, Response, current_app, send_file
+from flask import Blueprint, Response, send_file
 
 docs_bp = Blueprint("docs", __name__)
 
