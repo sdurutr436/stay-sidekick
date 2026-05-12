@@ -2,6 +2,7 @@
 // TOOLS: MIXINS
 // Combinaciones de estilos reutilizables — sin generar CSS por sí solos
 // =============================================================================
+@use 'sass:math';
 
 // -----------------------------------------------------------------------------
 // Responsive — media query desde un breakpoint hacia arriba
@@ -130,7 +131,7 @@
 // $px: valor numérico sin unidad (p.ej. rem(16) → 1rem)
 // -----------------------------------------------------------------------------
 @function rem($px) {
-  @return #{$px / 16}rem;
+  @return math.div($px, 16) * 1rem;
 }
 
 // -----------------------------------------------------------------------------
