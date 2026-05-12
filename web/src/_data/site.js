@@ -11,13 +11,6 @@ module.exports = {
   // URL de la aplicación Angular
   appUrl: "/app",
 
-  headerNav: [
-    { text: "Funcionalidades", href: "/producto/funcionalidades/" },
-    { text: "Precios",         href: "/producto/precios/" },
-    { text: "Sobre nosotros",  href: "/empresa/sobre-nosotros/" },
-    { text: "Contacto",        href: "/empresa/contacto/" },
-  ],
-
   footerNav: [
     {
       label: "Producto",
