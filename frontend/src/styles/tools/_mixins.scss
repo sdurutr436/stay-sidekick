@@ -126,6 +126,14 @@
 }
 
 // -----------------------------------------------------------------------------
+// Conversión px → rem
+// $px: valor numérico sin unidad (p.ej. rem(16) → 1rem)
+// -----------------------------------------------------------------------------
+@function rem($px) {
+  @return #{$px / 16}rem;
+}
+
+// -----------------------------------------------------------------------------
 // Focus ring accesible — sustituye outline:none en controles interactivos
 // $color   : color del anillo (cualquier valor CSS de color; default $color-gray-800)
 // $offset  : distancia entre el control y el anillo en px (default 2px)

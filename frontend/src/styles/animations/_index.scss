@@ -39,6 +39,10 @@
   50%       { opacity: 0.4; }
 }
 
+.a-skeleton-pulse {
+  animation: skeleton-pulse 1.5s ease-in-out infinite;
+}
+
 // Respetar preferencia de movimiento reducido
 @media (prefers-reduced-motion: reduce) {
   .a-fade-in,

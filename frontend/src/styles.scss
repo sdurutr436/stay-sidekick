@@ -7,9 +7,6 @@
 // Fuente: Archivo (variable font)
 @import url('https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,100..900;1,100..900&display=swap');
 
-// flatpickr — CSS base (los estilos se sobreescriben en _mapa-calor.scss)
-@import 'flatpickr/dist/flatpickr.min.css';
-
 // 1. Settings — variables, sin CSS generado
 @import 'styles/settings/tipografia';
 @import 'styles/settings/colores';
@@ -20,8 +17,10 @@
 // 2. Tools — mixins, sin CSS generado
 @import 'styles/tools/mixins';
 
-// 3. Generic — resets
+// 3. Generic — resets y CSS de librerías externas
 @import 'styles/generic/resets';
+// flatpickr — CSS base (los estilos se sobreescriben en _mapa-calor.scss)
+@import 'flatpickr/dist/flatpickr.min.css';
 
 // 4. Elements — estilos de elementos HTML sin clase
 @import 'styles/elements/base';
