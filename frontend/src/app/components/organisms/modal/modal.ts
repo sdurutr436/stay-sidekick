@@ -22,9 +22,9 @@ export class ModalComponent implements OnChanges {
     if (changes['open']?.currentValue === true) {
       setTimeout(() => {
         const panel = this.elRef.nativeElement.querySelector('.modal__panel');
-        const firstFocusable = panel?.querySelector<HTMLElement>(
+        const firstFocusable = panel?.querySelector(
           'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-        );
+        ) as HTMLElement | null;
         firstFocusable?.focus();
       });
     }
