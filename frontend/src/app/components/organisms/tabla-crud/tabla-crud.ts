@@ -23,6 +23,7 @@ export class TablaCrudComponent {
   @Input() resultCount = 0;
   @Input() selectedCount = 0;
   @Input() searchLabel = '';
+  @Input() cargando = false;
 
   @Output() searchChange = new EventEmitter<string>();
 

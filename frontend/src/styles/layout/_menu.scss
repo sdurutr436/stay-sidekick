@@ -26,7 +26,7 @@
       position: fixed;
       inset: 0;
       z-index: $z-sidenav - 1; // por encima del contenido, por debajo del sidenav y header
-      background: rgba(0, 0, 0, 0.4);
+      background: $color-overlay-bg;
       animation: fade-in var(--transition-slow) ease both;
     }
   }

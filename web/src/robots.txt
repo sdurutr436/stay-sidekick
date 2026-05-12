@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /login
+Disallow: /solicitud
+Disallow: /cambio-password
+
+Sitemap: https://stay-sidekick.up.railway.app/sitemap.xml

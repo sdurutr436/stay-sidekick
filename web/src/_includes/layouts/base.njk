@@ -20,6 +20,28 @@
   <link rel="stylesheet" href="/assets/styles/main.css" />
 
   {% block head %}{% endblock %}
+
+    <script type="application/ld+json">
+      {{ {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": site.url + "/#organization",
+            "name": site.name,
+            "url": site.url
+          },
+          {
+            "@type": "WebSite",
+            "@id": site.url + "/#website",
+            "url": site.url,
+            "name": site.name,
+            "description": site.description,
+            "publisher": { "@id": site.url + "/#organization" }
+          }
+        ]
+      } | dump | safe }}
+  </script>
 </head>
 <body class="l-page">
 
