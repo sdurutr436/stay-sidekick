@@ -41,6 +41,13 @@
       </picture>
     </a>
 
+    {# Navegación principal — datos desde _data/site.js #}
+    <nav class="header__nav" aria-label="Menú principal">
+      {% for item in site.headerNav %}
+        <a class="header__nav-link" href="{{ item.href }}">{{ item.text }}</a>
+      {% endfor %}
+    </nav>
+
     {# Acciones: sesión + CTA — icono + texto en desktop; solo icono en mobile #}
     <nav class="header__actions" aria-label="Acciones de usuario">
       {{ atoms.button('Iniciar sesión', '/login', 'secondary', 'md', false, 'button', '', icon_signin) }}
