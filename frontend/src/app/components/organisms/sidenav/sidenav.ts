@@ -1,4 +1,4 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, effect, HostListener, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { NgIconComponent } from '@ng-icons/core';
 import { SidenavService } from '../../../services/sidenav.service';
@@ -23,6 +23,8 @@ const TOOLS: Tool[] = [
   { id: 'hoja-estilos', label: 'Hoja de estilos', route: '/hoja-estilos', icon: 'phosphorSwatches', adminOnly: true },
 ];
 
+const BREAKPOINT_MD = 768;
+
 @Component({
   selector: 'app-sidenav',
   templateUrl: './sidenav.html',
@@ -33,6 +35,24 @@ const TOOLS: Tool[] = [
 export class SidenavComponent {
   readonly sidenavService = inject(SidenavService);
   private readonly auth = inject(AuthService);
+  private _openerRef: HTMLElement | null = null;
 
   readonly visibleTools = computed(() => TOOLS.filter(t => !t.adminOnly || this.auth.isAdmin));
+
+  constructor() {
+    effect(() => {
+      if (this.sidenavService.isOpen() && window.innerWidth < BREAKPOINT_MD) {
+        this._openerRef = document.activeElement as HTMLElement;
+      }
+    });
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    if (this.sidenavService.isOpen() && window.innerWidth < BREAKPOINT_MD) {
+      this.sidenavService.toggle();
+      this._openerRef?.focus();
+      this._openerRef = null;
+    }
+  }
 }
