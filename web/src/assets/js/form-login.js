@@ -85,6 +85,7 @@ function clearFieldError(input) {
   if (!field) return;
   field.classList.remove('form-field--error');
   field.querySelector('.form-field__error')?.remove();
+  input.removeAttribute('aria-describedby');
 }
 
 function showFieldError(input, message) {
@@ -92,11 +93,14 @@ function showFieldError(input, message) {
   if (!field) return;
   clearFieldError(input);
   field.classList.add('form-field--error');
+  const errorId = (input.id || 'field') + '-error';
   const msg = document.createElement('p');
   msg.className = 'form-field__error';
   msg.setAttribute('role', 'alert');
+  msg.id = errorId;
   msg.textContent = message;
   field.appendChild(msg);
+  input.setAttribute('aria-describedby', errorId);
 }
 
 function clearAllErrors(form) {
