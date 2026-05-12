@@ -391,6 +391,7 @@ async function submitPayload(payload, csrfToken) {
 
     // 5 — Enviar
     submitBtn.disabled = true;
+    submitBtn.setAttribute('aria-busy', 'true');
     submitBtn.textContent = 'Enviando…';
 
     try {
@@ -413,6 +414,7 @@ async function submitPayload(payload, csrfToken) {
       );
     } finally {
       submitBtn.disabled = false;
+      submitBtn.removeAttribute('aria-busy');
       submitBtn.textContent = 'Enviar formulario';
     }
   });

@@ -260,6 +260,7 @@ async function submitPayload(payload, csrfToken) {
     // 5 — Enviar
     const submitBtn = form.querySelector('[type="submit"]');
     submitBtn.disabled = true;
+    submitBtn.setAttribute('aria-busy', 'true');
     submitBtn.textContent = 'Entrando…';
 
     try {
@@ -273,6 +274,7 @@ async function submitPayload(payload, csrfToken) {
       showFieldError(inputEmail, err.message || 'Credenciales incorrectas.');
     } finally {
       submitBtn.disabled = false;
+      submitBtn.removeAttribute('aria-busy');
       submitBtn.textContent = 'Iniciar sesión';
     }
   });

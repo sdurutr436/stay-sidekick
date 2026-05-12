@@ -14,7 +14,7 @@
         <span class="btn__icon" aria-hidden="true">
           <ng-icon name="phosphorArrowsClockwise" size="20" />
         </span>
-        {{ sincronizando() ? 'Sincronizando…' : 'Sincronizar Smoobu' }}
+        <span aria-live="polite">{{ sincronizando() ? 'Sincronizando…' : 'Sincronizar Smoobu' }}</span>
       </app-button>
     }
 
@@ -56,6 +56,7 @@
     searchLabel="Buscar apartamentos"
     [resultCount]="filteredApartamentos().length"
     [selectedCount]="selectedCount()"
+    [cargando]="cargando()"
     (searchChange)="onSearch($event)"
   >
     <span title>Listado de apartamentos</span>
@@ -64,7 +65,7 @@
       @if (isAdmin) {
         @if (modoCreacion()) {
           <app-button variant="primary" size="md" [disabled]="guardando()" (click)="guardarCreacion()">
-            {{ guardando() ? 'Guardando…' : 'Guardar cambios' }}
+            <span aria-live="polite">{{ guardando() ? 'Guardando…' : 'Guardar cambios' }}</span>
           </app-button>
           <app-button variant="ghost" size="md" [disabled]="guardando()" (click)="cancelarCreacion()">
             Cancelar
