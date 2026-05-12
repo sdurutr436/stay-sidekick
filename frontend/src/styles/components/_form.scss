@@ -73,7 +73,7 @@ $_form-input-padding-y: $space-2;
   }
 
   &:focus {
-    outline: none;
+    @include focus-ring;
     border-color: $color-border-strong;
   }
 
@@ -108,7 +108,7 @@ $_form-input-padding-y: $space-2;
   }
 
   &:focus {
-    outline: none;
+    @include focus-ring;
   }
 }
 
@@ -217,7 +217,7 @@ $_form-input-padding-y: $space-2;
   transition: border-color var(--transition-base);
 
   &:focus {
-    outline: none;
+    @include focus-ring;
     border-color: $color-border-strong;
   }
 }
