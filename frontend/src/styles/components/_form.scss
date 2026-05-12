@@ -267,12 +267,12 @@ $_form-input-padding-y: $space-2;
   // Estado de error (radio group sin selección)
   &--error {
     padding-left: $space-3;
-    border-left: 2px solid $color-gray-700;
+    border-left: 2px solid $color-error;
   }
 
   &__error {
     @include text-caption-md;
-    color: $color-gray-700;
+    color: $color-error;
     margin-top: $space-1;
   }
 }
@@ -285,25 +285,25 @@ $_form-input-padding-y: $space-2;
   &--error {
     // Marca el wrapper del input con borde oscuro
     .form-input-wrapper {
-      border-color: $color-gray-700;
+      border-color: $color-error;
       border-width: 2px;
     }
 
     // Input standalone
     .form-input {
-      border-color: $color-gray-700;
+      border-color: $color-error;
       border-width: 2px;
     }
 
     // Textarea standalone (fuera del editor)
     .form-textarea {
-      border: 2px solid $color-gray-700;
+      border: 2px solid $color-error;
     }
   }
 
   &__error {
     @include text-caption-md;
-    color: $color-gray-700;
+    color: $color-error;
     margin-top: $space-1;
   }
 }
