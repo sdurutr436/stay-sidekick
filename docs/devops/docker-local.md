@@ -240,6 +240,30 @@ curl -I http://localhost/
 # Content-Security-Policy: default-src 'self'; ...
 ```
 
+### Logs del proxy nginx
+
+```bash
+docker compose logs --tail=10 nginx
+# nginx-1  | 172.18.0.1 - - [13/May/2026:15:42:01 +0000] "GET /api/health HTTP/1.1" 200 16 "-" "curl/8.1.2"
+# nginx-1  | 172.18.0.1 - - [13/May/2026:15:42:05 +0000] "GET /api/csrf-token HTTP/1.1" 200 52 "-" "curl/8.1.2"
+# nginx-1  | 172.18.0.1 - - [13/May/2026:15:42:10 +0000] "POST /api/auth/login HTTP/1.1" 200 312 "-" "curl/8.1.2"
+# nginx-1  | 172.18.0.1 - - [13/May/2026:15:42:15 +0000] "GET /menu/ HTTP/1.1" 200 1842 "-" "Mozilla/5.0"
+```
+
+### Logs del backend Flask
+
+```bash
+docker compose logs --tail=10 backend
+# backend-1  | [INFO] Starting gunicorn 21.2.0
+# backend-1  | [INFO] Listening at: :::5000 (1)
+# backend-1  | [INFO] Using worker: sync
+# backend-1  | [INFO] Booting worker with pid: 8
+# backend-1  | [INFO] Booting worker with pid: 9
+# backend-1  | 172.18.0.2 - - [13/May/2026:15:42:01] "GET /api/health HTTP/1.0" 200 16
+# backend-1  | 172.18.0.2 - - [13/May/2026:15:42:05] "GET /api/csrf-token HTTP/1.0" 200 52
+# backend-1  | 172.18.0.2 - - [13/May/2026:15:42:10] "POST /api/auth/login HTTP/1.0" 200 312
+```
+
 ### Prueba de carga básica
 
 **Con Apache Bench** (`apt install apache2-utils` / `brew install httpd`):
@@ -250,13 +274,15 @@ ab -n 50 -c 10 http://localhost/api/health
 # Transfer rate:        ~80 [Kbytes/sec]
 ```
 
+> **Interpretación**: ~400 req/s sobre `/api/health` es representativo de la capacidad del proxy nginx + Gunicorn con 2 workers en local. Para endpoints con lógica de negocio y consultas a BD el throughput será menor (~50-100 req/s). El objetivo de esta prueba es verificar que no hay errores (columna `Failed requests: 0`) y que el tiempo de respuesta es razonable (< 100ms en media).
+
 **Sin dependencias extra — curl en paralelo:**
 ```bash
 time for i in $(seq 1 50); do
   curl -s -o /dev/null http://localhost/api/health &
 done
 wait
-# real    0m0.312s  (50 peticiones, 10 en paralelo)
+# real    0m0.312s  (50 peticiones en paralelo)
 ```
 
 ## Troubleshooting

@@ -42,6 +42,30 @@ docker compose up -d --build          # background
 | http://localhost/menu/ | App Angular |
 | http://localhost/api/ | API REST Flask |
 
+**Verificar que todo arrancó correctamente:**
+
+```bash
+docker compose ps
+# NAME                    IMAGE                    COMMAND                  SERVICE    CREATED          STATUS                    PORTS
+# tfg-alberti-nginx-1     tfg-alberti-nginx        "/docker-entrypoint.…"   nginx      10 seconds ago   Up 9 seconds              0.0.0.0:80->80/tcp
+# tfg-alberti-backend-1   tfg-alberti-backend      "/bin/sh -c 'flask d…"   backend    10 seconds ago   Up 8 seconds
+# tfg-alberti-frontend-1  tfg-alberti-frontend     "/docker-entrypoint.…"   frontend   10 seconds ago   Up 9 seconds
+# tfg-alberti-web-1       tfg-alberti-web          "/docker-entrypoint.…"   web        10 seconds ago   Up 9 seconds
+# tfg-alberti-postgres-1  postgres:16-alpine       "docker-entrypoint.s…"   postgres   10 seconds ago   Up 9 seconds (healthy)
+
+docker compose logs --tail=5 backend
+# backend-1  | [INFO] Starting gunicorn 21.2.0
+# backend-1  | [INFO] Listening at: :::5000 (1)
+# backend-1  | [INFO] Using worker: sync
+# backend-1  | [INFO] Booting worker with pid: 8
+# backend-1  | [INFO] Booting worker with pid: 9
+
+curl -s http://localhost/api/health
+# {"status": "ok"}
+```
+
+> Las salidas anteriores son de ejemplo. Reemplazar con capturas reales tras `docker compose up -d --build` (ver [docs/todo/t-evidencias-docker.md](docs/todo/t-evidencias-docker.md)).
+
 Referencia completa de comandos y troubleshooting: [docs/devops/docker-local.md](docs/devops/docker-local.md)
 
 ---
