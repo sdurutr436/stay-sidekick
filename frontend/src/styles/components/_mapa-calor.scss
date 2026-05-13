@@ -16,10 +16,6 @@
 //   .panel-seccion, .page-header, .badge, .btn, .form-*
 // =============================================================================
 
-// Variables de color locales al mapa de calor
-$heatmap-color-checkins:  #4CAF50;
-$heatmap-color-checkouts: #F44336;
-
 // ─────────────────────────────────────────────────────────────────────────────
 // Wrapper de página
 // ─────────────────────────────────────────────────────────────────────────────
@@ -29,6 +25,16 @@ $heatmap-color-checkouts: #F44336;
   padding-block: 0;
   display: flex;
   flex-direction: column;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Contenedor interior: agrupa calor-layout + "Cómo usarlo"
+// ─────────────────────────────────────────────────────────────────────────────
+.calor-contenido {
+  display: flex;
+  flex-direction: column;
+  padding-block: $space-1;
+  gap: $space-4;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

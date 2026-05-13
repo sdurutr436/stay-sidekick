@@ -7,5 +7,7 @@
   [disabled]="disabled"
   [attr.aria-label]="ariaLabel || null"
   [attr.aria-describedby]="ariaDescribedby || null"
+  [attr.aria-invalid]="hasError || null"
+  [attr.aria-required]="required || null"
   (input)="onInput($event)"
 />

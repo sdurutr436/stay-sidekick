@@ -19,7 +19,7 @@
   </div>
 
   <!-- Tabla -->
-  <div class="tabla-crud__wrapper" role="region" tabindex="0">
+  <div class="tabla-crud__wrapper" role="region" tabindex="0" [attr.aria-busy]="cargando || null">
     <ng-content select="table" />
   </div>
 

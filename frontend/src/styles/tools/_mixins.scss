@@ -2,6 +2,7 @@
 // TOOLS: MIXINS
 // Combinaciones de estilos reutilizables — sin generar CSS por sí solos
 // =============================================================================
+@use 'sass:math';
 
 // -----------------------------------------------------------------------------
 // Responsive — media query desde un breakpoint hacia arriba
@@ -123,4 +124,23 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+// -----------------------------------------------------------------------------
+// Conversión px → rem
+// $px: valor numérico sin unidad (p.ej. rem(16) → 1rem)
+// -----------------------------------------------------------------------------
+@function rem($px) {
+  @return math.div($px, 16) * 1rem;
+}
+
+// -----------------------------------------------------------------------------
+// Focus ring accesible — sustituye outline:none en controles interactivos
+// $color   : color del anillo (cualquier valor CSS de color; default $color-gray-800)
+// $offset  : distancia entre el control y el anillo en px (default 2px)
+// Uso: @include focus-ring; | @include focus-ring($color-accent-primary, 4px);
+// -----------------------------------------------------------------------------
+@mixin focus-ring($color: $color-gray-800, $offset: 2px) {
+  outline: 2px solid $color;
+  outline-offset: $offset;
 }

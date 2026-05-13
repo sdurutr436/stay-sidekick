@@ -36,6 +36,7 @@
   &--sm {
     @include text-label-sm;
     padding: $space-1 $space-3;
+    min-height: 2.75rem;
   }
 
   &--md {

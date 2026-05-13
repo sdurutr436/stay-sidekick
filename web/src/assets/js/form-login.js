@@ -85,6 +85,7 @@ function clearFieldError(input) {
   if (!field) return;
   field.classList.remove('form-field--error');
   field.querySelector('.form-field__error')?.remove();
+  input.removeAttribute('aria-describedby');
 }
 
 function showFieldError(input, message) {
@@ -92,11 +93,14 @@ function showFieldError(input, message) {
   if (!field) return;
   clearFieldError(input);
   field.classList.add('form-field--error');
+  const errorId = (input.id || 'field') + '-error';
   const msg = document.createElement('p');
   msg.className = 'form-field__error';
   msg.setAttribute('role', 'alert');
+  msg.id = errorId;
   msg.textContent = message;
   field.appendChild(msg);
+  input.setAttribute('aria-describedby', errorId);
 }
 
 function clearAllErrors(form) {
@@ -256,6 +260,7 @@ async function submitPayload(payload, csrfToken) {
     // 5 — Enviar
     const submitBtn = form.querySelector('[type="submit"]');
     submitBtn.disabled = true;
+    submitBtn.setAttribute('aria-busy', 'true');
     submitBtn.textContent = 'Entrando…';
 
     try {
@@ -269,6 +274,7 @@ async function submitPayload(payload, csrfToken) {
       showFieldError(inputEmail, err.message || 'Credenciales incorrectas.');
     } finally {
       submitBtn.disabled = false;
+      submitBtn.removeAttribute('aria-busy');
       submitBtn.textContent = 'Iniciar sesión';
     }
   });

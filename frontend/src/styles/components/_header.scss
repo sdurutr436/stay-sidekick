@@ -45,6 +45,8 @@
     justify-content: center;
     width: $space-10;
     height: $space-10;
+    min-width: 2.75rem;
+    min-height: 2.75rem;
     padding: 0;
     background: transparent;
     border: $border-width $border-style transparent;
