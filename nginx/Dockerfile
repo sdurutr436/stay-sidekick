@@ -20,3 +20,6 @@ ENV WEB_PORT=80
 ENV BACKEND_PORT=5000
 
 EXPOSE 80
+# USER nginx no se aplica: el proceso maestro de nginx necesita root para
+# enlazar el puerto 80 (< 1024). Los worker processes ya corren como nginx
+# por defecto en nginx:alpine.
