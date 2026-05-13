@@ -108,9 +108,9 @@ Para conectarse a la base de datos desde el host (con cualquier cliente SQL):
 ```
 Host:     localhost
 Puerto:   5432        # expuesto solo si añades ports: en el servicio postgres
-Usuario:  postgres
-Password: postgres
-DB:       stay_sidekick
+Usuario:  ${POSTGRES_USER}     # valor de tu .env raíz
+Password: ${POSTGRES_PASSWORD} # valor de tu .env raíz
+DB:       ${POSTGRES_DB}       # valor de tu .env raíz
 ```
 
 > El servicio `postgres` no expone el puerto 5432 al host por defecto para mayor seguridad.
@@ -123,6 +123,23 @@ docker compose exec postgres psql -U postgres -d stay_sidekick
 ```
 
 ## Variables de entorno
+
+### `.env` (raíz del proyecto — PostgreSQL)
+
+Copiar desde `.env.example` y completar:
+
+```bash
+cp .env.example .env
+```
+
+| Variable | Descripción | Valor por defecto |
+|----------|-------------|-------------------|
+| `POSTGRES_DB` | Nombre de la base de datos | `stay_sidekick` |
+| `POSTGRES_USER` | Usuario de PostgreSQL | `postgres` |
+| `POSTGRES_PASSWORD` | Contraseña de PostgreSQL | **cambiar obligatoriamente** |
+| `DATABASE_URL` | URI de conexión completa | se compone de las anteriores |
+
+> `DATABASE_URL` y `ALLOWED_ORIGINS` son inyectadas desde el `.env` raíz por `docker-compose.yml`. No es necesario definirlas en `backend/.env` para el entorno Docker.
 
 ### `backend/.env`
 
@@ -138,8 +155,6 @@ Copiar desde `backend/.env.example` y completar:
 | `GMAIL_APP_PASSWORD` | Contraseña de aplicación Gmail (16 caracteres) |
 | `MAIL_RECIPIENT` | Correo que recibe las solicitudes de contacto |
 | `DISCORD_WEBHOOK_URL` | Webhook de Discord para notificaciones |
-
-> `DATABASE_URL` y `ALLOWED_ORIGINS` son inyectadas automáticamente por `docker-compose.yml` para el entorno Docker. No es necesario cambiarlas.
 
 ### `web/.env`
 
@@ -248,6 +263,9 @@ wait
 
 **`web/.env not found`**
 → El fichero `web/.env` no existe. Crearlo con `TURNSTILE_SITE_KEY=1x00000000000000000000AA` para desarrollo.
+
+**`DATABASE_URL variable is not set`**
+→ Falta el `.env` raíz. Ejecutar `cp .env.example .env` y editar `POSTGRES_PASSWORD`.
 
 **`backend/.env not found`**
 → Ejecutar `cp backend/.env.example backend/.env` y rellenar las variables.
