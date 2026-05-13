@@ -56,15 +56,17 @@ CREATE TABLE IF NOT EXISTS empresas (
 --               notificaciones). No puede tocar configuración de la empresa.
 -- =============================================================================
 CREATE TABLE IF NOT EXISTS usuarios (
-    id            UUID         PRIMARY KEY DEFAULT uuid_generate_v4(),
-    empresa_id    UUID         NOT NULL REFERENCES empresas(id) ON DELETE CASCADE,
-    email         VARCHAR(254) NOT NULL UNIQUE,
-    password_hash VARCHAR(255) NOT NULL,          -- bcrypt
-    rol           VARCHAR(20)  NOT NULL DEFAULT 'operativo'
-                      CHECK (rol IN ('admin', 'operativo')),
-    activo        BOOLEAN      NOT NULL DEFAULT TRUE,
-    created_at    TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
-    updated_at    TIMESTAMPTZ  NOT NULL DEFAULT NOW()
+    id                   UUID         PRIMARY KEY DEFAULT uuid_generate_v4(),
+    empresa_id           UUID         NOT NULL REFERENCES empresas(id) ON DELETE CASCADE,
+    email                VARCHAR(254) NOT NULL UNIQUE,
+    password_hash        VARCHAR(255) NOT NULL,          -- bcrypt
+    rol                  VARCHAR(20)  NOT NULL DEFAULT 'operativo'
+                             CHECK (rol IN ('admin', 'operativo')),
+    activo               BOOLEAN      NOT NULL DEFAULT TRUE,
+    password_changed_at  TIMESTAMPTZ,
+    es_superadmin        BOOLEAN      NOT NULL DEFAULT FALSE,
+    created_at           TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+    updated_at           TIMESTAMPTZ  NOT NULL DEFAULT NOW()
 );
 
 CREATE INDEX IF NOT EXISTS idx_usuarios_empresa_id ON usuarios(empresa_id);
@@ -92,16 +94,20 @@ CREATE TABLE IF NOT EXISTS apartamentos (
     direccion   VARCHAR(300),
     ciudad      VARCHAR(100),
 
+    -- ID del apartamento en el PMS externo (columna 1 del XLSX).
+    id_pms      VARCHAR(100),
+
     -- Origen del alta: API del PMS, importación XLSX o alta manual.
     pms_origen  VARCHAR(50)  CHECK (pms_origen IN ('smoobu', 'beds24', 'manual', 'xlsx')),
 
     activo      BOOLEAN      NOT NULL DEFAULT TRUE,
     created_at  TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
-    updated_at  TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
-
-    -- Una empresa no puede tener dos alojamientos con el mismo ID externo.
-    CONSTRAINT uq_apartamento_empresa_id_externo UNIQUE (empresa_id, id_externo)
+    updated_at  TIMESTAMPTZ  NOT NULL DEFAULT NOW()
 );
+
+CREATE UNIQUE INDEX IF NOT EXISTS uq_apartamento_empresa_id_pms
+    ON apartamentos(empresa_id, id_pms)
+    WHERE id_pms IS NOT NULL;
 
 CREATE INDEX IF NOT EXISTS idx_apartamentos_empresa_id ON apartamentos(empresa_id);
 
@@ -261,7 +267,7 @@ CREATE TABLE IF NOT EXISTS logs_sincronizacion (
     empresa_id    UUID         NOT NULL REFERENCES empresas(id) ON DELETE CASCADE,
 
     -- Servicio con el que se sincronizó.
-    origen        VARCHAR(50)  NOT NULL CHECK (origen IN ('pms', 'google_contacts', 'xlsx')),
+    origen        VARCHAR(50)  NOT NULL CHECK (origen IN ('pms', 'google_contacts', 'xlsx', 'heatmap_pms')),
 
     -- Resultado de la operación.
     estado        VARCHAR(20)  NOT NULL CHECK (estado IN ('exito', 'error', 'parcial')),
@@ -277,3 +283,27 @@ CREATE TABLE IF NOT EXISTS logs_sincronizacion (
 
 CREATE INDEX IF NOT EXISTS idx_logs_sincronizacion_empresa_id ON logs_sincronizacion(empresa_id);
 CREATE INDEX IF NOT EXISTS idx_logs_sincronizacion_created_at ON logs_sincronizacion(created_at DESC);
+
+-- =============================================================================
+-- TABLA: ai_usage_log
+-- Registro de uso de IA por empresa y fecha.
+-- =============================================================================
+CREATE TABLE IF NOT EXISTS ai_usage_log (
+    id            UUID   PRIMARY KEY DEFAULT uuid_generate_v4(),
+    empresa_id    UUID   NOT NULL REFERENCES empresas(id) ON DELETE CASCADE,
+    accion        VARCHAR(20)  NOT NULL,
+    fecha         DATE         NOT NULL,
+    tokens_usados INTEGER
+);
+
+CREATE INDEX IF NOT EXISTS ix_ai_usage_log_empresa_id_fecha ON ai_usage_log(empresa_id, fecha);
+
+-- =============================================================================
+-- TABLA: system_prompts
+-- Prompts de sistema configurables sin redeploy.
+-- =============================================================================
+CREATE TABLE IF NOT EXISTS system_prompts (
+    nombre     VARCHAR(100) PRIMARY KEY,
+    contenido  TEXT         NOT NULL,
+    updated_at TIMESTAMPTZ  NOT NULL
+);

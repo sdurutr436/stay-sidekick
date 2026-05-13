@@ -14,5 +14,5 @@ CREATE TABLE IF NOT EXISTS alembic_version (
 );
 
 INSERT INTO alembic_version (version_num)
-VALUES ('a1b2c3d4e5f6')
+VALUES ('g7h8i9j0k1l2')
 ON CONFLICT DO NOTHING;
