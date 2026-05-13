@@ -15,7 +15,7 @@
 #
 # URLs tras levantar:
 #   http://localhost/          → sitio estático 11ty
-#   http://localhost/app/      → app Angular
+#   http://localhost/menu/     → app Angular
 #   http://localhost/api/      → API Flask
 #
 # Los datos de PostgreSQL se persisten en el volumen `postgres_data`.

@@ -132,7 +132,7 @@ docker compose down -v           # parar, eliminar contenedores Y la base de dat
 | URL | Servicio |
 |-----|---------|
 | http://localhost/ | Sitio estático (11ty) |
-| http://localhost/app/ | App Angular |
+| http://localhost/menu/ | App Angular |
 | http://localhost/api/ | API Flask |
 
 **Credenciales de acceso (creadas por el seed de desarrollo):**
