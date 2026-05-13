@@ -100,7 +100,8 @@ un único comando. Es la forma más fácil de probar el stack completo en local.
 
 **Primer uso** — preparar los `.env`:
 ```bash
-cp backend/.env.example backend/.env   # completar con tus valores
+cp .env.example .env                   # credenciales PostgreSQL — editar POSTGRES_PASSWORD
+cp backend/.env.example backend/.env   # completar con tus valores (SMTP, Discord, JWT…)
 # web/.env ya está incluido con la key de prueba de Turnstile (dev)
 ```
 
@@ -126,7 +127,7 @@ docker compose down -v           # parar, eliminar contenedores Y la base de dat
 | URL | Servicio |
 |-----|---------|
 | http://localhost/ | Sitio estático (11ty) |
-| http://localhost/app/ | App Angular |
+| http://localhost/menu/ | App Angular |
 | http://localhost/api/ | API Flask |
 
 > Referencia completa de comandos, troubleshooting y variables de entorno: [docs/devops/docker-local.md](docs/devops/docker-local.md)

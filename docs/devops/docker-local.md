@@ -155,7 +155,7 @@ En producción, sustituir por la site key real obtenida en el [Dashboard de Clou
 | URL | Servicio |
 |-----|---------|
 | http://localhost/ | Sitio estático (11ty) |
-| http://localhost/app/ | App Angular |
+| http://localhost/menu/ | App Angular |
 | http://localhost/api/ | API REST Flask |
 
 ## Verificación y pruebas
