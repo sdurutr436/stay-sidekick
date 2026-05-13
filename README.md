@@ -100,6 +100,7 @@ un único comando. Es la forma más fácil de probar el stack completo en local.
 
 **Primer uso** — preparar los `.env`:
 ```bash
+cp .env.example .env                   # variables de PostgreSQL y Turnstile
 cp backend/.env.example backend/.env   # completar con tus valores
 # web/.env ya está incluido con la key de prueba de Turnstile (dev)
 ```
@@ -109,6 +110,11 @@ cp backend/.env.example backend/.env   # completar con tus valores
 docker compose up --build        # construye imágenes y arranca (foreground)
 docker compose up -d --build     # igual pero en background
 ```
+
+> Primera vez: si el volumen ya existía sin el seed, borrar y recrear:
+> ```bash
+> docker compose down -v && docker compose up -d --build
+> ```
 
 **Comandos del día a día:**
 ```bash
@@ -128,6 +134,16 @@ docker compose down -v           # parar, eliminar contenedores Y la base de dat
 | http://localhost/ | Sitio estático (11ty) |
 | http://localhost/app/ | App Angular |
 | http://localhost/api/ | API Flask |
+
+**Credenciales de acceso (creadas por el seed de desarrollo):**
+
+| Campo | Valor |
+|-------|-------|
+| Email | `dev@staysidekick.es` |
+| Contraseña | `admin123` |
+| Rol | superadmin |
+
+> Estas credenciales son solo para entorno local. En producción, generar credenciales nuevas.
 
 > Referencia completa de comandos, troubleshooting y variables de entorno: [docs/devops/docker-local.md](docs/devops/docker-local.md)
 
