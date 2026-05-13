@@ -14,6 +14,29 @@ El proyecto está dividido en tres capas independientes:
 
 Los estilos SCSS son **compartidos** entre `web/` y `frontend/`: ambos compilan desde `frontend/src/styles/` siguiendo la arquitectura [ITCSS](https://www.xfive.co/blog/itcss-scalable-maintainable-css-architecture/) con nomenclatura [BEM](https://getbem.com/).
 
+### Arquitectura Docker
+
+```mermaid
+graph TD
+    Cliente(["Cliente HTTP"])
+
+    subgraph app-net["app-net (red interna Docker)"]
+        Nginx["nginx · Nginx:alpine · :80"]
+        Frontend["frontend · Angular+Nginx · :80"]
+        Web["web · 11ty+Nginx · :80"]
+        Backend["backend · Flask+Gunicorn · :5000"]
+        Postgres[("postgres · PostgreSQL 16 · :5432")]
+    end
+
+    Cliente -->|"HTTP :80 — único puerto expuesto al host"| Nginx
+    Nginx -->|"/api/*"| Backend
+    Nginx -->|"/menu/*"| Frontend
+    Nginx -->|"/*"| Web
+    Backend -->|"SQL :5432"| Postgres
+```
+
+Una petición autenticada recorre el siguiente camino: el cliente envía la solicitud HTTP al puerto 80 del host, donde **nginx** actúa como proxy inverso y la enruta según el prefijo — `/api/*` se redirige al **backend** Flask (Gunicorn en puerto 5000), que consulta **PostgreSQL** (puerto 5432) y devuelve una respuesta JSON. nginx reenvía esa respuesta al cliente. El resto de rutas sirven la SPA Angular (`/menu/*`) o el sitio estático 11ty (`/*`). Todo el tráfico entre servicios circula por la red interna `app-net`; el único puerto expuesto al host es el 80.
+
 ## Inicio rápido
 
 ### Prerrequisitos
