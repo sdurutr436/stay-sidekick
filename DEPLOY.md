@@ -139,7 +139,11 @@ No escribir la URL a mano — Railway la actualiza automáticamente al rotar cre
 
 ---
 
-## 5. Verificación post-despliegue
+## 5. Referencia de la API
+
+Documentación completa de endpoints, parámetros, códigos de respuesta y ejemplos curl: [docs/api/endpoints.md](docs/api/endpoints.md)
+
+## 6. Verificación post-despliegue
 
 ```bash
 # Health check básico
@@ -163,7 +167,7 @@ Verificación completa con ejemplos de login y endpoints autenticados: [docs/dev
 
 ---
 
-## 6. Troubleshooting
+## 7. Troubleshooting
 
 **`DATABASE_URL variable is not set`**
 → Falta crear el `.env` raíz. Ejecutar `cp .env.example .env` y rellenar `POSTGRES_PASSWORD`.
