@@ -27,7 +27,7 @@ services:
       - path: ./backend/.env.dev
         required: true
     environment:
-      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/stay_sidekick
+      DATABASE_URL: ${DATABASE_URL}
       ALLOWED_ORIGINS: "http://localhost"
 
   postgres:
