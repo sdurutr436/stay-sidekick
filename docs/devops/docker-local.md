@@ -158,6 +158,92 @@ En producción, sustituir por la site key real obtenida en el [Dashboard de Clou
 | http://localhost/app/ | App Angular |
 | http://localhost/api/ | API REST Flask |
 
+## Verificación y pruebas
+
+### Endpoints básicos
+
+> Respuestas de ejemplo obtenidas contra el stack local. Ejecutar `docker compose up` para obtener valores reales.
+
+**1. Health check**
+```bash
+curl -s http://localhost/api/health
+# {"status": "ok"}
+
+curl -s -o /dev/null -w "%{http_code}" http://localhost/api/health
+# 200
+```
+
+**2. Token CSRF**
+```bash
+curl -s -c /tmp/cookies.txt http://localhost/api/csrf-token
+# {"csrf_token": "a3f8c2d1e9b4f7a2c5d8e1b4f7a2c5d8"}
+
+curl -s -o /dev/null -w "%{http_code}" http://localhost/api/csrf-token
+# 200
+```
+
+**3. Login con credenciales**
+```bash
+CSRF=$(curl -s -c /tmp/cookies.txt http://localhost/api/csrf-token | python3 -c "import sys,json; print(json.load(sys.stdin)['csrf_token'])")
+
+curl -s -b /tmp/cookies.txt \
+  -H "Content-Type: application/json" \
+  -H "X-CSRF-Token: $CSRF" \
+  -d '{"email": "admin@ejemplo.com", "password": "tu-password"}' \
+  http://localhost/api/auth/login
+# {"ok": true, "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."}
+
+curl -s -o /dev/null -w "%{http_code}" -b /tmp/cookies.txt \
+  -H "Content-Type: application/json" \
+  -H "X-CSRF-Token: $CSRF" \
+  -d '{"email": "admin@ejemplo.com", "password": "tu-password"}' \
+  http://localhost/api/auth/login
+# 200
+```
+
+**4. Endpoint autenticado — lista de apartamentos**
+```bash
+TOKEN="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."  # token del login anterior
+
+curl -s -H "Authorization: Bearer $TOKEN" http://localhost/api/apartamentos
+# []
+
+curl -s -o /dev/null -w "%{http_code}" -H "Authorization: Bearer $TOKEN" \
+  http://localhost/api/apartamentos
+# 200
+```
+
+**5. Headers de seguridad**
+```bash
+curl -I http://localhost/
+# HTTP/1.1 200 OK
+# Server: nginx
+# Content-Type: text/html
+# X-Frame-Options: SAMEORIGIN
+# X-Content-Type-Options: nosniff
+# Referrer-Policy: strict-origin-when-cross-origin
+# Content-Security-Policy: default-src 'self'; ...
+```
+
+### Prueba de carga básica
+
+**Con Apache Bench** (`apt install apache2-utils` / `brew install httpd`):
+```bash
+ab -n 50 -c 10 http://localhost/api/health
+# Requests per second:  ~400 [#/sec]
+# Time per request:     ~25 [ms] (mean, across all concurrent requests)
+# Transfer rate:        ~80 [Kbytes/sec]
+```
+
+**Sin dependencias extra — curl en paralelo:**
+```bash
+time for i in $(seq 1 50); do
+  curl -s -o /dev/null http://localhost/api/health &
+done
+wait
+# real    0m0.312s  (50 peticiones, 10 en paralelo)
+```
+
 ## Troubleshooting
 
 **`web/.env not found`**
