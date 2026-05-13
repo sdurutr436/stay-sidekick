@@ -175,6 +175,7 @@ tfg-alberti/
 
 | Documento | Contenido |
 |-----------|-----------|
+| [DEPLOY.md](DEPLOY.md) | Guía consolidada de despliegue (local + Railway) |
 | [docs/DESARROLLO.md](docs/DESARROLLO.md) | Guía completa de entorno de desarrollo |
 | [docs/devops/docker-local.md](docs/devops/docker-local.md) | Referencia Docker para desarrollo local |
 | [docs/backend/DEPENDENCIAS.md](docs/backend/DEPENDENCIAS.md) | Librerías del backend y justificación |
