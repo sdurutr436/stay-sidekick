@@ -36,3 +36,6 @@ COPY --from=builder /app/dist/frontend/browser /usr/share/nginx/html
 
 ENV PORT=80
 EXPOSE 80
+# USER nginx no se aplica: el proceso maestro de nginx necesita root para
+# enlazar el puerto 80 (< 1024). Los worker processes ya corren como nginx
+# por la directiva `user nginx` del nginx.conf interno.
