@@ -78,8 +78,8 @@ services:
         required: true   # crear desde backend/.env.example antes de levantar
     environment:
       # DATABASE_URL apunta al servicio postgres de este compose.
-      # Sobreescribe el valor de backend/.env para despliegue local.
-      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/stay_sidekick
+      # Sobreescribe el valor de backend/.env; se lee de .env raíz (cp .env.example .env).
+      DATABASE_URL: ${DATABASE_URL}
       # En Docker todos los servicios pasan por nginx (:80) → mismo origen
       ALLOWED_ORIGINS: "http://localhost"
     depends_on:
@@ -91,12 +91,13 @@ services:
   # ── PostgreSQL ───────────────────────────────────────────────────────────────
   # Los datos persisten en el volumen `postgres_data` entre reinicios.
   # El schema se aplica automáticamente en el primer arranque (init script).
+  # Las credenciales se leen del .env raíz (cp .env.example .env).
   postgres:
     image: postgres:16-alpine
     environment:
-      POSTGRES_DB: stay_sidekick
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./backend/db/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro,Z

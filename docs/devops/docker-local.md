@@ -16,11 +16,15 @@ en local con Docker Compose.
 ## Primer uso
 
 ```bash
-# 1. Copiar y completar el .env del backend
+# 1. Copiar y completar el .env raíz (credenciales de PostgreSQL)
+cp .env.example .env
+# Editar .env y cambiar POSTGRES_PASSWORD por una contraseña real
+
+# 2. Copiar y completar el .env del backend
 cp backend/.env.example backend/.env
 # Editar backend/.env con tus claves reales (SMTP, Discord, JWT…)
 
-# 2. El web/.env ya está creado con la key de prueba de Turnstile
+# 3. El web/.env ya está creado con la key de prueba de Turnstile
 #    (1x00000000000000000000AA — siempre OK en desarrollo)
 #    Para producción, editar web/.env con la site key real de Cloudflare.
 ```
