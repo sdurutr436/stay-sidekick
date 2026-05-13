@@ -1,6 +1,12 @@
 # Stay Sidekick
 
+[![CI Python](https://github.com/sdurutr436/tfg-alberti/actions/workflows/ci-python.yml/badge.svg)](https://github.com/sdurutr436/tfg-alberti/actions/workflows/ci-python.yml)
+[![CI Angular](https://github.com/sdurutr436/tfg-alberti/actions/workflows/ci-angular.yml/badge.svg)](https://github.com/sdurutr436/tfg-alberti/actions/workflows/ci-angular.yml)
+[![Docker Hub](https://github.com/sdurutr436/tfg-alberti/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/sdurutr436/tfg-alberti/actions/workflows/docker-publish.yml)
+
 TFG DAW 2 — Plataforma para la gestión de solicitudes de estancia.
+
+Imágenes publicadas en [Docker Hub — sdurutr436](https://hub.docker.com/u/sdurutr436).
 
 ## Arquitectura
 
