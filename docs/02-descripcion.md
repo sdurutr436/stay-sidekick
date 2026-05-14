@@ -1,7 +1,5 @@
 # 2. Descripcion
 
----
-
 ## Indice
 
 - [2.1. Descripcion detallada de cada funcionalidad principal](#21-descripcion-detallada-de-cada-funcionalidad-principal)

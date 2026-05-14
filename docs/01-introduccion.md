@@ -1,7 +1,5 @@
 # 01-introduccion
 
----
-
 ## Indice
 
 - [1.1. Origen de la idea y motivacion del proyecto](#11-origen-de-la-idea-y-motivacion-del-proyecto)
