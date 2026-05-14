@@ -2,8 +2,8 @@
 
 ## Requisitos previos
 
-- Python 3.x instalado (`python3 --version`)
-- pip instalado (`pip3 --version`)
+- Python 3.12 instalado (`python3.12 --version` en Linux/Mac o `py -3.12 --version` en Windows)
+- pip para Python 3.12 instalado
 
 ---
 
@@ -14,7 +14,7 @@
 sudo apt install python3-venv python3-pip
 
 # 2. Crear el entorno virtual
-python3 -m venv venv
+python3.12 -m venv venv
 
 # 3. Activar el entorno virtual
 source venv/bin/activate          # Linux/Mac
@@ -33,8 +33,8 @@ cp .env.example .env
 ## En el segundo PC (o al clonar el repo)
 
 ```bash
-# El venv NO se sube a git, hay que recrearlo
-python3 -m venv venv
+# El venv NO se sube a git, hay que recrearlo con Python 3.12
+python3.12 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 ```
