@@ -149,7 +149,7 @@ def mejorar_plantilla(plantilla_id):
     data = _mejorar_schema.load(body)
 
     try:
-        contenido = ai_service.mejorar(data["contenido"], data["idioma"], _empresa_id())
+        contenido = ai_service.mejorar(data["contenido"], data["idioma"], _empresa_id(), data.get("tono"))
     except Exception as exc:
         return _handle_ia_error(exc)
 

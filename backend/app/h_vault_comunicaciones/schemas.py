@@ -3,6 +3,7 @@
 from marshmallow import Schema, fields, validate
 
 _IDIOMAS = ("es", "en", "fr", "de", "it", "pt")
+_TONOS = ("clasico", "cercano", "entusiasta", "minimalista")
 
 
 class PlantillaResponseSchema(Schema):
@@ -40,6 +41,7 @@ class ActualizarPlantillaSchema(Schema):
 class MejorarSchema(Schema):
     contenido = fields.Str(required=True, validate=validate.Length(min=1))
     idioma = fields.Str(required=True, validate=validate.OneOf(_IDIOMAS))
+    tono = fields.Str(load_default=None, allow_none=True, validate=validate.OneOf(_TONOS))
 
 
 class TraducirSchema(Schema):
