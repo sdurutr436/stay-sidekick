@@ -2,68 +2,89 @@
 
 ---
 
-## 1.1. Origen de la idea y motivación del proyecto
+## Indice
 
-La idea nace de la experiencia directa como recepcionista en una empresa gestora de apartamentos turísticos durante **2 años y 5 meses**. A lo largo de ese tiempo quedó patente que determinadas tareas operativas cotidianas —repetitivas, manuales y fragmentadas entre herramientas— consumían un tiempo desproporcionado que restaba capacidad para atender reservas activas, mejorar la experiencia del huésped o coordinar al equipo de forma eficiente.
+- [1.1. Origen de la idea y motivacion del proyecto](#11-origen-de-la-idea-y-motivacion-del-proyecto)
+- [1.2. Expectativas y objetivos especificos](#12-expectativas-y-objetivos-especificos)
+	- [Objetivo general](#objetivo-general)
+	- [Objetivos especificos](#objetivos-especificos)
+	- [Expectativas a futuro](#expectativas-a-futuro)
+- [1.3. Analisis comparativo de aplicaciones similares](#13-analisis-comparativo-de-aplicaciones-similares)
+	- [Panorama actual](#panorama-actual)
+	- [Analisis de competidores directos](#analisis-de-competidores-directos)
+	- [Tabla comparativa funcional](#tabla-comparativa-funcional)
+	- [Posicionamiento](#posicionamiento)
 
-Este problema no era exclusivo del puesto de recepción: afectaba a los compañeros en rotación, que expresaban las mismas fricciones de forma recurrente. Bajo esas observaciones y quejas compartidas se desarrolló un primer boceto funcional en **Java con JavaFX** como interfaz gráfica: una herramienta sencilla que cruzaba información introducida manualmente para facilitar el envío de un correo y generar contactos rápidamente.
+## 1.1. Origen de la idea y motivacion del proyecto
 
-Con mayor formación técnica, se desplegó un segundo prototipo sobre el stack **MERN** (MongoDB, Express, React, Node.js), ampliando las funcionalidades con un mapa de calor y permitiendo la subida de ficheros `.csv` para la persistencia y cruce de datos. Este prototipo, en su versión más básica; sin sesiones ni autenticación por empresa, **sigue en uso a día de hoy**, lo que valida empíricamente que la herramienta resuelve necesidades reales y abre la puerta a su venta y escalado a otras empresas del sector.
+La idea de Stay Sidekick surge de una experiencia profesional directa como recepcionista en una empresa gestora de apartamentos turisticos durante **2 años y 5 meses**. En ese periodo se detecto que una parte importante de la jornada se destinaba a tareas repetitivas, manuales y distribuidas en varias herramientas, lo que reducia la capacidad para atender reservas activas, mejorar la experiencia del huesped y coordinar al equipo.
 
-El proyecto **Stay Sidekick** nace de esa evolución. No pretende competir con los PMS (*Property Management Systems*) modernos del mercado, sino ocupar los huecos operativos que esos sistemas no cubren o cubren de forma poco práctica. Es una capa satélite: complementa al PMS sin sustituirlo.
+La problematica no afectaba solo a un puesto concreto: era una friccion compartida por distintos companeros en rotacion. A partir de estas observaciones se creo un primer boceto funcional en **Java con JavaFX**, orientado a cruzar datos introducidos manualmente para agilizar envios de correo y generacion de contactos.
+
+Con una base tecnica mas solida se desarrollo un segundo prototipo sobre stack **MERN** (MongoDB, Express, React, Node.js). Esta version incorporo nuevas capacidades, como el mapa de calor y la carga de archivos `.csv` para persistencia y cruce de datos. Aunque era una version basica, sin sesiones ni autenticacion por empresa, **sigue en uso actualmente**, lo que confirma su utilidad real y su potencial de escalado.
+
+Stay Sidekick nace como evolucion de ese recorrido. No busca sustituir a los PMS (*Property Management Systems*) existentes, sino cubrir necesidades operativas que estos sistemas no resuelven de forma suficiente. Su enfoque es el de una capa satelite: complementa al PMS y se adapta a la operativa diaria de cada empresa.
 
 ---
 
-## 1.2. Expectativas y objetivos específicos
+## 1.2. Expectativas y objetivos especificos
 
-El objetivo principal es diseñar, desarrollar y desplegar una plataforma web multi-empresa que automatice las tareas operativas más comunes del sector del alquiler vacacional, ofreciendo herramientas satélite configurables por empresa como complemento directo al PMS utilizado.
+### Objetivo general
 
-### Objetivos específicos
+Disenar, desarrollar y desplegar una plataforma web multiempresa que automatice tareas operativas frecuentes del alquiler vacacional mediante herramientas satelite configurables por cuenta, como complemento directo al PMS.
 
-- **Desarrollar un motor de configuración parametrizable por empresa**, de modo que cada herramienta se adapte a los formatos de datos, protocolos internos y preferencias de cada cliente, sin modificar el código base.
-- **Implementar las cinco herramientas del MVP**: mapa de calor de entradas y salidas, notificaciones automáticas para check-ins tardíos, sincronización con Google Contacts, base de datos de alojamientos y vault de comunicaciones con generador asistido por IA.
-- **Garantizar compatibilidad universal con cualquier PMS**, mediante entrada de datos por ficheros XLSX autogenerados como fallback e integración vía API REST cuando sea posible (Smoobu como PMS de referencia en el MVP).
-- **Construir una arquitectura multi-tenant real**, con autenticación por empresa, catálogo personalizado y configuración persistente por cuenta.
-- **Cumplir con la normativa aplicable** (RGPD, LSSI-CE, WCAG 2.1 AA), garantizando que los datos personales de huéspedes se tratan únicamente en memoria y no se persisten en base de datos.
-- **Desplegar el MVP en producción** con infraestructura real (Docker, Nginx, Railway, GitHub Actions CI/CD) antes del 15 de mayo de 2026, con al menos una empresa del sector como caso de uso activo.
-- **Documentar el proyecto de forma completa**: memoria técnica, wireframes en Figma, vídeo de demostración y presentación de defensa.
+### Objetivos especificos
+
+- **Desarrollar un motor de configuracion parametrizable por empresa**, para adaptar cada herramienta a formatos de datos, protocolos internos y preferencias de cliente sin modificar el codigo base.
+- **Implementar las cinco herramientas del MVP**: mapa de calor de entradas y salidas, notificaciones de check-in tardio, sincronizacion con Google Contacts, base de datos de alojamientos y vault de comunicaciones asistido por IA.
+- **Garantizar compatibilidad con distintos PMS**, mediante integracion API REST cuando exista y mediante importacion XLSX como mecanismo de respaldo.
+- **Construir una arquitectura multi-tenant real**, con autenticacion por empresa, catalogo personalizado y configuracion persistente por cuenta.
+- **Cumplir normativa aplicable** (RGPD, LSSI-CE y WCAG 2.1 AA), priorizando minimizacion y tratamiento responsable de datos.
+- **Desplegar el MVP en produccion** con infraestructura real (Docker, Nginx, Railway y GitHub Actions CI/CD), con al menos un caso de uso empresarial activo.
+- **Documentar el proyecto de forma completa**, incluyendo memoria tecnica, wireframes, demostracion y defensa.
 
 ### Expectativas a futuro
 
-Más allá del alcance del TFG, Stay Sidekick tiene proyección comercial como producto bajo licencia privada. Las empresas participantes durante el desarrollo recibirán acceso gratuito y soporte directo. A largo plazo se contempla un modelo *freemium* (herramientas básicas gratuitas, herramientas adicionales por suscripción) con reconocimiento permanente en la landing pública para las empresas fundadoras.
+Mas alla del alcance del TFG, Stay Sidekick se plantea con proyeccion comercial como producto bajo licencia privada. Las empresas que colaboren en etapas iniciales dispondran de acceso y soporte directo. A medio plazo se contempla un modelo *freemium*, con funcionalidades base gratuitas y herramientas avanzadas bajo suscripcion.
 
 ---
 
-## 1.3. Análisis comparativo de aplicaciones similares
+## 1.3. Analisis comparativo de aplicaciones similares
 
-El mercado de gestión de alquiler vacacional cuenta con soluciones consolidadas, pero ninguna cubre de forma directa, práctica y configurable las necesidades operativas que Stay Sidekick aborda.
+El mercado de gestion de alquiler vacacional dispone de soluciones consolidadas, pero ninguna cubre de forma integrada, configurable y enfocada a operativa diaria el conjunto de necesidades que aborda Stay Sidekick.
 
 ### Panorama actual
 
-Las soluciones existentes se dividen en dos categorías principales:
+Las soluciones existentes se agrupan en dos bloques:
 
-- **PMS generalistas** (Smoobu, Beds24, KrossBooking, Guesty, Hostaway): resuelven eficazmente la gestión de reservas, canales, calendarios y facturación, pero sus herramientas operativas específicas son limitadas o inexistentes. Sus paneles están orientados a la gestión centralizada, no a la coordinación del equipo operativo en el terreno.
-- **Herramientas especializadas aisladas** (Properly para limpiezas, Hospitable para mensajería): cubren parcialmente alguna necesidad concreta, pero requieren múltiples suscripciones independientes y no están integradas entre sí.
+- **PMS generalistas** (Smoobu, Beds24, KrossBooking, Guesty, Hostaway): resuelven reservas, canales, calendarios y facturacion, pero suelen ofrecer soporte limitado para tareas operativas concretas del dia a dia.
+- **Herramientas especializadas aisladas** (Properly, Hospitable): cubren necesidades puntuales, pero obligan a gestionar varias suscripciones y no siempre comparten un flujo unificado.
 
-### Análisis de competidores directos identificados
+### Analisis de competidores directos
 
-**Smoobu** es uno de los PMS más extendidos entre medianas empresas del sector en España y Europa. Ofrece API REST bien documentada con plan gratuito para una propiedad, lo que lo convierte en el PMS de referencia del MVP. Sin embargo, no ofrece visualizaciones tipo heatmap, las automatizaciones de mensajería son genéricas y no existe integración con Google Contacts.
+**Smoobu**
 
-**Beds24** destaca por su sistema de automatizaciones mediante triggers y su API OpenAPI. Es técnicamente potente, pero con una curva de aprendizaje elevada que lo hace inaccesible para equipos pequeños sin perfil técnico. Está incluido en la hoja de ruta de Stay Sidekick como segundo PMS a integrar tras el MVP. Tampoco cubre las funcionalidades operativas específicas que aborda este proyecto.
+Es uno de los PMS mas extendidos en pymes del sector y ofrece API REST documentada con plan de entrada asequible. Por ello se adopta como PMS de referencia en el MVP. Como limitacion, no incorpora de forma nativa un mapa de calor operativo, ni sincronizacion directa con Google Contacts, ni un vault configurable orientado a protocolos internos.
 
-**KrossBooking** es el PMS del entorno laboral del que nació el proyecto. No dispone de API pública oficial, y el acceso externo depende de soluciones no oficiales. Esto lo sitúa como objetivo de integración futura condicionada a acuerdo con una empresa del sector, dejando Smoobu como primera integración API del MVP.
+**Beds24**
+
+Destaca por su capacidad de automatizacion y por su API OpenAPI. No obstante, su curva de aprendizaje suele ser elevada para equipos sin perfil tecnico. Se considera objetivo de integracion posterior al MVP.
+
+**KrossBooking**
+
+Fue el PMS del entorno donde surge el proyecto, pero no dispone de API publica oficial en condiciones equivalentes a otros proveedores. Su integracion se plantea como linea futura sujeta a acuerdos especificos.
 
 ### Tabla comparativa funcional
 
-| Herramienta | Mapa de calor operativo | Notificaciones configurables | Sincronización Google Contacts | Vault de comunicaciones | Configurable por empresa |
+| Herramienta | Mapa de calor operativo | Notificaciones configurables | Sincronizacion Google Contacts | Vault de comunicaciones | Configurable por empresa |
 | --- | --- | --- | --- | --- | --- |
-| Smoobu | ❌ | ⚠️ Básicas | ❌ | ⚠️ Limitado | ❌ |
-| Beds24 | ❌ | ⚠️ Complejas | ❌ | ⚠️ Templates email | ⚠️ Parcial |
-| KrossBooking | ❌ | ⚠️ Estándar | ❌ | ⚠️ Mínimo | ❌ |
-| Hospitable | ❌ | ✅ Avanzadas | ❌ | ✅ Con variables | ⚠️ Parcial |
-| Properly | ⚠️ Vista de tareas | ❌ | ❌ | ❌ | ❌ |
-| **Stay Sidekick** | **✅ Heatmap configurable** | **✅ Por empresa y protocolo** | **✅ API + CSV fallback** | **✅ Con IA (BYOK)** | **✅ Motor propio** |
+| Smoobu | No | Basico | No | Limitado | No |
+| Beds24 | No | Avanzado pero complejo | No | Parcial | Parcial |
+| KrossBooking | No | Estandar | No | Minimo | No |
+| Hospitable | No | Avanzado | No | Con variables | Parcial |
+| Properly | Parcial (tareas) | No | No | No | No |
+| **Stay Sidekick** | **Si** | **Si, por empresa y protocolo** | **Si** | **Si, con IA opcional** | **Si** |
 
 ### Posicionamiento
 
-No existe actualmente una plataforma satélite multi-empresa que agrupe herramientas operativas específicas como capa complementaria al PMS, que sea completamente configurable por empresa sin tocar código y que ofrezca las cinco funcionalidades del MVP en un único producto integrado. Stay Sidekick se posiciona en ese hueco del mercado, entre las necesidades que los PMS no resuelven y las soluciones especializadas que sólo cubren una parte del problema.
+Stay Sidekick se posiciona como una capa operativa satelite para empresas de alquiler vacacional que ya trabajan con PMS, pero necesitan resolver procesos concretos con mas flexibilidad. Su diferencial es combinar, en una misma plataforma, configuracion por empresa, enfoque multi-tenant y un conjunto de herramientas operativas integradas que normalmente aparecen dispersas o no disponibles en los sistemas tradicionales.
