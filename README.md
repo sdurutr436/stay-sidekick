@@ -48,7 +48,7 @@ Una petición autenticada recorre el siguiente camino: el cliente envía la soli
 ### Prerrequisitos
 
 - Node.js ≥ 18
-- Python ≥ 3.11
+- Python 3.12
 - npm ≥ 10
 
 ### Levantar frontend + sitio estático (una sola orden)
