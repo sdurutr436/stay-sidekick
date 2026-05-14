@@ -249,8 +249,21 @@
       <!-- Acciones: refinar con IA + copiar mensaje -->
       <div class="vault-editor__acciones">
 
-        <!-- Lado izquierdo: refinar con IA (con cooldown de 1 min) -->
+        <!-- Lado izquierdo: tono + refinar con IA (con cooldown de 1 min) -->
         <div class="vault-editor__acciones-izq">
+          <select
+            class="form-input vault-editor__tono-select"
+            [value]="tonoSeleccionado() ?? ''"
+            (change)="onTonoSeleccionado(selectValue($event))"
+            [disabled]="!isEditing()"
+            aria-label="Tono del mensaje refinado"
+          >
+            <option value="">Tono por defecto</option>
+            <option value="clasico">Clásico — formal, de usted</option>
+            <option value="cercano">Cercano — cálido, tuteando</option>
+            <option value="entusiasta">Entusiasta — acogedor y con energía</option>
+            <option value="minimalista">Minimalista — breve y directo</option>
+          </select>
           <app-button
             [variant]="cooldownActivo() ? 'secondary' : 'primary'"
             size="md"

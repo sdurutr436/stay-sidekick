@@ -64,6 +64,7 @@ export class VaultComunicacionesPageComponent implements OnInit, OnDestroy {
   readonly mensajeCopiadoTexto   = signal('');
   readonly toastVisible          = signal(false);
   readonly toastMensaje          = signal('');
+  readonly tonoSeleccionado      = signal<string | null>(null);
 
   readonly filtroCategoria = signal<string | null>(null);
   readonly filtroIdioma    = signal<string | null>(null);
@@ -266,6 +267,7 @@ export class VaultComunicacionesPageComponent implements OnInit, OnDestroy {
       this.plantillaSeleccionada()!.id,
       this.mensajeActual(),
       this.editorIdioma(),
+      this.tonoSeleccionado(),
     ).subscribe({
       next: res => {
         this.mensajeActual.set(res.contenido);
@@ -322,6 +324,7 @@ export class VaultComunicacionesPageComponent implements OnInit, OnDestroy {
   onIdiomaDestino(value: string):   void { this.idiomaDestino.set(value   || null); }
   onEditorIdioma(value: string):    void { this.editorIdioma.set(value); }
   onEditorCategoria(value: string): void { this.editorCategoria.set(value || null); }
+  onTonoSeleccionado(value: string): void { this.tonoSeleccionado.set(value || null); }
 
   copiarMensaje(): void {
     const texto = this.mensajeActual();

@@ -225,6 +225,12 @@
     gap: $space-3;
   }
 
+  // Selector de tono para el refinado con IA
+  &__tono-select {
+    min-width: 12.5rem;
+    margin-bottom: $space-2;
+  }
+
   // Bloque de traducción: select de idioma + botón Traducir
   &__traducir {
     display: flex;
