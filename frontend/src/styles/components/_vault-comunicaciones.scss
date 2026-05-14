@@ -209,8 +209,15 @@
     }
   }
 
-  // Fila de botones inferior
+  // Contenedor de acciones: columna de dos filas
   &__acciones {
+    display: flex;
+    flex-direction: column;
+    gap: $space-3;
+  }
+
+  // Fila 1: tono+refinar a la izquierda | guardar+copiar a la derecha
+  &__acciones-fila {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -228,15 +235,14 @@
   // Selector de tono para el refinado con IA
   &__tono-select {
     min-width: 12.5rem;
-    margin-bottom: $space-2;
   }
 
-  // Bloque de traducción: select de idioma + botón Traducir
+  // Fila 2: select de idioma destino + botón Traducir (solo lado izquierdo)
   &__traducir {
     display: flex;
     align-items: center;
     gap: $space-3;
-    margin-top: $space-2;
+    width: fit-content;
   }
 
   &__traducir-select {
