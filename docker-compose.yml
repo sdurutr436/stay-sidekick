@@ -9,13 +9,13 @@
 #   postgres  → PostgreSQL 16 con volumen persistente
 #
 # Primer uso:
+#   cp .env.example .env                   # variables de PostgreSQL y Turnstile
 #   cp backend/.env.example backend/.env   # rellenar variables reales
-#   cp web/.env.example web/.env           # rellenar TURNSTILE_SITE_KEY
 #   docker compose up --build
 #
 # URLs tras levantar:
 #   http://localhost/          → sitio estático 11ty
-#   http://localhost/app/      → app Angular
+#   http://localhost/menu/     → app Angular
 #   http://localhost/api/      → API Flask
 #
 # Los datos de PostgreSQL se persisten en el volumen `postgres_data`.
@@ -57,7 +57,7 @@ services:
       context: .
       dockerfile: web/Dockerfile
       args:
-        TURNSTILE_SITE_KEY: ${TURNSTILE_SITE_KEY}
+        TURNSTILE_SITE_KEY: ${TURNSTILE_SITE_KEY:-1x00000000000000000000AA}
     env_file:
       - path: ./web/.env
         required: true   # crear desde web/.env.example antes de levantar
@@ -78,8 +78,8 @@ services:
         required: true   # crear desde backend/.env.example antes de levantar
     environment:
       # DATABASE_URL apunta al servicio postgres de este compose.
-      # Sobreescribe el valor de backend/.env para despliegue local.
-      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/stay_sidekick
+      # Sobreescribe el valor de backend/.env; se lee de .env raíz (cp .env.example .env).
+      DATABASE_URL: ${DATABASE_URL:-postgresql://postgres:postgres@postgres:5432/stay_sidekick}
       # En Docker todos los servicios pasan por nginx (:80) → mismo origen
       ALLOWED_ORIGINS: "http://localhost"
     depends_on:
@@ -91,17 +91,20 @@ services:
   # ── PostgreSQL ───────────────────────────────────────────────────────────────
   # Los datos persisten en el volumen `postgres_data` entre reinicios.
   # El schema se aplica automáticamente en el primer arranque (init script).
+  # Las credenciales se leen del .env raíz (cp .env.example .env).
   postgres:
     image: postgres:16-alpine
     environment:
-      POSTGRES_DB: stay_sidekick
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ${POSTGRES_DB:-stay_sidekick}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./backend/db/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro,Z
+      - ./backend/seed.sql:/docker-entrypoint-initdb.d/seed.sql:ro,Z
+      - ./backend/db/stamp_alembic.sql:/docker-entrypoint-initdb.d/stamp_alembic.sql:ro,Z
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d stay_sidekick"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-stay_sidekick}"]
       interval: 5s
       timeout: 5s
       retries: 10

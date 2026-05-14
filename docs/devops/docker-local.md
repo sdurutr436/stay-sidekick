@@ -16,11 +16,15 @@ en local con Docker Compose.
 ## Primer uso
 
 ```bash
-# 1. Copiar y completar el .env del backend
+# 1. Copiar y completar el .env raíz (credenciales de PostgreSQL)
+cp .env.example .env
+# Editar .env y cambiar POSTGRES_PASSWORD por una contraseña real
+
+# 2. Copiar y completar el .env del backend
 cp backend/.env.example backend/.env
 # Editar backend/.env con tus claves reales (SMTP, Discord, JWT…)
 
-# 2. El web/.env ya está creado con la key de prueba de Turnstile
+# 3. El web/.env ya está creado con la key de prueba de Turnstile
 #    (1x00000000000000000000AA — siempre OK en desarrollo)
 #    Para producción, editar web/.env con la site key real de Cloudflare.
 ```
@@ -104,9 +108,9 @@ Para conectarse a la base de datos desde el host (con cualquier cliente SQL):
 ```
 Host:     localhost
 Puerto:   5432        # expuesto solo si añades ports: en el servicio postgres
-Usuario:  postgres
-Password: postgres
-DB:       stay_sidekick
+Usuario:  ${POSTGRES_USER}     # valor de tu .env raíz
+Password: ${POSTGRES_PASSWORD} # valor de tu .env raíz
+DB:       ${POSTGRES_DB}       # valor de tu .env raíz
 ```
 
 > El servicio `postgres` no expone el puerto 5432 al host por defecto para mayor seguridad.
@@ -119,6 +123,23 @@ docker compose exec postgres psql -U postgres -d stay_sidekick
 ```
 
 ## Variables de entorno
+
+### `.env` (raíz del proyecto — PostgreSQL)
+
+Copiar desde `.env.example` y completar:
+
+```bash
+cp .env.example .env
+```
+
+| Variable | Descripción | Valor por defecto |
+|----------|-------------|-------------------|
+| `POSTGRES_DB` | Nombre de la base de datos | `stay_sidekick` |
+| `POSTGRES_USER` | Usuario de PostgreSQL | `postgres` |
+| `POSTGRES_PASSWORD` | Contraseña de PostgreSQL | **cambiar obligatoriamente** |
+| `DATABASE_URL` | URI de conexión completa | se compone de las anteriores |
+
+> `DATABASE_URL` y `ALLOWED_ORIGINS` son inyectadas desde el `.env` raíz por `docker-compose.yml`. No es necesario definirlas en `backend/.env` para el entorno Docker.
 
 ### `backend/.env`
 
@@ -135,8 +156,6 @@ Copiar desde `backend/.env.example` y completar:
 | `MAIL_RECIPIENT` | Correo que recibe las solicitudes de contacto |
 | `DISCORD_WEBHOOK_URL` | Webhook de Discord para notificaciones |
 
-> `DATABASE_URL` y `ALLOWED_ORIGINS` son inyectadas automáticamente por `docker-compose.yml` para el entorno Docker. No es necesario cambiarlas.
-
 ### `web/.env`
 
 | Variable | Descripción |
@@ -151,13 +170,104 @@ En producción, sustituir por la site key real obtenida en el [Dashboard de Clou
 | URL | Servicio |
 |-----|---------|
 | http://localhost/ | Sitio estático (11ty) |
-| http://localhost/app/ | App Angular |
+| http://localhost/menu/ | App Angular |
 | http://localhost/api/ | API REST Flask |
+
+## Verificación y pruebas
+
+### Endpoints básicos
+
+> Respuestas de ejemplo obtenidas contra el stack local. Ejecutar `docker compose up` para obtener valores reales.
+
+**1. Health check**
+```bash
+curl -s http://localhost/api/health
+# {"status": "ok"}
+
+curl -s -o /dev/null -w "%{http_code}" http://localhost/api/health
+# 200
+```
+
+**2. Token CSRF**
+```bash
+curl -s -c /tmp/cookies.txt http://localhost/api/csrf-token
+# {"csrf_token": "a3f8c2d1e9b4f7a2c5d8e1b4f7a2c5d8"}
+
+curl -s -o /dev/null -w "%{http_code}" http://localhost/api/csrf-token
+# 200
+```
+
+**3. Login con credenciales**
+```bash
+CSRF=$(curl -s -c /tmp/cookies.txt http://localhost/api/csrf-token | python3 -c "import sys,json; print(json.load(sys.stdin)['csrf_token'])")
+
+curl -s -b /tmp/cookies.txt \
+  -H "Content-Type: application/json" \
+  -H "X-CSRF-Token: $CSRF" \
+  -d '{"email": "admin@ejemplo.com", "password": "tu-password"}' \
+  http://localhost/api/auth/login
+# {"ok": true, "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."}
+
+curl -s -o /dev/null -w "%{http_code}" -b /tmp/cookies.txt \
+  -H "Content-Type: application/json" \
+  -H "X-CSRF-Token: $CSRF" \
+  -d '{"email": "admin@ejemplo.com", "password": "tu-password"}' \
+  http://localhost/api/auth/login
+# 200
+```
+
+**4. Endpoint autenticado — lista de apartamentos**
+```bash
+TOKEN="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."  # token del login anterior
+
+curl -s -H "Authorization: Bearer $TOKEN" http://localhost/api/apartamentos
+# []
+
+curl -s -o /dev/null -w "%{http_code}" -H "Authorization: Bearer $TOKEN" \
+  http://localhost/api/apartamentos
+# 200
+```
+
+**5. Headers de seguridad**
+```bash
+curl -I http://localhost/
+# HTTP/1.1 200 OK
+# Server: nginx
+# Content-Type: text/html
+# X-Frame-Options: SAMEORIGIN
+# X-Content-Type-Options: nosniff
+# Referrer-Policy: strict-origin-when-cross-origin
+# Content-Security-Policy: default-src 'self'; ...
+```
+
+### Prueba de carga básica
+
+**Con Apache Bench** (`apt install apache2-utils` / `brew install httpd`):
+```bash
+ab -n 50 -c 10 http://localhost/api/health
+# Requests per second:  ~400 [#/sec]
+# Time per request:     ~25 [ms] (mean, across all concurrent requests)
+# Transfer rate:        ~80 [Kbytes/sec]
+```
+
+> **Interpretación**: ~400 req/s sobre `/api/health` es representativo de la capacidad del proxy nginx + Gunicorn con 2 workers en local. Para endpoints con lógica de negocio y consultas a BD el throughput será menor (~50-100 req/s). El objetivo de esta prueba es verificar que no hay errores (columna `Failed requests: 0`) y que el tiempo de respuesta es razonable (< 100ms en media).
+
+**Sin dependencias extra — curl en paralelo:**
+```bash
+time for i in $(seq 1 50); do
+  curl -s -o /dev/null http://localhost/api/health &
+done
+wait
+# real    0m0.312s  (50 peticiones en paralelo)
+```
 
 ## Troubleshooting
 
 **`web/.env not found`**
 → El fichero `web/.env` no existe. Crearlo con `TURNSTILE_SITE_KEY=1x00000000000000000000AA` para desarrollo.
+
+**`DATABASE_URL variable is not set`**
+→ Falta el `.env` raíz. Ejecutar `cp .env.example .env` y editar `POSTGRES_PASSWORD`.
 
 **`backend/.env not found`**
 → Ejecutar `cp backend/.env.example backend/.env` y rellenar las variables.

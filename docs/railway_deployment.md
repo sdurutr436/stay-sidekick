@@ -61,9 +61,9 @@ server {
         proxy_set_header   X-Forwarded-Proto $scheme;
     }
 
-    # ── Angular SPA (/app/) ───────────────────────────────────────────────────
-    location /app/ {
-        rewrite ^/app/(.*) /$1 break;
+    # ── Angular SPA (/menu/) ─────────────────────────────────────────────────
+    location /menu {
+        rewrite ^/menu/?(.*)$ /$1 break;
         proxy_pass         $frontend_url;
         proxy_set_header   Host              $host;
         proxy_set_header   X-Real-IP         $remote_addr;
@@ -369,7 +369,7 @@ git checkout main && git merge dev && git push origin main
 - [ ] Verificar logs de runtime del nginx (busca errores de resolución DNS)
 - [ ] Acceder al dominio público y comprobar:
   - `/` → carga el sitio 11ty
-  - `/app/` → carga el panel Angular
+  - `/menu/` → carga el panel Angular
   - `/api/health` → devuelve `{"status": "ok"}`
 - [ ] Crear entorno staging y repetir para la rama `dev`
 

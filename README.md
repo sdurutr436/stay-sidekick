@@ -1,6 +1,12 @@
 # Stay Sidekick
 
+[![CI Python](https://github.com/sdurutr436/tfg-alberti/actions/workflows/ci-python.yml/badge.svg)](https://github.com/sdurutr436/tfg-alberti/actions/workflows/ci-python.yml)
+[![CI Angular](https://github.com/sdurutr436/tfg-alberti/actions/workflows/ci-angular.yml/badge.svg)](https://github.com/sdurutr436/tfg-alberti/actions/workflows/ci-angular.yml)
+[![Docker Hub](https://github.com/sdurutr436/tfg-alberti/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/sdurutr436/tfg-alberti/actions/workflows/docker-publish.yml)
+
 TFG DAW 2 — Plataforma para la gestión de solicitudes de estancia.
+
+Imágenes publicadas en [Docker Hub — sdurutr436](https://hub.docker.com/u/sdurutr436).
 
 ## Arquitectura
 
@@ -13,6 +19,29 @@ El proyecto está dividido en tres capas independientes:
 | `backend/` | [Flask](https://flask.palletsprojects.com/) | `5000` | API REST: formularios, autenticación, notificaciones |
 
 Los estilos SCSS son **compartidos** entre `web/` y `frontend/`: ambos compilan desde `frontend/src/styles/` siguiendo la arquitectura [ITCSS](https://www.xfive.co/blog/itcss-scalable-maintainable-css-architecture/) con nomenclatura [BEM](https://getbem.com/).
+
+### Arquitectura Docker
+
+```mermaid
+graph TD
+    Cliente(["Cliente HTTP"])
+
+    subgraph app-net["app-net (red interna Docker)"]
+        Nginx["nginx · Nginx:alpine · :80"]
+        Frontend["frontend · Angular+Nginx · :80"]
+        Web["web · 11ty+Nginx · :80"]
+        Backend["backend · Flask+Gunicorn · :5000"]
+        Postgres[("postgres · PostgreSQL 16 · :5432")]
+    end
+
+    Cliente -->|"HTTP :80 — único puerto expuesto al host"| Nginx
+    Nginx -->|"/api/*"| Backend
+    Nginx -->|"/menu/*"| Frontend
+    Nginx -->|"/*"| Web
+    Backend -->|"SQL :5432"| Postgres
+```
+
+Una petición autenticada recorre el siguiente camino: el cliente envía la solicitud HTTP al puerto 80 del host, donde **nginx** actúa como proxy inverso y la enruta según el prefijo — `/api/*` se redirige al **backend** Flask (Gunicorn en puerto 5000), que consulta **PostgreSQL** (puerto 5432) y devuelve una respuesta JSON. nginx reenvía esa respuesta al cliente. El resto de rutas sirven la SPA Angular (`/menu/*`) o el sitio estático 11ty (`/*`). Todo el tráfico entre servicios circula por la red interna `app-net`; el único puerto expuesto al host es el 80.
 
 ## Inicio rápido
 
@@ -71,6 +100,7 @@ un único comando. Es la forma más fácil de probar el stack completo en local.
 
 **Primer uso** — preparar los `.env`:
 ```bash
+cp .env.example .env                   # variables de PostgreSQL y Turnstile
 cp backend/.env.example backend/.env   # completar con tus valores
 # web/.env ya está incluido con la key de prueba de Turnstile (dev)
 ```
@@ -80,6 +110,11 @@ cp backend/.env.example backend/.env   # completar con tus valores
 docker compose up --build        # construye imágenes y arranca (foreground)
 docker compose up -d --build     # igual pero en background
 ```
+
+> Primera vez: si el volumen ya existía sin el seed, borrar y recrear:
+> ```bash
+> docker compose down -v && docker compose up -d --build
+> ```
 
 **Comandos del día a día:**
 ```bash
@@ -97,8 +132,18 @@ docker compose down -v           # parar, eliminar contenedores Y la base de dat
 | URL | Servicio |
 |-----|---------|
 | http://localhost/ | Sitio estático (11ty) |
-| http://localhost/app/ | App Angular |
+| http://localhost/menu/ | App Angular |
 | http://localhost/api/ | API Flask |
+
+**Credenciales de acceso (creadas por el seed de desarrollo):**
+
+| Campo | Valor |
+|-------|-------|
+| Email | `dev@staysidekick.es` |
+| Contraseña | `admin123` |
+| Rol | superadmin |
+
+> Estas credenciales son solo para entorno local. En producción, generar credenciales nuevas.
 
 > Referencia completa de comandos, troubleshooting y variables de entorno: [docs/devops/docker-local.md](docs/devops/docker-local.md)
 
@@ -146,6 +191,7 @@ tfg-alberti/
 
 | Documento | Contenido |
 |-----------|-----------|
+| [DEPLOY.md](DEPLOY.md) | Guía consolidada de despliegue (local + Railway) |
 | [docs/DESARROLLO.md](docs/DESARROLLO.md) | Guía completa de entorno de desarrollo |
 | [docs/devops/docker-local.md](docs/devops/docker-local.md) | Referencia Docker para desarrollo local |
 | [docs/backend/DEPENDENCIAS.md](docs/backend/DEPENDENCIAS.md) | Librerías del backend y justificación |

@@ -82,3 +82,9 @@ class Config:
         "postgresql://postgres:postgres@localhost:5432/stay_sidekick",
     )
     SQLALCHEMY_TRACK_MODIFICATIONS: bool = False
+    SQLALCHEMY_ENGINE_OPTIONS: dict = {
+        "pool_size": 5,
+        "max_overflow": 10,
+        "pool_recycle": 1800,  # evita conexiones caducadas en Railway (timeout 30 min)
+        "pool_pre_ping": True,  # verifica la conexión antes de usarla
+    }
