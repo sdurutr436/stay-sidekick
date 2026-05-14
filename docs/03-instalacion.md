@@ -40,7 +40,7 @@ Para desarrollo local sin contenedores:
 
 - Node.js >= 18 (recomendado: 20 LTS).
 - npm >= 10.
-- Python >= 3.11.
+- Python 3.12.
 - pip para Python 3.
 - Git para clonar el repositorio.
 
@@ -53,7 +53,7 @@ Para ejecucion con contenedores (modo recomendado):
 
 Las imagenes declaradas en los Dockerfiles y compose del proyecto son:
 
-- Backend: `python:3.11-slim`.
+- Backend: `python:3.12-slim`.
 - Frontend build: `node:20-alpine`.
 - Web build (11ty): `node:20-alpine`.
 - Frontend serve: `nginx:alpine`.
@@ -293,7 +293,7 @@ Desde `backend/`:
 Linux/macOS:
 
 ```bash
-python3 -m venv .venv
+python3.12 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 cp .env.example .env
@@ -302,7 +302,7 @@ cp .env.example .env
 Windows PowerShell:
 
 ```powershell
-python -m venv .venv
+py -3.12 -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 Copy-Item .env.example .env

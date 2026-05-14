@@ -404,7 +404,7 @@ de publicación de imágenes Docker.
 Se ejecuta en cada *push* a `main` y en *pull requests*. Consta de dos trabajos secuenciales:
 
 1. `lint` — Análisis estático con `ruff` sobre `backend/app/`.
-2. `tests` — Ejecución de `pytest backend/tests/ -v` con Python 3.11. Este trabajo levanta un
+2. `tests` — Ejecución de `pytest backend/tests/ -v` con Python 3.12. Este trabajo levanta un
    contenedor de servicio `postgres:16-alpine` con las variables `DATABASE_URL`, `SECRET_KEY` y
    `JWT_SECRET_KEY` inyectadas como variables de entorno, reproduciendo las condiciones reales de
    producción.
@@ -428,7 +428,7 @@ trabajo `publicar`, que construye y publica las imágenes con etiquetas de SHA c
 
 | Pipeline | Disparador | Herramienta | Acción principal |
 |---|---|---|---|
-| `ci-python.yml` | Push/PR a `main` | Python 3.11 + pytest | Lint ruff + tests con postgres:16-alpine |
+| `ci-python.yml` | Push/PR a `main` | Python 3.12 + pytest | Lint ruff + tests con postgres:16-alpine |
 | `ci-angular-tests.yml` | Push a cualquier rama / PR a `main` | Node 22 + Vitest | Tests + artefacto de cobertura |
 | `ci-angular.yml` | Push/PR a `main` | Node 22 + Angular CLI | Build de producción |
 | `ci-web.yml` | Push/PR a `main` | Node 22 + 11ty | Build del sitio estático |
