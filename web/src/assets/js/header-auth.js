@@ -24,14 +24,16 @@
     var token = localStorage.getItem(TOKEN_KEY);
     if (!token || !isTokenValid(token)) return;
 
-    // Swap "Iniciar sesión" → "Perfil"
+    // Swap "Iniciar sesión" → "Perfil" preservando icono y estructura BEM
     var loginLink = document.querySelector('.header__actions a[href="/login"]');
     if (loginLink) {
-      var perfilLink = document.createElement('a');
-      perfilLink.href        = PERFIL_URL;
-      perfilLink.className   = loginLink.className;
-      perfilLink.textContent = 'Perfil';
-      loginLink.parentNode.replaceChild(perfilLink, loginLink);
+      loginLink.setAttribute('href', PERFIL_URL);
+      var label = loginLink.querySelector('.btn__label');
+      if (label) {
+        label.textContent = 'Perfil';
+      } else {
+        loginLink.textContent = 'Perfil';
+      }
     }
 
     // Swap logo → /menu
