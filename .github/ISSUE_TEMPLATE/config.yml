@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Documentación del proyecto
+    url: https://github.com/sdurutr436
+    about: Consulta el README y la documentación antes de abrir un issue.
