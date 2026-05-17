@@ -28,10 +28,12 @@ class Config:
         "https://challenges.cloudflare.com/turnstile/v0/siteverify",
     )
 
-    # Gmail SMTP
-    GMAIL_USER: str = os.environ.get("GMAIL_USER", "")
-    GMAIL_APP_PASSWORD: str = os.environ.get("GMAIL_APP_PASSWORD", "")
-    MAIL_RECIPIENT: str = os.environ.get("MAIL_RECIPIENT", "")
+    # SMTP transaccional (Gmail por defecto)
+    MAIL_HOST: str = os.environ.get("MAIL_HOST", "smtp.gmail.com")
+    MAIL_PORT: int = int(os.environ.get("MAIL_PORT", "587"))
+    MAIL_USER: str = os.environ.get("MAIL_USER", "")
+    MAIL_PASSWORD: str = os.environ.get("MAIL_PASSWORD", "")
+    MAIL_FROM: str = os.environ.get("MAIL_FROM", "")
 
     # Discord
     DISCORD_WEBHOOK_URL: str = os.environ.get("DISCORD_WEBHOOK_URL", "")

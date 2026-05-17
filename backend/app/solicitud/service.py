@@ -6,7 +6,7 @@ from flask import request
 from marshmallow import ValidationError
 
 from app.common.notifications.discord import send_discord_notification
-from app.common.notifications.gmail import send_contact_email
+from app.common.notifications.mail_service import send_form_request
 from app.solicitud.schemas import FormularioSolicitudSchema
 from app.solicitud.turnstile import verify_turnstile
 
@@ -45,8 +45,16 @@ def process_solicitud(json_data: dict) -> tuple[dict, list[str]]:
 
 
 def _dispatch_notifications(clean_data: dict) -> None:
-    email_ok = send_contact_email(clean_data)
-    discord_ok = send_discord_notification(clean_data)
+    try:
+        email_ok = send_form_request(clean_data)
+    except Exception:
+        logger.exception("Excepción inesperada al enviar form_request.")
+        email_ok = False
+    try:
+        discord_ok = send_discord_notification(clean_data)
+    except Exception:
+        logger.exception("Excepción inesperada al notificar a Discord.")
+        discord_ok = False
 
     if not email_ok:
         logger.warning("No se pudo enviar el email de notificación.")
