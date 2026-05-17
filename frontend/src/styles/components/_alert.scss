@@ -4,6 +4,8 @@
 // Estructura BEM: .alert.alert--{tipo}
 // =============================================================================
 
+@use '../shared' as *;
+
 .alert {
   display: flex;
   align-items: flex-start;

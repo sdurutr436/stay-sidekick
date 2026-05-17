@@ -12,13 +12,17 @@
 //   $heatmap-color-checkouts: rojo para check-outs
 //
 // Reutiliza:
-//   .instrucciones-pasos, .acciones-body__separator (de sincronizador-contactos)
 //   .panel-seccion, .page-header, .badge, .btn, .form-*
+//
+// Las instrucciones de uso viven ahora en el modal del HowItWorksButton
+// (page-header__end), reutilizando .modal-instrucciones.
 // =============================================================================
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Wrapper de página
 // ─────────────────────────────────────────────────────────────────────────────
+
+@use '../shared' as *;
 
 .mapa-calor {
   @include container;
@@ -28,7 +32,7 @@
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Contenedor interior: agrupa calor-layout + "Cómo usarlo"
+// Contenedor interior del cuerpo de la página
 // ─────────────────────────────────────────────────────────────────────────────
 .calor-contenido {
   display: flex;
@@ -167,7 +171,7 @@
 
   &:hover,
   &:focus {
-    background: $color-gray-100;
+    background: $color-btn-ghost-bg-hover;
     border-color: $color-border;
   }
 

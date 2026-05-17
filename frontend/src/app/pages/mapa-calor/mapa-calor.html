@@ -15,6 +15,42 @@
         {{ pmsActivo() ? 'PMS' + (pmsProveedor() ? ': ' + pmsProveedor() : ' conectado') : 'Sin PMS' }}
       </span>
     </div>
+
+    <app-how-it-works-button modalTitle="Cómo usar el Mapa de calor">
+      <section class="modal-instrucciones__seccion">
+        <h3 class="modal-instrucciones__titulo">¿Qué hace esta herramienta?</h3>
+        <p class="modal-instrucciones__texto">
+          Visualiza, día por día, la concentración de check-ins y check-outs
+          dentro del rango de fechas seleccionado para detectar picos de
+          ocupación.
+        </p>
+      </section>
+
+      @if (pmsActivo()) {
+        <section class="modal-instrucciones__seccion">
+          <h3 class="modal-instrucciones__titulo">Trabajando con PMS conectado</h3>
+          <ol class="modal-instrucciones__lista">
+            <li><strong>Selecciona el rango de fechas</strong> que quieres visualizar.</li>
+            <li>Pulsa <strong>Generar mapa de calor</strong>: los datos se obtienen del PMS automáticamente.</li>
+            <li>Ajusta los umbrales para resaltar los días que más te interesen.</li>
+          </ol>
+        </section>
+      } @else {
+        <section class="modal-instrucciones__seccion">
+          <h3 class="modal-instrucciones__titulo">Trabajando sin PMS (XLSX)</h3>
+          <ol class="modal-instrucciones__lista">
+            <li><strong>Exporta los check-ins</strong> desde tu PMS en formato <code>.xlsx</code>.</li>
+            <li><strong>Exporta los check-outs (opcional):</strong> el mismo proceso para las salidas.</li>
+            <li><strong>Selecciona el rango de fechas</strong> que quieres visualizar.</li>
+            <li><strong>Sube los archivos</strong> y pulsa <strong>Generar mapa de calor</strong>.</li>
+          </ol>
+          <p class="modal-instrucciones__nota">
+            La columna de fecha del XLSX se configura en el perfil de empresa
+            (Ajustes → Mapa de calor).
+          </p>
+        </section>
+      }
+    </app-how-it-works-button>
   </app-page-header>
 
   <!-- Panel de control -->
@@ -23,48 +59,6 @@
     <ng-icon title-icon name="phosphorCalendar" size="20" aria-hidden="true" />
 
     <div class="mapa-calor__control">
-
-      <!-- Instrucciones XLSX (caso B, sin PMS) -->
-      @if (!pmsActivo()) {
-        <div class="instrucciones-body">
-          <p class="instrucciones-body__intro">
-            Para generar el mapa de calor sin PMS, exporta los listados desde
-            tu software y súbelos aquí.
-          </p>
-          <ol class="instrucciones-pasos">
-            <li class="instrucciones-pasos__item">
-              <span class="instrucciones-pasos__num" aria-hidden="true">1</span>
-              <div class="instrucciones-pasos__content">
-                <strong>Exporta los check-ins:</strong> descarga desde tu PMS
-                el listado de check-ins del periodo en formato <code>.xlsx</code>.
-                La columna de fecha debe estar configurada en el perfil de empresa
-                (Ajustes → Mapa de calor).
-              </div>
-            </li>
-            <li class="instrucciones-pasos__item">
-              <span class="instrucciones-pasos__num" aria-hidden="true">2</span>
-              <div class="instrucciones-pasos__content">
-                <strong>Exporta los check-outs (opcional):</strong> el mismo
-                proceso para las salidas. Sin este archivo solo se mostrarán
-                los check-ins.
-              </div>
-            </li>
-            <li class="instrucciones-pasos__item">
-              <span class="instrucciones-pasos__num" aria-hidden="true">3</span>
-              <div class="instrucciones-pasos__content">
-                <strong>Selecciona el rango de fechas</strong> que quieres
-                visualizar en el mapa.
-              </div>
-            </li>
-            <li class="instrucciones-pasos__item">
-              <span class="instrucciones-pasos__num" aria-hidden="true">4</span>
-              <div class="instrucciones-pasos__content">
-                <strong>Sube los archivos</strong> y pulsa "Generar mapa de calor".
-              </div>
-            </li>
-          </ol>
-        </div>
-      }
 
       <!-- Selectores de fecha (siempre visibles) -->
       <div class="mapa-calor__fechas">

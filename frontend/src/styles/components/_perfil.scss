@@ -13,6 +13,8 @@
 
 // ── Wrapper de página ─────────────────────────────────────────────────────
 
+@use '../shared' as *;
+
 .perfil-page {
   @include container;
   padding-block-start: $space-6;

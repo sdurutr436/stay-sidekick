@@ -2,6 +2,8 @@
 // COMPONENTS: MODAL (organism)
 // =============================================================================
 
+@use '../shared' as *;
+
 .modal {
   &__overlay {
     position: fixed;
@@ -53,7 +55,7 @@
     color: $color-text-secondary;
 
     &:hover {
-      background: $color-gray-100;
+      background: $color-btn-ghost-bg-hover;
       color: $color-text-primary;
     }
   }

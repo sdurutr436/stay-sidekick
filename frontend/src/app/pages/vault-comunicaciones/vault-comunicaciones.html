@@ -8,12 +8,43 @@
   <app-page-header
     title="Vault de comunicaciones"
     description="Biblioteca centralizada de plantillas de mensajes. Selecciona una plantilla, rellena las variables y refínala con IA antes de enviar."
-  />
+  >
+    <app-how-it-works-button modalTitle="Cómo usar el Vault de comunicaciones">
+      <section class="modal-instrucciones__seccion">
+        <h3 class="modal-instrucciones__titulo">¿Qué hace esta herramienta?</h3>
+        <p class="modal-instrucciones__texto">
+          Centraliza todas tus plantillas de mensajes para huéspedes:
+          bienvenida, instrucciones, recordatorios, incidencias, etc.
+        </p>
+      </section>
+
+      <section class="modal-instrucciones__seccion">
+        <h3 class="modal-instrucciones__titulo">Cómo trabajar con plantillas</h3>
+        <ol class="modal-instrucciones__lista">
+          <li>Busca o filtra por categoría/idioma en el panel izquierdo.</li>
+          <li>Selecciona una plantilla o pulsa <strong>Nueva plantilla</strong>.</li>
+          <li>Inserta variables como <code>&#123;NOMBRE&#125;</code> con el dropdown <em>Insertar variable</em>.</li>
+          <li>Refina el tono con IA o traduce el mensaje a otro idioma.</li>
+          <li>Copia el resultado y pégalo en tu canal de comunicación.</li>
+        </ol>
+      </section>
+
+      <p class="modal-instrucciones__nota">
+        Si no tienes una clave de IA propia (BYOK) configurada, el uso de
+        refinar/traducir está limitado por día y por semana.
+      </p>
+    </app-how-it-works-button>
+  </app-page-header>
 
   <div class="vault-layout">
 
     <!-- ── Sidebar: lista de plantillas (estilo nav-sidenav) ── -->
-    <aside class="vault-sidebar" aria-label="Plantillas disponibles">
+    <app-templates-card
+      class="vault-sidebar"
+      title="Plantillas"
+      [total]="plantillas().length"
+      emptyMessage="No hay plantillas guardadas. Crea la primera con el botón “Nueva plantilla”."
+    >
 
       <div class="vault-sidebar__search-wrap">
         <input
@@ -85,17 +116,24 @@
               }
             </li>
           }
+        } @else if (searchPlantillas() || filtroCategoria() || filtroIdioma()) {
+          <li class="vault-sidebar__empty" role="option" aria-selected="false">
+            Sin resultados para los filtros actuales
+          </li>
         } @else {
           <li class="vault-sidebar__empty" role="option" aria-selected="false">
-            Sin resultados para "{{ searchPlantillas() }}"
+            No hay plantillas guardadas. Crea la primera con el botón “Nueva plantilla”.
           </li>
         }
 
       </ul>
-    </aside>
+    </app-templates-card>
 
-    <!-- ── Editor: composer de mensaje ── -->
-    <section class="vault-editor" aria-label="Editor de mensaje">
+    <!-- ── Editor: composer de mensaje (toolbar, textarea, acciones, traducir) ── -->
+    <app-panel-seccion
+      class="vault-editor"
+      [title]="isEditing() ? (isNueva() ? 'Nueva plantilla' : 'Editor: ' + (plantillaSeleccionada()?.nombre ?? nombreActual())) : 'Editor de mensaje'"
+    >
 
       @if (isEditing()) {
         <!-- Nombre de la plantilla (editable) -->
@@ -374,7 +412,7 @@
         </p>
       }
 
-    </section>
+    </app-panel-seccion>
 
   </div>
 
