@@ -4,6 +4,8 @@
 // Los organismos internos (page-header, tabla-crud) tienen sus propios archivos.
 // =============================================================================
 
+@use '../shared' as *;
+
 .gestion-usuarios {
   @include container;
   padding-block: 0;

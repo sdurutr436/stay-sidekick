@@ -8,56 +8,56 @@
 // =============================================================================
 
 // ── Átomos visuales y base ───────────────────────────────────────────────
-@import 'svg';            // [ESPEJO NJK] _includes/macros/atoms.njk (macro icon)
-@import 'img';
-@import 'logo';
-@import 'button';         // [ESPEJO NJK] _includes/macros/atoms.njk (macro button)
-@import 'badge';          // [ESPEJO NJK] _includes/macros/atoms.njk (macro badge)
+@use 'svg';            // [ESPEJO NJK] _includes/macros/atoms.njk (macro icon)
+@use 'img';
+@use 'logo';
+@use 'button';         // [ESPEJO NJK] _includes/macros/atoms.njk (macro button)
+@use 'badge';          // [ESPEJO NJK] _includes/macros/atoms.njk (macro badge)
 
 // ── Organismos de estructura del sitio (compartidos Angular ↔ 11ty) ──────
-@import 'header';         // [ESPEJO NJK] _includes/partials/header.njk
-@import 'footer';         // [ESPEJO NJK] _includes/partials/footer.njk
+@use 'header';         // [ESPEJO NJK] _includes/partials/header.njk
+@use 'footer';         // [ESPEJO NJK] _includes/partials/footer.njk
 
 // ── Formularios ──────────────────────────────────────────────────────────
-@import 'form';           // [ESPEJO NJK] _includes/macros/molecules.njk (form-input/-select/-textarea/-checkbox/-label)
-@import 'form-solicitud'; // [ESPEJO NJK] _includes/partials/form-solicitud.njk
-@import 'form-login';     // [ESPEJO NJK] web/src/login/index.njk
+@use 'form';           // [ESPEJO NJK] _includes/macros/molecules.njk (form-input/-select/-textarea/-checkbox/-label)
+@use 'form-solicitud'; // [ESPEJO NJK] _includes/partials/form-solicitud.njk
+@use 'form-login';     // [ESPEJO NJK] web/src/login/index.njk
 
 // ── Navegación interna (solo SPA Angular) ────────────────────────────────
-@import 'nav-sidenav';
-@import 'page-header';
+@use 'nav-sidenav';
+@use 'page-header';
 
 // ── Tablas y CRUDs (solo SPA Angular) ────────────────────────────────────
-@import 'tabla-crud';
-@import 'maestro-apartamentos';
-@import 'gestion-usuarios';
+@use 'tabla-crud';
+@use 'maestro-apartamentos';
+@use 'gestion-usuarios';
 
 // ── Componentes de feedback (solo SPA Angular) ───────────────────────────
-@import 'alert';
-@import 'card';
-@import 'panel-seccion';
-@import 'confirm-inline';
+@use 'alert';
+@use 'card';
+@use 'panel-seccion';
+@use 'confirm-inline';
 
 // ── Páginas de herramientas (solo SPA Angular) ───────────────────────────
-@import 'sincronizador-contactos';
-@import 'notificaciones-checkin-tardio';
-@import 'dropdown-buscador';
-@import 'vault-comunicaciones';
-@import 'hoja-estilos';
-@import 'perfil';
-@import 'not-found';
-@import 'modal';
-@import 'modal-importacion-xlsx';
-@import 'accordion-item';
-@import 'mapa-calor';
-@import 'menu-default';
+@use 'sincronizador-contactos';
+@use 'notificaciones-checkin-tardio';
+@use 'dropdown-buscador';
+@use 'vault-comunicaciones';
+@use 'hoja-estilos';
+@use 'perfil';
+@use 'not-found';
+@use 'modal';
+@use 'modal-importacion-xlsx';
+@use 'accordion-item';
+@use 'mapa-calor';
+@use 'menu-default';
 
 // ── Contenido del sitio 11ty (legales, marketing) ────────────────────────
-@import 'web-content';    // [ESPEJO NJK] web/src/legal/*, web/src/empresa/*
-@import 'landing';        // [ESPEJO NJK] web/src/index.njk
+@use 'web-content';    // [ESPEJO NJK] web/src/legal/*, web/src/empresa/*
+@use 'landing';        // [ESPEJO NJK] web/src/index.njk
 
 // ── Estandarización UI (sprint pre-entrega) ──────────────────────────────
-@import 'theme-toggle';            // [ESPEJO NJK] _includes/partials/header.njk + web/src/assets/js/theme-toggle.js
-@import 'how-it-works-button';     // (solo SPA Angular)
-@import 'templates-card';          // (solo SPA Angular)
-@import 'modal-instrucciones';     // (solo SPA Angular — cuerpo del modal de instrucciones)
+@use 'theme-toggle';            // [ESPEJO NJK] _includes/partials/header.njk + web/src/assets/js/theme-toggle.js
+@use 'how-it-works-button';     // (solo SPA Angular)
+@use 'templates-card';          // (solo SPA Angular)
+@use 'modal-instrucciones';     // (solo SPA Angular — cuerpo del modal de instrucciones)

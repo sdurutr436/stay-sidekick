@@ -6,6 +6,8 @@
 // [ESPEJO NJK] no aplica — solo Angular SPA.
 // =============================================================================
 
+@use '../shared' as *;
+
 .modal-instrucciones {
   display: flex;
   flex-direction: column;

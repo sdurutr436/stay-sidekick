@@ -6,6 +6,8 @@
 // =============================================================================
 
 // Variables locales
+@use '../shared' as *;
+
 $_form-input-height:    2.75rem;  // 44px — altura estándar
 $_form-input-padding-x: $space-4;
 $_form-input-padding-y: $space-2;
@@ -178,7 +180,7 @@ $_form-input-padding-y: $space-2;
 
     &:hover {
       color: $color-text-primary;
-      background-color: $color-gray-200;
+      background-color: $color-btn-ghost-bg-active;
     }
 
     &--separator {

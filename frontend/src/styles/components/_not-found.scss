@@ -7,6 +7,8 @@
 // Nota: añadir la clase .a-fade-in en el bloque .not-found desde el HTML/template.
 // Ejemplo: <main class="not-found a-fade-in">
 
+@use '../shared' as *;
+
 .not-found {
   @include flex-center;
   flex: 1 1 auto;

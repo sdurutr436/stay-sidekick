@@ -31,6 +31,8 @@
 //   .ds-organism-preview   (caja contenedora para organismos)
 // =============================================================================
 
+@use '../shared' as *;
+
 $_ds-nav-width: 200px;
 
 // -------------------------------------------------------------------------
@@ -83,7 +85,7 @@ $_ds-nav-width: 200px;
     transition: background-color var(--transition-base);
 
     &:hover {
-      background-color: $color-gray-100;
+      background-color: $color-btn-ghost-bg-hover;
     }
 
     &:focus-visible {
@@ -92,7 +94,7 @@ $_ds-nav-width: 200px;
     }
 
     &--active {
-      background-color: $color-gray-200;
+      background-color: $color-btn-ghost-bg-active;
       font-weight: $font-weight-heading;
     }
   }
@@ -229,7 +231,7 @@ $_ds-nav-width: 200px;
   display: inline-block;
   padding: $space-1 $space-2;
   border: $border-width $border-style $color-border;
-  background-color: $color-gray-100;
+  background-color: $color-btn-ghost-bg-hover;
   @include text-caption-xs;
   color: $color-text-secondary;
   font-family: monospace;

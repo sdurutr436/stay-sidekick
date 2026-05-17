@@ -6,6 +6,8 @@
 //             web/src/assets/js/theme-toggle.js
 // =============================================================================
 
+@use '../shared' as *;
+
 app-theme-toggle {
   display: inline-flex;
   align-items: center;

@@ -5,6 +5,8 @@
 // [ESPEJO NJK] _includes/macros/molecules.njk (macro how_it_works_button)
 // =============================================================================
 
+@use '../shared' as *;
+
 app-how-it-works-button {
   display: inline-flex;
   align-items: center;

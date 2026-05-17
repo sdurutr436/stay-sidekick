@@ -4,6 +4,8 @@
 // Estructura BEM: .card.card--{variante}
 // =============================================================================
 
+@use '../shared' as *;
+
 .card {
   border: $border-width $border-style $color-border;
   padding: $space-6;

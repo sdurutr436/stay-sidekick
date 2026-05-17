@@ -22,6 +22,8 @@
 // Wrapper de página
 // ─────────────────────────────────────────────────────────────────────────────
 
+@use '../shared' as *;
+
 .mapa-calor {
   @include container;
   padding-block: 0;
@@ -169,7 +171,7 @@
 
   &:hover,
   &:focus {
-    background: $color-gray-100;
+    background: $color-btn-ghost-bg-hover;
     border-color: $color-border;
   }
 

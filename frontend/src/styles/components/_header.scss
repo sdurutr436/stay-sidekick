@@ -9,6 +9,8 @@
 //       .header__actions      (botones de CTA)
 // =============================================================================
 
+@use '../shared' as *;
+
 .header {
   position: sticky;
   top: 0;
@@ -55,11 +57,11 @@
     transition: background-color var(--transition-base);
 
     &:hover {
-      background-color: $color-gray-100;
+      background-color: $color-btn-ghost-bg-hover;
     }
 
     &:focus-visible {
-      outline: 2px solid $color-gray-800;
+      outline: 2px solid $color-text-primary;
       outline-offset: -2px;
     }
   }

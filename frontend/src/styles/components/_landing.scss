@@ -4,6 +4,8 @@
 // =============================================================================
 
 // ── Hero ─────────────────────────────────────────────────────────────────────
+@use '../shared' as *;
+
 .hero {
   padding-block: $space-16;
   text-align: center;
@@ -85,7 +87,7 @@
       width: 100%;
       aspect-ratio: 16 / 9;
       object-fit: cover;
-      background-color: $color-gray-100;
+      background-color: $color-btn-ghost-bg-hover;
     }
   }
 

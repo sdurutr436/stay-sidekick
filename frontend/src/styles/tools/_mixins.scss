@@ -2,17 +2,22 @@
 // TOOLS: MIXINS
 // Combinaciones de estilos reutilizables — sin generar CSS por sí solos
 // =============================================================================
+@use 'sass:map';
 @use 'sass:math';
+@use '../settings/breakpoints' as *;
+@use '../settings/tipografia' as *;
+@use '../settings/variables' as *;
+@use '../settings/colores' as *;
 
 // -----------------------------------------------------------------------------
 // Responsive — media query desde un breakpoint hacia arriba
 // Uso: @include respond-from('md') { ... }
 // -----------------------------------------------------------------------------
 @mixin respond-from($bp) {
-  $value: map-get($breakpoints, $bp);
+  $value: map.get($breakpoints, $bp);
 
   @if $value == null {
-    @warn "Breakpoint `#{$bp}` no existe. Usa: #{map-keys($breakpoints)}";
+    @warn "Breakpoint `#{$bp}` no existe. Usa: #{map.keys($breakpoints)}";
   } @else if $value == 0px {
     @content;
   } @else {
@@ -27,7 +32,7 @@
 // Uso: @include respond-until('md') { ... }
 // -----------------------------------------------------------------------------
 @mixin respond-until($bp) {
-  $value: map-get($breakpoints, $bp);
+  $value: map.get($breakpoints, $bp);
 
   @if $value == null {
     @warn "Breakpoint `#{$bp}` no existe.";
@@ -136,11 +141,11 @@
 
 // -----------------------------------------------------------------------------
 // Focus ring accesible — sustituye outline:none en controles interactivos
-// $color   : color del anillo (cualquier valor CSS de color; default $color-gray-800)
+// $color   : color del anillo (default var(--ring), reactivo al tema)
 // $offset  : distancia entre el control y el anillo en px (default 2px)
-// Uso: @include focus-ring; | @include focus-ring($color-accent-primary, 4px);
+// Uso: @include focus-ring; | @include focus-ring(var(--primary), 4px);
 // -----------------------------------------------------------------------------
-@mixin focus-ring($color: $color-gray-800, $offset: 2px) {
+@mixin focus-ring($color: $color-ring, $offset: 2px) {
   outline: 2px solid $color;
   outline-offset: $offset;
 }

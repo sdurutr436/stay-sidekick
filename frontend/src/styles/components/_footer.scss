@@ -18,6 +18,8 @@
 //       .footer__copyright
 // =============================================================================
 
+@use '../shared' as *;
+
 .footer {
   background-color: $color-surface-alt;
   border-top: $border-width $border-style $color-border;
@@ -153,7 +155,7 @@
   // -------------------------------------------------------------------------
   &__bar {
     border-top: $border-width $border-style $color-border;
-    background-color: $color-gray-100;
+    background-color: $color-btn-ghost-bg-hover;
     padding-block: $space-2;
   }
 

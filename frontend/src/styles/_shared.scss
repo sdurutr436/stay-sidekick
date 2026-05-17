@@ -1,0 +1,17 @@
+// =============================================================================
+// SHARED — punto único de inyección de tokens y mixins en cada archivo de
+// elements / generic / layout / components / utilities / animations.
+//
+// Uso desde un archivo cualquiera:
+//   @use '../shared' as *;
+//
+// Re-exporta variables y mixins de settings + tools sin generar CSS por sí
+// mismo. NO importar desde `styles.scss` (allí ya se inyectan vía @use de
+// cada capa ITCSS). Mantener el ORDEN para respetar las dependencias.
+// =============================================================================
+
+@forward 'settings/tipografia';
+@forward 'settings/breakpoints';
+@forward 'settings/variables';
+@forward 'settings/colores';
+@forward 'tools/mixins';
