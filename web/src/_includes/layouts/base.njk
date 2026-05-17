@@ -6,6 +6,19 @@
   <meta name="description" content="{{ description or site.description }}" />
   <link rel="icon" type="image/x-icon" href="/assets/img/staysidekick-ico.ico" />
 
+  {# Inline pre-paint para evitar FOUC al alternar tema claro/oscuro #}
+  <script>
+    (function () {
+      try {
+        var stored = localStorage.getItem('theme');
+        var theme = (stored === 'light' || stored === 'dark') ? stored
+          : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.classList.toggle('dark', theme === 'dark');
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (_) { /* no-op */ }
+    }());
+  </script>
+
   <title>{% if title %}{{ title }} | {% endif %}{{ site.name }}</title>
 
   <!-- Fuente: Archivo — preconnect para rendimiento -->
@@ -60,6 +73,7 @@
   {% include "partials/footer.njk" %}
 
   <script src="/assets/js/header-auth.js" defer></script>
+  <script src="/assets/js/theme-toggle.js" defer></script>
   {% block scripts %}{% endblock %}
 </body>
 </html>

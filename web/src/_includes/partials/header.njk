@@ -7,6 +7,8 @@
 {# Iconos para los botones — Phosphor Icons inline #}
 {% set icon_signin %}<svg viewBox="0 0 256 256" fill="currentColor" width="20" height="20" xmlns="http://www.w3.org/2000/svg"><path d="M230.92,212c-15.23-26.33-38.7-45.21-66.09-54.16a72,72,0,1,0-73.66,0C63.78,166.78,40.31,185.66,25.08,212a8,8,0,1,0,13.85,8c18.84-32.56,52.14-52,89.07-52s70.23,19.44,89.07,52a8,8,0,1,0,13.85-8ZM72,96a56,56,0,1,1,56,56A56.06,56.06,0,0,1,72,96Z"/></svg>{% endset %}
 {% set icon_solicitud %}<svg viewBox="0 0 256 256" fill="currentColor" width="20" height="20" xmlns="http://www.w3.org/2000/svg"><path d="M216,56H176V48a24,24,0,0,0-24-24H104A24,24,0,0,0,80,48v8H40A16,16,0,0,0,24,72V200a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V72A16,16,0,0,0,216,56ZM96,48a8,8,0,0,1,8-8h48a8,8,0,0,1,8,8v8H96ZM216,72v41.61A184.07,184.07,0,0,1,128,136a184.07,184.07,0,0,1-88-22.39V72Zm0,128H40V131.08A200.89,200.89,0,0,0,128,152a200.89,200.89,0,0,0,88-20.92V200ZM112,120a8,8,0,0,1,8-8h16a8,8,0,0,1,0,16H120A8,8,0,0,1,112,120Z"/></svg>{% endset %}
+{% set icon_sun %}<svg viewBox="0 0 256 256" fill="currentColor" width="20" height="20" xmlns="http://www.w3.org/2000/svg"><path d="M120,40V16a8,8,0,0,1,16,0V40a8,8,0,0,1-16,0Zm72,88a64,64,0,1,1-64-64A64.07,64.07,0,0,1,192,128Zm-16,0a48,48,0,1,0-48,48A48.05,48.05,0,0,0,176,128ZM58.34,69.66A8,8,0,0,0,69.66,58.34l-16-16A8,8,0,0,0,42.34,53.66Zm0,116.68-16,16a8,8,0,0,0,11.32,11.32l16-16a8,8,0,0,0-11.32-11.32ZM192,72a8,8,0,0,0,5.66-2.34l16-16a8,8,0,0,0-11.32-11.32l-16,16A8,8,0,0,0,192,72Zm5.66,114.34a8,8,0,0,0-11.32,11.32l16,16a8,8,0,0,0,11.32-11.32ZM48,128a8,8,0,0,0-8-8H16a8,8,0,0,0,0,16H40A8,8,0,0,0,48,128Zm80,80a8,8,0,0,0-8,8v24a8,8,0,0,0,16,0V216A8,8,0,0,0,128,208Zm112-88H216a8,8,0,0,0,0,16h24a8,8,0,0,0,0-16Z"/></svg>{% endset %}
+{% set icon_moon %}<svg viewBox="0 0 256 256" fill="currentColor" width="20" height="20" xmlns="http://www.w3.org/2000/svg"><path d="M233.54,142.23a8,8,0,0,0-8-2,88.08,88.08,0,0,1-109.8-109.8,8,8,0,0,0-10-10,104.84,104.84,0,0,0-52.91,37A104,104,0,0,0,136,224a103.09,103.09,0,0,0,62.52-20.88,104.84,104.84,0,0,0,37-52.91A8,8,0,0,0,233.54,142.23ZM188.9,190.34A88,88,0,0,1,65.66,67.11a89,89,0,0,1,31.4-26A106,106,0,0,0,96,56,104.11,104.11,0,0,0,200,160a106,106,0,0,0,14.92-1.06A89,89,0,0,1,188.9,190.34Z"/></svg>{% endset %}
 
 <header class="header l-page__header">
   <div class="header__inner">
@@ -45,6 +47,17 @@
     <nav class="header__actions" aria-label="Acciones de usuario">
       {{ atoms.button('Iniciar sesión', '/login', 'secondary', 'md', false, 'button', '', icon_signin) }}
       {{ atoms.button('Presentar solicitud', '/solicitud', 'primary', 'md', false, 'button', '', icon_solicitud) }}
+
+      {# Toggle de tema (icono Sun/Moon). El JS de theme-toggle.js controla aria-label e icono visible #}
+      <button
+        type="button"
+        class="btn btn--ghost btn--md btn--icon-only"
+        data-theme-toggle
+        aria-label="Activar modo oscuro"
+      >
+        <span class="theme-toggle__icon" data-theme-icon="moon" aria-hidden="true">{{ icon_moon | safe }}</span>
+        <span class="theme-toggle__icon" data-theme-icon="sun" aria-hidden="true" style="display:none">{{ icon_sun | safe }}</span>
+      </button>
     </nav>
 
   </div>
