@@ -4,7 +4,9 @@ import { NgIconComponent } from '@ng-icons/core';
 import { AlertComponent } from '../../components/molecules/alert/alert';
 import { ButtonComponent } from '../../components/atoms/button/button';
 import { DropdownBuscadorComponent, DropdownOption } from '../../components/molecules/dropdown-buscador/dropdown-buscador';
+import { HowItWorksButtonComponent } from '../../components/molecules/how-it-works-button/how-it-works-button';
 import { PageHeaderComponent } from '../../components/organisms/page-header/page-header';
+import { TemplatesCardComponent } from '../../components/organisms/templates-card/templates-card';
 import { VaultService, Plantilla } from '../../services/vault.service';
 import { PerfilService } from '../../services/perfil.service';
 
@@ -33,7 +35,10 @@ const COOLDOWN_SEGUNDOS = 60;
   templateUrl: './vault-comunicaciones.html',
   styleUrl: './vault-comunicaciones.scss',
   standalone: true,
-  imports: [RouterLink, NgIconComponent, PageHeaderComponent, ButtonComponent, AlertComponent, DropdownBuscadorComponent],
+  imports: [
+    RouterLink, NgIconComponent, PageHeaderComponent, ButtonComponent, AlertComponent,
+    DropdownBuscadorComponent, HowItWorksButtonComponent, TemplatesCardComponent,
+  ],
 })
 export class VaultComunicacionesPageComponent implements OnInit, OnDestroy {
   private readonly vault  = inject(VaultService);

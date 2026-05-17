@@ -36,6 +36,41 @@
       tabindex="-1"
       (change)="onXlsxFileSelected($event)"
     />
+
+    <app-how-it-works-button modalTitle="Cómo usar el Maestro de apartamentos">
+      <section class="modal-instrucciones__seccion">
+        <h3 class="modal-instrucciones__titulo">¿Qué hace esta herramienta?</h3>
+        <p class="modal-instrucciones__texto">
+          Gestiona el catálogo de propiedades de tu empresa: añade apartamentos
+          manualmente, importa un Excel o sincronízalos desde tu PMS.
+        </p>
+      </section>
+
+      @if (pmsActivo()) {
+        <section class="modal-instrucciones__seccion">
+          <h3 class="modal-instrucciones__titulo">Con PMS conectado (Smoobu)</h3>
+          <ol class="modal-instrucciones__lista">
+            <li>Pulsa <strong>Sincronizar Smoobu</strong> para importar los apartamentos del PMS.</li>
+            <li>Revisa la tabla; edita o elimina las propiedades no deseadas.</li>
+          </ol>
+        </section>
+      } @else {
+        <section class="modal-instrucciones__seccion">
+          <h3 class="modal-instrucciones__titulo">Sin PMS conectado</h3>
+          <ol class="modal-instrucciones__lista">
+            <li>Pulsa <strong>Importar XLSX</strong> para cargar un Excel con tus apartamentos.</li>
+            <li>O añade filas manualmente con el botón <strong>Añadir apartamento</strong>.</li>
+          </ol>
+        </section>
+      }
+
+      @if (isAdmin) {
+        <p class="modal-instrucciones__nota">
+          Como administrador, puedes usar las acciones masivas para eliminar
+          varios apartamentos a la vez.
+        </p>
+      }
+    </app-how-it-works-button>
   </app-page-header>
 
   @if (syncAlerta()) {

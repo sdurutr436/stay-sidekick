@@ -10,10 +10,10 @@ import { FormSelectComponent } from '../../components/atoms/form-select/form-sel
 import { FormFieldComponent } from '../../components/molecules/form-field/form-field';
 import { FormInputIconComponent } from '../../components/molecules/form-input-icon/form-input-icon';
 import { AlertComponent } from '../../components/molecules/alert/alert';
+import { HowItWorksButtonComponent } from '../../components/molecules/how-it-works-button/how-it-works-button';
 import { PageHeaderComponent } from '../../components/organisms/page-header/page-header';
 import { PanelSeccionComponent } from '../../components/organisms/panel-seccion/panel-seccion';
 import { TarjetaEstadoComponent } from '../../components/molecules/tarjeta-estado/tarjeta-estado';
-import { ModalComponent } from '../../components/organisms/modal/modal';
 import { ContactosService, PREFS_CONTACTOS_DEFECTO } from '../../services/contactos.service';
 
 interface Alerta {
@@ -55,7 +55,7 @@ const _FECHA_PREVIEW: Record<string, string> = {
     FormSelectComponent,
     FormFieldComponent,
     AlertComponent,
-    ModalComponent,
+    HowItWorksButtonComponent,
   ],
 })
 export class SincronizadorContactosPageComponent implements OnInit {
@@ -119,9 +119,6 @@ export class SincronizadorContactosPageComponent implements OnInit {
     { value: 'MM/DD/YYYY', label: 'MM/DD/YYYY'               },
     { value: 'DD-MM-YYYY', label: 'DD-MM-YYYY'               },
   ];
-
-  // ── Modal de instrucciones XLSX ───────────────────────────────────────────
-  readonly modalInstruccionesAbierto = signal(false);
 
   // ── Ciclo de vida ─────────────────────────────────────────────────────────
 
