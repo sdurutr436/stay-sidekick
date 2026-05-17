@@ -4,7 +4,16 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="{{ description or site.description }}" />
-  <link rel="icon" type="image/x-icon" href="/assets/img/staysidekick-ico.ico" />
+
+  {# Favicon: ICO clásico + PNG/WebP modernos. La variante dark se sirve
+     cuando el sistema declara prefers-color-scheme: dark (los navegadores no
+     respetan nuestra clase .dark en el favicon de la pestaña). #}
+  <link rel="icon" type="image/x-icon" href="/assets/img/favicon/stay-sidekick-fav-icon-512x512.ico" />
+  <link rel="icon" type="image/webp" sizes="600x600" href="/assets/img/favicon/stay-sidekick-fav-icon-600x600.webp" />
+  <link rel="icon" type="image/png"  sizes="512x512" href="/assets/img/favicon/stay-sidekick-fav-icon-512x512.png" />
+  <link rel="icon" type="image/png"  sizes="512x512"
+        media="(prefers-color-scheme: dark)"
+        href="/assets/img/favicon/stay-sidekick-fav-icon-dark-mode-512x512.png" />
 
   {# Inline pre-paint para evitar FOUC al alternar tema claro/oscuro #}
   <script>
