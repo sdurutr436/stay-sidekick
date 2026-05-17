@@ -2,12 +2,14 @@
 
 from __future__ import annotations
 
+import logging
 import secrets
 from datetime import datetime, timedelta, timezone
 
 from marshmallow import ValidationError
 
 from app.auth.passwords import hash_password
+from app.common.notifications.mail_service import send_temp_password
 from app.common.sanitizers.email import sanitize_email
 from app.empresas.model import Empresa
 from app.extensions import db
@@ -15,6 +17,8 @@ from app.usuarios import repository
 from app.usuarios.model import ROL_ADMIN
 from app.usuarios.model import Usuario  # noqa: F401
 from app.usuarios.schemas import UsuarioCreateSchema, UsuarioPatchSchema
+
+logger = logging.getLogger(__name__)
 
 _create_schema = UsuarioCreateSchema()
 _patch_schema = UsuarioPatchSchema()
@@ -92,7 +96,18 @@ def crear_usuario(empresa_id: str, json_data: dict) -> tuple[dict | None, list[s
     )
     db.session.commit()
 
+    _notificar_password_temporal(email, password_temp)
+
     return {"usuario": _to_dict(u), "password_temporal": password_temp}, []
+
+
+def _notificar_password_temporal(email: str, password_temp: str) -> None:
+    """Envía la contraseña temporal por correo. No interrumpe el flujo si falla."""
+    try:
+        if not send_temp_password(email, password_temp):
+            logger.warning("No se pudo enviar la contraseña temporal a %s", email)
+    except Exception:
+        logger.exception("Excepción inesperada al enviar contraseña temporal a %s", email)
 
 
 def eliminar_usuario(empresa_id: str, usuario_id: str, caller_id: str) -> list[str]:
@@ -143,4 +158,7 @@ def resetear_password(empresa_id: str, usuario_id: str) -> tuple[dict | None, li
         password_changed_at=_forced_change_at(),
     )
     db.session.commit()
+
+    _notificar_password_temporal(u.email, password_temp)
+
     return {"password_temporal": password_temp}, []
