@@ -6,6 +6,8 @@
 //   .header
 //     .header__inner          (contenedor centrado)
 //       .header__brand        (logo + nombre app)
+//         .header__brand-img--light  (visible en modo claro)
+//         .header__brand-img--dark   (visible en modo oscuro)
 //       .header__actions      (botones de CTA)
 // =============================================================================
 
@@ -88,6 +90,9 @@
     }
   }
 
+  // Picture switching light/dark — solo una visible a la vez
+  &__brand-img--dark { display: none; }
+
   // -------------------------------------------------------------------------
   // Acciones — botones de la derecha
   // Desktop: icono + texto; mobile (≤575px): solo icono
@@ -123,4 +128,17 @@
   @include respond-until('md') {
     height: $header-height-mobile;
   }
+}
+
+// Overrides para modo oscuro — invertir visibilidad de las dos pictures.
+// Selector fuera del bloque .header para no incurrir en doble anidación con
+// :root.dark / [data-theme="dark"].
+:root.dark .header__brand-img--light,
+[data-theme="dark"] .header__brand-img--light {
+  display: none;
+}
+
+:root.dark .header__brand-img--dark,
+[data-theme="dark"] .header__brand-img--dark {
+  display: flex;
 }

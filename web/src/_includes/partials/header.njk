@@ -13,9 +13,11 @@
 <header class="header l-page__header">
   <div class="header__inner">
 
-    {# Brand: favicon en mobile (<768px), logo horizontal en tablet/desktop (≥768px) #}
+    {# Brand: dos <picture>s hermanas (light/dark) controladas por CSS según
+       la clase .dark en <html>. Cada una sirve favicon en mobile (<768px) y
+       logo horizontal en tablet/desktop (≥768px). #}
     <a href="/" class="header__brand" aria-label="{{ site.name }} — Inicio">
-      <picture>
+      <picture class="header__brand-img header__brand-img--light">
         <source
           media="(max-width: 767px)"
           srcset="/assets/img/favicon/stay-sidekick-fav-icon-512x512.png"
@@ -39,6 +41,30 @@
           loading="eager"
           decoding="async"
           fetchpriority="high"
+        >
+      </picture>
+      <picture class="header__brand-img header__brand-img--dark">
+        <source
+          media="(max-width: 767px)"
+          srcset="/assets/img/favicon/stay-sidekick-fav-icon-dark-mode-512x512.png"
+          type="image/png">
+        <source
+          srcset="/assets/img/header/stay-sidekick-1024x576-dark-mode.webp"
+          type="image/webp"
+          sizes="(max-width: 767px) 120px, 160px">
+        <source
+          srcset="/assets/img/header/stay-sidekick-1024x576-dark-mode.png"
+          type="image/png"
+          sizes="(max-width: 767px) 120px, 160px">
+        <img
+          class="logo__img"
+          src="/assets/img/header/stay-sidekick-1024x576-dark-mode.png"
+          alt=""
+          width="1024"
+          height="576"
+          loading="eager"
+          decoding="async"
+          aria-hidden="true"
         >
       </picture>
     </a>

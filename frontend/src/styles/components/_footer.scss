@@ -88,6 +88,9 @@
     }
   }
 
+  // Picture switching light/dark — solo una visible a la vez
+  &__brand-img--dark { display: none; }
+
   &__description {
     @include text-body-sm;
     color: $color-text-secondary;
@@ -165,4 +168,15 @@
     color: $color-text-secondary;
     text-align: center;
   }
+}
+
+// Overrides para modo oscuro — invertir visibilidad de las dos pictures
+:root.dark .footer__brand-img--light,
+[data-theme="dark"] .footer__brand-img--light {
+  display: none;
+}
+
+:root.dark .footer__brand-img--dark,
+[data-theme="dark"] .footer__brand-img--dark {
+  display: flex;
 }
