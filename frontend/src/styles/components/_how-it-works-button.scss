@@ -1,0 +1,49 @@
+// =============================================================================
+// COMPONENTS: HOW-IT-WORKS BUTTON
+// Molécula — botón de ayuda contextual (icono Info) que abre el modal de
+// instrucciones. En desktop muestra "¿Cómo se usa?"; en mobile solo icono.
+// [ESPEJO NJK] _includes/macros/molecules.njk (macro how_it_works_button)
+// =============================================================================
+
+app-how-it-works-button {
+  display: inline-flex;
+  align-items: center;
+}
+
+.how-it-works-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: $space-2;
+  padding: $space-2 $space-3;
+  background: transparent;
+  border: $border-width $border-style var(--border);
+  border-radius: $border-radius-default;
+  color: var(--foreground);
+  font-family: $font-family-base;
+  cursor: pointer;
+  @include text-label-sm;
+  transition: background-color var(--transition-base),
+              border-color var(--transition-base);
+
+  &:hover:not(:disabled) {
+    background-color: var(--secondary);
+    border-color: var(--ring);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+
+  &__icon {
+    display: inline-flex;
+    align-items: center;
+    color: var(--primary);
+  }
+
+  &__label {
+    @include respond-until('md') {
+      display: none;
+    }
+  }
+}
