@@ -1,0 +1,33 @@
+// =============================================================================
+// COMPONENTS: THEME TOGGLE
+// Molécula — botón icono para alternar entre modo claro y oscuro.
+// Reutiliza el átomo .btn .btn--ghost; añade clase auxiliar para layout icono.
+// [ESPEJO NJK] _includes/partials/header.njk (botón con [data-theme-toggle])
+//             web/src/assets/js/theme-toggle.js
+// =============================================================================
+
+app-theme-toggle {
+  display: inline-flex;
+  align-items: center;
+
+  .btn {
+    padding: $space-2;
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+  }
+}
+
+.theme-toggle__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--foreground);
+}
+
+// Modificador para el botón del header 11ty: comparte .btn .btn--ghost,
+// solo ajusta tamaño cuadrado e iconos con colores tematizados.
+.btn--icon-only {
+  padding: $space-2;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+}
