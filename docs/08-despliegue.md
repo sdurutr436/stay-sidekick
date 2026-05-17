@@ -234,7 +234,7 @@ El acceso público se realiza exclusivamente por el servicio `nginx` de Railway.
 
 | Recurso | URL |
 |---|---|
-| Aplicación en producción (nginx) | `https://staysidekick.up.railway.app` |
+| Aplicación en producción (nginx) | `https://stay-sidekick.up.railway.app` |
 
 > Si Railway regenera el dominio o se configura dominio personalizado, esta URL
 > debe actualizarse en la memoria y en `ALLOWED_ORIGINS` del backend.
