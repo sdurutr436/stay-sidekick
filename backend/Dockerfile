@@ -4,7 +4,7 @@
 # Para producción real sustituir `python run.py` por gunicorn.
 # =============================================================================
 
-FROM python:3.11-slim
+FROM python:3.12-slim
 
 # Evitar buffering para que los logs aparezcan inmediatamente en Railway
 ENV PYTHONUNBUFFERED=1

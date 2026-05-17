@@ -19,6 +19,55 @@
         {{ googleConectado() ? 'Google conectado' : 'Google desconectado' }}
       </span>
     </div>
+
+    <app-how-it-works-button modalTitle="Cómo usar el Sincronizador de contactos">
+      <section class="modal-instrucciones__seccion">
+        <h3 class="modal-instrucciones__titulo">¿Qué hace esta herramienta?</h3>
+        <p class="modal-instrucciones__texto">
+          Unifica los datos de los huéspedes en una sola fuente y los exporta a
+          CSV o los sincroniza con Google Contacts.
+        </p>
+      </section>
+
+      @if (pmsConectado()) {
+        <section class="modal-instrucciones__seccion">
+          <h3 class="modal-instrucciones__titulo">Trabajando con PMS conectado</h3>
+          <ol class="modal-instrucciones__lista">
+            <li><strong>Elige el rango de fechas</strong> para extraer las reservas del PMS.</li>
+            @if (googleConectado()) {
+              <li><strong>Sincroniza con Google:</strong> los contactos se envían directamente a Google Contacts.</li>
+            } @else {
+              <li><strong>Descarga el CSV</strong> listo para importar donde quieras.</li>
+            }
+            <li><strong>Verifica:</strong> revisa el contador de contactos nuevos antes de ejecutar.</li>
+          </ol>
+        </section>
+      } @else {
+        <section class="modal-instrucciones__seccion">
+          <h3 class="modal-instrucciones__titulo">Trabajando sin PMS (XLSX)</h3>
+          <ol class="modal-instrucciones__lista">
+            <li><strong>Sube tu archivo XLSX</strong> exportado desde tu PMS.</li>
+            @if (googleConectado()) {
+              <li><strong>Sincroniza con Google:</strong> los contactos del archivo se envían a Google Contacts.</li>
+            } @else {
+              <li><strong>Descarga el CSV</strong> listo para importar donde quieras.</li>
+            }
+            <li><strong>Verifica:</strong> revisa el contador de contactos nuevos antes de ejecutar.</li>
+          </ol>
+          <p class="modal-instrucciones__nota">
+            Las columnas del XLSX se configuran en el perfil de empresa
+            (Ajustes → Importación XLSX).
+          </p>
+        </section>
+      }
+
+      @if (!googleConectado()) {
+        <p class="modal-instrucciones__nota">
+          Conecta Google Contacts en tu perfil para sincronizar directamente en
+          lugar de descargar el CSV.
+        </p>
+      }
+    </app-how-it-works-button>
   </app-page-header>
 
   @if (errorAlerta()) {
@@ -38,11 +87,6 @@
 
     <!-- Columna izquierda: formato de contacto -->
     <app-panel-seccion title="Formato del nombre de contacto" class="sincro-layout__instrucciones" [divider]="true">
-
-      <p class="u-text-secondary u-mb-8">
-        Define cómo se formatea el nombre de cada contacto. Tokens disponibles:
-        <code>&#123;FECHA&#125;</code>, <code>&#123;APT&#125;</code>, <code>&#123;NOMBRE&#125;</code>.
-      </p>
 
       @if (plantillaAlerta()) {
         <app-alert
@@ -134,13 +178,6 @@
                 tabindex="-1"
                 (change)="onXlsxSeleccionado($event)"
               />
-              <button
-                type="button"
-                class="sincro-instrucciones-link"
-                (click)="modalInstruccionesAbierto.set(true)"
-              >
-                ¿Cómo configurar las columnas del archivo?
-              </button>
             </div>
           }
 
@@ -261,103 +298,7 @@
 
   </div>
 
-  <!-- Panel de instrucciones de uso -->
-  <app-panel-seccion
-    title="Cómo usarlo"
-    [hasIcon]="true"
-    [divider]="true"
-  >
-    <ng-icon title-icon name="phosphorInfo" size="20" aria-hidden="true" />
-
-    <div class="instrucciones-body">
-      <p class="instrucciones-body__intro">
-        El <strong>Sincronizador de Contactos</strong> te permite unificar la
-        información de los huéspedes. Las opciones cambian dinámicamente según
-        tus integraciones activas.
-      </p>
-
-      <ol class="instrucciones-pasos">
-        @if (pmsConectado()) {
-          <li class="instrucciones-pasos__item">
-            <span class="instrucciones-pasos__num" aria-hidden="true">1</span>
-            <div class="instrucciones-pasos__content">
-              <strong>Elige el rango de fechas:</strong> Selecciona de cuándo
-              a cuándo quieres extraer los contactos directamente desde tu PMS.
-            </div>
-          </li>
-          @if (googleConectado()) {
-            <li class="instrucciones-pasos__item">
-              <span class="instrucciones-pasos__num" aria-hidden="true">2</span>
-              <div class="instrucciones-pasos__content">
-                <strong>Sincroniza con Google:</strong> Haz clic en el botón
-                de sincronización para enviar los contactos directamente a
-                Google Contacts.
-              </div>
-            </li>
-          } @else {
-            <li class="instrucciones-pasos__item">
-              <span class="instrucciones-pasos__num" aria-hidden="true">2</span>
-              <div class="instrucciones-pasos__content">
-                <strong>Descarga en CSV:</strong> Haz clic en el botón de
-                descarga para exportar un CSV con el formato estandarizado
-                listo para importar donde quieras.
-              </div>
-            </li>
-          }
-        } @else {
-          <li class="instrucciones-pasos__item">
-            <span class="instrucciones-pasos__num" aria-hidden="true">1</span>
-            <div class="instrucciones-pasos__content">
-              <strong>Sube tu archivo XLSX:</strong> Exporta las reservas desde
-              tu PMS a Excel y súbelas aquí.
-            </div>
-          </li>
-          @if (googleConectado()) {
-            <li class="instrucciones-pasos__item">
-              <span class="instrucciones-pasos__num" aria-hidden="true">2</span>
-              <div class="instrucciones-pasos__content">
-                <strong>Sincroniza con Google:</strong> Los contactos del
-                archivo se enviarán directamente a Google Contacts.
-              </div>
-            </li>
-          } @else {
-            <li class="instrucciones-pasos__item">
-              <span class="instrucciones-pasos__num" aria-hidden="true">2</span>
-              <div class="instrucciones-pasos__content">
-                <strong>Descarga en CSV:</strong> Exporta un CSV con el
-                formato estandarizado listo para importar donde quieras.
-              </div>
-            </li>
-          }
-        }
-        <li class="instrucciones-pasos__item">
-          <span class="instrucciones-pasos__num" aria-hidden="true">3</span>
-          <div class="instrucciones-pasos__content">
-            <strong>Verifica los nuevos contactos:</strong> Comprueba el
-            indicador a la derecha para ver cuántos contactos nuevos se
-            procesarán.
-          </div>
-        </li>
-      </ol>
-    </div>
-  </app-panel-seccion>
-
-</section><!-- /sincro-contenido -->
+  </section><!-- /sincro-contenido -->
 
 </div>
 
-<!-- Modal de instrucciones XLSX (solo en modo sin PMS) -->
-<app-modal
-  title="Configuración de columnas XLSX"
-  [open]="modalInstruccionesAbierto()"
-  (cerrar)="modalInstruccionesAbierto.set(false)"
->
-  <p>
-    Las posiciones de las columnas del archivo de reservas se configuran en el
-    <strong>perfil de empresa</strong>, en la sección
-    <em>Importación XLSX — Reservas</em>.
-  </p>
-  <p class="u-mt-8">
-    Solo los administradores pueden modificar esta configuración.
-  </p>
-</app-modal>

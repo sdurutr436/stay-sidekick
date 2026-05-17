@@ -16,6 +16,8 @@
 //         .dropdown-buscador__empty     (li cuando no hay resultados)
 // =============================================================================
 
+@use '../shared' as *;
+
 .dropdown-buscador {
   position: relative;
 
@@ -106,11 +108,11 @@
     transition: background-color var(--transition-base);
 
     &:hover {
-      background-color: $color-gray-100;
+      background-color: $color-btn-ghost-bg-hover;
     }
 
     &--selected {
-      background-color: $color-gray-200;
+      background-color: $color-btn-ghost-bg-active;
       font-weight: $font-weight-label;
     }
   }

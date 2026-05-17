@@ -11,6 +11,8 @@
 //       (botones de acción)
 // =============================================================================
 
+@use '../shared' as *;
+
 .page-header {
   display: flex;
   align-items: flex-start;

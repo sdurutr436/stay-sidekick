@@ -3,6 +3,8 @@
 // Estilos de elementos HTML sin clases — usa las variables de settings
 // =============================================================================
 
+@use '../shared' as *;
+
 body {
   font-family: $font-family-base;
   font-size: $font-size-body-lg;

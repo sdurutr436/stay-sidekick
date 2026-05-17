@@ -4,6 +4,8 @@
 // Estructura BEM: .logo > .logo__icon + .logo__name
 // =============================================================================
 
+@use '../shared' as *;
+
 .logo {
   display: inline-flex;
   align-items: center;

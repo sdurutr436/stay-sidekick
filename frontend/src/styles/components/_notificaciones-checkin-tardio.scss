@@ -13,6 +13,8 @@
 
 // ── Wrapper de página ─────────────────────────────────────────────────────
 
+@use '../shared' as *;
+
 .notif-checkin {
   @include container;
   padding-block: 0;
@@ -117,10 +119,10 @@
     color: $color-text-secondary;
     transition: background-color var(--transition-base);
 
-    &:hover { background-color: $color-gray-100; }
+    &:hover { background-color: $color-btn-ghost-bg-hover; }
 
     &--activo {
-      background-color: $color-gray-200;
+      background-color: $color-btn-ghost-bg-active;
       border-style: solid;
       color: $color-text-primary;
     }
@@ -143,10 +145,10 @@
     gap: $space-2;
     transition: background-color var(--transition-base);
 
-    &:hover { background-color: $color-gray-100; }
+    &:hover { background-color: $color-btn-ghost-bg-hover; }
 
     &--activo {
-      background-color: $color-gray-200;
+      background-color: $color-btn-ghost-bg-active;
       .notif-sidebar__item-nombre { font-weight: $font-weight-heading; }
     }
   }

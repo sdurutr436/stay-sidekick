@@ -130,8 +130,8 @@ erDiagram
     EMPRESAS ||--o{ MENSAJES_GENERADOS : "genera"
     EMPRESAS ||--o{ AI_USAGE_LOG : "acumula"
     EMPRESAS ||--o{ LOGS_SINCRONIZACION : "registra"
-    EMPRESAS ||--o| CONFIGURACION_PMS : "configura"
-    EMPRESAS ||--o| CONFIGURACION_IA : "configura"
-    EMPRESAS ||--o| INTEGRACIONES_GOOGLE : "conecta"
+    EMPRESAS ||--o{ CONFIGURACION_PMS : "configura"
+    EMPRESAS ||--o{ CONFIGURACION_IA : "configura"
+    EMPRESAS ||--o{ INTEGRACIONES_GOOGLE : "conecta"
     PLANTILLAS_VAULT ||--o{ MENSAJES_GENERADOS : "origina"
 ```

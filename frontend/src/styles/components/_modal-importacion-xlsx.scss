@@ -2,6 +2,8 @@
 // COMPONENTS: MODAL IMPORTACIÓN XLSX
 // =============================================================================
 
+@use '../shared' as *;
+
 .modal-importacion-xlsx {
   display: flex;
   flex-direction: column;

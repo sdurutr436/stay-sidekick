@@ -4,6 +4,8 @@
 // Estructura BEM: .badge.badge--{variante}
 // =============================================================================
 
+@use '../shared' as *;
+
 .badge {
   display: inline-flex;
   align-items: center;
@@ -22,7 +24,7 @@
   // Variantes (wireframe — se distinguen por borde y opacidad de fondo)
   // -------------------------------------------------------------------------
   &--default {
-    background-color: $color-gray-200;
+    background-color: $color-btn-ghost-bg-active;
     border-color:     $color-gray-300;
     color:            $color-gray-700;
   }

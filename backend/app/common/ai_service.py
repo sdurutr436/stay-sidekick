@@ -143,6 +143,50 @@ _MEJORAR_DEFAULT = (
     "({NOMBRE}, {APARTAMENTO}, etc.). Devuelve únicamente el mensaje mejorado, sin explicaciones."
 )
 
+_MEJORAR_CLASICO_DEFAULT = (
+    "Eres un asistente experto en comunicación para alojamientos turísticos. "
+    "Mejora el siguiente mensaje en tono formal y profesional, usando usted. "
+    "Mantén el idioma original. "
+    "Conserva sin modificar todos los placeholders entre llaves "
+    "({NOMBRE}, {APARTAMENTO}, {HORA_LLEGADA}, {HORA_SALIDA}, {PROTOCOLO_CHECKIN}, etc.). "
+    "Devuelve únicamente el mensaje mejorado, sin explicaciones."
+)
+
+_MEJORAR_CERCANO_DEFAULT = (
+    "Eres un asistente experto en comunicación para alojamientos turísticos. "
+    "Mejora el siguiente mensaje con un tono cálido y cercano, tuteando al huésped. "
+    "Mantén el idioma original. "
+    "Conserva sin modificar todos los placeholders entre llaves "
+    "({NOMBRE}, {APARTAMENTO}, {HORA_LLEGADA}, {HORA_SALIDA}, {PROTOCOLO_CHECKIN}, etc.). "
+    "Devuelve únicamente el mensaje mejorado, sin explicaciones."
+)
+
+_MEJORAR_ENTUSIASTA_DEFAULT = (
+    "Eres un asistente experto en comunicación para alojamientos turísticos. "
+    "Mejora el siguiente mensaje con un tono muy acogedor y entusiasta, transmitiendo "
+    "emoción genuina por recibir al huésped. Tutea con energía positiva. "
+    "Mantén el idioma original. "
+    "Conserva sin modificar todos los placeholders entre llaves "
+    "({NOMBRE}, {APARTAMENTO}, {HORA_LLEGADA}, {HORA_SALIDA}, {PROTOCOLO_CHECKIN}, etc.). "
+    "Devuelve únicamente el mensaje mejorado, sin explicaciones."
+)
+
+_MEJORAR_MINIMALISTA_DEFAULT = (
+    "Eres un asistente experto en comunicación para alojamientos turísticos. "
+    "Mejora el siguiente mensaje haciéndolo muy breve y directo, solo con la información esencial. "
+    "Sin adornos ni frases de relleno. Mantén el idioma original. "
+    "Conserva sin modificar todos los placeholders entre llaves "
+    "({NOMBRE}, {APARTAMENTO}, {HORA_LLEGADA}, {HORA_SALIDA}, {PROTOCOLO_CHECKIN}, etc.). "
+    "Devuelve únicamente el mensaje mejorado, sin explicaciones."
+)
+
+_TONO_PROMPTS: dict[str, tuple[str, str]] = {
+    "clasico":     ("vault_mejorar_clasico",     _MEJORAR_CLASICO_DEFAULT),
+    "cercano":     ("vault_mejorar_cercano",      _MEJORAR_CERCANO_DEFAULT),
+    "entusiasta":  ("vault_mejorar_entusiasta",   _MEJORAR_ENTUSIASTA_DEFAULT),
+    "minimalista": ("vault_mejorar_minimalista",  _MEJORAR_MINIMALISTA_DEFAULT),
+}
+
 _TRADUCIR_DEFAULT = (
     "Eres un traductor experto. Traduce el siguiente mensaje al idioma indicado. "
     "Conserva sin traducir todos los placeholders entre llaves "
@@ -154,12 +198,17 @@ def _rate_limit_code(config_ia: ConfiguracionIA | None) -> str:
     return "RATE_LIMIT_BYOK" if _is_byok(config_ia) else "RATE_LIMIT_SYSTEM"
 
 
-def mejorar(contenido: str, idioma: str, empresa_id: str) -> str:
+def mejorar(contenido: str, idioma: str, empresa_id: str, tono: str | None = None) -> str:
     config_ia = _get_config_ia(empresa_id)
     if not _is_byok(config_ia):
         _check_limits(empresa_id)
 
-    system_prompt = get_system_prompt("vault_mejorar", _MEJORAR_DEFAULT)
+    if tono and tono in _TONO_PROMPTS:
+        prompt_key, prompt_default = _TONO_PROMPTS[tono]
+    else:
+        prompt_key, prompt_default = "vault_mejorar", _MEJORAR_DEFAULT
+
+    system_prompt = get_system_prompt(prompt_key, prompt_default)
     model, api_key = _litellm_params(config_ia)
     user_message = f"Idioma: {idioma}\n\n{contenido}"
     try:

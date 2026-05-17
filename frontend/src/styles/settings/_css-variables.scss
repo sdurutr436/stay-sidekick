@@ -2,7 +2,15 @@
 // SETTINGS: CSS CUSTOM PROPERTIES
 // Expone la paleta como tokens CSS nativos para uso en templates y JS.
 // Importar después del resto de archivos de settings.
+//
+// IMPORTANTE: estas variables son la ÚNICA fuente de verdad cromática. Las
+// variables SCSS semánticas de _colores.scss (`$color-text-primary`,
+// `$color-btn-primary-bg`, …) apuntan a las custom properties definidas aquí
+// para que el toggle de tema (`.dark`) cambie todos los componentes a la vez.
 // =============================================================================
+
+@use 'tipografia' as *;
+@use 'variables' as *;
 
 :root {
   // Tipografía
@@ -65,7 +73,7 @@
   --shadow-xl:  1px 4px 5px 0px hsl(0 0% 0% / 0.03), 1px 8px 10px -1px hsl(0 0% 0% / 0.03);
   --shadow-2xl: 1px 4px 5px 0px hsl(0 0% 0% / 0.07);
 
-  // Colores — light mode
+  // ── Paleta base (light mode) ──────────────────────────────────────────────
   --background:          hsl(0 0% 97.6471%);
   --foreground:          hsl(0 0% 22.7451%);
   --card:                hsl(0 0% 100%);
@@ -83,6 +91,7 @@
   --destructive:         hsl(0 41.4894% 63.1373%);
   --destructive-foreground: hsl(0 0% 100%);
   --border:              hsl(0 0.8696% 45.0980%);
+  --border-strong:       hsl(0 0% 31.3725%);
   --input:               hsl(0 0% 100%);
   --ring:                hsl(0 0% 62.7451%);
   --sidebar:             hsl(0 0% 94.1176%);
@@ -94,16 +103,66 @@
   --sidebar-border:      hsl(0 0% 75.2941%);
   --sidebar-ring:        hsl(0 0% 62.7451%);
 
-  // Aliases semánticos (compat con componentes existentes)
-  --color-surface:        var(--background);
-  --color-surface-alt:    var(--primary-foreground);
+  // ── Tokens semánticos derivados ──────────────────────────────────────────
+  // Texto
+  --text-primary:        var(--foreground);
+  --text-secondary:      var(--muted-foreground);
+  --text-disabled:       hsl(0 0% 62.7451%);
+  --text-inverse:        hsl(0 0% 100%);
+  --text-placeholder:    hsl(0 0% 62.7451%);
+
+  // Superficies
+  --surface:             var(--background);
+  --surface-card:        var(--card);
+  --surface-alt:         var(--secondary);
+  --surface-raised:      var(--card);
+
+  // Botón primario
+  --btn-primary-bg:        hsl(0 0% 37.6471%);
+  --btn-primary-bg-hover:  hsl(0 0% 31.3725%);
+  --btn-primary-bg-active: hsl(0 0% 22.7451%);
+  --btn-primary-text:      hsl(0 0% 94.1176%);
+
+  // Botón secundario
+  --btn-secondary-bg:        hsl(0 0% 100%);
+  --btn-secondary-bg-hover:  hsl(0 0% 97.6471%);
+  --btn-secondary-bg-active: hsl(0 0% 89.0196%);
+  --btn-secondary-border:    hsl(0 0.8696% 45.0980%);
+  --btn-secondary-text:      hsl(0 0% 22.7451%);
+
+  // Botón danger (fijo en ambos temas — semántica destructiva)
+  --btn-danger-bg:        hsl(0 72% 51%);
+  --btn-danger-bg-hover:  hsl(0 72% 44%);
+  --btn-danger-bg-active: hsl(0 72% 37%);
+  --btn-danger-text:      hsl(0 0% 100%);
+
+  // Botón ghost (transparencias)
+  --btn-ghost-bg-hover:   hsl(0 0% 94.1176%);
+  --btn-ghost-bg-active:  hsl(0 0% 89.0196%);
+
+  // Badge
+  --badge-bg:    hsl(0 0% 87.0588%);
+  --badge-text:  hsl(0 0% 31.3725%);
+
+  // Header
+  --header-bg:      hsl(0 0% 100%);
+  --header-border:  hsl(0 0% 87.0588%);
+
+  // Aliases legacy (compat con componentes existentes)
+  --color-surface:        var(--surface);
+  --color-surface-alt:    var(--surface-alt);
   --color-border:         var(--border);
-  --color-text-primary:   var(--foreground);
-  --color-text-secondary: var(--muted-foreground);
-  --color-text-inverse:   hsl(0 0% 100%);
+  --color-text-primary:   var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-inverse:   var(--text-inverse);
 }
 
-.dark {
+// =============================================================================
+// MODO OSCURO — overrides
+// Toggleable vía `.dark` en <html> o atributo `[data-theme="dark"]`.
+// =============================================================================
+.dark,
+[data-theme="dark"] {
   --background:          hsl(0 0% 16.8627%);
   --foreground:          hsl(0 0% 86.2745%);
   --card:                hsl(0 0% 20%);
@@ -121,6 +180,7 @@
   --destructive:         hsl(0 35.5932% 76.8627%);
   --destructive-foreground: hsl(0 0% 16.8627%);
   --border:              hsl(0 0% 30.9804%);
+  --border-strong:       hsl(0 0% 50%);
   --input:               hsl(0 0% 20%);
   --ring:                hsl(0 0% 75.2941%);
   --sidebar:             hsl(0 0% 12.9412%);
@@ -131,4 +191,34 @@
   --sidebar-accent-foreground: hsl(0 0% 20%);
   --sidebar-border:      hsl(0 0% 30.9804%);
   --sidebar-ring:        hsl(0 0% 75.2941%);
+
+  // Tokens semánticos derivados — overrides oscuros
+  --text-disabled:       hsl(0 0% 50%);
+  --text-inverse:        hsl(0 0% 16.8627%);
+  --text-placeholder:    hsl(0 0% 50%);
+
+  // Botón primario
+  --btn-primary-bg:        hsl(0 0% 69.0196%);
+  --btn-primary-bg-hover:  hsl(0 0% 80%);
+  --btn-primary-bg-active: hsl(0 0% 86.2745%);
+  --btn-primary-text:      hsl(0 0% 16.8627%);
+
+  // Botón secundario
+  --btn-secondary-bg:        hsl(0 0% 20%);
+  --btn-secondary-bg-hover:  hsl(0 0% 27.0588%);
+  --btn-secondary-bg-active: hsl(0 0% 35.2941%);
+  --btn-secondary-border:    hsl(0 0% 30.9804%);
+  --btn-secondary-text:      hsl(0 0% 86.2745%);
+
+  // Botón ghost
+  --btn-ghost-bg-hover:   hsl(0 0% 27.0588%);
+  --btn-ghost-bg-active:  hsl(0 0% 35.2941%);
+
+  // Badge
+  --badge-bg:    hsl(0 0% 35.2941%);
+  --badge-text:  hsl(0 0% 75.2941%);
+
+  // Header
+  --header-bg:      hsl(0 0% 20%);
+  --header-border:  hsl(0 0% 30.9804%);
 }

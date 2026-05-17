@@ -18,6 +18,8 @@
 //       .footer__copyright
 // =============================================================================
 
+@use '../shared' as *;
+
 .footer {
   background-color: $color-surface-alt;
   border-top: $border-width $border-style $color-border;
@@ -86,6 +88,9 @@
     }
   }
 
+  // Picture switching light/dark — solo una visible a la vez
+  &__brand-img--dark { display: none; }
+
   &__description {
     @include text-body-sm;
     color: $color-text-secondary;
@@ -153,7 +158,7 @@
   // -------------------------------------------------------------------------
   &__bar {
     border-top: $border-width $border-style $color-border;
-    background-color: $color-gray-100;
+    background-color: $color-btn-ghost-bg-hover;
     padding-block: $space-2;
   }
 
@@ -163,4 +168,15 @@
     color: $color-text-secondary;
     text-align: center;
   }
+}
+
+// Overrides para modo oscuro — invertir visibilidad de las dos pictures
+:root.dark .footer__brand-img--light,
+[data-theme="dark"] .footer__brand-img--light {
+  display: none;
+}
+
+:root.dark .footer__brand-img--dark,
+[data-theme="dark"] .footer__brand-img--dark {
+  display: flex;
 }

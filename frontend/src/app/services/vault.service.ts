@@ -34,10 +34,12 @@ export class VaultService {
     return this.http.delete<{ ok: boolean }>(`/api/vault/plantillas/${id}`);
   }
 
-  mejorar(plantillaId: string, contenido: string, idioma: string): Observable<{ ok: boolean; contenido: string }> {
+  mejorar(plantillaId: string, contenido: string, idioma: string, tono?: string | null): Observable<{ ok: boolean; contenido: string }> {
+    const body: Record<string, string> = { contenido, idioma };
+    if (tono) body['tono'] = tono;
     return this.http.post<{ ok: boolean; contenido: string }>(
       `/api/vault/plantillas/${plantillaId}/mejoras`,
-      { contenido, idioma },
+      body,
     );
   }
 

@@ -37,6 +37,42 @@
           (change)="onXlsxSeleccionado($event)"
         />
       }
+
+      <app-how-it-works-button modalTitle="Cómo usar las Notificaciones de check-in tardío">
+        <section class="modal-instrucciones__seccion">
+          <h3 class="modal-instrucciones__titulo">¿Qué hace esta herramienta?</h3>
+          <p class="modal-instrucciones__texto">
+            Genera mensajes recordatorios listos para enviar a los huéspedes con
+            check-in tardío del día.
+          </p>
+        </section>
+
+        @if (pmsConfigurado()) {
+          <section class="modal-instrucciones__seccion">
+            <h3 class="modal-instrucciones__titulo">Trabajando con PMS conectado</h3>
+            <ol class="modal-instrucciones__lista">
+              <li>Los check-ins de hoy se cargan automáticamente desde tu PMS.</li>
+              <li>Selecciona una plantilla del panel izquierdo o pulsa <strong>Generar automáticamente</strong>.</li>
+              <li>Revisa, edita y copia el mensaje desde el panel derecho.</li>
+            </ol>
+            <p class="modal-instrucciones__nota">
+              La hora de corte para considerar un check-in como tardío se ajusta en tu perfil.
+            </p>
+          </section>
+        } @else {
+          <section class="modal-instrucciones__seccion">
+            <h3 class="modal-instrucciones__titulo">Trabajando sin PMS (importación XLSX)</h3>
+            <ol class="modal-instrucciones__lista">
+              <li>Pulsa <strong>Importar XLSX</strong> y selecciona el archivo de check-ins de hoy.</li>
+              <li>Comprueba la tabla generada para asegurarte de que los datos son correctos.</li>
+              <li>Genera el mensaje y copia el resultado.</li>
+            </ol>
+            <p class="modal-instrucciones__nota">
+              El mapeo de columnas del XLSX se configura en el perfil de empresa.
+            </p>
+          </section>
+        }
+      </app-how-it-works-button>
     }
   </app-page-header>
 
@@ -86,7 +122,11 @@
     <div class="notif-bloques">
 
       <!-- ── Panel izquierdo: Plantillas ─────────────────────────────── -->
-      <app-panel-seccion title="Plantillas">
+      <app-templates-card
+        title="Plantillas"
+        [total]="plantillas().length"
+        emptyMessage="No hay plantillas guardadas. Crea la primera con el botón “Nueva plantilla”."
+      >
 
         @if (plantillaAlerta()) {
           <app-alert
@@ -219,7 +259,7 @@
 
         }
 
-      </app-panel-seccion>
+      </app-templates-card>
 
       <!-- ── Panel derecho: Mensaje ───────────────────────────────────── -->
       <app-panel-seccion title="Mensaje">

@@ -4,6 +4,8 @@
 // Estructura BEM: .form-login, .login-page
 // =============================================================================
 
+@use '../shared' as *;
+
 .form-login {
   display: flex;
   flex-direction: column;
