@@ -1,26 +1,44 @@
 // =============================================================================
 // COMPONENTS: INDEX
-// Punto de entrada de todos los componentes
+// Punto de entrada de todos los componentes (capa 6 de ITCSS).
+//
+// Convención: para cada componente, el comentario [ESPEJO NJK] indica
+// el archivo/macro correspondiente del sitio 11ty cuando existe. Si NO
+// aplica (componente exclusivo de la SPA Angular) se omite el comentario.
 // =============================================================================
 
-@import 'svg';
+// ── Átomos visuales y base ───────────────────────────────────────────────
+@import 'svg';            // [ESPEJO NJK] _includes/macros/atoms.njk (macro icon)
 @import 'img';
 @import 'logo';
-@import 'button';
-@import 'badge';
-@import 'header';
-@import 'footer';
-@import 'form';
-@import 'form-solicitud';
-@import 'form-login';
+@import 'button';         // [ESPEJO NJK] _includes/macros/atoms.njk (macro button)
+@import 'badge';          // [ESPEJO NJK] _includes/macros/atoms.njk (macro badge)
+
+// ── Organismos de estructura del sitio (compartidos Angular ↔ 11ty) ──────
+@import 'header';         // [ESPEJO NJK] _includes/partials/header.njk
+@import 'footer';         // [ESPEJO NJK] _includes/partials/footer.njk
+
+// ── Formularios ──────────────────────────────────────────────────────────
+@import 'form';           // [ESPEJO NJK] _includes/macros/molecules.njk (form-input/-select/-textarea/-checkbox/-label)
+@import 'form-solicitud'; // [ESPEJO NJK] _includes/partials/form-solicitud.njk
+@import 'form-login';     // [ESPEJO NJK] web/src/login/index.njk
+
+// ── Navegación interna (solo SPA Angular) ────────────────────────────────
 @import 'nav-sidenav';
 @import 'page-header';
+
+// ── Tablas y CRUDs (solo SPA Angular) ────────────────────────────────────
 @import 'tabla-crud';
 @import 'maestro-apartamentos';
 @import 'gestion-usuarios';
+
+// ── Componentes de feedback (solo SPA Angular) ───────────────────────────
 @import 'alert';
 @import 'card';
 @import 'panel-seccion';
+@import 'confirm-inline';
+
+// ── Páginas de herramientas (solo SPA Angular) ───────────────────────────
 @import 'sincronizador-contactos';
 @import 'notificaciones-checkin-tardio';
 @import 'dropdown-buscador';
@@ -29,10 +47,17 @@
 @import 'perfil';
 @import 'not-found';
 @import 'modal';
-@import 'accordion-item';
-@import 'confirm-inline';
 @import 'modal-importacion-xlsx';
+@import 'accordion-item';
 @import 'mapa-calor';
 @import 'menu-default';
-@import 'web-content';
-@import 'landing';
+
+// ── Contenido del sitio 11ty (legales, marketing) ────────────────────────
+@import 'web-content';    // [ESPEJO NJK] web/src/legal/*, web/src/empresa/*
+@import 'landing';        // [ESPEJO NJK] web/src/index.njk
+
+// ── Estandarización UI (sprint pre-entrega) ──────────────────────────────
+@import 'theme-toggle';            // [ESPEJO NJK] _includes/partials/header.njk + web/src/assets/js/theme-toggle.js
+@import 'how-it-works-button';     // (solo SPA Angular)
+@import 'templates-card';          // (solo SPA Angular)
+@import 'modal-instrucciones';     // (solo SPA Angular — cuerpo del modal de instrucciones)
