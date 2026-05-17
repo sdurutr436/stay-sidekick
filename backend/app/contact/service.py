@@ -6,6 +6,7 @@ from flask import request
 from marshmallow import ValidationError
 
 from app.common.notifications.discord import send_discord_contact_notification
+from app.common.notifications.mail_service import send_contact
 from app.contact.schemas import ContactoMessageSchema
 from app.solicitud.turnstile import verify_turnstile
 
@@ -36,7 +37,7 @@ def process_contacto(json_data: dict) -> tuple[dict, list[str]]:
     if not verify_turnstile(turnstile_token, client_ip):
         return {}, ["La verificación del captcha ha fallado."]
 
-    send_discord_contact_notification(clean_data)
+    _dispatch_notifications(clean_data)
 
     logger.info(
         "Mensaje de contacto recibido de: %s",
@@ -44,3 +45,21 @@ def process_contacto(json_data: dict) -> tuple[dict, list[str]]:
     )
 
     return clean_data, []
+
+
+def _dispatch_notifications(clean_data: dict) -> None:
+    try:
+        email_ok = send_contact(clean_data)
+    except Exception:
+        logger.exception("Excepción inesperada al enviar contacto por email.")
+        email_ok = False
+    try:
+        discord_ok = send_discord_contact_notification(clean_data)
+    except Exception:
+        logger.exception("Excepción inesperada al notificar contacto a Discord.")
+        discord_ok = False
+
+    if not email_ok:
+        logger.warning("No se pudo enviar el email de contacto.")
+    if not discord_ok:
+        logger.warning("No se pudo enviar la notificación de contacto a Discord.")
