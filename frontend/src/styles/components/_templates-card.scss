@@ -1,0 +1,52 @@
+// =============================================================================
+// COMPONENTS: TEMPLATES CARD
+// Organismo — contenedor unificado para listas de plantillas
+// (Notificaciones de check-in tardío + Vault de comunicaciones).
+// Encapsula título, buscador, mensaje de estado vacío y lista.
+// [ESPEJO NJK] no aplica — solo Angular SPA.
+// =============================================================================
+
+.templates-card {
+  display: flex;
+  flex-direction: column;
+  gap: $space-3;
+  padding: $space-4;
+  background-color: var(--card);
+  border: $border-width $border-style var(--border);
+  border-radius: $border-radius-default;
+  color: var(--card-foreground);
+
+  &__header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: $space-3;
+  }
+
+  &__title {
+    @include text-label-lg;
+    margin: 0;
+    color: var(--foreground);
+  }
+
+  &__count {
+    @include text-caption-md;
+    color: var(--muted-foreground);
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    gap: $space-2;
+  }
+
+  &__empty {
+    padding: $space-4;
+    text-align: center;
+    color: var(--muted-foreground);
+    @include text-body-sm;
+    border: 1px dashed var(--border);
+    border-radius: $border-radius-default;
+    background-color: var(--muted);
+  }
+}
