@@ -17,7 +17,7 @@ from app.h_maestro_apartamentos import repository as apt_repo
 from app.perfil import repository as perfil_repo
 from app.common.col_utils import col_letra_a_indice
 from app.common.crypto import decrypt
-from app.common.notifications.gmail import send_via_smtp
+from app.common.notifications.mail_service import send_via_smtp
 from app.common.xlsx_reservas import parse_xlsx_reservas
 from app.normalizador_pms.factory import build_pms_client
 
@@ -31,14 +31,14 @@ def get_status(empresa_id: str, fecha: str | None = None) -> dict:
     """Devuelve el estado de la herramienta para la empresa.
 
     Incluye:
-    - Si Gmail SMTP está configurado (GMAIL_USER + GMAIL_APP_PASSWORD).
+    - Si SMTP está configurado (MAIL_USER + MAIL_PASSWORD).
     - Si hay PMS configurado y las reservas de check-in de hoy.
     - Lista de apartamentos activos del maestro.
     - hora_corte configurada para la empresa.
     """
     gmail_ok = bool(
-        current_app.config.get("GMAIL_USER")
-        and current_app.config.get("GMAIL_APP_PASSWORD")
+        current_app.config.get("MAIL_USER")
+        and current_app.config.get("MAIL_PASSWORD")
     )
 
     apts = apt_repo.list_by_empresa(empresa_id)
