@@ -9,11 +9,11 @@
     title="Mapa de calor"
     description="Visualiza la distribución de check-ins y check-outs en el período seleccionado."
   >
-    <div class="meta-chip-group">
-      <span class="meta-chip" [class.meta-chip--ok]="pmsActivo()">
-        <ng-icon [name]="pmsActivo() ? 'phosphorCheckCircle' : 'phosphorWarningCircle'" size="14" aria-hidden="true" />
+    <div class="tag-group">
+      <app-tag [variant]="pmsActivo() ? 'success' : 'default'">
+        <ng-icon tag-icon [name]="pmsActivo() ? 'phosphorCheckCircle' : 'phosphorWarningCircle'" size="14" aria-hidden="true" />
         {{ pmsActivo() ? 'PMS' + (pmsProveedor() ? ': ' + pmsProveedor() : ' conectado') : 'Sin PMS' }}
-      </span>
+      </app-tag>
     </div>
 
     <app-how-it-works-button modalTitle="Cómo usar el Mapa de calor">
