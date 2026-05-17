@@ -6,6 +6,7 @@ import { ButtonComponent } from '../../components/atoms/button/button';
 import { DropdownBuscadorComponent, DropdownOption } from '../../components/molecules/dropdown-buscador/dropdown-buscador';
 import { HowItWorksButtonComponent } from '../../components/molecules/how-it-works-button/how-it-works-button';
 import { PageHeaderComponent } from '../../components/organisms/page-header/page-header';
+import { PanelSeccionComponent } from '../../components/organisms/panel-seccion/panel-seccion';
 import { TemplatesCardComponent } from '../../components/organisms/templates-card/templates-card';
 import { VaultService, Plantilla } from '../../services/vault.service';
 import { PerfilService } from '../../services/perfil.service';
@@ -38,6 +39,7 @@ const COOLDOWN_SEGUNDOS = 60;
   imports: [
     RouterLink, NgIconComponent, PageHeaderComponent, ButtonComponent, AlertComponent,
     DropdownBuscadorComponent, HowItWorksButtonComponent, TemplatesCardComponent,
+    PanelSeccionComponent,
   ],
 })
 export class VaultComunicacionesPageComponent implements OnInit, OnDestroy {

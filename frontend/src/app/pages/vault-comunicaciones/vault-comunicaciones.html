@@ -129,8 +129,11 @@
       </ul>
     </app-templates-card>
 
-    <!-- ── Editor: composer de mensaje ── -->
-    <section class="vault-editor" aria-label="Editor de mensaje">
+    <!-- ── Editor: composer de mensaje (toolbar, textarea, acciones, traducir) ── -->
+    <app-panel-seccion
+      class="vault-editor"
+      [title]="isEditing() ? (isNueva() ? 'Nueva plantilla' : 'Editor: ' + (plantillaSeleccionada()?.nombre ?? nombreActual())) : 'Editor de mensaje'"
+    >
 
       @if (isEditing()) {
         <!-- Nombre de la plantilla (editable) -->
@@ -409,7 +412,7 @@
         </p>
       }
 
-    </section>
+    </app-panel-seccion>
 
   </div>
 
