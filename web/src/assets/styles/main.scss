@@ -4,35 +4,33 @@
 // loadPaths configurado en package.json para resolver desde:
 //   ../frontend/src/styles/
 //
+// Sintaxis moderna Dart Sass: @use / @forward (sin @import).
+//
 // Orden ITCSS: Settings → Tools → Generic → Elements →
 //              Layout → Components → Utilities → Animations
 // =============================================================================
 
-// 1. Settings — variables, sin CSS generado
-@import 'settings/tipografia';
-@import 'settings/colores';
-@import 'settings/breakpoints';
-@import 'settings/variables';
-@import 'settings/css-variables';
+// 1+2. Settings + Tools — tokens y mixins inyectados en el scope global
+@use 'shared' as *;
 
-// 2. Tools — mixins, sin CSS generado
-@import 'tools/mixins';
+// Custom properties — generan CSS en :root y .dark (única definición)
+@use 'settings/css-variables';
 
 // 3. Generic — resets
-@import 'generic/resets';
+@use 'generic/resets';
 
 // 4. Elements — estilos de elementos HTML sin clase
-@import 'elements/base';
+@use 'elements/base';
 
 // 5. Layout — contenedor, grid, flex
-@import 'layout/grid';
-@import 'layout/flex';
+@use 'layout/grid';
+@use 'layout/flex';
 
 // 6. Components — todos los componentes y organismos
-@import 'components/index';
+@use 'components';
 
 // 7. Utilities — clases de ayuda de alta especificidad
-@import 'utilities/index';
+@use 'utilities';
 
 // 8. Animations — keyframes y clases de animación
-@import 'animations/index';
+@use 'animations';
