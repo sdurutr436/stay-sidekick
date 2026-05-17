@@ -117,6 +117,171 @@
   </div>
 
   <!-- =========================================================
+       BOTÓN GHOST
+  ========================================================== -->
+  <div class="ds-block">
+    <p class="ds-block__label">Botón ghost (sin fondo)</p>
+    <div class="ds-block__body">
+
+      <div class="ds-row">
+        <div class="ds-specimen">
+          <span class="ds-specimen__label">sm</span>
+          <div class="ds-specimen__preview">
+            <button class="btn btn--ghost btn--sm" type="button">Cancelar</button>
+          </div>
+          <span class="ds-specimen__meta">btn--ghost btn--sm</span>
+        </div>
+
+        <div class="ds-specimen">
+          <span class="ds-specimen__label">md</span>
+          <div class="ds-specimen__preview">
+            <button class="btn btn--ghost btn--md" type="button">Cancelar</button>
+          </div>
+          <span class="ds-specimen__meta">btn--ghost btn--md</span>
+        </div>
+
+        <div class="ds-specimen">
+          <span class="ds-specimen__label">solo icono</span>
+          <div class="ds-specimen__preview">
+            <button class="btn btn--ghost btn--md btn--icon-only" type="button" aria-label="Cambiar tema">
+              <svg class="svg svg--sm" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <circle cx="10" cy="10" r="4"/>
+                <line x1="10" y1="1" x2="10" y2="3" stroke="currentColor" stroke-width="1.5"/>
+                <line x1="10" y1="17" x2="10" y2="19" stroke="currentColor" stroke-width="1.5"/>
+              </svg>
+            </button>
+          </div>
+          <span class="ds-specimen__meta">btn--icon-only</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- =========================================================
+       BOTÓN DANGER
+  ========================================================== -->
+  <div class="ds-block">
+    <p class="ds-block__label">Botón danger (acciones destructivas)</p>
+    <div class="ds-block__body">
+
+      <div class="ds-row">
+        <div class="ds-specimen">
+          <span class="ds-specimen__label">sm</span>
+          <div class="ds-specimen__preview">
+            <button class="btn btn--danger btn--sm" type="button">Eliminar</button>
+          </div>
+          <span class="ds-specimen__meta">btn--danger btn--sm</span>
+        </div>
+
+        <div class="ds-specimen">
+          <span class="ds-specimen__label">md</span>
+          <div class="ds-specimen__preview">
+            <button class="btn btn--danger btn--md" type="button">Eliminar</button>
+          </div>
+          <span class="ds-specimen__meta">btn--danger btn--md</span>
+        </div>
+
+        <div class="ds-specimen">
+          <span class="ds-specimen__label">deshabilitado</span>
+          <div class="ds-specimen__preview">
+            <button class="btn btn--danger btn--md" type="button" disabled>Eliminar</button>
+          </div>
+          <span class="ds-specimen__meta">btn--danger disabled</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- =========================================================
+       TAG (indicador de estado con icono opcional)
+  ========================================================== -->
+  <div class="ds-block">
+    <p class="ds-block__label">Tag — indicador de estado contextual</p>
+    <p class="ds-block__hint">
+      Reemplazo del antiguo <code>.meta-chip</code>. Variantes semánticas que
+      recolorean el texto + icono opcional. Reutilizar en
+      <code>page-header__end</code> agrupado por <code>.tag-group</code>.
+    </p>
+    <div class="ds-block__body">
+
+      <div class="ds-row">
+        <div class="ds-specimen">
+          <span class="ds-specimen__label">default</span>
+          <div class="ds-specimen__preview">
+            <span class="tag tag--default">
+              <span class="tag__label">Corte: 20:00</span>
+            </span>
+          </div>
+          <span class="ds-specimen__meta">tag tag--default</span>
+        </div>
+
+        <div class="ds-specimen">
+          <span class="ds-specimen__label">success + icono</span>
+          <div class="ds-specimen__preview">
+            <span class="tag tag--success">
+              <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <circle cx="10" cy="10" r="8" fill="none" stroke="currentColor" stroke-width="2"/>
+                <polyline points="6,10 9,13 14,7" fill="none" stroke="currentColor" stroke-width="2"/>
+              </svg>
+              <span class="tag__label">PMS conectado</span>
+            </span>
+          </div>
+          <span class="ds-specimen__meta">tag--success + svg</span>
+        </div>
+
+        <div class="ds-specimen">
+          <span class="ds-specimen__label">warning</span>
+          <div class="ds-specimen__preview">
+            <span class="tag tag--warning">
+              <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <circle cx="10" cy="10" r="8" fill="none" stroke="currentColor" stroke-width="2"/>
+                <line x1="10" y1="6" x2="10" y2="11" stroke="currentColor" stroke-width="2"/>
+                <circle cx="10" cy="14" r="1" fill="currentColor"/>
+              </svg>
+              <span class="tag__label">Error PMS</span>
+            </span>
+          </div>
+          <span class="ds-specimen__meta">tag--warning</span>
+        </div>
+
+        <div class="ds-specimen">
+          <span class="ds-specimen__label">danger</span>
+          <div class="ds-specimen__preview">
+            <span class="tag tag--danger">
+              <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <circle cx="10" cy="10" r="8" fill="none" stroke="currentColor" stroke-width="2"/>
+                <line x1="6" y1="6" x2="14" y2="14" stroke="currentColor" stroke-width="2"/>
+                <line x1="14" y1="6" x2="6" y2="14" stroke="currentColor" stroke-width="2"/>
+              </svg>
+              <span class="tag__label">Sin Google</span>
+            </span>
+          </div>
+          <span class="ds-specimen__meta">tag--danger</span>
+        </div>
+      </div>
+
+      <!-- Agrupador -->
+      <div class="ds-specimen">
+        <span class="ds-specimen__label">tag-group (agrupador horizontal)</span>
+        <div class="ds-specimen__preview">
+          <div class="tag-group">
+            <span class="tag tag--success">
+              <span class="tag__label">PMS conectado</span>
+            </span>
+            <span class="tag tag--default">
+              <span class="tag__label">Corte: 20:00</span>
+            </span>
+          </div>
+        </div>
+        <span class="ds-specimen__meta">.tag-group (gap horizontal, wrap)</span>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- =========================================================
        BADGES
   ========================================================== -->
   <div class="ds-block">

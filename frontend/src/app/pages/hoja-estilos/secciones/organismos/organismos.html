@@ -201,4 +201,342 @@
     </div>
   </div>
 
+  <!-- =========================================================
+       PAGE HEADER
+  ========================================================== -->
+  <div class="ds-block">
+    <p class="ds-block__label">Page header — cabecera de herramienta</p>
+    <p class="ds-block__hint">
+      BEM: <code>.page-header > .page-header__start (title + desc) + .page-header__end (tags, acciones, ¿Cómo se usa?)</code>
+    </p>
+    <div class="ds-block__body">
+
+      <div class="ds-organism-preview">
+        <header class="page-header">
+          <div class="page-header__start">
+            <h1 class="page-header__title">Notificaciones de check-in tardíos</h1>
+            <p class="page-header__desc">
+              Genera recordatorios personalizados para huéspedes con check-in tardío.
+            </p>
+          </div>
+
+          <div class="page-header__end">
+            <div class="tag-group">
+              <span class="tag tag--success">
+                <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                  <circle cx="10" cy="10" r="8" fill="none" stroke="currentColor" stroke-width="2"/>
+                  <polyline points="6,10 9,13 14,7" fill="none" stroke="currentColor" stroke-width="2"/>
+                </svg>
+                <span class="tag__label">PMS conectado</span>
+              </span>
+              <span class="tag"><span class="tag__label">Corte: 20:00</span></span>
+            </div>
+            <button class="btn btn--secondary btn--md" type="button">Importar XLSX</button>
+            <button class="how-it-works-btn" type="button" aria-label="¿Cómo se usa?">
+              <span class="how-it-works-btn__icon" aria-hidden="true">
+                <svg class="svg svg--sm" viewBox="0 0 20 20" fill="currentColor">
+                  <circle cx="10" cy="10" r="8" fill="none" stroke="currentColor" stroke-width="2"/>
+                  <line x1="10" y1="9" x2="10" y2="14" stroke="currentColor" stroke-width="2"/>
+                  <circle cx="10" cy="6" r="1" fill="currentColor"/>
+                </svg>
+              </span>
+              <span class="how-it-works-btn__label">¿Cómo se usa?</span>
+            </button>
+          </div>
+        </header>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- =========================================================
+       PANEL SECCION
+  ========================================================== -->
+  <div class="ds-block">
+    <p class="ds-block__label">Panel sección — bloque con título y cuerpo</p>
+    <p class="ds-block__hint">Contenedor base para agrupar formularios y controles dentro de una herramienta.</p>
+    <div class="ds-block__body">
+
+      <div class="ds-organism-preview">
+        <section class="panel-seccion" aria-label="Configuración">
+          <h2 class="panel-seccion__titulo">
+            <span class="panel-seccion__titulo-icon" aria-hidden="true">
+              <svg class="svg svg--sm" viewBox="0 0 20 20" fill="currentColor"><rect x="3" y="3" width="14" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+            </span>
+            Configuración
+          </h2>
+          <p class="panel-seccion__desc">Ajustes generales de la herramienta.</p>
+          <hr class="panel-seccion__divider" aria-hidden="true" />
+          <div class="panel-seccion__body">
+            <div class="form-field">
+              <label class="form-label" for="ds-panel-input">Hora de corte</label>
+              <input class="form-input" id="ds-panel-input" type="time" value="20:00">
+            </div>
+            <button class="btn btn--primary btn--md" type="button" style="align-self:flex-start">Guardar</button>
+          </div>
+        </section>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- =========================================================
+       MODAL
+  ========================================================== -->
+  <div class="ds-block">
+    <p class="ds-block__label">Modal — diálogo modal accesible</p>
+    <p class="ds-block__hint">
+      Overlay con foco trap, cierre por ESC y por clic en overlay. Se muestra
+      aquí simulado <em>siempre visible</em> dentro de la previsualización.
+    </p>
+    <div class="ds-block__body">
+
+      <div class="ds-organism-preview" style="min-height:280px;background:rgba(0,0,0,0.05)">
+        <div class="modal__overlay" role="dialog" aria-modal="true" aria-label="¿Cómo se usa?" style="position:relative">
+          <div class="modal__panel">
+            <header class="modal__header">
+              <h2 class="modal__title">Cómo usar las Notificaciones</h2>
+              <button class="modal__close" type="button" aria-label="Cerrar">
+                <svg class="svg svg--sm" viewBox="0 0 16 16" fill="none">
+                  <line x1="4" y1="4" x2="12" y2="12" stroke="currentColor" stroke-width="1.5"/>
+                  <line x1="12" y1="4" x2="4" y2="12" stroke="currentColor" stroke-width="1.5"/>
+                </svg>
+              </button>
+            </header>
+            <div class="modal__body">
+              <div class="modal-instrucciones">
+                <section class="modal-instrucciones__seccion">
+                  <h3 class="modal-instrucciones__titulo">¿Qué hace esta herramienta?</h3>
+                  <p class="modal-instrucciones__texto">Genera mensajes recordatorios listos para enviar a los huéspedes con check-in tardío del día.</p>
+                </section>
+                <p class="modal-instrucciones__nota">La hora de corte se ajusta en tu perfil.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- =========================================================
+       TEMPLATES CARD
+  ========================================================== -->
+  <div class="ds-block">
+    <p class="ds-block__label">Templates card — contenedor de plantillas</p>
+    <p class="ds-block__hint">Organismo que envuelve listas de plantillas: título, contador opcional y estado vacío.</p>
+    <div class="ds-block__body">
+
+      <div class="ds-row">
+        <div class="ds-specimen ds-specimen--form-wide">
+          <span class="ds-specimen__label">con contenido</span>
+          <div class="ds-specimen__preview">
+            <section class="templates-card" aria-label="Plantillas">
+              <header class="templates-card__header">
+                <h2 class="templates-card__title">Plantillas</h2>
+                <span class="templates-card__count">3 plantillas</span>
+              </header>
+              <div class="templates-card__body">
+                <p>Bienvenida estándar</p>
+                <p>Check-in tardío</p>
+                <p>Recordatorio limpieza</p>
+              </div>
+            </section>
+          </div>
+          <span class="ds-specimen__meta">.templates-card · __title + __count + __body</span>
+        </div>
+
+        <div class="ds-specimen ds-specimen--form-wide">
+          <span class="ds-specimen__label">estado vacío</span>
+          <div class="ds-specimen__preview">
+            <section class="templates-card" aria-label="Plantillas">
+              <header class="templates-card__header">
+                <h2 class="templates-card__title">Plantillas</h2>
+                <span class="templates-card__count">0 plantillas</span>
+              </header>
+              <div class="templates-card__body">
+                <p class="templates-card__empty">No hay plantillas guardadas. Crea la primera con el botón “Nueva plantilla”.</p>
+              </div>
+            </section>
+          </div>
+          <span class="ds-specimen__meta">.templates-card__empty</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- =========================================================
+       FOOTER
+  ========================================================== -->
+  <div class="ds-block">
+    <p class="ds-block__label">Footer — pie de página</p>
+    <p class="ds-block__hint">
+      BEM: <code>.footer > .footer__inner > .footer__grid (.footer__brand + .footer__nav*) + .footer__bar</code>
+    </p>
+    <div class="ds-block__body">
+
+      <div class="ds-organism-preview">
+        <footer class="footer" role="contentinfo">
+          <div class="footer__inner">
+            <div class="footer__grid">
+
+              <div class="footer__brand">
+                <a href="#" aria-label="Stay Sidekick — Inicio" class="logo">
+                  <span class="logo__icon" aria-hidden="true">
+                    <svg viewBox="0 0 32 32" width="32" height="32">
+                      <rect width="32" height="32" fill="currentColor"/>
+                    </svg>
+                  </span>
+                  <span class="logo__name">Stay Sidekick</span>
+                </a>
+                <p class="footer__description">Tu copiloto para gestionar alojamientos turísticos.</p>
+              </div>
+
+              <nav class="footer__nav" aria-label="Producto">
+                <h3 class="footer__nav-title">Producto</h3>
+                <ul class="footer__nav-list">
+                  <li class="footer__nav-item"><a href="#" class="footer__nav-link">Funcionalidades</a></li>
+                  <li class="footer__nav-item"><a href="#" class="footer__nav-link">Precios</a></li>
+                </ul>
+              </nav>
+
+              <nav class="footer__nav" aria-label="Empresa">
+                <h3 class="footer__nav-title">Empresa</h3>
+                <ul class="footer__nav-list">
+                  <li class="footer__nav-item"><a href="#" class="footer__nav-link">Sobre nosotros</a></li>
+                  <li class="footer__nav-item"><a href="#" class="footer__nav-link">Contacto</a></li>
+                </ul>
+              </nav>
+            </div>
+          </div>
+          <div class="footer__bar">
+            <p class="footer__copyright">&copy; 2026 Stay Sidekick · Todos los derechos reservados</p>
+          </div>
+        </footer>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- =========================================================
+       TABLA CRUD
+  ========================================================== -->
+  <div class="ds-block">
+    <p class="ds-block__label">Tabla CRUD — lista editable con selección</p>
+    <p class="ds-block__hint">Tabla con checkbox de selección, columnas tipadas y acciones por fila. Usada en Maestro de apartamentos.</p>
+    <div class="ds-block__body">
+
+      <div class="ds-organism-preview">
+        <table class="tabla-crud" aria-label="Apartamentos">
+          <thead class="tabla-crud__head">
+            <tr>
+              <th scope="col" class="tabla-crud__th tabla-crud__th--check">
+                <input type="checkbox" aria-label="Seleccionar todo">
+              </th>
+              <th scope="col" class="tabla-crud__th">Nombre</th>
+              <th scope="col" class="tabla-crud__th">Ciudad</th>
+              <th scope="col" class="tabla-crud__th tabla-crud__th--acciones">Acciones</th>
+            </tr>
+          </thead>
+          <tbody class="tabla-crud__body">
+            <tr class="tabla-crud__row">
+              <td class="tabla-crud__td tabla-crud__td--check"><input type="checkbox" aria-label="Seleccionar fila"></td>
+              <td class="tabla-crud__td">Apartamento Centro 1</td>
+              <td class="tabla-crud__td">Sevilla</td>
+              <td class="tabla-crud__td">
+                <button class="btn btn--ghost btn--sm" type="button">Editar</button>
+              </td>
+            </tr>
+            <tr class="tabla-crud__row">
+              <td class="tabla-crud__td tabla-crud__td--check"><input type="checkbox" aria-label="Seleccionar fila"></td>
+              <td class="tabla-crud__td">Apartamento Plaza 2</td>
+              <td class="tabla-crud__td">Sevilla</td>
+              <td class="tabla-crud__td">
+                <button class="btn btn--ghost btn--sm" type="button">Editar</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- =========================================================
+       HEATMAP GRID
+  ========================================================== -->
+  <div class="ds-block">
+    <p class="ds-block__label">Heatmap grid — visualización de check-ins/outs</p>
+    <p class="ds-block__hint">Cuadrícula de 7 columnas con cabecera de días. Cada celda muestra intensidad de check-ins (verde) y check-outs (rojo).</p>
+    <div class="ds-block__body">
+
+      <div class="ds-organism-preview">
+        <div class="heatmap-grid">
+          <div class="heatmap-grid__header">L</div>
+          <div class="heatmap-grid__header">M</div>
+          <div class="heatmap-grid__header">X</div>
+          <div class="heatmap-grid__header">J</div>
+          <div class="heatmap-grid__header">V</div>
+          <div class="heatmap-grid__header">S</div>
+          <div class="heatmap-grid__header">D</div>
+
+          <div class="heatmap-grid__mes-separador">Enero</div>
+
+          <div class="heatmap-grid__celda heatmap-grid__celda--adyacente">
+            <span class="heatmap-grid__dia">29</span>
+            <div class="heatmap-grid__contenido">
+              <div class="heatmap-grid__checkins heatmap-grid__checkins--i25">2</div>
+              <div class="heatmap-grid__checkouts heatmap-grid__checkouts--o0">0</div>
+            </div>
+          </div>
+          <div class="heatmap-grid__celda heatmap-grid__celda--adyacente">
+            <span class="heatmap-grid__dia">30</span>
+            <div class="heatmap-grid__contenido">
+              <div class="heatmap-grid__checkins heatmap-grid__checkins--i0">0</div>
+              <div class="heatmap-grid__checkouts heatmap-grid__checkouts--o25">1</div>
+            </div>
+          </div>
+          <div class="heatmap-grid__celda heatmap-grid__celda--adyacente">
+            <span class="heatmap-grid__dia">31</span>
+            <div class="heatmap-grid__contenido">
+              <div class="heatmap-grid__checkins heatmap-grid__checkins--i50">4</div>
+              <div class="heatmap-grid__checkouts heatmap-grid__checkouts--o0">0</div>
+            </div>
+          </div>
+          <div class="heatmap-grid__celda">
+            <span class="heatmap-grid__dia">1</span>
+            <span class="heatmap-grid__mes">ENE</span>
+            <div class="heatmap-grid__contenido">
+              <div class="heatmap-grid__checkins heatmap-grid__checkins--i75">6</div>
+              <div class="heatmap-grid__checkouts heatmap-grid__checkouts--o25">1</div>
+            </div>
+          </div>
+          <div class="heatmap-grid__celda">
+            <span class="heatmap-grid__dia">2</span>
+            <div class="heatmap-grid__contenido">
+              <div class="heatmap-grid__checkins heatmap-grid__checkins--i100">9</div>
+              <div class="heatmap-grid__checkouts heatmap-grid__checkouts--o50">3</div>
+            </div>
+          </div>
+          <div class="heatmap-grid__celda">
+            <span class="heatmap-grid__dia">3</span>
+            <div class="heatmap-grid__contenido">
+              <div class="heatmap-grid__checkins heatmap-grid__checkins--i25">2</div>
+              <div class="heatmap-grid__checkouts heatmap-grid__checkouts--o75">5</div>
+            </div>
+          </div>
+          <div class="heatmap-grid__celda">
+            <span class="heatmap-grid__dia">4</span>
+            <div class="heatmap-grid__contenido">
+              <div class="heatmap-grid__checkins heatmap-grid__checkins--i0">0</div>
+              <div class="heatmap-grid__checkouts heatmap-grid__checkouts--o100">7</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
 </div>

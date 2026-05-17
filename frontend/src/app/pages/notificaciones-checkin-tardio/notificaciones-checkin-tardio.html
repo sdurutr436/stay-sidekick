@@ -10,14 +10,12 @@
     description="Genera recordatorios personalizados para huéspedes con check-in tardío."
   >
     @if (!cargando()) {
-      <div class="meta-chip-group">
-        <span class="meta-chip" [class.meta-chip--ok]="pmsConfigurado() && !pmsError()">
-          <ng-icon [name]="pmsConfigurado() && !pmsError() ? 'phosphorCheckCircle' : 'phosphorWarningCircle'" size="14" aria-hidden="true" />
+      <div class="tag-group">
+        <app-tag [variant]="pmsConfigurado() && !pmsError() ? 'success' : pmsConfigurado() ? 'warning' : 'default'">
+          <ng-icon tag-icon [name]="pmsConfigurado() && !pmsError() ? 'phosphorCheckCircle' : 'phosphorWarningCircle'" size="14" aria-hidden="true" />
           {{ pmsConfigurado() && !pmsError() ? 'PMS conectado' : pmsConfigurado() ? 'Error PMS' : 'Sin PMS' }}
-        </span>
-        <span class="meta-chip">
-          Corte: {{ horaCortePerfil() }}
-        </span>
+        </app-tag>
+        <app-tag>Corte: {{ horaCortePerfil() }}</app-tag>
       </div>
 
       @if (!pmsConfigurado()) {
