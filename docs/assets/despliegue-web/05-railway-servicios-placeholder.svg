@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
+  <rect width="1280" height="720" fill="#111827"/>
+  <rect x="40" y="40" width="1200" height="640" rx="24" fill="#1f2937" stroke="#6b7280" stroke-width="4"/>
+  <text x="640" y="300" fill="#f9fafb" font-family="Arial, sans-serif" font-size="42" text-anchor="middle">Placeholder Railway</text>
+  <text x="640" y="360" fill="#d1d5db" font-family="Arial, sans-serif" font-size="30" text-anchor="middle">Servicios, dominio y estado del despliegue</text>
+  <text x="640" y="430" fill="#e5e7eb" font-family="Arial, sans-serif" font-size="24" text-anchor="middle">Sustituir por captura real del dashboard</text>
+</svg>

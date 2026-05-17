@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
+  <rect width="1280" height="720" fill="#082f49"/>
+  <rect x="40" y="40" width="1200" height="640" rx="24" fill="#0c4a6e" stroke="#38bdf8" stroke-width="4"/>
+  <text x="640" y="300" fill="#e0f2fe" font-family="Arial, sans-serif" font-size="42" text-anchor="middle">Placeholder docker compose ps</text>
+  <text x="640" y="360" fill="#bae6fd" font-family="Arial, sans-serif" font-size="30" text-anchor="middle">5 servicios levantados y puertos visibles</text>
+  <text x="640" y="430" fill="#e0f2fe" font-family="Arial, sans-serif" font-size="24" text-anchor="middle">Sustituir por captura real de terminal</text>
+</svg>
