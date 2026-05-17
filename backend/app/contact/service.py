@@ -5,7 +5,10 @@ import logging
 from flask import request
 from marshmallow import ValidationError
 
-from app.common.notifications.discord import send_discord_contact_notification
+from app.common.notifications.discord import (
+    send_discord_contact_notification,
+    send_operational_notification,
+)
 from app.common.notifications.mail_service import send_contact
 from app.contact.schemas import ContactoMessageSchema
 from app.solicitud.turnstile import verify_turnstile
@@ -48,18 +51,34 @@ def process_contacto(json_data: dict) -> tuple[dict, list[str]]:
 
 
 def _dispatch_notifications(clean_data: dict) -> None:
+    failed_channels: list[str] = []
+
     try:
         email_ok = send_contact(clean_data)
     except Exception:
         logger.exception("Excepción inesperada al enviar contacto por email.")
         email_ok = False
+    if not email_ok:
+        failed_channels.append("email")
+
     try:
         discord_ok = send_discord_contact_notification(clean_data)
     except Exception:
         logger.exception("Excepción inesperada al notificar contacto a Discord.")
         discord_ok = False
+    if not discord_ok:
+        failed_channels.append("discord-funcional")
 
     if not email_ok:
         logger.warning("No se pudo enviar el email de contacto.")
     if not discord_ok:
         logger.warning("No se pudo enviar la notificación de contacto a Discord.")
+    if failed_channels:
+        send_operational_notification(
+            "Fallo en notificaciones del formulario de contacto",
+            {
+                "Formulario": "contacto",
+                "Canales fallidos": failed_channels,
+            },
+            severity="error" if "email" in failed_channels else "warning",
+        )
