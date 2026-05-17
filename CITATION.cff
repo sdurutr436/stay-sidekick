@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+title: Stay Sidekick
+message: Si usas Stay Sidekick en una memoria, articulo o entrega academica, cita el software con estos metadatos.
+type: software
+authors:
+  - given-names: Sergio
+    family-names: Durán
+repository-code: https://github.com/sdurutr436/stay-sidekick
+url: https://github.com/sdurutr436/stay-sidekick
+license: MIT
