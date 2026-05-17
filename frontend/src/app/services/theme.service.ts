@@ -10,6 +10,21 @@ export class ThemeService {
   constructor() {
     if (typeof document === 'undefined') return;
     this._apply(this.theme());
+
+    // Sincronización entre pestañas/apps del mismo origen (Angular ↔ 11ty).
+    // El evento 'storage' SOLO se dispara en otras pestañas, nunca en la que
+    // hizo el setItem — exactamente lo que necesitamos para que la app espejo
+    // se entere del cambio sin entrar en bucle.
+    if (typeof window !== 'undefined') {
+      window.addEventListener('storage', (event: StorageEvent) => {
+        if (event.key !== STORAGE_KEY) return;
+        const next: Theme = event.newValue === 'dark' ? 'dark' : 'light';
+        if (next !== this.theme()) {
+          this.theme.set(next);
+          this._apply(next);
+        }
+      });
+    }
   }
 
   toggle(): void {
