@@ -5,7 +5,6 @@ import { RouterLink } from '@angular/router';
 import flatpickr from 'flatpickr';
 import { forkJoin, catchError, of } from 'rxjs';
 import { NgIconComponent } from '@ng-icons/core';
-import { BadgeComponent } from '../../components/atoms/badge/badge';
 import { ButtonComponent } from '../../components/atoms/button/button';
 import { AlertComponent } from '../../components/molecules/alert/alert';
 import { HowItWorksButtonComponent } from '../../components/molecules/how-it-works-button/how-it-works-button';
@@ -25,7 +24,6 @@ import { MapaCalorService, DiaCalor, UmbralesCalor } from '../../services/mapa-c
     NgIconComponent,
     PageHeaderComponent,
     PanelSeccionComponent,
-    BadgeComponent,
     ButtonComponent,
     AlertComponent,
     HeatmapGridComponent,
