@@ -249,7 +249,27 @@ La interfaz esta pensada para uso en escritorio y movil:
 
 ![Análisis Wave - Maestro de Apartamentos](assets/wave/02-auditoria-wave-maestro-apartamentos.png)
 
-**Herramienta: Sincronizador de contactos
+![Análisis Lighthouse - Maestro de Apartamentos](assets/lighthouse/02-auditoria-lighthouse-maestro-apartamentos.png)
+
+**Herramienta: Sincronizador de contactos**
+
+![Análisis Lighthouse - Sincronizador de contactos](assets/lighthouse/02-auditoria-lighthouse-sincronizador-contactos.png)
+
+**Herramienta: Notificaciones check-in**
+
+![Análisis Lighthouse - Notificaciones Check-in](assets/lighthouse/02-auditoria-lighthouse-notificaciones-checkin.png)
+
+**Herramienta: Mapa de calor**
+
+![Análisis Lighthouse - Mapa de calor](assets/lighthouse/02-auditoria-lighthouse-mapa-calor.png)
+
+**Herramienta: Vault de comunicaciones**
+
+![Análisis Lighthouse - Vault de comunicaciones](assets/lighthouse/02-auditoria-lighthouse-vault-comunicaciones.png)
+
+**Perfil empresa / usuario**
+
+![Análisis Lighthouse - Perfil](assets/lighthouse/02-auditoria-lighthouse-perfil.png)
 
 ### Feedback y manejo de errores
 
