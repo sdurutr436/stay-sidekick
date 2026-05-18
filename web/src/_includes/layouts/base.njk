@@ -37,18 +37,11 @@
         media="(prefers-color-scheme: dark)"
         href="/assets/img/favicon/stay-sidekick-fav-icon-dark-mode-512x512.png" />
 
-  {# Inline pre-paint para evitar FOUC al alternar tema claro/oscuro #}
-  <script>
-    (function () {
-      try {
-        var stored = localStorage.getItem('theme');
-        var theme = (stored === 'light' || stored === 'dark') ? stored
-          : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-        document.documentElement.classList.toggle('dark', theme === 'dark');
-        document.documentElement.setAttribute('data-theme', theme);
-      } catch (_) { /* no-op */ }
-    }());
-  </script>
+  {# Script anti-FOUC: aplica el tema en <html> antes del primer paint.
+     Debe ser EXTERNO + síncrono (sin defer/async) para respetar la CSP
+     `script-src 'self'` sin requerir el hash del script inline. Va antes
+     del CSS para que las custom properties `.dark` ya estén en cascada. #}
+  <script src="/assets/js/theme-init.js"></script>
   <title>{{ metaTitle }}</title>
 
   <!-- Fuente: Archivo — preconnect para rendimiento -->
