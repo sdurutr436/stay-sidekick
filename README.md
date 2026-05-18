@@ -1,197 +1,200 @@
 # Stay Sidekick
 
-![Logotipo de Stay Sidekick](web/src/assets/img/header/stay-sidekick-512x256-light-mode.png)
+[![CI Python](https://github.com/sdurutr436/tfg-alberti/actions/workflows/ci-python.yml/badge.svg)](https://github.com/sdurutr436/tfg-alberti/actions/workflows/ci-python.yml)
+[![CI Angular](https://github.com/sdurutr436/tfg-alberti/actions/workflows/ci-angular.yml/badge.svg)](https://github.com/sdurutr436/tfg-alberti/actions/workflows/ci-angular.yml)
+[![Docker Hub](https://github.com/sdurutr436/tfg-alberti/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/sdurutr436/tfg-alberti/actions/workflows/docker-publish.yml)
 
-[![CI Python](https://github.com/sdurutr436/stay-sidekick/actions/workflows/ci-python.yml/badge.svg)](https://github.com/sdurutr436/stay-sidekick/actions/workflows/ci-python.yml)
-[![CI Angular](https://github.com/sdurutr436/stay-sidekick/actions/workflows/ci-angular.yml/badge.svg)](https://github.com/sdurutr436/stay-sidekick/actions/workflows/ci-angular.yml)
-[![Tests Angular](https://github.com/sdurutr436/stay-sidekick/actions/workflows/ci-angular-tests.yml/badge.svg)](https://github.com/sdurutr436/stay-sidekick/actions/workflows/ci-angular-tests.yml)
-[![CI 11ty](https://github.com/sdurutr436/stay-sidekick/actions/workflows/ci-web.yml/badge.svg)](https://github.com/sdurutr436/stay-sidekick/actions/workflows/ci-web.yml)
+TFG DAW 2 — Plataforma para la gestión de solicitudes de estancia.
 
-Stay Sidekick es una plataforma web para equipos de alojamiento turístico que agrupa, en un mismo stack, una landing pública, un panel de trabajo privado y una API REST para operaciones como gestión de solicitudes, herramientas multiempresa, sincronización de contactos y automatizaciones de apoyo.
-
-- Producción pública: [stay-sidekick.up.railway.app](https://stay-sidekick.up.railway.app)
-- Imágenes publicadas: [Docker Hub - sdurutr436](https://hub.docker.com/u/sdurutr436)
-
-## Qué incluye
-
-- `web/`: sitio estático con contenido público, legal y corporativo.
-- `frontend/`: SPA Angular para el panel operativo.
-- `backend/`: API REST Flask para autenticación, negocio y notificaciones.
-- `nginx/`: proxy inverso que publica `/`, `/menu/` y `/api/` en una única entrada.
+Imágenes publicadas en [Docker Hub — sdurutr436](https://hub.docker.com/u/sdurutr436).
 
 ## Arquitectura
 
-| Capa | Tecnología | Puerto | Descripción |
-|------|------------|--------|-------------|
-| `web/` | [11ty](https://www.11ty.dev/) + Nunjucks | `8080` | Sitio estático público |
-| `frontend/` | [Angular](https://angular.dev/) | `4200` | Panel privado y herramientas |
-| `backend/` | [Flask](https://flask.palletsprojects.com/) | `5000` | API REST y lógica de negocio |
-| `nginx/` | Nginx | `80` | Entrada única y enrutado por prefijos |
+El proyecto está dividido en tres capas independientes:
 
-Los estilos SCSS se comparten entre `web/` y `frontend/` desde `frontend/src/styles/`, con una organización ITCSS y nomenclatura BEM para mantener consistencia visual entre el sitio público y la SPA.
+| Capa | Tecnología | Puerto | Descripción |
+|------|-----------|--------|-------------|
+| `web/` | [11ty](https://www.11ty.dev/) + Nunjucks | `8080` | Sitio estático: landing, legales, empresa, producto |
+| `frontend/` | [Angular](https://angular.dev/) | `4200` | Aplicación dinámica: panel de usuario, solicitudes |
+| `backend/` | [Flask](https://flask.palletsprojects.com/) | `5000` | API REST: formularios, autenticación, notificaciones |
+
+Los estilos SCSS son **compartidos** entre `web/` y `frontend/`: ambos compilan desde `frontend/src/styles/` siguiendo la arquitectura [ITCSS](https://www.xfive.co/blog/itcss-scalable-maintainable-css-architecture/) con nomenclatura [BEM](https://getbem.com/).
+
+### Arquitectura Docker
 
 ```mermaid
 graph TD
     Cliente(["Cliente HTTP"])
 
-    subgraph app_net["app-net (red interna Docker)"]
-        Nginx["nginx · :80"]
-        Frontend["frontend · Angular + Nginx · :80"]
-        Web["web · 11ty + Nginx · :80"]
-        Backend["backend · Flask + Gunicorn · :5000"]
+    subgraph app-net["app-net (red interna Docker)"]
+        Nginx["nginx · Nginx:alpine · :80"]
+        Frontend["frontend · Angular+Nginx · :80"]
+        Web["web · 11ty+Nginx · :80"]
+        Backend["backend · Flask+Gunicorn · :5000"]
         Postgres[("postgres · PostgreSQL 16 · :5432")]
     end
 
-    Cliente -->|"/"| Nginx
+    Cliente -->|"HTTP :80 — único puerto expuesto al host"| Nginx
     Nginx -->|"/api/*"| Backend
     Nginx -->|"/menu/*"| Frontend
     Nginx -->|"/*"| Web
-    Backend -->|"SQL"| Postgres
+    Backend -->|"SQL :5432"| Postgres
 ```
 
-## Stack técnico
-
-| Área | Stack real del repositorio |
-|------|----------------------------|
-| Sitio público | 11ty, Nunjucks, Sass |
-| Aplicación | Angular 21 |
-| Backend | Flask, Gunicorn, PostgreSQL |
-| Infraestructura | Docker Compose, Railway, Nginx |
-| Calidad | GitHub Actions, Ruff, Pytest, Angular build y tests |
+Una petición autenticada recorre el siguiente camino: el cliente envía la solicitud HTTP al puerto 80 del host, donde **nginx** actúa como proxy inverso y la enruta según el prefijo — `/api/*` se redirige al **backend** Flask (Gunicorn en puerto 5000), que consulta **PostgreSQL** (puerto 5432) y devuelve una respuesta JSON. nginx reenvía esa respuesta al cliente. El resto de rutas sirven la SPA Angular (`/menu/*`) o el sitio estático 11ty (`/*`). Todo el tráfico entre servicios circula por la red interna `app-net`; el único puerto expuesto al host es el 80.
 
 ## Inicio rápido
 
-### Requisitos
+### Prerrequisitos
 
-- Node.js 18 o superior
-- npm 10 o superior
+- Node.js ≥ 18
 - Python 3.12
-- Docker 24+ si quieres levantar el stack completo
+- npm ≥ 10
 
-### Sitio público y SPA en desarrollo
+### Levantar frontend + sitio estático (una sola orden)
 
-Linux o macOS:
-
+**Linux / macOS:**
 ```bash
 chmod +x dev.sh
 ./dev.sh
 ```
 
-Windows:
-
+**Windows:**
 ```bat
 dev.bat
 ```
 
-Alternativa directa con npm:
-
+O directamente con npm:
 ```bash
 npm install
 npm run dev
 ```
 
-Esto deja disponibles:
+Esto levanta en paralelo:
+- **http://localhost:8080** — Sitio estático (11ty)
+- **http://localhost:4200** — App Angular
 
-- `http://localhost:8080` para el sitio estático.
-- `http://localhost:4200` para la SPA Angular.
-
-### Arranque por servicio
+### Levantar cada servicio por separado
 
 ```bash
-npm run dev:web
-npm run dev:app
+# Sitio estático
+npm run dev:web        # cd web && npm start
+
+# App Angular
+npm run dev:app        # cd frontend && npm start
+
+# Backend Flask (ver docs/backend/VENV_SETUP.md)
 cd backend && python run.py
 ```
 
-La preparación del entorno virtual Python está documentada en [docs/backend/VENV_SETUP.md](docs/backend/VENV_SETUP.md).
-
-### Instalar dependencias Node de una vez
+### Instalar todas las dependencias Node de una vez
 
 ```bash
 npm run install:all
 ```
 
-### Stack completo con Docker
+### Levantar con Docker (entorno completo)
 
-Primer uso:
+Docker levanta todos los servicios juntos (nginx, frontend, web, backend, PostgreSQL) en
+un único comando. Es la forma más fácil de probar el stack completo en local.
 
+**Primer uso** — preparar los `.env`:
 ```bash
-cp .env.example .env
-cp backend/.env.example backend/.env
+cp .env.example .env                   # variables de PostgreSQL y Turnstile
+cp backend/.env.example backend/.env   # completar con tus valores
+# web/.env ya está incluido con la key de prueba de Turnstile (dev)
 ```
 
-Arranque:
-
+**Arrancar:**
 ```bash
-docker compose up --build
-docker compose up -d --build
+docker compose up --build        # construye imágenes y arranca (foreground)
+docker compose up -d --build     # igual pero en background
 ```
 
-URLs disponibles tras el arranque:
+> Primera vez: si el volumen ya existía sin el seed, borrar y recrear:
+> ```bash
+> docker compose down -v && docker compose up -d --build
+> ```
+
+**Comandos del día a día:**
+```bash
+docker compose ps                # ver qué contenedores están corriendo
+docker compose logs -f           # seguir logs de todos los servicios
+docker compose logs -f backend   # logs solo del backend
+docker compose restart backend   # reiniciar un único servicio
+docker compose stop              # parar todos los contenedores (conserva datos)
+docker compose down              # parar y eliminar contenedores (conserva volúmenes)
+docker compose down -v           # parar, eliminar contenedores Y la base de datos
+```
+
+**URLs tras arrancar:**
 
 | URL | Servicio |
-|-----|----------|
-| `http://localhost/` | Sitio público 11ty |
-| `http://localhost/menu/` | SPA Angular |
-| `http://localhost/api/` | API Flask |
+|-----|---------|
+| http://localhost/ | Sitio estático (11ty) |
+| http://localhost/menu/ | App Angular |
+| http://localhost/api/ | API Flask |
 
-Credenciales de desarrollo sembradas por el seed local:
+**Credenciales de acceso (creadas por el seed de desarrollo):**
 
 | Campo | Valor |
 |-------|-------|
 | Email | `dev@staysidekick.es` |
 | Contraseña | `admin123` |
-| Rol | `superadmin` |
+| Rol | `admin` (con `es_superadmin=true`) |
 
-La referencia completa de despliegue, variables y verificación está en [DEPLOY.md](DEPLOY.md) y [docs/devops/docker-local.md](docs/devops/docker-local.md).
+> Estas credenciales son solo para entorno local. En producción, generar credenciales nuevas.
 
-## Demo y material visual
-
-![Identidad visual en modo claro](web/src/assets/img/header/stay-sidekick-1024x576-light-mode.png)
-
-El repositorio ya incluye placeholders para la entrega pública de capturas en [docs/assets/despliegue-web](docs/assets/despliegue-web). Mientras no se sustituyan por evidencias finales, se mantienen como referencia honesta del material pendiente:
-
-| Ruta esperada | Captura pendiente |
-|---------------|-------------------|
-| `docs/assets/despliegue-web/01-github-actions-general-placeholder.svg` | Vista general de GitHub Actions con los workflows principales en verde |
-| `docs/assets/despliegue-web/02-github-actions-run-verde-placeholder.svg` | Detalle de un run correcto de CI/CD |
-| `docs/assets/despliegue-web/03-docker-compose-ps-placeholder.svg` | Salida de `docker compose ps` con los servicios levantados |
-| `docs/assets/despliegue-web/04-docker-hub-tags-placeholder.svg` | Repositorio de Docker Hub con tags publicados |
-| `docs/assets/despliegue-web/05-railway-servicios-placeholder.svg` | Dashboard de Railway con servicios y dominio público |
-
-![Placeholder del stack en Docker Compose](docs/assets/despliegue-web/03-docker-compose-ps-placeholder.svg)
-
-![Placeholder de servicios desplegados en Railway](docs/assets/despliegue-web/05-railway-servicios-placeholder.svg)
+> Referencia completa de comandos, troubleshooting y variables de entorno: [docs/devops/docker-local.md](docs/devops/docker-local.md)
 
 ## Estructura del proyecto
 
-```text
-stay-sidekick/
-├── backend/      # API Flask y módulos funcionales
-├── frontend/     # SPA Angular
-├── web/          # Sitio estático 11ty
-├── nginx/        # Proxy inverso y rutas públicas
-├── docs/         # Documentación técnica y funcional
-├── package.json  # Orquestador de desarrollo
-├── dev.sh        # Inicio rápido Linux/macOS
-└── dev.bat       # Inicio rápido Windows
+```
+tfg-alberti/
+├── web/                    # Sitio estático — 11ty + Nunjucks
+│   ├── src/
+│   │   ├── _includes/      # Layouts y partials Nunjucks
+│   │   ├── _data/          # Datos globales del sitio
+│   │   ├── assets/styles/  # SCSS entry (compila desde frontend/src/styles/)
+│   │   ├── producto/       # Páginas de producto
+│   │   ├── legal/          # Páginas legales
+│   │   └── empresa/        # Páginas de empresa
+│   └── eleventy.config.js
+│
+├── frontend/               # App Angular (SPA)
+│   └── src/
+│       ├── app/
+│       │   └── components/ # Componentes standalone (header, footer…)
+│       └── styles/         # SCSS compartido con web/ (ITCSS)
+│           ├── settings/   # Variables: tipografía, colores, breakpoints
+│           ├── tools/      # Mixins reutilizables
+│           ├── generic/    # Resets CSS
+│           ├── elements/   # Estilos base de elementos HTML
+│           ├── layout/     # Grid, flex, contenedor
+│           ├── components/ # Átomos y organismos BEM
+│           ├── utilities/  # Clases de utilidad
+│           └── animations/ # Keyframes y transiciones
+│
+├── backend/                # API REST Flask
+│   └── app/
+│       ├── contact/        # Módulo de formulario de contacto
+│       ├── security/       # CSRF, honeypot, JWT
+│       └── services/       # Gmail, Discord, Turnstile
+│
+├── docs/                   # Documentación del proyecto
+├── package.json            # Orquestador de desarrollo (concurrently)
+├── dev.sh                  # Inicio rápido Linux / macOS
+└── dev.bat                 # Inicio rápido Windows
 ```
 
 ## Documentación
 
 | Documento | Contenido |
 |-----------|-----------|
-| [DEPLOY.md](DEPLOY.md) | Despliegue local y producción en Railway |
-| [docs/01-introduccion.md](docs/01-introduccion.md) a [docs/10-conclusiones.md](docs/10-conclusiones.md) | Memoria técnica principal del proyecto |
-| [docs/DESARROLLO.md](docs/DESARROLLO.md) | Guía de entorno y flujo de trabajo |
-| [docs/backend/DEPENDENCIAS.md](docs/backend/DEPENDENCIAS.md) | Dependencias del backend y justificación |
-| [docs/backend/VENV_SETUP.md](docs/backend/VENV_SETUP.md) | Entorno virtual Python |
-| [docs/design/decisiones_disenio.md](docs/design/decisiones_disenio.md) | Decisiones de diseño y arquitectura |
-| [docs/propuesta_formal/propuesta_formal_sergio_duran_2DAW.md](docs/propuesta_formal/propuesta_formal_sergio_duran_2DAW.md) | Propuesta formal del proyecto |
-
-## Colaboración y mantenimiento
-
-- [CONTRIBUTING.md](CONTRIBUTING.md)
-- [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)
-- [SECURITY.md](SECURITY.md)
-- [LICENSE](LICENSE)
+| [DEPLOY.md](DEPLOY.md) | Guía consolidada de despliegue (local + Railway) |
+| [docs/DESARROLLO.md](docs/DESARROLLO.md) | Guía completa de entorno de desarrollo |
+| [docs/devops/docker-local.md](docs/devops/docker-local.md) | Referencia Docker para desarrollo local |
+| [docs/backend/DEPENDENCIAS.md](docs/backend/DEPENDENCIAS.md) | Librerías del backend y justificación |
+| [docs/backend/VENV_SETUP.md](docs/backend/VENV_SETUP.md) | Configuración del entorno virtual Python |
+| [docs/design/decisiones_disenio.md](docs/design/decisiones_disenio.md) | Decisiones de arquitectura y diseño |
+| [docs/design/wireframes_figma.md](docs/design/wireframes_figma.md) | Referencias a wireframes en Figma |

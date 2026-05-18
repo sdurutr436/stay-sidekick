@@ -1,7 +1,17 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" role="img" aria-labelledby="title desc">
+  <title id="title">Placeholder docker compose ps</title>
+  <desc id="desc">Hueco temporal para una captura de la salida docker compose ps.</desc>
   <rect width="1280" height="720" fill="#082f49"/>
-  <rect x="40" y="40" width="1200" height="640" rx="24" fill="#0c4a6e" stroke="#38bdf8" stroke-width="4"/>
-  <text x="640" y="300" fill="#e0f2fe" font-family="Arial, sans-serif" font-size="42" text-anchor="middle">Placeholder docker compose ps</text>
-  <text x="640" y="360" fill="#bae6fd" font-family="Arial, sans-serif" font-size="30" text-anchor="middle">5 servicios levantados y puertos visibles</text>
-  <text x="640" y="430" fill="#e0f2fe" font-family="Arial, sans-serif" font-size="24" text-anchor="middle">Sustituir por captura real de terminal</text>
+  <rect x="52" y="52" width="1176" height="616" rx="28" fill="#0b1120" stroke="#155e75" stroke-width="2"/>
+  <text x="84" y="118" fill="#e0f2fe" font-family="Consolas, monospace" font-size="34" font-weight="700">Placeholder docker compose ps</text>
+  <text x="84" y="158" fill="#a5f3fc" font-family="Consolas, monospace" font-size="19">Sustituir por la captura real del estado de contenedores tras docker compose up -d --build</text>
+  <rect x="84" y="202" width="1112" height="402" rx="20" fill="#020617" stroke="#164e63"/>
+  <text x="108" y="250" fill="#67e8f9" font-family="Consolas, monospace" font-size="20">NAME                       IMAGE                    SERVICE    STATUS                    PORTS</text>
+  <text x="108" y="308" fill="#f8fafc" font-family="Consolas, monospace" font-size="20">stay-sidekick-nginx-1      stay-sidekick-nginx      nginx      Up                        0.0.0.0:80-&gt;80/tcp</text>
+  <text x="108" y="360" fill="#f8fafc" font-family="Consolas, monospace" font-size="20">stay-sidekick-backend-1    stay-sidekick-backend    backend    Up                        5000/tcp</text>
+  <text x="108" y="412" fill="#f8fafc" font-family="Consolas, monospace" font-size="20">stay-sidekick-frontend-1   stay-sidekick-frontend   frontend   Up                        80/tcp</text>
+  <text x="108" y="464" fill="#f8fafc" font-family="Consolas, monospace" font-size="20">stay-sidekick-web-1        stay-sidekick-web        web        Up                        80/tcp</text>
+  <text x="108" y="516" fill="#f8fafc" font-family="Consolas, monospace" font-size="20">stay-sidekick-postgres-1   postgres:16-alpine       postgres   Up (healthy)              5432/tcp</text>
+  <text x="84" y="646" fill="#7dd3fc" font-family="Arial, sans-serif" font-size="16">Cubre la evidencia visual de c2 y refuerza tambien C8.</text>
 </svg>

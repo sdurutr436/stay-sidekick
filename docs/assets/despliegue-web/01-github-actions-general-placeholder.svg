@@ -1,7 +1,31 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" role="img" aria-labelledby="title desc">
+  <title id="title">Placeholder GitHub Actions general</title>
+  <desc id="desc">Hueco temporal para una captura del panel general de GitHub Actions.</desc>
   <rect width="1280" height="720" fill="#0f172a"/>
-  <rect x="40" y="40" width="1200" height="640" rx="24" fill="#111827" stroke="#334155" stroke-width="4"/>
-  <text x="640" y="300" fill="#e5e7eb" font-family="Arial, sans-serif" font-size="42" text-anchor="middle">Placeholder captura GitHub Actions</text>
-  <text x="640" y="360" fill="#93c5fd" font-family="Arial, sans-serif" font-size="30" text-anchor="middle">Vista general de workflows en verde</text>
-  <text x="640" y="430" fill="#9ca3af" font-family="Arial, sans-serif" font-size="24" text-anchor="middle">Sustituir por captura real del repositorio</text>
+  <rect x="52" y="52" width="1176" height="616" rx="28" fill="#111827" stroke="#334155" stroke-width="2"/>
+  <rect x="52" y="52" width="1176" height="92" rx="28" fill="#1e293b"/>
+  <circle cx="96" cy="98" r="10" fill="#22c55e"/>
+  <circle cx="128" cy="98" r="10" fill="#f59e0b"/>
+  <circle cx="160" cy="98" r="10" fill="#ef4444"/>
+  <text x="196" y="108" fill="#e2e8f0" font-family="Arial, sans-serif" font-size="32" font-weight="700">Placeholder GitHub Actions</text>
+  <text x="84" y="190" fill="#cbd5e1" font-family="Arial, sans-serif" font-size="20">Sustituir por la vista general del panel de workflows del repositorio</text>
+  <text x="84" y="222" fill="#94a3b8" font-family="Arial, sans-serif" font-size="18">Criterio c5 - evidencia de CI/CD y organizacion de workflows</text>
+  <rect x="84" y="272" width="1112" height="72" rx="18" fill="#0b1220" stroke="#23324a"/>
+  <rect x="84" y="366" width="1112" height="72" rx="18" fill="#0b1220" stroke="#23324a"/>
+  <rect x="84" y="460" width="1112" height="72" rx="18" fill="#0b1220" stroke="#23324a"/>
+  <rect x="84" y="554" width="1112" height="72" rx="18" fill="#0b1220" stroke="#23324a"/>
+  <circle cx="132" cy="308" r="12" fill="#22c55e"/>
+  <circle cx="132" cy="402" r="12" fill="#22c55e"/>
+  <circle cx="132" cy="496" r="12" fill="#22c55e"/>
+  <circle cx="132" cy="590" r="12" fill="#38bdf8"/>
+  <text x="164" y="316" fill="#e5e7eb" font-family="Arial, sans-serif" font-size="24" font-weight="700">CI Python</text>
+  <text x="164" y="410" fill="#e5e7eb" font-family="Arial, sans-serif" font-size="24" font-weight="700">CI - Tests y cobertura</text>
+  <text x="164" y="504" fill="#e5e7eb" font-family="Arial, sans-serif" font-size="24" font-weight="700">CI Angular / CI 11ty</text>
+  <text x="164" y="598" fill="#e5e7eb" font-family="Arial, sans-serif" font-size="24" font-weight="700">Docker Hub</text>
+  <text x="946" y="316" fill="#93c5fd" font-family="Arial, sans-serif" font-size="18">push / pull_request / workflow_run</text>
+  <text x="1030" y="410" fill="#93c5fd" font-family="Arial, sans-serif" font-size="18">artefactos y build</text>
+  <text x="1040" y="504" fill="#93c5fd" font-family="Arial, sans-serif" font-size="18">main estable</text>
+  <text x="980" y="598" fill="#93c5fd" font-family="Arial, sans-serif" font-size="18">publicacion de imagenes</text>
+  <text x="84" y="658" fill="#64748b" font-family="Arial, sans-serif" font-size="16">Reemplazar por captura real antes de la entrega final si se quiere evidencia visual definitiva.</text>
 </svg>

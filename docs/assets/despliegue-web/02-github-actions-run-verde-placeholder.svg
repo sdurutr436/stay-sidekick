@@ -1,7 +1,27 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" role="img" aria-labelledby="title desc">
+  <title id="title">Placeholder GitHub Actions run en verde</title>
+  <desc id="desc">Hueco temporal para una captura de una ejecucion correcta en GitHub Actions.</desc>
   <rect width="1280" height="720" fill="#052e16"/>
-  <rect x="40" y="40" width="1200" height="640" rx="24" fill="#14532d" stroke="#22c55e" stroke-width="4"/>
-  <text x="640" y="300" fill="#f0fdf4" font-family="Arial, sans-serif" font-size="42" text-anchor="middle">Placeholder run CI/CD correcto</text>
-  <text x="640" y="360" fill="#bbf7d0" font-family="Arial, sans-serif" font-size="30" text-anchor="middle">Detalle de workflow en verde</text>
-  <text x="640" y="430" fill="#dcfce7" font-family="Arial, sans-serif" font-size="24" text-anchor="middle">Sustituir por captura real del run</text>
+  <rect x="52" y="52" width="1176" height="616" rx="28" fill="#071b11" stroke="#14532d" stroke-width="2"/>
+  <rect x="52" y="52" width="1176" height="92" rx="28" fill="#0f3d1f"/>
+  <circle cx="100" cy="100" r="22" fill="#22c55e"/>
+  <path d="M90 100l8 8 18-20" fill="none" stroke="#f8fafc" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="146" y="108" fill="#ecfdf5" font-family="Arial, sans-serif" font-size="32" font-weight="700">Placeholder run en verde</text>
+  <text x="84" y="190" fill="#d1fae5" font-family="Arial, sans-serif" font-size="20">Sustituir por una ejecucion correcta donde se vea el commit, la rama y los jobs completados</text>
+  <text x="84" y="222" fill="#86efac" font-family="Arial, sans-serif" font-size="18">Criterio c5 - evidencia directa del workflow ejecutado correctamente</text>
+  <rect x="84" y="270" width="1112" height="110" rx="20" fill="#0b2214" stroke="#166534"/>
+  <rect x="84" y="406" width="1112" height="196" rx="20" fill="#0b2214" stroke="#166534"/>
+  <text x="120" y="320" fill="#f0fdf4" font-family="Arial, sans-serif" font-size="28" font-weight="700">CI Python - success</text>
+  <text x="120" y="356" fill="#bbf7d0" font-family="Arial, sans-serif" font-size="18">Branch: main   Commit: abc1234   Trigger: push</text>
+  <rect x="120" y="446" width="1048" height="42" rx="12" fill="#14532d"/>
+  <rect x="120" y="504" width="1048" height="42" rx="12" fill="#14532d"/>
+  <rect x="120" y="562" width="1048" height="42" rx="12" fill="#14532d"/>
+  <text x="148" y="474" fill="#f0fdf4" font-family="Arial, sans-serif" font-size="22">lint - completed</text>
+  <text x="148" y="532" fill="#f0fdf4" font-family="Arial, sans-serif" font-size="22">tests - completed</text>
+  <text x="148" y="590" fill="#f0fdf4" font-family="Arial, sans-serif" font-size="22">publish gate - completed</text>
+  <text x="1000" y="474" fill="#dcfce7" font-family="Arial, sans-serif" font-size="18">green checks visible</text>
+  <text x="1000" y="532" fill="#dcfce7" font-family="Arial, sans-serif" font-size="18">logs and timings</text>
+  <text x="980" y="590" fill="#dcfce7" font-family="Arial, sans-serif" font-size="18">screenshot this panel</text>
+  <text x="84" y="648" fill="#86efac" font-family="Arial, sans-serif" font-size="16">Idealmente la captura debe mostrar el nombre del workflow, el estado success y el commit evaluado.</text>
 </svg>

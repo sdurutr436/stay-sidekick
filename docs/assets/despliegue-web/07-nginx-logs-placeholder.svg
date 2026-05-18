@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" role="img" aria-labelledby="title desc">
+  <title id="title">Placeholder logs nginx</title>
+  <desc id="desc">Hueco temporal para una captura de logs del proxy nginx y respuestas HTTP.</desc>
+  <rect width="1280" height="720" fill="#0f172a"/>
+  <rect x="48" y="48" width="1184" height="624" rx="24" fill="#020617" stroke="#334155" stroke-width="2"/>
+  <text x="84" y="112" fill="#e2e8f0" font-family="Consolas, monospace" font-size="32" font-weight="700">Placeholder logs nginx</text>
+  <text x="84" y="154" fill="#94a3b8" font-family="Consolas, monospace" font-size="18">Sustituir por captura de logs del proxy y, si cabe, del curl -I / o curl /api/usuarios</text>
+  <rect x="84" y="196" width="1112" height="398" rx="18" fill="#111827" stroke="#1e293b"/>
+  <text x="112" y="244" fill="#93c5fd" font-family="Consolas, monospace" font-size="20">nginx-1  | 172.18.0.1 - - [15/May/2026:18:03:49 +0000] "HEAD / HTTP/1.1" 200 0</text>
+  <text x="112" y="292" fill="#93c5fd" font-family="Consolas, monospace" font-size="20">nginx-1  | 172.18.0.1 - - [15/May/2026:18:03:51 +0000] "GET /api/health HTTP/1.1" 200 16</text>
+  <text x="112" y="340" fill="#93c5fd" font-family="Consolas, monospace" font-size="20">nginx-1  | 172.18.0.1 - - [15/May/2026:18:03:51 +0000] "GET /api/usuarios HTTP/1.1" 401 53</text>
+  <rect x="112" y="402" width="420" height="118" rx="14" fill="#0b1220" stroke="#334155"/>
+  <text x="136" y="446" fill="#e2e8f0" font-family="Consolas, monospace" font-size="18">HTTP/1.1 200 OK</text>
+  <text x="136" y="478" fill="#e2e8f0" font-family="Consolas, monospace" font-size="18">Server: nginx/1.29.4</text>
+  <rect x="568" y="402" width="560" height="118" rx="14" fill="#0b1220" stroke="#334155"/>
+  <text x="592" y="446" fill="#e2e8f0" font-family="Consolas, monospace" font-size="18">HTTP/1.1 401 UNAUTHORIZED</text>
+  <text x="592" y="478" fill="#e2e8f0" font-family="Consolas, monospace" font-size="18">{"errors":["Token de acceso requerido."],"ok":false}</text>
+  <text x="84" y="636" fill="#64748b" font-family="Arial, sans-serif" font-size="16">Evidencia visual recomendada para reforzar c3.</text>
+</svg>

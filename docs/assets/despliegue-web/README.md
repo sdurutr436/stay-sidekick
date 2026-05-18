@@ -1,20 +1,16 @@
-# Placeholders de capturas — Despliegue de la aplicación web
+# Placeholders para 08-despliegue-evaluacion-web
 
-Sustituye los SVG de esta carpeta por capturas reales manteniendo el mismo nombre de archivo:
+Esta carpeta recupera los SVG temporales usados por `docs/08-despliegue-evaluacion-web.md` para no
+dejar rotas las referencias de capturas mientras se preparan las imagenes finales.
 
-- `01-github-actions-general-placeholder.svg`
-  - vista general de GitHub Actions con workflows en verde
-- `02-github-actions-run-verde-placeholder.svg`
-  - detalle de un run correcto de CI/CD
-- `03-docker-compose-ps-placeholder.svg`
-  - captura de `docker compose ps` con los 5 servicios levantados
-- `04-docker-hub-tags-placeholder.svg`
-  - captura del repositorio Docker Hub con tags/última publicación
-- `05-railway-servicios-placeholder.svg`
-  - captura del dashboard de Railway con servicios y dominio público
+- `01-github-actions-general-placeholder.svg`: panel general de GitHub Actions.
+- `02-github-actions-run-verde-placeholder.svg`: detalle de un run correcto en verde.
+- `03-docker-compose-ps-placeholder.svg`: salida visual de `docker compose ps`.
+- `04-docker-hub-tags-placeholder.svg`: repositorios y tags publicados en Docker Hub.
+- `05-railway-servicios-placeholder.svg`: vista del proyecto y servicios en Railway.
+- `06-swagger-ui-placeholder.svg`: Swagger UI y contrato OpenAPI accesibles desde el proxy.
+- `07-nginx-logs-placeholder.svg`: logs del proxy y prueba visual del reverse proxy.
+- `08-backend-logs-placeholder.svg`: logs del backend y prueba ligera de respuesta.
 
-Recomendaciones:
-
-- Ocultar datos sensibles o secretos antes de capturar.
-- Mantener una resolución homogénea.
-- Si una captura incluye credenciales, recrearla con datos de demo.
+Cuando existan capturas reales, se puede reemplazar el placeholder manteniendo el mismo nombre o
+editar el markdown para apuntar a un PNG o WebP definitivo.

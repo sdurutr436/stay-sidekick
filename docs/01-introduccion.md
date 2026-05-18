@@ -15,11 +15,11 @@
 
 ## 1.1. Origen de la idea y motivacion del proyecto
 
-La idea de Stay Sidekick surge de una experiencia profesional directa como recepcionista en una empresa gestora de apartamentos turisticos durante **2 años y 5 meses**. En ese periodo se detecto que una parte importante de la jornada se destinaba a tareas repetitivas, manuales y distribuidas en varias herramientas, lo que reducia la capacidad para atender reservas activas, mejorar la experiencia del huesped y coordinar al equipo.
+La idea de Stay Sidekick nace de una experiencia profesional directa como recepcionista en una empresa gestora de apartamentos turisticos durante **2 años y 5 meses**. En ese periodo se detecta que el comienzo y el final de la jornada se destinaba a tareas repetitivas, manuales y distribuidas en varias herramientas (PMS, Google, Excel), lo que reducia la capacidad para atender reservas activas, mejorar la experiencia del huesped y coordinar al equipo.
 
-La problematica no afectaba solo a un puesto concreto: era una friccion compartida por distintos companeros en rotacion. A partir de estas observaciones se creo un primer boceto funcional en **Java con JavaFX**, orientado a cruzar datos introducidos manualmente para agilizar envios de correo y generacion de contactos.
+La problematica no afectaba solo a un puesto concreto: era una friccion compartida por distintos companeros en rotacion. A partir de estas observaciones se crea un primer boceto funcional en **Java con JavaFX**, orientado a cruzar datos introducidos manualmente para agilizar envios de correo y generacion de contactos; usando distintos archivos manuales en CSV descargados directamente desde el PMS y _hardcodeado_ especial para las cabeceras que se usaban en esa empresa.
 
-Con una base tecnica mas solida se desarrollo un segundo prototipo sobre stack **MERN** (MongoDB, Express, React, Node.js). Esta version incorporo nuevas capacidades, como el mapa de calor y la carga de archivos `.csv` para persistencia y cruce de datos. Aunque era una version basica, sin sesiones ni autenticacion por empresa, **sigue en uso actualmente**, lo que confirma su utilidad real y su potencial de escalado.
+Con una base tecnica mas solida se desarrollo un segundo prototipo sobre stack **MERN** (MongoDB, Express, React, Node.js). Esta version incorporo nuevas capacidades, como el mapa de calor (incompleto en ese momento) y la carga de archivos `.csv` para persistencia y cruce de datos. Aunque era una version basica, sin sesiones ni autenticacion por empresa, **sigue en uso actualmente**, lo que confirma su utilidad real y su potencial de escalado.
 
 Stay Sidekick nace como evolucion de ese recorrido. No busca sustituir a los PMS (*Property Management Systems*) existentes, sino cubrir necesidades operativas que estos sistemas no resuelven de forma suficiente. Su enfoque es el de una capa satelite: complementa al PMS y se adapta a la operativa diaria de cada empresa.
 
@@ -29,7 +29,7 @@ Stay Sidekick nace como evolucion de ese recorrido. No busca sustituir a los PMS
 
 ### Objetivo general
 
-Disenar, desarrollar y desplegar una plataforma web multiempresa que automatice tareas operativas frecuentes del alquiler vacacional mediante herramientas satelite configurables por cuenta, como complemento directo al PMS.
+Diseñar, desarrollar y desplegar una plataforma web multiempresa que automatice tareas operativas frecuentes del alquiler vacacional mediante herramientas satelite configurables por cuenta, como complemento directo al PMS.
 
 ### Objetivos especificos
 
@@ -43,7 +43,7 @@ Disenar, desarrollar y desplegar una plataforma web multiempresa que automatice 
 
 ### Expectativas a futuro
 
-Mas alla del alcance del TFG, Stay Sidekick se plantea con proyeccion comercial como producto bajo licencia privada. Las empresas que colaboren en etapas iniciales dispondran de acceso y soporte directo. A medio plazo se contempla un modelo *freemium*, con funcionalidades base gratuitas y herramientas avanzadas bajo suscripcion.
+Mas alla del alcance del TFG, Stay Sidekick se plantea con proyeccion comercial como producto bajo licencia privada. Las empresas que colaboren en etapas iniciales dispondran de acceso y soporte directo. A medio plazo se contempla un modelo *freemium*, con funcionalidades base gratuitas y herramientas avanzadas bajo pago único y/o suscripcion.
 
 ---
 
@@ -62,7 +62,7 @@ Las soluciones existentes se agrupan en dos bloques:
 
 **Smoobu**
 
-Es uno de los PMS mas extendidos en pymes del sector y ofrece API REST documentada con plan de entrada asequible. Por ello se adopta como PMS de referencia en el MVP. Como limitacion, no incorpora de forma nativa un mapa de calor operativo, ni sincronizacion directa con Google Contacts, ni un vault configurable orientado a protocolos internos.
+Es uno de los PMS mas extendidos en pymes del sector y ofrece API REST documentada con plan de entrada asequible (14 días de prueba gratuita). Por ello se adopta como PMS de referencia en el MVP. Como limitacion, no incorpora de forma nativa un mapa de calor operativo, ni sincronizacion directa con Google Contacts, ni un vault configurable orientado a protocolos internos.
 
 **Beds24**
 
@@ -70,7 +70,7 @@ Destaca por su capacidad de automatizacion y por su API OpenAPI. No obstante, su
 
 **KrossBooking**
 
-Fue el PMS del entorno donde surge el proyecto, pero no dispone de API publica oficial en condiciones equivalentes a otros proveedores. Su integracion se plantea como linea futura sujeta a acuerdos especificos.
+Fue el PMS del entorno donde surge el proyecto, pero no dispone de API publica oficial en condiciones equivalentes a otros proveedores. Su integracion se plantea como linea futura sujeta a acuerdos especificos. Se maneja a través de ficheros que se descargan directamente del PMS.
 
 ### Tabla comparativa funcional
 

@@ -1,23 +1,25 @@
 """Blueprint de documentación: Swagger UI + spec OpenAPI.
 
-Rutas (públicas):
-- GET /api/docs            → Swagger UI (sin autenticación, solo en DEBUG)
+Rutas públicas:
+- GET /api/docs              → Swagger UI
 - GET /api/docs/openapi.yaml → Spec OpenAPI 3.0 en YAML
 """
 
 import os
 
-from flask import Blueprint, Response, send_file
+from flask import Blueprint, Response, render_template_string, send_file, url_for
 
-docs_bp = Blueprint("docs", __name__)
+docs_bp = Blueprint("docs", __name__, static_folder="static", static_url_path="/api/docs/static")
 
 _SPEC_PATH = os.path.join(os.path.dirname(__file__), "openapi.yaml")
 
 
 @docs_bp.route("/api/docs")
 def swagger_ui():
+    init_script_url = url_for("docs.static", filename="swagger-init.js")
     return Response(
-        """<!DOCTYPE html>
+        render_template_string(
+            """<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="utf-8"/>
@@ -29,18 +31,12 @@ def swagger_ui():
 <body>
 <div id="swagger-ui"></div>
 <script src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-bundle.js"></script>
-<script>
-  window.onload = () => SwaggerUIBundle({
-    url: "/api/docs/openapi.yaml",
-    dom_id: "#swagger-ui",
-    deepLinking: true,
-    presets: [SwaggerUIBundle.presets.apis, SwaggerUIBundle.SwaggerUIStandalonePreset],
-    layout: "BaseLayout",
-    persistAuthorization: true,
-  });
-</script>
+<script src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-standalone-preset.js"></script>
+<script src="{{ init_script_url }}"></script>
 </body>
 </html>""",
+            init_script_url=init_script_url,
+        ),
         mimetype="text/html",
     )
 
