@@ -67,28 +67,18 @@
 }
 
 // =============================================================================
-// META-CHIP — pill de estado (PMS, Google, etc.) para usar en page-header
-// Uso: <div class="meta-chip-group"><span class="meta-chip meta-chip--ok">…</span></div>
+// TAG-GROUP — agrupador de chips de estado para usar en page-header.
+// Cada chip es un <app-tag> (átomo). Uso:
+//   <div class="tag-group">
+//     <app-tag variant="success"> … </app-tag>
+//     <app-tag> … </app-tag>
+//   </div>
 // =============================================================================
 
-.meta-chip-group {
+.tag-group {
   display: flex;
   align-items: center;
   gap: $space-2;
   flex-shrink: 0;
-}
-
-.meta-chip {
-  display: flex;
-  align-items: center;
-  gap: $space-2;
-  padding: $space-1 $space-3;
-  border: $border-width $border-style $color-border;
-  @include text-caption-md;
-  color: $color-text-secondary;
-  white-space: nowrap;
-
-  &--ok {
-    color: $color-text-primary;
-  }
+  flex-wrap: wrap;
 }

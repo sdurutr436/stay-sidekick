@@ -26,7 +26,7 @@ La pregunta es: ¿debe `/web` vivir dentro de `/frontend`?
 ### Opción A — Mantener `/web` y `/frontend` separados (decisión adoptada)
 
 ```
-tfg-alberti/
+stay-sidekick/
 ├── frontend/   # Angular SPA
 ├── web/        # 11ty SSG
 └── backend/    # Flask API
@@ -35,7 +35,7 @@ tfg-alberti/
 ### Opción B — Anidar `/web` dentro de `/frontend`
 
 ```
-tfg-alberti/
+stay-sidekick/
 ├── frontend/
 │   ├── src/        # Angular
 │   └── web/        # 11ty dentro de Angular
@@ -123,7 +123,7 @@ Ambos proyectos compilan desde exactamente los mismos archivos fuente. No es nec
 Cada servicio tiene su propio `Dockerfile` mínimo:
 
 ```
-tfg-alberti/
+stay-sidekick/
 ├── frontend/Dockerfile   # node:alpine → build Angular → nginx
 ├── web/Dockerfile        # node:alpine → build 11ty → nginx/serve
 └── backend/Dockerfile    # python:slim → gunicorn

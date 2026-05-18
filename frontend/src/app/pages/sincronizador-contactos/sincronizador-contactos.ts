@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { NgIconComponent } from '@ng-icons/core';
 import { ButtonComponent } from '../../components/atoms/button/button';
+import { TagComponent } from '../../components/atoms/tag/tag';
 import { FormInputComponent } from '../../components/atoms/form-input/form-input';
 import { FormSelectComponent } from '../../components/atoms/form-select/form-select';
 import { FormFieldComponent } from '../../components/molecules/form-field/form-field';
@@ -45,6 +46,7 @@ const _FECHA_PREVIEW: Record<string, string> = {
     NgIconComponent,
     PageHeaderComponent,
     ButtonComponent,
+    TagComponent,
     PanelSeccionComponent,
     FormInputIconComponent,
     FormInputComponent,

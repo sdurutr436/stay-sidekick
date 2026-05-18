@@ -88,7 +88,8 @@ def test_crear_empresa_exitosa_devuelve_201(client):
     # SimpleNamespace evita que Marshmallow trate el objeto como Mapping (dict)
     from types import SimpleNamespace
     empresa_mock = SimpleNamespace(id="emp-new", nombre="Nueva Empresa", email="nueva@test.com")
-    with patch("app.empresas.routes.crear_empresa", return_value=empresa_mock):
+    with patch("app.empresas.routes.crear_empresa", return_value=empresa_mock), \
+         patch("app.empresas.routes.send_welcome_company", return_value=True) as send_mock:
         resp = client.post(
             "/api/empresas",
             headers=_auth(superadmin=True),
@@ -98,3 +99,30 @@ def test_crear_empresa_exitosa_devuelve_201(client):
     data = resp.get_json()
     assert data["ok"] is True
     assert data["empresa"]["email"] == "nueva@test.com"
+    send_mock.assert_called_once_with("nueva@test.com", "Nueva Empresa")
+
+
+def test_crear_empresa_envia_bienvenida_falla_no_interrumpe(client):
+    from types import SimpleNamespace
+    empresa_mock = SimpleNamespace(id="emp-new", nombre="Otra", email="otra@test.com")
+    with patch("app.empresas.routes.crear_empresa", return_value=empresa_mock), \
+         patch("app.empresas.routes.send_welcome_company", return_value=False):
+        resp = client.post(
+            "/api/empresas",
+            headers=_auth(superadmin=True),
+            json={"nombre": "Otra", "email": "otra@test.com"},
+        )
+    assert resp.status_code == 201
+
+
+def test_crear_empresa_envia_bienvenida_excepcion_no_interrumpe(client):
+    from types import SimpleNamespace
+    empresa_mock = SimpleNamespace(id="emp-new", nombre="Boom", email="boom@test.com")
+    with patch("app.empresas.routes.crear_empresa", return_value=empresa_mock), \
+         patch("app.empresas.routes.send_welcome_company", side_effect=RuntimeError("smtp down")):
+        resp = client.post(
+            "/api/empresas",
+            headers=_auth(superadmin=True),
+            json={"nombre": "Boom", "email": "boom@test.com"},
+        )
+    assert resp.status_code == 201

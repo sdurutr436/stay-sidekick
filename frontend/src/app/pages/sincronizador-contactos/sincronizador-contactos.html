@@ -9,15 +9,15 @@
     title="Sincronizador de contactos"
     description="Exporta o sincroniza los datos de los huéspedes con tus herramientas externas."
   >
-    <div class="meta-chip-group">
-      <span class="meta-chip" [class.meta-chip--ok]="pmsConectado()">
-        <ng-icon [name]="pmsConectado() ? 'phosphorCheckCircle' : 'phosphorWarningCircle'" size="14" aria-hidden="true" />
+    <div class="tag-group">
+      <app-tag [variant]="pmsConectado() ? 'success' : 'default'">
+        <ng-icon tag-icon [name]="pmsConectado() ? 'phosphorCheckCircle' : 'phosphorWarningCircle'" size="14" aria-hidden="true" />
         {{ pmsConectado() ? 'PMS conectado' : 'Sin PMS' }}
-      </span>
-      <span class="meta-chip" [class.meta-chip--ok]="googleConectado()">
-        <ng-icon [name]="googleConectado() ? 'phosphorCheckCircle' : 'phosphorWarningCircle'" size="14" aria-hidden="true" />
+      </app-tag>
+      <app-tag [variant]="googleConectado() ? 'success' : 'default'">
+        <ng-icon tag-icon [name]="googleConectado() ? 'phosphorCheckCircle' : 'phosphorWarningCircle'" size="14" aria-hidden="true" />
         {{ googleConectado() ? 'Google conectado' : 'Google desconectado' }}
-      </span>
+      </app-tag>
     </div>
 
     <app-how-it-works-button modalTitle="Cómo usar el Sincronizador de contactos">

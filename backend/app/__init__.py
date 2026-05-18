@@ -14,8 +14,9 @@ Estructura del proyecto:
 
 import logging
 
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 
+from app.common.notifications.discord import send_operational_notification
 from app.config import Config
 from app.extensions import cors, db, limiter, migrate
 
@@ -39,6 +40,12 @@ def create_app(config_class: type = Config) -> Flask:
     )
     limiter.init_app(app)
     db.init_app(app)
+
+    if app.config["FLASK_ENV"] != "development" and app.config["RATE_LIMIT_STORAGE_URI"] == "memory://":
+        app.logger.warning(
+            "Rate limiting usando storage en memoria. Configura RATE_LIMIT_STORAGE_URI "
+            "para despliegues con varias réplicas."
+        )
 
     # ── Modelos (registro en metadata de SQLAlchemy) ──────────────────────
     with app.app_context():
@@ -84,7 +91,17 @@ def create_app(config_class: type = Config) -> Flask:
         return jsonify({"ok": False, "errors": ["Demasiadas solicitudes. Inténtalo más tarde."]}), 429
 
     @app.errorhandler(500)
-    def internal_error(_e):
+    def internal_error(error):
+        root_error = getattr(error, "original_exception", None) or error
+        send_operational_notification(
+            "Error interno del backend",
+            {
+                "Metodo": request.method,
+                "Ruta": request.path,
+                "Excepcion": type(root_error).__name__,
+            },
+            severity="error",
+        )
         return jsonify({"ok": False, "errors": ["Error interno del servidor."]}), 500
 
     return app

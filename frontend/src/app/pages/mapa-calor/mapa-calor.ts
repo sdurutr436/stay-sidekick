@@ -6,6 +6,7 @@ import flatpickr from 'flatpickr';
 import { forkJoin, catchError, of } from 'rxjs';
 import { NgIconComponent } from '@ng-icons/core';
 import { ButtonComponent } from '../../components/atoms/button/button';
+import { TagComponent } from '../../components/atoms/tag/tag';
 import { AlertComponent } from '../../components/molecules/alert/alert';
 import { HowItWorksButtonComponent } from '../../components/molecules/how-it-works-button/how-it-works-button';
 import { PageHeaderComponent } from '../../components/organisms/page-header/page-header';
@@ -25,6 +26,7 @@ import { MapaCalorService, DiaCalor, UmbralesCalor } from '../../services/mapa-c
     PageHeaderComponent,
     PanelSeccionComponent,
     ButtonComponent,
+    TagComponent,
     AlertComponent,
     HeatmapGridComponent,
     HowItWorksButtonComponent,

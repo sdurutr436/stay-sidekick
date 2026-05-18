@@ -50,7 +50,7 @@ automático por rama y control por CI.
 | Frontend SPA | Angular |
 | Sitio estático | 11ty |
 | Base de datos | PostgreSQL 16 |
-| CI/CD | GitHub Actions + Docker Hub |
+| CI/CD | GitHub Actions + Docker Hub + GitHub Security |
 
 ---
 
@@ -121,6 +121,13 @@ La integración continua está separada por capa y se ejecuta con GitHub Actions
 
 - Build del sitio estático 11ty en `main` y PR.
 
+**5) Trivy (`.github/workflows/trivy.yml`)**
+
+- Disparador: `pull_request` a `main`, `push` a `main`, ejecución semanal y manual.
+- Escaneo de filesystem e IaC del repositorio con Trivy (`vuln` + `misconfig`).
+- Se limita a severidades `HIGH` y `CRITICAL`, ignora vulnerabilidades sin fix y publica SARIF para revisión técnica en GitHub Security.
+- Además, adjunta el fichero `trivy-results.sarif` como artefacto del workflow.
+
 ### 8.3.2. Pipeline de publicación de imágenes (CD)
 
 La publicación de contenedores se gestiona con
@@ -140,6 +147,8 @@ Flujo:
 5. El tag usado es el SHA corto del commit.
 
 Este gating evita publicar imágenes cuando alguna capa no ha superado su CI.
+
+Dependabot queda activado mediante `.github/dependabot.yml` con revisiones semanales agrupadas por ecosistema para GitHub Actions, `npm` (raíz, frontend y web) y `pip` en backend. Se limita el número de PR abiertos para reducir ruido operativo.
 
 ---
 
@@ -178,11 +187,21 @@ Variables mínimas relevantes para producción:
 | `backend` | `FERNET_KEY` | Cifrado de claves externas |
 | `backend` | `TURNSTILE_SECRET_KEY` | Validación anti-bots |
 | `backend` | `ALLOWED_ORIGINS` | Origen permitido del dominio público |
+| `backend` | `DISCORD_WEBHOOK_OPERATIONS_URL` | Alertas operativas del backend |
+| `backend` | `DISCORD_WEBHOOK_AI_OBSERVABILITY_URL` | Canal específico de IA (opcional) |
+| `backend` | `RATE_LIMIT_STORAGE_URI` | Backend compartido de rate limiting |
 | `nginx` | `PORT` | Puerto de escucha en Railway |
 | `nginx` | `FRONTEND_PORT`, `WEB_PORT`, `BACKEND_PORT` | Puertos internos de proxy |
 
 En Railway, `DATABASE_URL` se configura como referencia al servicio de base de
 datos (`${{ Postgres.DATABASE_URL }}`), evitando hardcodear credenciales.
+
+Notas operativas:
+
+- El backend sigue manteniendo separados los webhooks funcionales de formularios (`DISCORD_WEBHOOK_URL`, `DISCORD_WEBHOOK_CONTACT_URL`) y el canal operativo (`DISCORD_WEBHOOK_OPERATIONS_URL`).
+- `DISCORD_WEBHOOK_AI_OBSERVABILITY_URL` es opcional. Si queda vacío, la observabilidad de IA reutiliza el canal operativo.
+- La observabilidad de IA envía solo metadatos operativos (empresa, acción, modelo, límites y tipo de error); no reenvía prompts ni respuestas completas.
+- Con Gunicorn y más de un worker, `memory://` deja el rate limiting aislado por proceso. En producción se recomienda configurar `RATE_LIMIT_STORAGE_URI` contra Redis o Valkey; `memory://` queda como fallback local o para despliegues simples.
 
 ### 8.4.3. Despliegue del stack
 
@@ -234,7 +253,7 @@ El acceso público se realiza exclusivamente por el servicio `nginx` de Railway.
 
 | Recurso | URL |
 |---|---|
-| Aplicación en producción (nginx) | `https://staysidekick.up.railway.app` |
+| Aplicación en producción (nginx) | `https://stay-sidekick.up.railway.app` |
 
 > Si Railway regenera el dominio o se configura dominio personalizado, esta URL
 > debe actualizarse en la memoria y en `ALLOWED_ORIGINS` del backend.

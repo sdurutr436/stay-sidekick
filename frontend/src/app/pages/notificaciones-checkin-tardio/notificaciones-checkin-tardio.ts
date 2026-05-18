@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { NgIconComponent } from '@ng-icons/core';
 import { ButtonComponent } from '../../components/atoms/button/button';
+import { TagComponent } from '../../components/atoms/tag/tag';
 import { AlertComponent } from '../../components/molecules/alert/alert';
 import { DropdownBuscadorComponent, DropdownOption } from '../../components/molecules/dropdown-buscador/dropdown-buscador';
 import { HowItWorksButtonComponent } from '../../components/molecules/how-it-works-button/how-it-works-button';
@@ -62,7 +63,7 @@ interface StatusResponse {
     NgIconComponent,
     FormsModule,
     PageHeaderComponent, PanelSeccionComponent,
-    ButtonComponent, AlertComponent,
+    ButtonComponent, TagComponent, AlertComponent,
     DropdownBuscadorComponent,
     HowItWorksButtonComponent,
     TemplatesCardComponent,

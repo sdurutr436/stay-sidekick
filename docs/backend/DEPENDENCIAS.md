@@ -32,8 +32,13 @@ Este documento detalla cada librería añadida al backend, su propósito, motivo
 
 ### flask-limiter `3.12.x`
 - **Propósito:** Rate limiting por IP.
-- **Por qué:** Protege el endpoint de contacto contra abuso (spam, fuerza bruta). Configurable por variable de entorno (`RATE_LIMIT_CONTACT`).
+- **Por qué:** Protege los endpoints públicos contra abuso (spam, fuerza bruta). El límite funcional sigue siendo configurable por entorno (`RATE_LIMIT_CONTACT`) y el backend de almacenamiento puede endurecerse con `RATE_LIMIT_STORAGE_URI` cuando el despliegue usa varios workers o réplicas.
 - **Docs:** https://flask-limiter.readthedocs.io/
+
+### redis `5.2.x`
+- **Propósito:** Backend opcional de almacenamiento compartido para `flask-limiter`.
+- **Por qué:** El backend de producción arranca con Gunicorn y varios procesos; `memory://` deja el rate limiting separado por worker. Con `RATE_LIMIT_STORAGE_URI` apuntando a Redis o Valkey, los contadores se comparten sin cambiar la lógica de negocio y se mantiene `memory://` como fallback local.
+- **Docs:** https://redis.readthedocs.io/
 
 ### PyJWT `2.9.x`
 - **Propósito:** Generación y verificación de JSON Web Tokens (JWT).
@@ -73,7 +78,7 @@ Este documento detalla cada librería añadida al backend, su propósito, motivo
 
 ### requests `2.32.x`
 - **Propósito:** Cliente HTTP para Python.
-- **Por qué:** Se utiliza para la verificación server-side del captcha Turnstile contra la API de Cloudflare, y también para el envío de notificaciones al webhook de Discord. Es la librería HTTP más utilizada y probada del ecosistema Python.
+- **Por qué:** Se utiliza para la verificación server-side del captcha Turnstile contra la API de Cloudflare, y también para el envío de notificaciones funcionales y operativas a Discord. Es la librería HTTP más utilizada y probada del ecosistema Python.
 - **Docs:** https://docs.python-requests.org/
 
 ---
@@ -91,9 +96,12 @@ Este documento detalla cada librería añadida al backend, su propósito, motivo
 
 ### Discord Webhooks (vía requests)
 - **Propósito:** Aviso instantáneo en un canal de Discord.
-- **Por qué:** Los webhooks de Discord son gratuitos, no requieren bot ni librería extra, y permiten enviar embeds enriquecidos con un simple POST JSON. Se reutiliza `requests` que ya está en el proyecto. Cada solicitud válida envía un embed con los datos de contacto al canal configurado.
+- **Por qué:** Los webhooks de Discord son gratuitos, no requieren bot ni librería extra, y permiten enviar embeds enriquecidos con un simple POST JSON. Se reutiliza `requests` que ya está en el proyecto. Cada solicitud válida envía un embed al canal funcional correspondiente y, además, el backend puede emitir alertas operativas e hitos de observabilidad de IA a canales separados.
 - **Configuración necesaria:**
-  - `DISCORD_WEBHOOK_URL` → URL del webhook creado en Discord (canal → Editar → Integraciones → Webhooks).
+       - `DISCORD_WEBHOOK_URL` → solicitudes públicas (`/api/contact`).
+       - `DISCORD_WEBHOOK_CONTACT_URL` → contacto general (`/api/contacto`).
+       - `DISCORD_WEBHOOK_OPERATIONS_URL` → errores del backend y fallos de notificación.
+       - `DISCORD_WEBHOOK_AI_OBSERVABILITY_URL` → canal específico de IA; si queda vacío, usa `DISCORD_WEBHOOK_OPERATIONS_URL`.
 - **Docs:** https://discord.com/developers/docs/resources/webhook
 
 ---

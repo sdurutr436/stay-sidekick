@@ -42,14 +42,26 @@
 
   function init() {
     var button = document.querySelector('[data-theme-toggle]');
-    if (!button) return;
 
-    updateButtonIcon(button, currentTheme());
+    if (button) {
+      updateButtonIcon(button, currentTheme());
+      button.addEventListener('click', function () {
+        var next = currentTheme() === 'dark' ? 'light' : 'dark';
+        applyTheme(next);
+        updateButtonIcon(button, next);
+      });
+    }
 
-    button.addEventListener('click', function () {
-      var next = currentTheme() === 'dark' ? 'light' : 'dark';
-      applyTheme(next);
-      updateButtonIcon(button, next);
+    // Sincronización entre pestañas/apps del mismo origen (11ty ↔ Angular).
+    // 'storage' solo se dispara en pestañas DISTINTAS a la que escribió, por
+    // lo que reflejamos el cambio sin generar bucles.
+    window.addEventListener('storage', function (event) {
+      if (event.key !== STORAGE_KEY) return;
+      var next = event.newValue === 'dark' ? 'dark' : 'light';
+      var root = document.documentElement;
+      root.classList.toggle('dark', next === 'dark');
+      root.setAttribute('data-theme', next);
+      if (button) updateButtonIcon(button, next);
     });
   }
 

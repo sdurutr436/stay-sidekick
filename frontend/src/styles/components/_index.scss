@@ -13,6 +13,7 @@
 @use 'logo';
 @use 'button';         // [ESPEJO NJK] _includes/macros/atoms.njk (macro button)
 @use 'badge';          // [ESPEJO NJK] _includes/macros/atoms.njk (macro badge)
+@use 'tag';            // [ESPEJO NJK] _includes/macros/atoms.njk (macro tag)
 
 // ── Organismos de estructura del sitio (compartidos Angular ↔ 11ty) ──────
 @use 'header';         // [ESPEJO NJK] _includes/partials/header.njk
