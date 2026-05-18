@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" role="img" aria-labelledby="title desc">
+  <title id="title">Placeholder Docker Hub</title>
+  <desc id="desc">Hueco temporal para una captura del registry y de los tags publicados.</desc>
+  <rect width="1280" height="720" fill="#0f172a"/>
+  <rect x="52" y="52" width="1176" height="616" rx="28" fill="#101b31" stroke="#1d4ed8" stroke-width="2"/>
+  <rect x="52" y="52" width="1176" height="92" rx="28" fill="#172554"/>
+  <text x="84" y="108" fill="#dbeafe" font-family="Arial, sans-serif" font-size="32" font-weight="700">Placeholder Docker Hub</text>
+  <text x="84" y="188" fill="#bfdbfe" font-family="Arial, sans-serif" font-size="20">Sustituir por captura real del registry con repositorios y tags SHA publicados</text>
+  <text x="84" y="220" fill="#93c5fd" font-family="Arial, sans-serif" font-size="18">Sirve como evidencia comun para c5 y C7</text>
+  <rect x="84" y="268" width="520" height="308" rx="22" fill="#0b1220" stroke="#1e40af"/>
+  <rect x="632" y="268" width="564" height="308" rx="22" fill="#0b1220" stroke="#1e40af"/>
+  <text x="116" y="318" fill="#f8fafc" font-family="Arial, sans-serif" font-size="24" font-weight="700">Repositorios</text>
+  <text x="116" y="370" fill="#dbeafe" font-family="Arial, sans-serif" font-size="20">stay-sidekick-backend</text>
+  <text x="116" y="418" fill="#dbeafe" font-family="Arial, sans-serif" font-size="20">stay-sidekick-frontend</text>
+  <text x="116" y="466" fill="#dbeafe" font-family="Arial, sans-serif" font-size="20">stay-sidekick-web</text>
+  <text x="116" y="514" fill="#dbeafe" font-family="Arial, sans-serif" font-size="20">stay-sidekick-nginx</text>
+  <text x="664" y="318" fill="#f8fafc" font-family="Arial, sans-serif" font-size="24" font-weight="700">Tags publicados</text>
+  <rect x="664" y="352" width="500" height="42" rx="12" fill="#1d4ed8"/>
+  <rect x="664" y="412" width="500" height="42" rx="12" fill="#1d4ed8"/>
+  <rect x="664" y="472" width="500" height="42" rx="12" fill="#1d4ed8"/>
+  <text x="692" y="380" fill="#eff6ff" font-family="Consolas, monospace" font-size="20">abc1234</text>
+  <text x="692" y="440" fill="#eff6ff" font-family="Consolas, monospace" font-size="20">latest / sha corto</text>
+  <text x="692" y="500" fill="#eff6ff" font-family="Consolas, monospace" font-size="20">timestamp del push</text>
+  <text x="84" y="642" fill="#93c5fd" font-family="Arial, sans-serif" font-size="16">La captura final deberia dejar visibles el nombre del repo, el tag y la fecha del ultimo push.</text>
+</svg>
