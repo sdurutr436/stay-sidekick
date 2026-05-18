@@ -69,6 +69,48 @@ Acceso recomendado:
 - En validación local: levantar primero el stack con `docker compose up -d --build`, ya que el
   backend no se publica directamente y la documentación sale a través del proxy `nginx`.
 
+### Resumen operativo mínimo
+
+Aunque el proyecto tenga `README.md`, `DEPLOY.md` y documentación técnica adicional, el flujo básico
+de despliegue y verificación queda resumido aquí para mantener reunidos en un único archivo los
+pasos esenciales:
+
+1. Preparar variables del entorno con `cp .env.example .env` y `cp backend/.env.example backend/.env`.
+2. Preparar también el sitio 11ty con `cp web/.env.example web/.env`.
+3. Construir y arrancar el stack completo con `docker compose up -d --build`.
+4. Verificar que los cinco servicios están arriba con `docker compose ps`.
+5. Comprobar acceso al front público (`/`), a la SPA (`/menu/`) y al backend vía proxy (`/api/health`).
+6. Validar que la documentación de la API responde desde `http://localhost/api/docs` y `http://localhost/api/docs/openapi.yaml`.
+7. Si algo falla, revisar primero variables, estado de contenedores, logs del proxy y healthcheck.
+
+### Variables críticas del despliegue
+
+Las plantillas versionadas son `.env.example` y `backend/.env.example`. Las variables reales no se
+suben al repositorio. Las más relevantes para reproducir el despliegue son:
+
+| Variable | Dónde aplica | Para qué sirve |
+| --- | --- | --- |
+| `POSTGRES_DB` | `.env` raíz | Nombre de la base de datos local |
+| `POSTGRES_USER` | `.env` raíz | Usuario de PostgreSQL |
+| `POSTGRES_PASSWORD` | `.env` raíz | Contraseña de PostgreSQL |
+| `DATABASE_URL` | `.env` raíz / backend | Cadena de conexión usada por el backend |
+| `TURNSTILE_SITE_KEY` | `web/.env` | Site key pública insertada en el sitio 11ty |
+| `SECRET_KEY` | `backend/.env` | Clave principal de Flask |
+| `JWT_SECRET_KEY` | `backend/.env` | Firma de los tokens JWT |
+| `TURNSTILE_SECRET_KEY` | `backend/.env` | Verificación anti-bot del formulario |
+| `FERNET_KEY` | `backend/.env` | Cifrado de secretos almacenados |
+
+### Troubleshooting básico
+
+| Si falla | Qué revisar primero |
+| --- | --- |
+| `docker compose up` no levanta todo el stack | Confirmar que existen `.env` y `backend/.env` creados desde sus `.example` |
+| El sitio 11ty falla en build o no renderiza Turnstile | Confirmar que existe `web/.env` creado desde `web/.env.example` |
+| `http://localhost/api/health` no responde `200` | Revisar `docker compose ps` y `docker compose logs --tail=20 backend` |
+| `nginx` devuelve `502` o `404` inesperado | Revisar `docker compose logs --tail=20 nginx` y la configuración de rutas `/`, `/menu/` y `/api/` |
+| La base de datos no tiene tablas | Confirmar el `healthcheck` de `postgres` y que `flask db upgrade` se ejecuta al arrancar backend |
+| El puerto `80` está ocupado | Liberar el puerto o ajustar temporalmente el mapeo del servicio `nginx` en Compose |
+
 Ejemplos reales de verificación local:
 
 ```bash
@@ -123,6 +165,10 @@ Códigos de respuesta comunes documentados en la API:
 - `429 Too Many Requests` -> límite de peticiones superado.
 
 Esto evidencia que la documentación no es solo descriptiva: permite probar endpoints reales con comandos reproducibles.
+
+Placeholders recomendados para la evidencia visual de `c6`:
+
+![Placeholder — Swagger UI y OpenAPI](assets/despliegue-web/06-swagger-ui-placeholder.svg)
 
 ---
 
@@ -231,6 +277,19 @@ Credenciales y secretos utilizados en la cadena:
 - `TURNSTILE_SITE_KEY`
 - `github.token` para consultar, desde GitHub Actions, el estado de los workflows asociados al commit
 
+### Artefactos publicados por el workflow de CD
+
+El job `publicar` genera cuatro imágenes Docker y las sube al namespace definido en
+`DOCKERHUB_USERNAME`. En la rama actual, la estrategia de etiquetado visible en el workflow es una:
+una etiqueta por SHA corto del commit publicado.
+
+| Imagen | Destino en Docker Hub | Etiqueta aplicada |
+| --- | --- | --- |
+| `stay-sidekick-backend` | `$DOCKERHUB_USERNAME/stay-sidekick-backend` | SHA corto del commit |
+| `stay-sidekick-frontend` | `$DOCKERHUB_USERNAME/stay-sidekick-frontend` | SHA corto del commit |
+| `stay-sidekick-web` | `$DOCKERHUB_USERNAME/stay-sidekick-web` | SHA corto del commit |
+| `stay-sidekick-nginx` | `$DOCKERHUB_USERNAME/stay-sidekick-nginx` | SHA corto del commit |
+
 El soporte principal de este apartado sigue estando en los propios ficheros YAML, en el historial Git
 reproducible y en la trazabilidad entre commit, ejecución de CI y etiquetas SHA de las imágenes
 publicadas. Aun así, para alinearlo literalmente con la rúbrica, conviene adjuntar tres capturas
@@ -306,6 +365,24 @@ postgres:
 
 La separación es clara: solo se expone `nginx`, mientras que backend y base de datos quedan en red interna. Esto cumple el criterio de arquitectura por servicios diferenciados y comunicación interna explícita.
 
+### Comunicaciones principales entre servicios
+
+- Cliente -> `nginx` por `http://localhost:80`: único punto de entrada publicado al host.
+- `nginx` -> `web`: sirve el sitio estático 11ty en `/`.
+- `nginx` -> `frontend`: sirve la SPA Angular en `/menu`.
+- `nginx` -> `backend`: proxy-pasa toda `/api/*`, incluida la documentación `/api/docs`.
+- `backend` -> `postgres`: persistencia relacional por la red interna `app-net`.
+
+### Decisiones de despliegue principales
+
+1. Solo `nginx` publica puerto al host; backend y PostgreSQL quedan aislados de acceso directo.
+2. El sitio estático 11ty y la SPA Angular se mantienen como servicios separados pero unificados bajo
+  el mismo proxy inverso.
+3. La documentación OpenAPI también se publica a través de `nginx`, de modo que el backend no
+  necesita exponerse por un puerto propio.
+4. PostgreSQL persiste en el volumen `postgres_data`, lo que evita perder datos al recrear los
+  contenedores.
+
 ---
 
 ## c2 — Implementación en Docker
@@ -317,16 +394,35 @@ La separación es clara: solo se expone `nginx`, mientras que backend y base de 
 | Orquestación | [docker-compose.yml](../docker-compose.yml) |
 | Variables raíz | [.env.example](../.env.example) |
 | Variables backend | [backend/.env.example](../backend/.env.example) |
+| Variables web | [web/.env.example](../web/.env.example) |
 | Imagen backend | [backend/Dockerfile](../backend/Dockerfile) |
 | Imagen frontend | [frontend/Dockerfile](../frontend/Dockerfile) |
 | Imagen web | [web/Dockerfile](../web/Dockerfile) |
 | Imagen nginx | [nginx/Dockerfile](../nginx/Dockerfile) |
+
+### Red interna, puertos y persistencia
+
+| Elemento | Configuración real | Función |
+| --- | --- | --- |
+| Red Docker | `app-net` | Comunicación interna entre `nginx`, `frontend`, `web`, `backend` y `postgres` |
+| Puerto publicado | `80:80` en `nginx` | Único punto de entrada desde el host |
+| Puertos internos | `80`, `80`, `5000`, `5432` vía `expose` | Tráfico interno entre servicios sin exposición pública |
+| Volumen persistente | `postgres_data` | Conserva la base de datos entre reinicios y recreaciones |
+
+### Variables necesarias para levantar el stack local
+
+| Fichero | Para qué se usa |
+| --- | --- |
+| `.env` | Credenciales de PostgreSQL y `DATABASE_URL` del entorno Compose |
+| `backend/.env` | Configuración Flask, JWT, Turnstile, Google, Gmail, Discord, IA y cifrado |
+| `web/.env` | `TURNSTILE_SITE_KEY` pública usada por el sitio estático 11ty |
 
 ### Arranque reproducible desde cero
 
 ```bash
 cp .env.example .env
 cp backend/.env.example backend/.env
+cp web/.env.example web/.env
 docker compose up -d --build
 docker compose ps
 ```
@@ -367,6 +463,10 @@ stay-sidekick-web-1        stay-sidekick-web        latest      9d3fa9e61f22   3
 ```
 
 En remoto, el workflow de CD publica imágenes en Docker Hub usando el usuario configurado en `DOCKERHUB_USERNAME`, con nombres `stay-sidekick-backend`, `stay-sidekick-frontend`, `stay-sidekick-web` y `stay-sidekick-nginx`.
+
+Variables y persistencia quedan resueltas de forma reproducible porque el arranque parte de
+plantillas versionadas (`.env.example` y `backend/.env.example`) y la base de datos conserva estado
+en el volumen `postgres_data`.
 
 ---
 
@@ -437,6 +537,14 @@ Content-Type: application/json
 
 La respuesta `401` en JSON prueba que la petición entra por `nginx`, atraviesa el reverse proxy y es respondida por Flask, no por un `404` HTML local.
 
+### Adaptaciones relevantes del proxy
+
+- En local, `nginx` escucha en `80` para simplificar el acceso al stack completo desde Docker Compose.
+- En producción, Railway expone HTTPS en el borde y reenvía al servicio `nginx`, por eso el documento
+  distingue entre `http://localhost` y `https://staysidekick.up.railway.app`.
+- La separación de contextos (`/`, `/menu/`, `/api/`) evita exponer el backend directamente y deja
+  todo el tráfico pasando por el mismo front.
+
 ### Logs reales del proxy
 
 ```bash
@@ -451,6 +559,10 @@ nginx-1  | 172.18.0.1 - - [15/May/2026:18:03:51 +0000] "GET /api/usuarios HTTP/1
 
 En producción, el dominio público se sirve mediante Railway (`https://staysidekick.up.railway.app`), que proporciona HTTPS en el borde y reenvía al servicio `nginx`.
 
+Placeholder recomendado para la evidencia visual de `c3`:
+
+![Placeholder — logs y respuesta del proxy nginx](assets/despliegue-web/07-nginx-logs-placeholder.svg)
+
 ---
 
 ## c4 — Servidor de aplicaciones (backend)
@@ -464,6 +576,15 @@ CMD flask db upgrade && gunicorn --bind "[::]:${PORT:-5000}" --workers 2 run:app
 ```
 
 Esto demuestra que el backend no corre con el servidor de desarrollo de Flask, sino con Gunicorn, que es adecuado como servidor de aplicaciones para despliegue.
+
+### Adaptaciones relevantes del backend
+
+- El contenedor ejecuta `flask db upgrade` antes de arrancar Gunicorn, de modo que las migraciones se
+  aplican automáticamente al levantar el servicio.
+- Gunicorn escucha en `"[::]:${PORT:-5000}"`, lo que permite servir en el puerto interno previsto del
+  contenedor y mantener compatibilidad con despliegues gestionados.
+- La configuración fija `--workers 2`, suficiente para una carga ligera del entorno de despliegue
+  evaluado y coherente con una prueba funcional del stack.
 
 Comando real del proceso principal dentro del contenedor:
 
@@ -529,6 +650,10 @@ backend-1  | 2026-05-15 18:03:50,182 [DEBUG] LiteLLM: Creating AiohttpTransport.
 
 Aunque el extracto mostrado pertenece a inicialización del cliente IA, evidencia que el backend está generando logs operativos dentro del contenedor y que la aplicación está viva.
 
+Placeholder recomendado para la evidencia visual de `c4`:
+
+![Placeholder — logs y prueba ligera del backend](assets/despliegue-web/08-backend-logs-placeholder.svg)
+
 ---
 
 ## C7 — Gestión de ficheros y artefactos
@@ -545,6 +670,8 @@ Aunque el extracto mostrado pertenece a inicialización del cliente IA, evidenci
 | Config del proxy | [nginx/nginx.conf](../nginx/nginx.conf) | Sí | Enrutado y cabeceras del front |
 | Workflows | [.github/workflows](../.github/workflows) | Sí | CI/CD y publicación de imágenes |
 | Volumen persistente | `postgres_data` | Se crea localmente | Conserva datos de PostgreSQL entre reinicios |
+| Artefacto de cobertura | `frontend/coverage/` | No, se genera en CI | Se sube como artefacto descargable del workflow de tests Angular |
+| Placeholders de evaluación | `docs/assets/despliegue-web/*.svg` | Sí, temporalmente | Marcan el lugar de las capturas reales de la memoria de despliegue |
 
 ### Evidencia de gestión correcta de secretos
 
@@ -589,6 +716,9 @@ Placeholders de capturas recomendadas para evaluación:
 
 La evidencia visual del registry y de los tags publicados ya se ha situado en `c5`, donde encaja
 mejor con la rúbrica de CI/CD y evita duplicar la misma captura en dos apartados.
+
+Queda así identificado qué se versiona, qué se genera en ejecución, qué se sube como artefacto de
+CI y qué no debe subirse nunca al repositorio por contener secretos.
 
 ---
 
@@ -703,6 +833,10 @@ placeholders SVG para no romper el documento mientras se sustituyen por capturas
 4. `04-docker-hub-tags-placeholder.svg`: repositorios e imágenes publicadas con tag SHA corto.
 5. `05-railway-servicios-placeholder.svg`: vista del proyecto en Railway con `nginx` como entrada
   pública y el resto de servicios en red privada.
+6. `06-swagger-ui-placeholder.svg`: interfaz Swagger UI y acceso al contrato OpenAPI desde `/api/docs`.
+7. `07-nginx-logs-placeholder.svg`: logs del proxy y prueba visual del reverse proxy respondiendo.
+8. `08-backend-logs-placeholder.svg`: logs del backend y evidencia de la prueba ligera sobre `/api/health`.
 
-Con ese bloque de cinco capturas el documento queda cubierto visualmente para `c2`, `c5`, `C7` y
-`C8` sin tocar el nombre del fichero ni mezclarlo con `08-despliegue.md`.
+Con ese bloque de ocho capturas el documento queda cubierto visualmente para `c3`, `c4`, `c5`,
+`c6`, `C7` y refuerza también `c2` y `C8` sin tocar el nombre del fichero ni mezclarlo con
+`08-despliegue.md`.

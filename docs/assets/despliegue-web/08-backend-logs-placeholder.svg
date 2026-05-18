@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" role="img" aria-labelledby="title desc">
+  <title id="title">Placeholder logs backend</title>
+  <desc id="desc">Hueco temporal para una captura de logs del backend y de la prueba ligera de respuesta.</desc>
+  <rect width="1280" height="720" fill="#111827"/>
+  <rect x="48" y="48" width="1184" height="624" rx="24" fill="#030712" stroke="#374151" stroke-width="2"/>
+  <text x="84" y="110" fill="#f9fafb" font-family="Consolas, monospace" font-size="32" font-weight="700">Placeholder logs backend</text>
+  <text x="84" y="150" fill="#9ca3af" font-family="Consolas, monospace" font-size="18">Sustituir por captura de docker compose logs backend y de la prueba ligera a /api/health</text>
+  <rect x="84" y="188" width="1112" height="256" rx="18" fill="#0f172a" stroke="#1f2937"/>
+  <text x="112" y="238" fill="#c4b5fd" font-family="Consolas, monospace" font-size="20">backend-1  | flask db upgrade</text>
+  <text x="112" y="286" fill="#c4b5fd" font-family="Consolas, monospace" font-size="20">backend-1  | [INFO] Listening at: :::5000</text>
+  <text x="112" y="334" fill="#c4b5fd" font-family="Consolas, monospace" font-size="20">backend-1  | [INFO] Booting worker with pid: 8</text>
+  <text x="112" y="382" fill="#c4b5fd" font-family="Consolas, monospace" font-size="20">backend-1  | [INFO] Booting worker with pid: 9</text>
+  <rect x="84" y="474" width="1112" height="128" rx="18" fill="#0f172a" stroke="#1f2937"/>
+  <text x="112" y="524" fill="#e5e7eb" font-family="Consolas, monospace" font-size="20">Requests : 20</text>
+  <text x="112" y="560" fill="#e5e7eb" font-family="Consolas, monospace" font-size="20">TotalMs  : 97,38</text>
+  <text x="112" y="596" fill="#e5e7eb" font-family="Consolas, monospace" font-size="20">AvgMs    : 4,87</text>
+  <text x="84" y="638" fill="#9ca3af" font-family="Arial, sans-serif" font-size="16">Evidencia visual recomendada para reforzar c4.</text>
+</svg>
