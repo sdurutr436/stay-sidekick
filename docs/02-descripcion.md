@@ -32,7 +32,7 @@ Stay Sidekick es una plataforma satelite para operaciones del alquiler vacaciona
 
 La plataforma implementa autenticacion basada en token para proteger las areas privadas:
 
-- Inicio de sesion mediante correo y contrasena.
+- Inicio de sesion mediante correo y contraseña.
 - Emision de JWT con datos de sesion (usuario, empresa, rol).
 - Validacion de token para endpoints protegidos.
 - Proteccion CSRF en operaciones de escritura mediante patron Double-Submit Cookie.
@@ -47,7 +47,7 @@ Cada usuario pertenece a una empresa y opera sobre sus propios datos. Esto permi
 Capacidades clave:
 
 - Separacion logica de datos por empresa (multi-tenant).
-- Gestion de usuarios por empresa (alta, baja, cambio de rol y reseteo de contrasena).
+- Gestion de usuarios por empresa (alta, baja, cambio de rol y reseteo de contraseña).
 - Gestion de empresas para perfiles superadmin.
 - Permisos por rol para limitar acciones administrativas.
 
@@ -103,6 +103,7 @@ Funciones incluidas:
 - Flujo alternativo XLSX -> Google para operaciones sin API.
 - Exportacion CSV para revisiones manuales o cargas externas.
 - Preferencias de sincronizacion configurables por empresa.
+- Preferencias en cómo mostrar en agenda los contactos.
 
 Con esto, el equipo evita mantener agendas duplicadas y mejora la trazabilidad del contacto con huespedes.
 
@@ -116,9 +117,12 @@ Caracteristicas destacadas:
 - CRUD completo con borrado logico.
 - Asistente IA para mejora de redaccion.
 - Traduccion asistida por IA a otros idiomas.
-- Contadores de uso y configuracion segura de proveedor IA.
+- Contadores de uso por IA compartida.
+- Configuracion segura de proveedor IA en caso de tener IA propia.
 
 Este modulo acelera la generacion de mensajes consistentes, especialmente en equipos con alta rotacion o volumen.
+
+> **Nota**: Algunas de las plantillas se comparten con el sistema de notifiaciones de check-in tardío por lo que se pueden mejorar en este apartado.
 
 ### Perfil, integraciones y parametros por empresa
 
@@ -126,12 +130,14 @@ Desde el area de perfil y ajustes se gestiona la personalizacion tecnica de la c
 
 Permite:
 
-- Cambio de contrasena del usuario autenticado.
+- Cambio de contraseña del usuario autenticado.
 - Configuracion de integracion PMS.
 - Configuracion de integracion IA.
 - Ajuste de parametros funcionales (columnas XLSX, reglas de modulos, etc.).
 
 La plataforma prioriza la configuracion sin codigo para adaptar herramientas a cada operativa real.
+
+Los usuarios **no administradores** pueden consultar la configuración, pero no modificarla. Solo los **administradores** pueden realizar estos cambios.
 
 ### Formulario de contacto publico
 
@@ -142,8 +148,9 @@ Medidas relevantes:
 - Validacion de datos de formulario.
 - Proteccion antispam con Turnstile.
 - Rate limit por IP para prevenir abuso.
+- Campo _honeypot_ secreto para prevenir _bots_.
 
-Este canal permite captar interes y gestionar consultas sin exponer la zona privada.
+Este canal permite captar interes y gestionar consultas sin exponer la zona privada (parte dinámica protegida por inicio de sesión).
 
 ### Seguridad y cumplimiento transversal
 
@@ -169,6 +176,7 @@ La experiencia de uso se define por cuatro principios:
 - Eficiencia: las tareas repetitivas se resuelven con flujos cortos.
 - Coherencia: los modulos comparten patrones de navegacion y formularios.
 - Escalabilidad: la interfaz permite crecer en herramientas sin romper el flujo principal.
+- Privacidad: la información sensible es mínima y solo se muestra cuando el usuario lo solicita.
 
 ### Estructura general de la interfaz
 
@@ -179,8 +187,9 @@ La solucion se organiza en dos superficies complementarias:
 
 En la aplicacion privada se mantiene una estructura comun:
 
-- Navegacion lateral o superior con acceso a herramientas.
-- Area central dinamica segun el modulo activo.
+- Navegacion lateral con acceso a herramientas.
+- _Dashboard_ con información del estado de las herramientas, así como de las conexiones externas.
+- Area central dinamica segun el modulo activo. Se añade un botón de como funcionan las herramientas mostrando un modal.
 - Formularios con validaciones y estados de carga.
 - Mensajeria de feedback para confirmar operaciones o informar errores.
 
@@ -196,9 +205,9 @@ En la aplicacion privada se mantiene una estructura comun:
 | Sincronizador de contactos | Mantener agenda operativa | Conectar Google, sincronizar, exportar CSV |
 | Vault de comunicaciones | Estandarizar mensajes | Crear plantillas, mejorar/traducir con IA |
 | Perfil e integraciones | Parametrizar la cuenta | Cambiar contrasena y configurar PMS/IA |
-| Administracion de usuarios | Gestion de equipo por empresa | Altas, roles, bajas y reseteo de contrasena |
+| Administracion de usuarios | Gestion de equipo por empresa | Altas, roles, bajas y reseteo de contraseña |
 
-### Accesibilidad y diseno responsive
+### Accesibilidad y diseño responsive
 
 La interfaz esta pensada para uso en escritorio y movil:
 
@@ -206,6 +215,39 @@ La interfaz esta pensada para uso en escritorio y movil:
 - Tipografia legible y jerarquia visual clara.
 - Controles de formulario con etiquetas y mensajes de validacion comprensibles.
 - Objetivo de alineacion con criterios WCAG 2.1 AA.
+
+**WAVE - Web Accessibility Evaluation Tool**
+**Google Lighthouse** 
+
+---
+
+**Landing page**
+
+![Análisis Wave - Landing page](assets/wave/02-auditoria-wave-landing-page.png)
+
+![Análisis Lighthouse - Landing page](assets/lighthouse/02-auditoria-lighthouse-landing-page.png)
+
+**Formulario solicitud**
+
+![Análisis Wave - Formulario solicitud](assets/wave/02-auditoria-wave-formulario-solicitud.png)
+
+![Análisis Lighthouse - Formulario solicitud](assets/lighthouse/02-auditoria-lighthouse-formulario-solicitud.png)
+
+**Inicio de sesión**
+
+![Análisis Wave - Formulario de inicio de sesión](assets/wave/02-auditoria-wave-formulario-inicio-sesion.png)
+
+![Análisis Lighthouse - Formulario de inicio de sesión](assets/lighthouse/02-auditoria-lighthouse-formulario-inicio-sesion.png)
+
+**Dashboard principal**
+
+![Análisis Wave - Dashboard principal](assets/wave/02-auditoria-wave-dashboard-principal.png)
+
+**Herramienta: Maestro de Apartamentos**
+
+![Análisis Wave - Maestro de Apartamentos](assets/wave/02-auditoria-wave-maestro-apartamentos.png)
+
+**Herramienta: Sincronizador de contactos
 
 ### Feedback y manejo de errores
 
