@@ -303,8 +303,8 @@ estado de interfaz.
 ### 7.2.4. Pruebas manuales de smoke y validaciones complementarias
 
 Además de la exploración manual de integraciones externas, el proyecto mantuvo un guion de smoke
-test específico para el módulo de mapa de calor en `docs/smoke-test-mapa-calor.md`. Ese documento
-estructura la comprobación manual en tres bloques:
+test específico para el módulo de mapa de calor. La comprobación manual se estructuró en tres
+bloques:
 
 1. **Caso A — con PMS conectado**: verifica badge de proveedor, generación de cuadrícula,
    representación del rango y ausencia de subida XLSX cuando la integración PMS está operativa.

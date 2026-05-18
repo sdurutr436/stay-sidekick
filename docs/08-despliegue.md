@@ -2,13 +2,15 @@
 
 **Documentos de referencia para evaluación y operación**
 
-Esta sección resume la estrategia de despliegue de Stay Sidekick. El detalle
-operativo completo está en:
+Esta sección resume de forma autosuficiente la estrategia de despliegue de Stay Sidekick para la
+memoria. Se recogen aquí el entorno objetivo, la arquitectura de contenedores, la cadena CI/CD,
+las variables relevantes, las diferencias entre los dos perfiles de nginx y el proceso de
+publicación y verificación en producción.
 
-| Documento | Contenido |
-| --------- | --------- |
-| [**DEPLOY.md**](../DEPLOY.md) | Guía consolidada: arranque local y Railway, variables de entorno, verificación, troubleshooting |
-| [**railway_deployment.md**](railway_deployment.md) | Procedimiento paso a paso en Railway: servicios, entornos, CI gating y checklist |
+> | Documento | Contenido |
+> | --------- | --------- |
+> | [**DEPLOY.md**](../DEPLOY.md) | Guía de despliegue paso a paso: arranque, verificación con `curl`, troubleshooting, gestión de artefactos y verificación de red |
+> | [**08-despliegue-eval.md**](08-despliegue-eval.md) | Evidencias de evaluación de la asignatura: criterios c1–c4, C7, C8 con capturas y comandos reales |
 
 ---
 
@@ -59,17 +61,28 @@ automático por rama y control por CI.
 El sistema se organiza en 5 servicios. Solo nginx se publica hacia Internet; el
 resto se comunica por red interna.
 
+```mermaid
+graph TD
+  Cliente(["Cliente HTTP/HTTPS"])
+
+  subgraph red_privada["Red interna de servicios"]
+    Nginx["nginx · público · :80"]
+    Frontend["frontend · Angular+Nginx · :80"]
+    Web["web · 11ty+Nginx · :80"]
+    Backend["backend · Flask+Gunicorn · :5000"]
+    Postgres[("postgres · PostgreSQL 16 · :5432")]
+  end
+
+  Cliente -->|"Dominio público"| Nginx
+  Nginx -->|"/menu/*"| Frontend
+  Nginx -->|"/*"| Web
+  Nginx -->|"/api/*"| Backend
+  Backend -->|"SQL :5432"| Postgres
 ```
-Internet (HTTPS)
-      │
-  [nginx]  ← único servicio con dominio público
-      │ red privada interna (.railway.internal en Railway)
-      ├── [frontend]  Angular SPA      :80
-      ├── [web]       11ty estático    :80
-      └── [backend]   Flask + Gunicorn :5000
-                           │
-                      [PostgreSQL]
-```
+
+El diagrama replica la topología base del stack y la aplica al despliegue: en local la
+comunicación se hace sobre la red Docker `app-net`, mientras que en Railway la misma estructura se
+conserva sobre la red privada interna del proveedor y solo `nginx` queda expuesto al exterior.
 
 En local, el enrutamiento se mantiene con el mismo patrón mediante
 `docker-compose.yml`: 
@@ -82,6 +95,12 @@ En Railway, `nginx/nginx.railway.conf` añade resolver IPv6 (`fd12::10`) y
 re-resolución DNS por petición para evitar errores cuando los servicios cambian
 de IP tras un redeploy.
 
+Como evidencia visual del despliegue real, la siguiente captura muestra la topología de servicios
+en Railway con `nginx-sidekick` como único punto público y el resto de contenedores enlazados por
+red privada:
+
+![Contenedores desplegados en Railway](assets/08-despliegue-contenedores-railway.png)
+
 | Servicio | Contexto/imagen | Puerto público | Puerto interno |
 |---|---|---|---|
 | `nginx` | `nginx/Dockerfile` | Sí (`80`) | `80` |
@@ -90,13 +109,28 @@ de IP tras un redeploy.
 | `backend` | `backend/Dockerfile` | No | `5000` |
 | `postgres` | `postgres:16-alpine` | No | `5432` |
 
+**Nginx local vs nginx Railway**
+
+- `nginx/nginx.conf` es el perfil local: usa upstreams por nombre de servicio Docker
+  (`frontend`, `web`, `backend`), escucha fija en `80` y reproduce el routing de
+  `docker-compose.yml`.
+- `nginx/nginx.railway.conf` es el perfil de producción: escucha en `${PORT}` y en
+  `[::]:${PORT}`, resuelve hostnames `.railway.internal`, define variables
+  `$frontend_url`, `$web_url` y `$backend_url` para forzar re-resolución DNS y añade un
+  endpoint `/healthz` independiente de los upstreams.
+- Ambos comparten la misma lógica funcional: `/api/` hacia backend, `/menu/` hacia Angular,
+  `/*` hacia 11ty, junto con los mismos headers de seguridad y la misma CSP. La diferencia entre
+  entornos está en la resolución de red y en la publicación del servicio, no en el contrato de
+  rutas.
+
 ---
 
 ## 8.3. Configuración de CI/CD
 
 ### 8.3.1. Pipeline de integración continua (CI)
 
-La integración continua está separada por capa y se ejecuta con GitHub Actions.
+La integración continua está separada por capa y por tipo de validación. En la rama principal del
+repositorio se ejecutan cinco workflows de comprobación antes o durante la promoción a producción.
 
 **1) CI Python (`.github/workflows/ci-python.yml`)**
 
@@ -121,6 +155,15 @@ La integración continua está separada por capa y se ejecuta con GitHub Actions
 
 - Build del sitio estático 11ty en `main` y PR.
 
+**5) Trivy Audit (`.github/workflows/trivy.yml`)**
+
+- Disparador: `pull_request` a `main` sobre rutas relevantes del monorepo, `push` a `main`,
+  ejecución semanal programada y `workflow_dispatch`.
+- Ejecuta un escaneo de filesystem e infraestructura como código con Trivy.
+- Limita el resultado a severidades `HIGH` y `CRITICAL`.
+- Publica un informe SARIF como artefacto con 14 días de retención y lo sube además a GitHub
+  Security.
+
 ### 8.3.2. Pipeline de publicación de imágenes (CD)
 
 La publicación de contenedores se gestiona con
@@ -139,7 +182,10 @@ Flujo:
    - `stay-sidekick-nginx`
 5. El tag usado es el SHA corto del commit.
 
-Este gating evita publicar imágenes cuando alguna capa no ha superado su CI.
+Este gating evita publicar imágenes cuando falla alguna de las tres validaciones que actúan como
+puerta dura de publicación. El workflow de tests y cobertura de Angular y la auditoría Trivy
+añaden validación adicional de calidad y seguridad, aunque no forman parte del `workflow_run` que
+desbloquea la publicación en Docker Hub.
 
 ---
 
@@ -157,7 +203,7 @@ En Railway se crea un proyecto con 5 servicios:
 
 Configuración clave por servicio:
 
-- `nginx`: root directory `nginx/`, variable `RAILWAY=true`.
+- `nginx`: root directory `nginx/`, variable `RAILWAY=true` y escucha publicada en el puerto `80`.
 - `frontend`: root directory `frontend/`.
 - `backend`: root directory `backend/`.
 - `web`: root directory vacío (usa contexto raíz para compilar SCSS compartido).
@@ -178,7 +224,7 @@ Variables mínimas relevantes para producción:
 | `backend` | `FERNET_KEY` | Cifrado de claves externas |
 | `backend` | `TURNSTILE_SECRET_KEY` | Validación anti-bots |
 | `backend` | `ALLOWED_ORIGINS` | Origen permitido del dominio público |
-| `nginx` | `PORT` | Puerto de escucha en Railway |
+| `nginx` | `PORT` | Puerto de escucha del servicio público (configurado en `80`) |
 | `nginx` | `FRONTEND_PORT`, `WEB_PORT`, `BACKEND_PORT` | Puertos internos de proxy |
 
 En Railway, `DATABASE_URL` se configura como referencia al servicio de base de
@@ -189,7 +235,7 @@ datos (`${{ Postgres.DATABASE_URL }}`), evitando hardcodear credenciales.
 El despliegue se produce por integración con GitHub:
 
 - Rama `main` -> entorno `production`.
-- Rama `dev` -> entorno `staging` (cuando está configurado en Railway).
+- Rama `dev` -> validación previa equivalente a `staging` mediante `docker-compose.yml`.
 
 Secuencia recomendada:
 
@@ -197,6 +243,10 @@ Secuencia recomendada:
 2. Esperar finalización correcta de CI.
 3. Railway despliega automáticamente (o manualmente si se fuerza desde dashboard).
 4. Revisar healthchecks de cada servicio (`/healthz` en nginx y `/api/health` en backend).
+
+Un ajuste operativo importante durante el cierre del despliegue fue corregir la escucha pública de
+`nginx` para que respondiera en `80` en lugar de `8080`. Ese cambio eliminó el `502` que afectaba
+al dominio final `stay-sidekick.com`.
 
 Para validación local equivalente antes de publicar:
 
@@ -235,6 +285,4 @@ El acceso público se realiza exclusivamente por el servicio `nginx` de Railway.
 | Recurso | URL |
 |---|---|
 | Aplicación en producción (nginx) | `https://staysidekick.up.railway.app` |
-
-> Si Railway regenera el dominio o se configura dominio personalizado, esta URL
-> debe actualizarse en la memoria y en `ALLOWED_ORIGINS` del backend.
+| Aplicación en producción (url final) | `https://stay-sidekick.com` |
