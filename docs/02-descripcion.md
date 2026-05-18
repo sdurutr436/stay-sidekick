@@ -253,21 +253,31 @@ La interfaz esta pensada para uso en escritorio y movil:
 
 **Herramienta: Sincronizador de contactos**
 
+![Análisis Wave - Sincronizador de contactos](assets/wave/02-auditoria-wave-sincronizador-contactos.png)
+
 ![Análisis Lighthouse - Sincronizador de contactos](assets/lighthouse/02-auditoria-lighthouse-sincronizador-contactos.png)
 
 **Herramienta: Notificaciones check-in**
+
+![Análisis Wave - Notificaciones check-in](assets/wave/02-auditoria-wave-notificaciones-checkin.png)
 
 ![Análisis Lighthouse - Notificaciones Check-in](assets/lighthouse/02-auditoria-lighthouse-notificaciones-checkin.png)
 
 **Herramienta: Mapa de calor**
 
+![Análisis Wave - Mapa de calor](assets/wave/02-auditoria-wave-mapa-calor.png)
+
 ![Análisis Lighthouse - Mapa de calor](assets/lighthouse/02-auditoria-lighthouse-mapa-calor.png)
 
 **Herramienta: Vault de comunicaciones**
 
+![Análisis Wave - Vault de comunicaciones](assets/wave/02-auditoria-wave-vault-comunicaciones.png)
+
 ![Análisis Lighthouse - Vault de comunicaciones](assets/lighthouse/02-auditoria-lighthouse-vault-comunicaciones.png)
 
 **Perfil empresa / usuario**
+
+![Análisis WAVE - Perfil](assets/wave/02-auditoria-wave-perfil.png)
 
 ![Análisis Lighthouse - Perfil](assets/lighthouse/02-auditoria-lighthouse-perfil.png)
 
@@ -290,7 +300,7 @@ Stay Sidekick esta orientado a equipos y profesionales del alquiler vacacional.
 
 **Administrador de empresa**
 
-Responsable de configurar la cuenta de su empresa, gestionar usuarios y definir parametros de funcionamiento (PMS, IA, plantillas, umbrales y formatos de entrada).
+Responsable de configurar la cuenta de su empresa, gestionar usuarios y definir parametros de funcionamiento (PMS, API Key IA, plantillas, umbrales y formatos de entrada).
 
 **Personal operativo (recepcion/coordinacion)**
 
