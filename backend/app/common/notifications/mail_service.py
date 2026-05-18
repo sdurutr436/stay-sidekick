@@ -71,12 +71,17 @@ def send_via_smtp(
         msg.add_alternative(body_html, subtype="html")
 
     try:
-        with smtplib.SMTP(host, port, timeout=_TIMEOUT) as server:
-            server.ehlo()
-            server.starttls()
-            server.ehlo()
-            server.login(user, password)
-            server.send_message(msg)
+        if port == 465:
+            with smtplib.SMTP_SSL(host, port, timeout=_TIMEOUT) as server:
+                server.login(user, password)
+                server.send_message(msg)
+        else:
+            with smtplib.SMTP(host, port, timeout=_TIMEOUT) as server:
+                server.ehlo()
+                server.starttls()
+                server.ehlo()
+                server.login(user, password)
+                server.send_message(msg)
         return True, None
     except (smtplib.SMTPException, OSError) as exc:
         logger.exception("Error al enviar email vía SMTP")
