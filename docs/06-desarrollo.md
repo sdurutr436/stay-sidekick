@@ -82,7 +82,7 @@ Las auditorias de accesibilidad y la validacion manual detectaron problemas no f
 
 ### Despliegue en Railway con Nginx y rutas inconsistentes
 
-En despliegue aparecieron errores 502 y navegacion inestable por dos causas combinadas: arranque incompleto del contenedor Nginx en Railway y rutas sin barra final en la configuracion del proxy. Se introdujo un `start.sh` especifico para Nginx en Railway y se unificaron las rutas con trailing slash para eliminar causas detectadas y reducir redirecciones innecesarias, pero el 502 no puede darse por resuelto a fecha de cierre de esta memoria y permanece como incidencia abierta en produccion.
+En despliegue aparecieron errores 502 y navegacion inestable por varias causas acumuladas: arranque incompleto del contenedor Nginx en Railway, rutas sin barra final en la configuracion del proxy y una escucha incorrecta del servicio publico en el puerto `8080` cuando debia exponerse en el `80`. Se introdujo un `start.sh` especifico para Nginx en Railway, se unificaron las rutas con trailing slash para reducir redirecciones innecesarias y se corrigio la escucha al puerto `80`. Con ese ajuste, el acceso publico a `stay-sidekick.com` quedo estabilizado y el 502 asociado al dominio se dio por resuelto.
 
 ### Restricciones SMTP del entorno gestionado
 
