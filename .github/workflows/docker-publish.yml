@@ -1,6 +1,6 @@
 name: Docker Hub
 
-# Se dispara cada vez que uno de los tres CI termina en main.
+# Se dispara cada vez que uno de los tres CI termina en dev-herramientas o main.
 # El job `verificar` comprueba si los tres han completado con éxito
 # antes de dejar correr la publicación. Si alguno sigue en progreso
 # o ha fallado, la publicación se salta silenciosamente.
@@ -8,7 +8,7 @@ on:
   workflow_run:
     workflows: [CI Angular, CI 11ty, CI Python]
     types: [completed]
-    branches: [main]
+    branches: [dev-herramientas, main]
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
