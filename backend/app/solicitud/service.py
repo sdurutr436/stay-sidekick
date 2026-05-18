@@ -5,7 +5,7 @@ import logging
 from flask import request
 from marshmallow import ValidationError
 
-from app.common.notifications.discord import send_discord_notification
+from app.common.notifications.discord import send_discord_notification, send_operational_notification
 from app.common.notifications.mail_service import send_form_request
 from app.solicitud.schemas import FormularioSolicitudSchema
 from app.solicitud.turnstile import verify_turnstile
@@ -45,21 +45,37 @@ def process_solicitud(json_data: dict) -> tuple[dict, list[str]]:
 
 
 def _dispatch_notifications(clean_data: dict) -> None:
+    failed_channels: list[str] = []
+
     try:
         email_ok = send_form_request(clean_data)
     except Exception:
         logger.exception("Excepción inesperada al enviar form_request.")
         email_ok = False
+    if not email_ok:
+        failed_channels.append("email")
+
     try:
         discord_ok = send_discord_notification(clean_data)
     except Exception:
         logger.exception("Excepción inesperada al notificar a Discord.")
         discord_ok = False
+    if not discord_ok:
+        failed_channels.append("discord-funcional")
 
     if not email_ok:
         logger.warning("No se pudo enviar el email de notificación.")
     if not discord_ok:
         logger.warning("No se pudo enviar la notificación de Discord.")
+    if failed_channels:
+        send_operational_notification(
+            "Fallo en notificaciones del formulario de solicitud",
+            {
+                "Formulario": "solicitud",
+                "Canales fallidos": failed_channels,
+            },
+            severity="error" if "email" in failed_channels else "warning",
+        )
 
 
 def _flatten_errors(messages: dict) -> list[str]:

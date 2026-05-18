@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
+  <rect width="1280" height="720" fill="#052e16"/>
+  <rect x="40" y="40" width="1200" height="640" rx="24" fill="#14532d" stroke="#22c55e" stroke-width="4"/>
+  <text x="640" y="300" fill="#f0fdf4" font-family="Arial, sans-serif" font-size="42" text-anchor="middle">Placeholder run CI/CD correcto</text>
+  <text x="640" y="360" fill="#bbf7d0" font-family="Arial, sans-serif" font-size="30" text-anchor="middle">Detalle de workflow en verde</text>
+  <text x="640" y="430" fill="#dcfce7" font-family="Arial, sans-serif" font-size="24" text-anchor="middle">Sustituir por captura real del run</text>
+</svg>

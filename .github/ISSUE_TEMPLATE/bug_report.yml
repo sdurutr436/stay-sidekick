@@ -1,0 +1,81 @@
+name: Bug report
+description: Reporta un comportamiento inesperado o un error reproducible del sistema.
+title: "bug: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Antes de continuar, asegúrate de que **no incluyes secretos, tokens ni datos personales** en ningún campo.
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: ¿Qué esperabas que ocurriera?
+      placeholder: Describe el comportamiento esperado.
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: ¿Qué ocurrió realmente?
+      placeholder: Describe el comportamiento observado.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Pasos para reproducir
+      placeholder: |
+        1. Ve a...
+        2. Haz clic en...
+        3. Observa...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: layer
+    attributes:
+      label: Capa afectada
+      options:
+        - web
+        - frontend
+        - backend
+        - nginx
+        - docker
+        - docs
+        - desconocida
+    validations:
+      required: true
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidencia disponible
+      placeholder: Pega logs, respuesta HTTP, nombre del test fallido o adjunta una captura.
+
+  - type: dropdown
+    id: environment
+    attributes:
+      label: Entorno de ejecución
+      multiple: true
+      options:
+        - Docker local
+        - Railway
+        - Producción
+    validations:
+      required: true
+
+  - type: input
+    id: browser
+    attributes:
+      label: Navegador y versión
+      placeholder: "Ej: Firefox 125, Chrome 124"
+
+  - type: input
+    id: os
+    attributes:
+      label: Sistema operativo
+      placeholder: "Ej: Pop!_OS 22.04, Windows 11"

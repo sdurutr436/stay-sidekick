@@ -1,9 +1,31 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+  {% set metaDescription = description or site.description %}
+  {% set metaTitle = site.name %}
+  {% if title %}{% set metaTitle = title ~ " | " ~ site.name %}{% endif %}
+  {% set currentPath = page.url or "/" %}
+  {% set canonicalUrl = site.url ~ currentPath %}
+  {% set socialImagePath = socialImage or site.socialImage %}
+  {% set socialImageUrl = site.url ~ socialImagePath %}
+  {% set socialImageText = socialImageAlt or site.socialImageAlt %}
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="{{ description or site.description }}" />
+  <meta name="description" content="{{ metaDescription }}" />
+  <link rel="canonical" href="{{ canonicalUrl }}" />
+  <meta property="og:locale" content="es_ES" />
+  <meta property="og:type" content="{{ ogType or 'website' }}" />
+  <meta property="og:title" content="{{ metaTitle }}" />
+  <meta property="og:description" content="{{ metaDescription }}" />
+  <meta property="og:url" content="{{ canonicalUrl }}" />
+  <meta property="og:site_name" content="{{ site.name }}" />
+  <meta property="og:image" content="{{ socialImageUrl }}" />
+  <meta property="og:image:alt" content="{{ socialImageText }}" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="{{ metaTitle }}" />
+  <meta name="twitter:description" content="{{ metaDescription }}" />
+  <meta name="twitter:image" content="{{ socialImageUrl }}" />
+  <meta name="twitter:image:alt" content="{{ socialImageText }}" />
 
   {# Favicon: ICO clásico + PNG/WebP modernos. La variante dark se sirve
      cuando el sistema declara prefers-color-scheme: dark (los navegadores no
@@ -27,8 +49,7 @@
       } catch (_) { /* no-op */ }
     }());
   </script>
-
-  <title>{% if title %}{{ title }} | {% endif %}{{ site.name }}</title>
+  <title>{{ metaTitle }}</title>
 
   <!-- Fuente: Archivo — preconnect para rendimiento -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />

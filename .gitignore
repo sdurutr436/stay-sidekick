@@ -123,3 +123,7 @@ docs/**/*.mov
 docs/**/*.avi
 docs/**/*.mkv
 docs/**/*.webm
+
+# Local-only documentation support material
+docs/todo/
+docs/devops/logs/

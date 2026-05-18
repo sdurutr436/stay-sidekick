@@ -38,6 +38,11 @@ class Config:
     # Discord
     DISCORD_WEBHOOK_URL: str = os.environ.get("DISCORD_WEBHOOK_URL", "")
     DISCORD_WEBHOOK_CONTACT_URL: str = os.environ.get("DISCORD_WEBHOOK_CONTACT_URL", "")
+    DISCORD_WEBHOOK_OPERATIONS_URL: str = os.environ.get("DISCORD_WEBHOOK_OPERATIONS_URL", "")
+    DISCORD_WEBHOOK_AI_OBSERVABILITY_URL: str = os.environ.get(
+        "DISCORD_WEBHOOK_AI_OBSERVABILITY_URL",
+        "",
+    )
 
     # JWT (para rutas autenticadas del panel)
     JWT_SECRET_KEY: str = os.environ["JWT_SECRET_KEY"]
@@ -45,6 +50,8 @@ class Config:
 
     # Rate limiting
     RATE_LIMIT_CONTACT: str = os.environ.get("RATE_LIMIT_CONTACT", "5/hour")
+    RATE_LIMIT_STORAGE_URI: str = os.environ.get("RATE_LIMIT_STORAGE_URI", "memory://")
+    RATELIMIT_STORAGE_URI: str = RATE_LIMIT_STORAGE_URI
 
     # Cifrado simétrico (Fernet) para API keys en BD
     FERNET_KEY: str = os.environ.get("FERNET_KEY", "")
