@@ -61,7 +61,10 @@ jobs:
 
       - id: meta
         name: Extraer SHA corto
-        run: echo "sha=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+        run: |
+          SHORT_SHA="${GITHUB_SHA::7}"
+          echo "sha=$SHORT_SHA" >> $GITHUB_OUTPUT
+          echo "sha_tag=sha-$SHORT_SHA" >> $GITHUB_OUTPUT
 
       - name: Login en Docker Hub
         uses: docker/login-action@v3
@@ -71,26 +74,52 @@ jobs:
 
       - name: Imagen backend
         run: |
-          docker build -t $HUB_USER/stay-sidekick-backend:${{ steps.meta.outputs.sha }} ./backend
-          docker push $HUB_USER/stay-sidekick-backend:${{ steps.meta.outputs.sha }}
+          IMAGE="$HUB_USER/stay-sidekick-backend"
+          docker build \
+            -t $IMAGE:${{ steps.meta.outputs.sha_tag }} \
+            -t $IMAGE:main \
+            -t $IMAGE:latest \
+            ./backend
+          for TAG in ${{ steps.meta.outputs.sha_tag }} main latest; do
+            docker push $IMAGE:$TAG
+          done
 
       - name: Imagen frontend
         run: |
-          docker build -t $HUB_USER/stay-sidekick-frontend:${{ steps.meta.outputs.sha }} ./frontend
-          docker push $HUB_USER/stay-sidekick-frontend:${{ steps.meta.outputs.sha }}
+          IMAGE="$HUB_USER/stay-sidekick-frontend"
+          docker build \
+            -t $IMAGE:${{ steps.meta.outputs.sha_tag }} \
+            -t $IMAGE:main \
+            -t $IMAGE:latest \
+            ./frontend
+          for TAG in ${{ steps.meta.outputs.sha_tag }} main latest; do
+            docker push $IMAGE:$TAG
+          done
 
       - name: Imagen web (11ty)
         env:
           TURNSTILE_SITE_KEY: ${{ secrets.TURNSTILE_SITE_KEY }}
         run: |
+          IMAGE="$HUB_USER/stay-sidekick-web"
           docker build \
             -f web/Dockerfile \
             --build-arg TURNSTILE_SITE_KEY=$TURNSTILE_SITE_KEY \
-            -t $HUB_USER/stay-sidekick-web:${{ steps.meta.outputs.sha }} \
+            -t $IMAGE:${{ steps.meta.outputs.sha_tag }} \
+            -t $IMAGE:main \
+            -t $IMAGE:latest \
             .
-          docker push $HUB_USER/stay-sidekick-web:${{ steps.meta.outputs.sha }}
+          for TAG in ${{ steps.meta.outputs.sha_tag }} main latest; do
+            docker push $IMAGE:$TAG
+          done
 
       - name: Imagen nginx
         run: |
-          docker build -t $HUB_USER/stay-sidekick-nginx:${{ steps.meta.outputs.sha }} ./nginx
-          docker push $HUB_USER/stay-sidekick-nginx:${{ steps.meta.outputs.sha }}
+          IMAGE="$HUB_USER/stay-sidekick-nginx"
+          docker build \
+            -t $IMAGE:${{ steps.meta.outputs.sha_tag }} \
+            -t $IMAGE:main \
+            -t $IMAGE:latest \
+            ./nginx
+          for TAG in ${{ steps.meta.outputs.sha_tag }} main latest; do
+            docker push $IMAGE:$TAG
+          done

@@ -166,9 +166,7 @@ Códigos de respuesta comunes documentados en la API:
 
 Esto evidencia que la documentación no es solo descriptiva: permite probar endpoints reales con comandos reproducibles.
 
-Placeholders recomendados para la evidencia visual de `c6`:
-
-![Placeholder — Swagger UI y OpenAPI](assets/despliegue-web/06-swagger-ui-placeholder.svg)
+![Swagger UI y OpenAPI](assets/08-swagger-ui.png)
 
 ---
 
@@ -233,8 +231,8 @@ La promoción a artefactos desplegables sigue una secuencia explícita y verific
    mismo `head_sha` y solo avanza cuando `CI Angular`, `CI 11ty` y `CI Python` devuelven
    `success`.
 4. Superada esa puerta, se construyen y publican las imágenes `stay-sidekick-backend`,
-   `stay-sidekick-frontend`, `stay-sidekick-web` y `stay-sidekick-nginx`, todas etiquetadas con el
-   SHA corto del commit.
+  `stay-sidekick-frontend`, `stay-sidekick-web` y `stay-sidekick-nginx`, cada una con tres tags:
+  `sha-<corto>`, `main` y `latest`.
 
 Esto implica que el workflow de tests y cobertura del frontend aporta calidad y evidencia, pero no
 forma parte de la puerta dura del `workflow_run` que desbloquea la publicación en Docker Hub.
@@ -266,8 +264,11 @@ on:
 
 - name: Imagen nginx
   run: |
-    docker build -t $HUB_USER/stay-sidekick-nginx:${{ steps.meta.outputs.sha }} ./nginx
-    docker push $HUB_USER/stay-sidekick-nginx:${{ steps.meta.outputs.sha }}
+    docker build \
+      -t $HUB_USER/stay-sidekick-nginx:${{ steps.meta.outputs.sha_tag }} \
+      -t $HUB_USER/stay-sidekick-nginx:main \
+      -t $HUB_USER/stay-sidekick-nginx:latest \
+      ./nginx
 ```
 
 Credenciales y secretos utilizados en la cadena:
@@ -280,15 +281,15 @@ Credenciales y secretos utilizados en la cadena:
 ### Artefactos publicados por el workflow de CD
 
 El job `publicar` genera cuatro imágenes Docker y las sube al namespace definido en
-`DOCKERHUB_USERNAME`. En la rama actual, la estrategia de etiquetado visible en el workflow es una:
-una etiqueta por SHA corto del commit publicado.
+`DOCKERHUB_USERNAME`. La estrategia de etiquetado visible en el workflow publica para cada imagen una
+tag inmutable por commit (`sha-<corto>`) y dos tags móviles de canal estable (`main` y `latest`).
 
-| Imagen | Destino en Docker Hub | Etiqueta aplicada |
+| Imagen | Destino en Docker Hub | Tags aplicadas |
 | --- | --- | --- |
-| `stay-sidekick-backend` | `$DOCKERHUB_USERNAME/stay-sidekick-backend` | SHA corto del commit |
-| `stay-sidekick-frontend` | `$DOCKERHUB_USERNAME/stay-sidekick-frontend` | SHA corto del commit |
-| `stay-sidekick-web` | `$DOCKERHUB_USERNAME/stay-sidekick-web` | SHA corto del commit |
-| `stay-sidekick-nginx` | `$DOCKERHUB_USERNAME/stay-sidekick-nginx` | SHA corto del commit |
+| `stay-sidekick-backend` | `$DOCKERHUB_USERNAME/stay-sidekick-backend` | `sha-<corto>`, `main`, `latest` |
+| `stay-sidekick-frontend` | `$DOCKERHUB_USERNAME/stay-sidekick-frontend` | `sha-<corto>`, `main`, `latest` |
+| `stay-sidekick-web` | `$DOCKERHUB_USERNAME/stay-sidekick-web` | `sha-<corto>`, `main`, `latest` |
+| `stay-sidekick-nginx` | `$DOCKERHUB_USERNAME/stay-sidekick-nginx` | `sha-<corto>`, `main`, `latest` |
 
 El soporte principal de este apartado sigue estando en los propios ficheros YAML, en el historial Git
 reproducible y en la trazabilidad entre commit, ejecución de CI y etiquetas SHA de las imágenes
@@ -298,13 +299,12 @@ publicados.
 
 ### Capturas recomendadas para cerrar c5
 
-Estas tres evidencias visuales cubren exactamente lo que la rúbrica pide en control de versiones y
-CI/CD. Mientras no se sustituyan por capturas reales, el documento conserva placeholders SVG para no
-dejar referencias rotas ni perder la estructura de la entrega.
+Estas tres evidencias visuales cubren el control de versiones y
+CI/CD.
 
-![Placeholder — GitHub Actions general](assets/despliegue-web/01-github-actions-general-placeholder.svg)
+![GitHub Actions general](assets/08-workflows-general.png)
 
-![Placeholder — GitHub Actions run en verde](assets/despliegue-web/02-github-actions-run-verde-placeholder.svg)
+![GitHub Actions run en verde](assets/08-workflows-all-green.png)
 
 ![Placeholder — Docker Hub y tags publicados](assets/despliegue-web/04-docker-hub-tags-placeholder.svg)
 
@@ -430,12 +430,12 @@ docker compose ps
 ### Salida real de `docker compose ps`
 
 ```text
-NAME                       IMAGE                    COMMAND                  SERVICE    STATUS                    PORTS
-stay-sidekick-backend-1    stay-sidekick-backend    "/bin/sh -c 'flask d…"   backend    Up 7 seconds              5000/tcp
-stay-sidekick-frontend-1   stay-sidekick-frontend   "/docker-entrypoint.…"   frontend   Up 13 seconds             80/tcp
-stay-sidekick-nginx-1      stay-sidekick-nginx      "/docker-entrypoint.…"   nginx      Up 6 seconds              0.0.0.0:80->80/tcp, [::]:80->80/tcp
-stay-sidekick-postgres-1   postgres:16-alpine       "docker-entrypoint.s…"   postgres   Up 13 seconds (healthy)   5432/tcp
-stay-sidekick-web-1        stay-sidekick-web        "/docker-entrypoint.…"   web        Up 13 seconds             80/tcp
+CONTAINER ID   IMAGE                    COMMAND                  CREATED         STATUS                 PORTS                                 NAMES
+92d942d2df82   stay-sidekick-nginx      "/docker-entrypoint.…"   4 minutes ago   Up 4 minutes           0.0.0.0:80->80/tcp, [::]:80->80/tcp   stay-sidekick-nginx-1
+89ad193f5b77   stay-sidekick-web        "/docker-entrypoint.…"   4 minutes ago   Up 4 minutes           80/tcp                                stay-sidekick-web-1
+90ccc4bc1d4c   stay-sidekick-frontend   "/docker-entrypoint.…"   4 minutes ago   Up 4 minutes           80/tcp                                stay-sidekick-frontend-1
+f4ad67ef0189   stay-sidekick-backend    "/bin/sh -c 'flask d…"   4 minutes ago   Up 4 minutes           5000/tcp                              stay-sidekick-backend-1
+76354a356603   postgres:16-alpine       "docker-entrypoint.s…"   28 hours ago    Up 9 hours (healthy)   5432/tcp                              stay-sidekick-postgres-1
 ```
 
 Esto demuestra:
@@ -445,24 +445,22 @@ Esto demuestra:
 - base de datos con `healthcheck`
 - backend, frontend y web accesibles por red interna
 
-Placeholders de captura para la evidencia visual:
-
-![Placeholder — docker compose ps](assets/despliegue-web/03-docker-compose-ps-placeholder.svg)
+![Logs de: docker compose ps](assets/08-docker-compose-ps.png)
 
 ### Imágenes y artefactos locales generados
 
 Salida real de `docker compose images`:
 
 ```text
-CONTAINER                  REPOSITORY               TAG         IMAGE ID       SIZE
-stay-sidekick-backend-1    stay-sidekick-backend    latest      5c3857e918c3   184MB
-stay-sidekick-frontend-1   stay-sidekick-frontend   latest      079bfc2ef05b   36MB
-stay-sidekick-nginx-1      stay-sidekick-nginx      latest      3c31d3fbdd83   25.9MB
-stay-sidekick-postgres-1   postgres                 16-alpine   a5074487380d   110MB
-stay-sidekick-web-1        stay-sidekick-web        latest      9d3fa9e61f22   35.8MB
+CONTAINER                  REPOSITORY               TAG                 PLATFORM            IMAGE ID            SIZE                CREATED
+stay-sidekick-backend-1    stay-sidekick-backend    latest              linux/amd64         a2b72a3cfd82        637MB               6 minutes ago
+stay-sidekick-frontend-1   stay-sidekick-frontend   latest              linux/amd64         b05deb47f494        36MB                6 minutes ago
+stay-sidekick-nginx-1      stay-sidekick-nginx      latest              linux/amd64         ae852155864d        25.9MB              6 minutes ago
+stay-sidekick-postgres-1   postgres                 16-alpine           linux/amd64         a5074487380d        110MB               5 months ago
+stay-sidekick-web-1        stay-sidekick-web        latest              linux/amd64         64e0f10aa81f        35.8MB              6 minutes ago
 ```
 
-En remoto, el workflow de CD publica imágenes en Docker Hub usando el usuario configurado en `DOCKERHUB_USERNAME`, con nombres `stay-sidekick-backend`, `stay-sidekick-frontend`, `stay-sidekick-web` y `stay-sidekick-nginx`.
+En remoto, el workflow de CD publica imágenes en Docker Hub usando el usuario configurado en `DOCKERHUB_USERNAME`, con nombres `stay-sidekick-backend`, `stay-sidekick-frontend`, `stay-sidekick-web` y `stay-sidekick-nginx`, etiquetadas como `sha-<corto>`, `main` y `latest`.
 
 Variables y persistencia quedan resueltas de forma reproducible porque el arranque parte de
 plantillas versionadas (`.env.example` y `backend/.env.example`) y la base de datos conserva estado
@@ -559,9 +557,7 @@ nginx-1  | 172.18.0.1 - - [15/May/2026:18:03:51 +0000] "GET /api/usuarios HTTP/1
 
 En producción, el dominio público se sirve mediante Railway (`https://staysidekick.up.railway.app`), que proporciona HTTPS en el borde y reenvía al servicio `nginx`.
 
-Placeholder recomendado para la evidencia visual de `c3`:
-
-![Placeholder — logs y respuesta del proxy nginx](assets/despliegue-web/07-nginx-logs-placeholder.svg)
+![Logs: respuesta del proxy nginx](assets/08-logs-nginx.png)
 
 ---
 
@@ -650,9 +646,7 @@ backend-1  | 2026-05-15 18:03:50,182 [DEBUG] LiteLLM: Creating AiohttpTransport.
 
 Aunque el extracto mostrado pertenece a inicialización del cliente IA, evidencia que el backend está generando logs operativos dentro del contenedor y que la aplicación está viva.
 
-Placeholder recomendado para la evidencia visual de `c4`:
-
-![Placeholder — logs y prueba ligera del backend](assets/despliegue-web/08-backend-logs-placeholder.svg)
+![Logs backend - Prueba ligera del backend](assets/08-backend-logs.png)
 
 ---
 
@@ -671,7 +665,7 @@ Placeholder recomendado para la evidencia visual de `c4`:
 | Workflows | [.github/workflows](../.github/workflows) | Sí | CI/CD y publicación de imágenes |
 | Volumen persistente | `postgres_data` | Se crea localmente | Conserva datos de PostgreSQL entre reinicios |
 | Artefacto de cobertura | `frontend/coverage/` | No, se genera en CI | Se sube como artefacto descargable del workflow de tests Angular |
-| Placeholders de evaluación | `docs/assets/despliegue-web/*.svg` | Sí, temporalmente | Marcan el lugar de las capturas reales de la memoria de despliegue |
+| Imagenes de evaluación | `docs/assets/*.png` | Sí, temporalmente | Marcan el punto donde se encuentran los ficheros de imagenes para la verificación |
 
 ### Evidencia de gestión correcta de secretos
 
@@ -703,16 +697,14 @@ En el despliegue actual, el volumen persistente esencial es `postgres_data`, don
 
 ### Evidencia de imágenes generadas
 
-Además de las imágenes locales del `docker compose images`, el workflow `docker-publish.yml` construye y publica cuatro imágenes con SHA corto:
+Además de las imágenes locales del `docker compose images`, el workflow `docker-publish.yml` construye y publica cuatro imágenes con las tags `sha-<corto>`, `main` y `latest`:
 
 - `stay-sidekick-backend`
 - `stay-sidekick-frontend`
 - `stay-sidekick-web`
 - `stay-sidekick-nginx`
 
-Placeholders de capturas recomendadas para evaluación:
-
-![Placeholder — Railway servicios desplegados](assets/despliegue-web/05-railway-servicios-placeholder.svg)
+![Railway: servicios desplegados](assets/08-despliegue-contenedores-railway.png)
 
 La evidencia visual del registry y de los tags publicados ya se ha situado en `c5`, donde encaja
 mejor con la rúbrica de CI/CD y evita duplicar la misma captura en dos apartados.
@@ -816,27 +808,3 @@ curl -s -o NUL -w "%{http_code}" --max-time 2 http://localhost:5432
 ```
 
 El código `000` demuestra que no hay publicación directa de esos puertos hacia el host, por lo que el único punto de entrada es el proxy `nginx`.
-
----
-
-## Capturas pendientes para “excelente”
-
-Las capturas recomendadas para redondear la evaluación visual siguen pendientes. Se han dejado
-placeholders SVG para no romper el documento mientras se sustituyen por capturas reales.
-
-1. `01-github-actions-general-placeholder.svg`: vista general del panel de GitHub Actions con los
-  workflows visibles.
-2. `02-github-actions-run-verde-placeholder.svg`: detalle de una ejecución correcta en verde donde
-  se vean jobs y commit asociados.
-3. `03-docker-compose-ps-placeholder.svg`: evidencia visual del estado del stack local tras
-  `docker compose up -d --build`.
-4. `04-docker-hub-tags-placeholder.svg`: repositorios e imágenes publicadas con tag SHA corto.
-5. `05-railway-servicios-placeholder.svg`: vista del proyecto en Railway con `nginx` como entrada
-  pública y el resto de servicios en red privada.
-6. `06-swagger-ui-placeholder.svg`: interfaz Swagger UI y acceso al contrato OpenAPI desde `/api/docs`.
-7. `07-nginx-logs-placeholder.svg`: logs del proxy y prueba visual del reverse proxy respondiendo.
-8. `08-backend-logs-placeholder.svg`: logs del backend y evidencia de la prueba ligera sobre `/api/health`.
-
-Con ese bloque de ocho capturas el documento queda cubierto visualmente para `c3`, `c4`, `c5`,
-`c6`, `C7` y refuerza también `c2` y `C8` sin tocar el nombre del fichero ni mezclarlo con
-`08-despliegue.md`.
