@@ -141,7 +141,7 @@ docker compose down -v           # parar, eliminar contenedores Y la base de dat
 |-------|-------|
 | Email | `dev@staysidekick.es` |
 | Contraseña | `admin123` |
-| Rol | superadmin |
+| Rol | `admin` (con `es_superadmin=true`) |
 
 > Estas credenciales son solo para entorno local. En producción, generar credenciales nuevas.
 
