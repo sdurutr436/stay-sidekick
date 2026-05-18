@@ -14,10 +14,10 @@
   - [Formulario de contacto publico](#formulario-de-contacto-publico)
   - [Seguridad y cumplimiento transversal](#seguridad-y-cumplimiento-transversal)
 - [2.2. Interfaz de usuario y experiencia de usuario (UI/UX)](#22-interfaz-de-usuario-y-experiencia-de-usuario-uiux)
-  - [Principios de diseno](#principios-de-diseno)
+  - [Principios de diseño](#principios-de-diseño)
   - [Estructura general de la interfaz](#estructura-general-de-la-interfaz)
   - [Pantallas y modulos principales](#pantallas-y-modulos-principales)
-  - [Accesibilidad y diseno responsive](#accesibilidad-y-diseno-responsive)
+  - [Accesibilidad y diseño responsive](#accesibilidad-y-diseño-responsive)
   - [Feedback y manejo de errores](#feedback-y-manejo-de-errores)
 - [2.3. Usuarios objetivo y casos de uso](#23-usuarios-objetivo-y-casos-de-uso)
   - [Perfiles de usuario](#perfiles-de-usuario)
@@ -168,7 +168,7 @@ A nivel de producto, el enfoque de Stay Sidekick tambien busca alinearse con RGP
 
 ## 2.2. Interfaz de usuario y experiencia de usuario (UI/UX)
 
-### Principios de diseno
+### Principios de diseño
 
 La experiencia de uso se define por cuatro principios:
 
@@ -204,7 +204,7 @@ En la aplicacion privada se mantiene una estructura comun:
 | Notificaciones tardias | Gestionar comunicacion de llegadas fuera de horario | Revisar check-ins, editar plantillas y parametros |
 | Sincronizador de contactos | Mantener agenda operativa | Conectar Google, sincronizar, exportar CSV |
 | Vault de comunicaciones | Estandarizar mensajes | Crear plantillas, mejorar/traducir con IA |
-| Perfil e integraciones | Parametrizar la cuenta | Cambiar contrasena y configurar PMS/IA |
+| Perfil e integraciones | Parametrizar la cuenta | Cambiar contraseña y configurar PMS/IA |
 | Administracion de usuarios | Gestion de equipo por empresa | Altas, roles, bajas y reseteo de contraseña |
 
 ### Accesibilidad y diseño responsive
@@ -320,7 +320,7 @@ Interactua con la capa publica (landing y formulario de contacto) para captar nu
 El usuario introduce credenciales validas, obtiene token de sesion y accede al panel principal.
 
 **CU-02. Gestionar usuarios de la empresa**
-El administrador crea una cuenta, ajusta su rol y, si es necesario, resetea su contrasena temporal.
+El administrador crea una cuenta, ajusta su rol y, si es necesario, resetea su contraseña temporal.
 
 **CU-03. Registrar o actualizar apartamentos**
 El usuario administrativo crea o edita apartamentos de forma manual o realiza importacion/sincronizacion masiva.
@@ -358,8 +358,8 @@ El usuario solicita al asistente IA una version refinada o traducida y decide si
 **CU-14. Configurar integraciones PMS e IA**
 El administrador actualiza claves y parametros de integracion desde ajustes para habilitar funcionalidades.
 
-**CU-15. Cambiar contrasena de perfil**
-El usuario autenticado modifica su contrasena para mantener la cuenta segura.
+**CU-15. Cambiar contraseña de perfil**
+El usuario autenticado modifica su contraseña para mantener la cuenta segura.
 
 **CU-16. Alta de empresa en modo superadmin**
 El superadmin registra una nueva empresa para habilitar su acceso a la plataforma.
@@ -385,6 +385,6 @@ Un usuario externo rellena el formulario, supera validacion antispam y envia su 
 | CU-12 | Crear y mantener plantillas en el vault | Personal operativo | Alta |
 | CU-13 | Mejorar o traducir plantilla con IA | Personal operativo | Media |
 | CU-14 | Configurar integraciones PMS e IA | Admin de empresa | Alta |
-| CU-15 | Cambiar contrasena de perfil | Usuario autenticado | Alta |
+| CU-15 | Cambiar contraseña de perfil | Usuario autenticado | Alta |
 | CU-16 | Alta de empresa en modo superadmin | Superadmin | Media |
 | CU-17 | Enviar formulario de contacto publico | Usuario externo | Media |

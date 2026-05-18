@@ -86,7 +86,7 @@ Las imagenes declaradas en los Dockerfiles y compose del proyecto son:
 | `web/Dockerfile` | Build 11ty + servido Nginx | Requiere contexto de build en raiz para SCSS compartido |
 | `nginx/Dockerfile` | Reverse proxy | Usa config distinta para local y Railway via `RAILWAY=true/false` |
 
-Este diseno permite separar build y runtime en frontend/web (multi-stage), y mantener un backend con migraciones automaticas en arranque.
+Este diseño permite separar build y runtime en frontend/web (multi-stage), y mantener un backend con migraciones automaticas en arranque.
 
 ### Scripts de instalacion y arranque
 

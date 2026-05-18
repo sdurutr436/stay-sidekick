@@ -1,4 +1,4 @@
-# 5. Diseno
+# 5. diseño
 
 ## Indice
 
@@ -19,7 +19,7 @@
   - [Capa backend](#capa-backend)
   - [Capa de datos](#capa-de-datos)
   - [Integraciones externas](#integraciones-externas)
-- [5.5. Diseno de la API](#55-diseno-de-la-api)
+- [5.5. diseño de la API](#55-diseño-de-la-api)
   - [Convenciones generales](#convenciones-generales)
   - [Modulos de endpoints](#modulos-de-endpoints)
   - [Ejemplos de respuestas](#ejemplos-de-respuestas)
@@ -392,7 +392,7 @@ graph TD
 
 ---
 
-## 5.5. Diseno de la API
+## 5.5. diseño de la API
 
 ### Convenciones generales
 

@@ -12,9 +12,9 @@
 
 ## 6.1. Secuencia de desarrollo
 
-El desarrollo se siguio de forma incremental y por bloques funcionales, cerrando primero diseno y estructura, y despues cada herramienta del MVP.
+El desarrollo se siguio de forma incremental y por bloques funcionales, cerrando primero diseño y estructura, y despues cada herramienta del MVP.
 
-### Fase 1 - Diseno previo en Figma
+### Fase 1 - diseño previo en Figma
 
 Se definieron wireframes y flujo visual antes de implementar codigo, con el objetivo de reducir iteraciones de interfaz durante desarrollo. El recurso base de disenio se mantuvo en Figma como referencia unica para maquetacion y validacion.
 
