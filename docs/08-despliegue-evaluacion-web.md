@@ -9,12 +9,12 @@
 
 - [c6: Documentación del proyecto](#c6--documentación-del-proyecto)
 - [c5: Control de versiones y CI/CD](#c5--control-de-versiones-y-cicd)
-- [c1 — Arquitectura de la aplicación](#c1--arquitectura-de-la-aplicación)
-- [c2 — Implementación en Docker](#c2--implementación-en-docker)
-- [c3 — Servidor web como front (reverse proxy)](#c3--servidor-web-como-front-reverse-proxy)
-- [c4 — Servidor de aplicaciones (backend)](#c4--servidor-de-aplicaciones-backend)
-- [C7 — Gestión de ficheros y artefactos](#c7--gestión-de-ficheros-y-artefactos)
-- [C8 — Verificación de red del despliegue](#c8--verificación-de-red-del-despliegue)
+- [c1: Arquitectura de la aplicación](#c1--arquitectura-de-la-aplicación)
+- [c2: Implementación en Docker](#c2--implementación-en-docker)
+- [c3: Servidor web como front (reverse proxy)](#c3--servidor-web-como-front-reverse-proxy)
+- [c4: Servidor de aplicaciones (backend)](#c4--servidor-de-aplicaciones-backend)
+- [C7: Gestión de ficheros y artefactos](#c7--gestión-de-ficheros-y-artefactos)
+- [C8: Verificación de red del despliegue](#c8--verificación-de-red-del-despliegue)
 
 ---
 
