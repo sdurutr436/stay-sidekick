@@ -1,4 +1,4 @@
-# 5. Diseno
+# 5. diseño
 
 ## Indice
 
@@ -19,7 +19,7 @@
   - [Capa backend](#capa-backend)
   - [Capa de datos](#capa-de-datos)
   - [Integraciones externas](#integraciones-externas)
-- [5.5. Diseno de la API](#55-diseno-de-la-api)
+- [5.5. diseño de la API](#55-diseño-de-la-api)
   - [Convenciones generales](#convenciones-generales)
   - [Modulos de endpoints](#modulos-de-endpoints)
   - [Ejemplos de respuestas](#ejemplos-de-respuestas)
@@ -32,122 +32,138 @@ El modelo de datos esta orientado a multiempresa. Cada empresa dispone de su pro
 
 ```mermaid
 erDiagram
-    EMPRESAS ||--o{ USUARIOS : tiene
-    EMPRESAS ||--o{ APARTAMENTOS : gestiona
-    EMPRESAS ||--o{ PLANTILLAS_VAULT : define
-    EMPRESAS ||--o{ MENSAJES_GENERADOS : registra
-    EMPRESAS ||--o{ AI_USAGE_LOG : acumula
-    EMPRESAS ||--o{ LOGS_SINCRONIZACION : audita
-    EMPRESAS ||--o{ CONFIGURACION_PMS : configura
-    EMPRESAS ||--o{ CONFIGURACION_IA : configura
-    EMPRESAS ||--o{ INTEGRACIONES_GOOGLE : conecta
-
-    PLANTILLAS_VAULT ||--o{ MENSAJES_GENERADOS : origen
 
     EMPRESAS {
-      string id
-      string nombre
-      string email
-      string password_hash
-      string herramientas_activas
-      string configuracion
-      string activa
-      string created_at
-      string updated_at
+        uuid id PK
+        string email UK
+        string nombre
+        string password_hash
+        string ciudad
+        jsonb herramientas_activas
+        jsonb configuracion
+        boolean activa
+        timestamp created_at
+        timestamp updated_at
     }
 
     USUARIOS {
-      string id
-      string empresa_id
-      string email
-      string password_hash
-      string rol
-      string activo
-      string es_superadmin
-      string created_at
-      string updated_at
+        uuid id PK
+        uuid empresa_id FK
+        string email UK
+        string password_hash
+        string rol
+        boolean activo
+        boolean es_superadmin
+        timestamp password_changed_at
+        timestamp created_at
+        timestamp updated_at
     }
 
     APARTAMENTOS {
-      string id
-      string empresa_id
-      string id_pms
-      string id_externo
-      string nombre
-      string direccion
-      string ciudad
-      string pms_origen
-      string activo
-      string created_at
-      string updated_at
-    }
-
-    CONFIGURACION_PMS {
-      string id
-      string empresa_id
-      string proveedor
-      text api_key_cifrada
-      string endpoint
-      string activo
-      string ultimo_sync
-    }
-
-    INTEGRACIONES_GOOGLE {
-      string id
-      string empresa_id
-      text access_token_cifrado
-      text refresh_token_cifrado
-      string token_expiry
-      text alcance
-      string activo
-    }
-
-    CONFIGURACION_IA {
-      string id
-      string empresa_id
-      string proveedor
-      text api_key_cifrada
-      string modelo
-      string activo
+        uuid id PK
+        uuid empresa_id FK
+        string nombre
+        string direccion
+        string ciudad
+        string id_pms
+        string id_externo
+        string pms_origen
+        boolean activo
+        timestamp created_at
+        timestamp updated_at
     }
 
     PLANTILLAS_VAULT {
-      string id
-      string empresa_id
-      string nombre
-      text contenido
-      string idioma
-      string categoria
-      string activa
+        uuid id PK
+        uuid empresa_id FK
+        string nombre
+        text contenido
+        string idioma
+        string categoria
+        boolean activa
+        timestamp created_at
+        timestamp updated_at
     }
 
     MENSAJES_GENERADOS {
-      string id
-      string empresa_id
-      string plantilla_id
-      text contenido_final
-      string modelo_ia
-      string metadatos
-      string created_at
-    }
-
-    LOGS_SINCRONIZACION {
-      string id
-      string empresa_id
-      string origen
-      string estado
-      int num_registros
-      text detalle
-      string created_at
+        uuid id PK
+        uuid empresa_id FK
+        uuid plantilla_id FK
+        text contenido_final
+        string modelo_ia
+        jsonb metadatos
+        timestamp created_at
     }
 
     AI_USAGE_LOG {
-      string id
-      string empresa_id
-      string accion
-      date fecha
-      int tokens_usados
+        uuid id PK
+        uuid empresa_id FK
+        string accion
+        date fecha
+        integer tokens_usados
     }
+
+    SYSTEM_PROMPTS {
+        string nombre PK
+        text contenido
+        timestamp updated_at
+    }
+
+    CONFIGURACION_PMS {
+        uuid id PK
+        uuid empresa_id FK,UK
+        string proveedor
+        text api_key_cifrada
+        string endpoint
+        boolean activo
+        timestamp ultimo_sync
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    CONFIGURACION_IA {
+        uuid id PK
+        uuid empresa_id FK,UK
+        string proveedor
+        text api_key_cifrada
+        string modelo
+        boolean activo
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    INTEGRACIONES_GOOGLE {
+        uuid id PK
+        uuid empresa_id FK,UK
+        text access_token_cifrado
+        text refresh_token_cifrado
+        timestamp token_expiry
+        text alcance
+        boolean activo
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    LOGS_SINCRONIZACION {
+        uuid id PK
+        uuid empresa_id FK
+        string origen
+        string estado
+        integer num_registros
+        text detalle
+        timestamp created_at
+    }
+
+    EMPRESAS ||--o{ USUARIOS              : "tiene"
+    EMPRESAS ||--o{ APARTAMENTOS          : "gestiona"
+    EMPRESAS ||--o{ PLANTILLAS_VAULT      : "crea"
+    EMPRESAS ||--o{ MENSAJES_GENERADOS    : "genera"
+    EMPRESAS ||--o{ AI_USAGE_LOG          : "acumula"
+    EMPRESAS ||--o{ LOGS_SINCRONIZACION   : "registra"
+    EMPRESAS ||--o| CONFIGURACION_PMS     : "configura"
+    EMPRESAS ||--o| CONFIGURACION_IA      : "configura"
+    EMPRESAS ||--o| INTEGRACIONES_GOOGLE  : "conecta"
+    PLANTILLAS_VAULT |o--o{ MENSAJES_GENERADOS : "origina"
 ```
 
 ### Entidades y atributos principales
@@ -356,9 +372,10 @@ graph TD
 
 ### Capa backend
 
-- Flask con blueprints modulares (`auth`, `perfil`, `usuarios`, `empresas`, `apartamentos`, `contactos`, `notificaciones`, `vault`, `heatmap`, `contacto`).
-- Seguridad: JWT, CSRF double-submit cookie, rate limiting, CORS.
-- Logica de negocio por herramientas del MVP.
+- Flask con blueprints modulares: privados (`auth`, `perfil`, `usuarios`, `empresas`, `apartamentos`, `contactos`, `notificaciones`, `h_vault_comunicaciones`, `heatmap`) y publicos (`solicitud` para el formulario de acceso, `contact` para el contacto general).
+- Blueprint `docs` para servir Swagger UI y la spec OpenAPI.
+- Seguridad: JWT, CSRF double-submit cookie, rate limiting, CORS, honeypot y Turnstile en formularios publicos.
+- Logica de negocio organizada por herramientas del MVP (`h_*`), con servicios y repositorios separados de los blueprints.
 
 ### Capa de datos
 
@@ -375,7 +392,7 @@ graph TD
 
 ---
 
-## 5.5. Diseno de la API
+## 5.5. diseño de la API
 
 ### Convenciones generales
 
@@ -392,15 +409,17 @@ graph TD
 |---|---|
 | Salud y docs | `GET /api/health`, `GET /api/docs`, `GET /api/docs/openapi.yaml` |
 | Autenticacion | `GET /api/csrf-token`, `POST /api/auth/login`, `GET /api/auth/validacion` |
-| Perfil e integraciones | `GET /api/perfil`, `PUT /api/perfil/password`, `GET/PUT/DELETE /api/perfil/integraciones/*` |
+| Perfil e integraciones | `GET /api/perfil`, `PUT /api/perfil/password`, `GET /api/perfil/integraciones`, `PUT/DELETE /api/perfil/integraciones/{pms,ia}`, `GET/PUT /api/perfil/xlsx-apartamentos`, `GET/PUT /api/perfil/notificaciones-tardio-config` |
 | Empresas | `GET/POST /api/empresas` (superadmin) |
-| Usuarios | `GET/POST /api/usuarios`, `PATCH/DELETE /api/usuarios/:id` |
-| Maestro apartamentos | `GET/POST/PUT/DELETE /api/apartamentos`, `POST /api/apartamentos/sincronizacion/smoobu`, importacion XLSX |
-| Contactos | OAuth Google, preferencias, sincronizacion y export CSV (`/api/contactos/*`) |
-| Notificaciones tardias | `GET /status`, `POST /checkins`, CRUD de plantillas check-in tardio |
-| Vault comunicaciones | CRUD plantillas, `mejoras`, `traducciones`, uso y config IA |
-| Mapa de calor | `GET /api/heatmap`, `POST /api/heatmap/xlsx`, `GET/PUT /umbrales`, `GET/PUT /config-xlsx` |
-| Contacto publico | `POST /api/contacto`, `POST /api/contact` |
+| Usuarios | `GET/POST /api/usuarios`, `PATCH/DELETE /api/usuarios/:id`, `PATCH /api/usuarios/:id/contrasena` |
+| Maestro apartamentos | `GET/POST/PUT/DELETE /api/apartamentos`, `POST /api/apartamentos/sincronizacion/smoobu`, `POST /api/apartamentos/importacion/preview`, `POST /api/apartamentos/importacion`, `GET/PUT/DELETE /api/apartamentos/pms` |
+| Contactos | OAuth Google (`/api/contactos/google/{auth,callback,status,conexion}`), preferencias (`/api/contactos/preferencias`), sincronizacion y export CSV via PMS (`/api/contactos/{sincronizacion,exportacion/csv}`) y via XLSX (`/api/contactos/xlsx/{sincronizacion,exportacion/csv}`) |
+| Notificaciones tardias | `GET /api/notificaciones/checkin-tardio/status`, `POST /api/notificaciones/checkin-tardio/checkins`, CRUD de plantillas en `/api/notificaciones/checkin-tardio/plantillas` |
+| Vault comunicaciones | CRUD plantillas (`/api/vault/plantillas`), `POST /mejoras`, `POST /traducciones`, `GET /api/ai/uso`, `GET /api/ai/config` |
+| Administracion IA | `GET/PUT /api/admin/system-prompts/:nombre` (rol admin + IP autorizada) |
+| Mapa de calor | `GET /api/heatmap`, `POST /api/heatmap/xlsx`, `GET/PUT /api/heatmap/umbrales`, `GET/PUT /api/heatmap/config-xlsx` |
+| Solicitud de acceso | `POST /api/contact` (alta publica de empresa, con Turnstile y honeypot) |
+| Contacto general | `POST /api/contacto` (formulario de contacto del sitio publico) |
 
 ### Ejemplos de respuestas
 

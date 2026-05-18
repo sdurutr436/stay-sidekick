@@ -14,10 +14,10 @@
   - [Formulario de contacto publico](#formulario-de-contacto-publico)
   - [Seguridad y cumplimiento transversal](#seguridad-y-cumplimiento-transversal)
 - [2.2. Interfaz de usuario y experiencia de usuario (UI/UX)](#22-interfaz-de-usuario-y-experiencia-de-usuario-uiux)
-  - [Principios de diseno](#principios-de-diseno)
+  - [Principios de diseño](#principios-de-diseño)
   - [Estructura general de la interfaz](#estructura-general-de-la-interfaz)
   - [Pantallas y modulos principales](#pantallas-y-modulos-principales)
-  - [Accesibilidad y diseno responsive](#accesibilidad-y-diseno-responsive)
+  - [Accesibilidad y diseño responsive](#accesibilidad-y-diseño-responsive)
   - [Feedback y manejo de errores](#feedback-y-manejo-de-errores)
 - [2.3. Usuarios objetivo y casos de uso](#23-usuarios-objetivo-y-casos-de-uso)
   - [Perfiles de usuario](#perfiles-de-usuario)
@@ -32,7 +32,7 @@ Stay Sidekick es una plataforma satelite para operaciones del alquiler vacaciona
 
 La plataforma implementa autenticacion basada en token para proteger las areas privadas:
 
-- Inicio de sesion mediante correo y contrasena.
+- Inicio de sesion mediante correo y contraseña.
 - Emision de JWT con datos de sesion (usuario, empresa, rol).
 - Validacion de token para endpoints protegidos.
 - Proteccion CSRF en operaciones de escritura mediante patron Double-Submit Cookie.
@@ -47,7 +47,7 @@ Cada usuario pertenece a una empresa y opera sobre sus propios datos. Esto permi
 Capacidades clave:
 
 - Separacion logica de datos por empresa (multi-tenant).
-- Gestion de usuarios por empresa (alta, baja, cambio de rol y reseteo de contrasena).
+- Gestion de usuarios por empresa (alta, baja, cambio de rol y reseteo de contraseña).
 - Gestion de empresas para perfiles superadmin.
 - Permisos por rol para limitar acciones administrativas.
 
@@ -103,6 +103,7 @@ Funciones incluidas:
 - Flujo alternativo XLSX -> Google para operaciones sin API.
 - Exportacion CSV para revisiones manuales o cargas externas.
 - Preferencias de sincronizacion configurables por empresa.
+- Preferencias en cómo mostrar en agenda los contactos.
 
 Con esto, el equipo evita mantener agendas duplicadas y mejora la trazabilidad del contacto con huespedes.
 
@@ -116,9 +117,12 @@ Caracteristicas destacadas:
 - CRUD completo con borrado logico.
 - Asistente IA para mejora de redaccion.
 - Traduccion asistida por IA a otros idiomas.
-- Contadores de uso y configuracion segura de proveedor IA.
+- Contadores de uso por IA compartida.
+- Configuracion segura de proveedor IA en caso de tener IA propia.
 
 Este modulo acelera la generacion de mensajes consistentes, especialmente en equipos con alta rotacion o volumen.
+
+> **Nota**: Algunas de las plantillas se comparten con el sistema de notifiaciones de check-in tardío por lo que se pueden mejorar en este apartado.
 
 ### Perfil, integraciones y parametros por empresa
 
@@ -126,12 +130,14 @@ Desde el area de perfil y ajustes se gestiona la personalizacion tecnica de la c
 
 Permite:
 
-- Cambio de contrasena del usuario autenticado.
+- Cambio de contraseña del usuario autenticado.
 - Configuracion de integracion PMS.
 - Configuracion de integracion IA.
 - Ajuste de parametros funcionales (columnas XLSX, reglas de modulos, etc.).
 
 La plataforma prioriza la configuracion sin codigo para adaptar herramientas a cada operativa real.
+
+Los usuarios **no administradores** pueden consultar la configuración, pero no modificarla. Solo los **administradores** pueden realizar estos cambios.
 
 ### Formulario de contacto publico
 
@@ -142,8 +148,9 @@ Medidas relevantes:
 - Validacion de datos de formulario.
 - Proteccion antispam con Turnstile.
 - Rate limit por IP para prevenir abuso.
+- Campo _honeypot_ secreto para prevenir _bots_.
 
-Este canal permite captar interes y gestionar consultas sin exponer la zona privada.
+Este canal permite captar interes y gestionar consultas sin exponer la zona privada (parte dinámica protegida por inicio de sesión).
 
 ### Seguridad y cumplimiento transversal
 
@@ -161,7 +168,7 @@ A nivel de producto, el enfoque de Stay Sidekick tambien busca alinearse con RGP
 
 ## 2.2. Interfaz de usuario y experiencia de usuario (UI/UX)
 
-### Principios de diseno
+### Principios de diseño
 
 La experiencia de uso se define por cuatro principios:
 
@@ -169,6 +176,7 @@ La experiencia de uso se define por cuatro principios:
 - Eficiencia: las tareas repetitivas se resuelven con flujos cortos.
 - Coherencia: los modulos comparten patrones de navegacion y formularios.
 - Escalabilidad: la interfaz permite crecer en herramientas sin romper el flujo principal.
+- Privacidad: la información sensible es mínima y solo se muestra cuando el usuario lo solicita.
 
 ### Estructura general de la interfaz
 
@@ -179,8 +187,9 @@ La solucion se organiza en dos superficies complementarias:
 
 En la aplicacion privada se mantiene una estructura comun:
 
-- Navegacion lateral o superior con acceso a herramientas.
-- Area central dinamica segun el modulo activo.
+- Navegacion lateral con acceso a herramientas.
+- _Dashboard_ con información del estado de las herramientas, así como de las conexiones externas.
+- Area central dinamica segun el modulo activo. Se añade un botón de como funcionan las herramientas mostrando un modal.
 - Formularios con validaciones y estados de carga.
 - Mensajeria de feedback para confirmar operaciones o informar errores.
 
@@ -195,10 +204,10 @@ En la aplicacion privada se mantiene una estructura comun:
 | Notificaciones tardias | Gestionar comunicacion de llegadas fuera de horario | Revisar check-ins, editar plantillas y parametros |
 | Sincronizador de contactos | Mantener agenda operativa | Conectar Google, sincronizar, exportar CSV |
 | Vault de comunicaciones | Estandarizar mensajes | Crear plantillas, mejorar/traducir con IA |
-| Perfil e integraciones | Parametrizar la cuenta | Cambiar contrasena y configurar PMS/IA |
-| Administracion de usuarios | Gestion de equipo por empresa | Altas, roles, bajas y reseteo de contrasena |
+| Perfil e integraciones | Parametrizar la cuenta | Cambiar contraseña y configurar PMS/IA |
+| Administracion de usuarios | Gestion de equipo por empresa | Altas, roles, bajas y reseteo de contraseña |
 
-### Accesibilidad y diseno responsive
+### Accesibilidad y diseño responsive
 
 La interfaz esta pensada para uso en escritorio y movil:
 
@@ -206,6 +215,71 @@ La interfaz esta pensada para uso en escritorio y movil:
 - Tipografia legible y jerarquia visual clara.
 - Controles de formulario con etiquetas y mensajes de validacion comprensibles.
 - Objetivo de alineacion con criterios WCAG 2.1 AA.
+
+**WAVE - Web Accessibility Evaluation Tool**
+**Google Lighthouse** 
+
+---
+
+**Landing page**
+
+![Análisis Wave - Landing page](assets/wave/02-auditoria-wave-landing-page.png)
+
+![Análisis Lighthouse - Landing page](assets/lighthouse/02-auditoria-lighthouse-landing-page.png)
+
+**Formulario solicitud**
+
+![Análisis Wave - Formulario solicitud](assets/wave/02-auditoria-wave-formulario-solicitud.png)
+
+![Análisis Lighthouse - Formulario solicitud](assets/lighthouse/02-auditoria-lighthouse-formulario-solicitud.png)
+
+**Inicio de sesión**
+
+![Análisis Wave - Formulario de inicio de sesión](assets/wave/02-auditoria-wave-formulario-inicio-sesion.png)
+
+![Análisis Lighthouse - Formulario de inicio de sesión](assets/lighthouse/02-auditoria-lighthouse-formulario-inicio-sesion.png)
+
+**Dashboard principal**
+
+![Análisis Wave - Dashboard principal](assets/wave/02-auditoria-wave-dashboard-principal.png)
+
+![Análisis Lighthouse - Dashboard principal](assets/lighthouse/02-auditoria-lighthouse-dashboard-principal.png)
+
+**Herramienta: Maestro de Apartamentos**
+
+![Análisis Wave - Maestro de Apartamentos](assets/wave/02-auditoria-wave-maestro-apartamentos.png)
+
+![Análisis Lighthouse - Maestro de Apartamentos](assets/lighthouse/02-auditoria-lighthouse-maestro-apartamentos.png)
+
+**Herramienta: Sincronizador de contactos**
+
+![Análisis Wave - Sincronizador de contactos](assets/wave/02-auditoria-wave-sincronizador-contactos.png)
+
+![Análisis Lighthouse - Sincronizador de contactos](assets/lighthouse/02-auditoria-lighthouse-sincronizador-contactos.png)
+
+**Herramienta: Notificaciones check-in**
+
+![Análisis Wave - Notificaciones check-in](assets/wave/02-auditoria-wave-notificaciones-checkin.png)
+
+![Análisis Lighthouse - Notificaciones Check-in](assets/lighthouse/02-auditoria-lighthouse-notificaciones-checkin.png)
+
+**Herramienta: Mapa de calor**
+
+![Análisis Wave - Mapa de calor](assets/wave/02-auditoria-wave-mapa-calor.png)
+
+![Análisis Lighthouse - Mapa de calor](assets/lighthouse/02-auditoria-lighthouse-mapa-calor.png)
+
+**Herramienta: Vault de comunicaciones**
+
+![Análisis Wave - Vault de comunicaciones](assets/wave/02-auditoria-wave-vault-comunicaciones.png)
+
+![Análisis Lighthouse - Vault de comunicaciones](assets/lighthouse/02-auditoria-lighthouse-vault-comunicaciones.png)
+
+**Perfil empresa / usuario**
+
+![Análisis WAVE - Perfil](assets/wave/02-auditoria-wave-perfil.png)
+
+![Análisis Lighthouse - Perfil](assets/lighthouse/02-auditoria-lighthouse-perfil.png)
 
 ### Feedback y manejo de errores
 
@@ -226,7 +300,7 @@ Stay Sidekick esta orientado a equipos y profesionales del alquiler vacacional.
 
 **Administrador de empresa**
 
-Responsable de configurar la cuenta de su empresa, gestionar usuarios y definir parametros de funcionamiento (PMS, IA, plantillas, umbrales y formatos de entrada).
+Responsable de configurar la cuenta de su empresa, gestionar usuarios y definir parametros de funcionamiento (PMS, API Key IA, plantillas, umbrales y formatos de entrada).
 
 **Personal operativo (recepcion/coordinacion)**
 
@@ -246,7 +320,7 @@ Interactua con la capa publica (landing y formulario de contacto) para captar nu
 El usuario introduce credenciales validas, obtiene token de sesion y accede al panel principal.
 
 **CU-02. Gestionar usuarios de la empresa**
-El administrador crea una cuenta, ajusta su rol y, si es necesario, resetea su contrasena temporal.
+El administrador crea una cuenta, ajusta su rol y, si es necesario, resetea su contraseña temporal.
 
 **CU-03. Registrar o actualizar apartamentos**
 El usuario administrativo crea o edita apartamentos de forma manual o realiza importacion/sincronizacion masiva.
@@ -284,8 +358,8 @@ El usuario solicita al asistente IA una version refinada o traducida y decide si
 **CU-14. Configurar integraciones PMS e IA**
 El administrador actualiza claves y parametros de integracion desde ajustes para habilitar funcionalidades.
 
-**CU-15. Cambiar contrasena de perfil**
-El usuario autenticado modifica su contrasena para mantener la cuenta segura.
+**CU-15. Cambiar contraseña de perfil**
+El usuario autenticado modifica su contraseña para mantener la cuenta segura.
 
 **CU-16. Alta de empresa en modo superadmin**
 El superadmin registra una nueva empresa para habilitar su acceso a la plataforma.
@@ -311,6 +385,6 @@ Un usuario externo rellena el formulario, supera validacion antispam y envia su 
 | CU-12 | Crear y mantener plantillas en el vault | Personal operativo | Alta |
 | CU-13 | Mejorar o traducir plantilla con IA | Personal operativo | Media |
 | CU-14 | Configurar integraciones PMS e IA | Admin de empresa | Alta |
-| CU-15 | Cambiar contrasena de perfil | Usuario autenticado | Alta |
+| CU-15 | Cambiar contraseña de perfil | Usuario autenticado | Alta |
 | CU-16 | Alta de empresa en modo superadmin | Superadmin | Media |
 | CU-17 | Enviar formulario de contacto publico | Usuario externo | Media |

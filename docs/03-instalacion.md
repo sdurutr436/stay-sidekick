@@ -1,4 +1,4 @@
-# 03-instalacion
+# 3. Instalacion
 
 ## Indice
 
@@ -27,6 +27,12 @@
   - [Paso 4. Levantar backend](#paso-4-levantar-backend)
 - [3.7. Comandos utiles de operacion](#37-comandos-utiles-de-operacion)
 - [3.8. Errores frecuentes y solucion](#38-errores-frecuentes-y-solucion)
+  - [Preparacion de entorno y arranque](#preparacion-de-entorno-y-arranque)
+  - [Variables de entorno](#variables-de-entorno)
+  - [Puertos y red](#puertos-y-red)
+  - [Base de datos y migraciones](#base-de-datos-y-migraciones)
+  - [Notificaciones (email y Discord)](#notificaciones-email-y-discord)
+  - [Frontend y sitio publico](#frontend-y-sitio-publico)
 
 ## 3.1. Objetivo del capitulo
 
@@ -80,7 +86,7 @@ Las imagenes declaradas en los Dockerfiles y compose del proyecto son:
 | `web/Dockerfile` | Build 11ty + servido Nginx | Requiere contexto de build en raiz para SCSS compartido |
 | `nginx/Dockerfile` | Reverse proxy | Usa config distinta para local y Railway via `RAILWAY=true/false` |
 
-Este diseno permite separar build y runtime en frontend/web (multi-stage), y mantener un backend con migraciones automaticas en arranque.
+Este diseño permite separar build y runtime en frontend/web (multi-stage), y mantener un backend con migraciones automaticas en arranque.
 
 ### Scripts de instalacion y arranque
 
@@ -136,12 +142,17 @@ Copiar desde `backend/.env.example`.
 | `GOOGLE_CLIENT_SECRET` | Opcional | OAuth Google Contacts |
 | `GOOGLE_REDIRECT_URI` | Opcional | Callback OAuth |
 | `FRONTEND_BASE_URL` | Si | URL base para redirects post OAuth |
-| `GMAIL_USER` | Opcional | Cuenta de envio SMTP |
-| `GMAIL_APP_PASSWORD` | Opcional | Password de aplicacion Gmail |
-| `MAIL_RECIPIENT` | Opcional | Destinatario de formularios |
-| `DISCORD_WEBHOOK_URL` | Opcional | Webhook de solicitudes |
+| `MAIL_HOST` | No | Host SMTP de salida (por defecto `smtp.gmail.com`) |
+| `MAIL_PORT` | No | Puerto SMTP de salida (por defecto `587`) |
+| `MAIL_USER` | Opcional | Cuenta de envio SMTP |
+| `MAIL_PASSWORD` | Opcional | Password de aplicacion (16 caracteres en Gmail) |
+| `MAIL_FROM` | Opcional | Direccion visible en el `From:` y destino de notificaciones publicas |
+| `DISCORD_WEBHOOK_URL` | Opcional | Webhook de solicitudes de empresa |
 | `DISCORD_WEBHOOK_CONTACT_URL` | Opcional | Webhook de contacto general |
+| `DISCORD_WEBHOOK_OPERATIONS_URL` | Opcional | Webhook de operacion/errores del backend |
+| `DISCORD_WEBHOOK_AI_OBSERVABILITY_URL` | Opcional | Canal especifico de observabilidad IA (si vacio, cae al de operacion) |
 | `RATE_LIMIT_CONTACT` | No | Limite de peticiones formulario |
+| `RATE_LIMIT_STORAGE_URI` | No | Backend de Flask-Limiter (por defecto `memory://`) |
 | `JWT_SECRET_KEY` | Si | Firma de tokens JWT |
 | `JWT_ACCESS_TOKEN_HOURS` | No | Duracion del token |
 | `FERNET_KEY` | Si | Cifrado de API keys en BD |
@@ -177,11 +188,15 @@ La siguiente tabla resume que variables son imprescindibles segun el entorno de 
 | `GOOGLE_CLIENT_ID` | Opcional | Opcional | Opcional |
 | `GOOGLE_CLIENT_SECRET` | Opcional | Opcional | Opcional |
 | `GOOGLE_REDIRECT_URI` | Opcional | Opcional | Opcional |
-| `GMAIL_USER` | Opcional | Opcional | Opcional |
-| `GMAIL_APP_PASSWORD` | Opcional | Opcional | Opcional |
-| `MAIL_RECIPIENT` | Opcional | Opcional | Opcional |
+| `MAIL_HOST` | Opcional | Opcional | Opcional |
+| `MAIL_PORT` | Opcional | Opcional | Opcional |
+| `MAIL_USER` | Opcional | Opcional | Opcional |
+| `MAIL_PASSWORD` | Opcional | Opcional | Opcional |
+| `MAIL_FROM` | Opcional | Opcional | Opcional |
 | `DISCORD_WEBHOOK_URL` | Opcional | Opcional | Opcional |
 | `DISCORD_WEBHOOK_CONTACT_URL` | Opcional | Opcional | Opcional |
+| `DISCORD_WEBHOOK_OPERATIONS_URL` | Opcional | Opcional | Opcional |
+| `DISCORD_WEBHOOK_AI_OBSERVABILITY_URL` | Opcional | Opcional | Opcional |
 | `SMOOBU_API_KEY` | Opcional | Opcional | Opcional |
 
 ### Variables web (web/.env)
@@ -355,13 +370,58 @@ docker compose down -v
 
 ## 3.8. Errores frecuentes y solucion
 
-- `backend/.env not found`:
-  crear `backend/.env` desde `backend/.env.example`.
+### Preparacion de entorno y arranque
+
+- `env file ./backend/.env not found` (o `./web/.env`):
+  Compose marca esos `.env` como `required: true`. Crearlos copiando desde el correspondiente `*.env.example` antes de arrancar.
+- `env file ./backend/.env.dev not found`:
+  solo aplica si se usa el override de desarrollo (`docker-compose.dev.yml`). El archivo existe en el repositorio; si falta, comprobar que la rama es la correcta o restaurarlo desde git.
+- `docker: 'compose' is not a docker command`:
+  el sistema usa Docker Compose v1. Instalar el plugin v2 (`docker compose`) o, como alternativa puntual, usar `docker-compose` con guion.
+- `Cannot connect to the Docker daemon`:
+  Docker Desktop o el servicio `docker` no esta arrancado. Iniciarlo y reintentar.
+
+### Variables de entorno
+
 - `DATABASE_URL variable is not set`:
-  revisar `.env` de raiz.
-- `KeyError: SECRET_KEY`:
-  definir `SECRET_KEY` en `backend/.env`.
-- `Port 80 already in use`:
-  liberar puerto o cambiar mapeo en `docker-compose.yml`.
-- `No se cargan tablas iniciales`:
-  reconstruir volumen con `docker compose down -v` y volver a levantar.
+  revisar `.env` de raiz. Recordar que los `.env` no interpolan variables, debe ser una URL literal.
+- `KeyError: 'SECRET_KEY'`:
+  definir `SECRET_KEY` en `backend/.env`. La aplicacion no arranca sin esa clave.
+- `KeyError: 'JWT_SECRET_KEY'`:
+  definir `JWT_SECRET_KEY` en `backend/.env`. Generar con `python -c "import secrets; print(secrets.token_urlsafe(32))"`.
+- `cryptography.fernet.InvalidToken` o errores con `FERNET_KEY`:
+  la clave debe ser una Fernet valida (32 bytes en base64 urlsafe). Generar con `python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"`.
+- CORS bloqueado en navegador desde Angular local:
+  comprobar que `ALLOWED_ORIGINS` incluye el origen exacto (`http://localhost:4200` o `http://localhost`). En Docker, el compose lo fuerza a `http://localhost`.
+
+### Puertos y red
+
+- `Port 80 already in use` (o `bind: address already in use`):
+  liberar el puerto (otro Nginx, IIS o Skype antiguos suelen ocuparlo) o cambiar el mapeo de `nginx` en `docker-compose.yml`.
+- `Port 5432 already in use`:
+  hay un Postgres local corriendo. PostgreSQL del compose no se expone al host por defecto, pero si se ha modificado el compose, parar el servicio local o cambiar mapeo.
+- La API responde pero los formularios fallan con 403 Turnstile:
+  revisar que `TURNSTILE_SECRET_KEY` (backend) y `TURNSTILE_SITE_KEY` (web) son del mismo par. Para desarrollo, usar las claves de prueba oficiales de Cloudflare.
+
+### Base de datos y migraciones
+
+- `No se cargan tablas iniciales` o el seed no aparece:
+  el volumen `postgres_data` ya existia y los scripts de `docker-entrypoint-initdb.d/` solo se ejecutan en la primera creacion. Reconstruir con `docker compose down -v` y volver a levantar.
+- `alembic.util.exc.CommandError: Can't locate revision`:
+  base de datos antigua con una revision no presente en el codigo actual. Hacer `docker compose down -v` para regenerarla desde `schema.sql`.
+- `psycopg2.OperationalError: could not connect to server`:
+  el backend arranco antes que Postgres. El compose define `depends_on: service_healthy`; si persiste, revisar logs de `postgres` y reintentar `docker compose up -d`.
+
+### Notificaciones (email y Discord)
+
+- Los formularios funcionan pero no llega correo:
+  comprobar que `MAIL_USER`, `MAIL_PASSWORD` y `MAIL_FROM` estan rellenos. La contraseña debe ser una App Password de 16 caracteres, no la contraseña normal de Gmail. Si el codigo de esta rama todavia lee `GMAIL_USER`/`GMAIL_APP_PASSWORD`/`MAIL_RECIPIENT`, usar esos nombres hasta fusionar `main`.
+- No llegan mensajes a Discord:
+  verificar que el webhook esta activo en el servidor de Discord. `DISCORD_WEBHOOK_AI_OBSERVABILITY_URL` es opcional; si se deja vacio, los eventos de IA caen al webhook de operaciones.
+
+### Frontend y sitio publico
+
+- El navegador muestra una version antigua tras `docker compose up --build`:
+  vaciar cache (Ctrl+Shift+R) o cerrar sesion del Service Worker. Angular sirve con hash en los nombres de fichero, pero el `index.html` puede estar cacheado.
+- 404 en `/menu/`:
+  reconstruir el frontend con `docker compose build --no-cache frontend`. El build de Angular usa `--base-href=/menu/` y un fallo de build deja el SPA sin assets.

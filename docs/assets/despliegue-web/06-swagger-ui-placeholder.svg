@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" role="img" aria-labelledby="title desc">
+  <title id="title">Placeholder Swagger UI y OpenAPI</title>
+  <desc id="desc">Hueco temporal para una captura de Swagger UI y del acceso al contrato OpenAPI.</desc>
+  <rect width="1280" height="720" fill="#0b1320"/>
+  <rect x="40" y="40" width="1200" height="640" rx="24" fill="#ffffff"/>
+  <rect x="40" y="40" width="1200" height="88" rx="24" fill="#16a34a"/>
+  <text x="76" y="96" fill="#f0fdf4" font-family="Arial, sans-serif" font-size="32" font-weight="700">Placeholder Swagger UI</text>
+  <text x="76" y="170" fill="#111827" font-family="Arial, sans-serif" font-size="22">Sustituir por captura de /api/docs mostrando la consola Swagger UI</text>
+  <text x="76" y="206" fill="#475569" font-family="Arial, sans-serif" font-size="18">y, si es posible, una segunda vista de /api/docs/openapi.yaml o ambas en la misma evidencia.</text>
+  <rect x="76" y="244" width="1120" height="78" rx="16" fill="#f1f5f9" stroke="#cbd5e1"/>
+  <text x="108" y="292" fill="#334155" font-family="Consolas, monospace" font-size="22">GET /api/health          200</text>
+  <rect x="76" y="348" width="1120" height="284" rx="16" fill="#f8fafc" stroke="#cbd5e1"/>
+  <text x="108" y="398" fill="#0f172a" font-family="Arial, sans-serif" font-size="26" font-weight="700">Stay Sidekick API</text>
+  <text x="108" y="438" fill="#475569" font-family="Arial, sans-serif" font-size="18">OpenAPI 3.0.3 · autenticación JWT · CSRF · endpoints documentados</text>
+  <rect x="108" y="482" width="1040" height="44" rx="12" fill="#dcfce7"/>
+  <rect x="108" y="542" width="1040" height="44" rx="12" fill="#dcfce7"/>
+  <text x="136" y="512" fill="#166534" font-family="Arial, sans-serif" font-size="20">GET /api/docs</text>
+  <text x="136" y="572" fill="#166534" font-family="Arial, sans-serif" font-size="20">GET /api/docs/openapi.yaml</text>
+  <text x="76" y="660" fill="#64748b" font-family="Arial, sans-serif" font-size="16">Evidencia visual recomendada para reforzar c6.</text>
+</svg>
