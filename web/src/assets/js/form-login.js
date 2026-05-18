@@ -267,7 +267,7 @@ async function submitPayload(payload, csrfToken) {
       const data = await submitPayload(payload, csrfToken);
       if (data.token) {
         localStorage.setItem('ss_token', data.token);
-        window.location.href = data.debe_cambiar_password ? '/cambio-password' : '/menu';
+        window.location.href = data.debe_cambiar_password ? '/cambio-password/' : '/menu';
       }
     } catch (err) {
       // Muestra el error del backend en el campo email (es el punto de entrada)

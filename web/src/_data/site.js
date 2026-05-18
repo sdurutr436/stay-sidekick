@@ -19,22 +19,22 @@ module.exports = {
       label: "Producto",
       links: [
         { text: "Funcionalidades", href: "#" },
-        { text: "Precios", href: "/precios" },
+        { text: "Precios", href: "/precios/" },
       ],
     },
     {
       label: "Legal",
       links: [
-        { text: "Política de privacidad", href: "/legal/privacidad" },
-        { text: "Términos de uso", href: "/legal/terminos" },
-        { text: "Política de cookies", href: "/legal/cookies" },
+        { text: "Política de privacidad", href: "/legal/privacidad/" },
+        { text: "Términos de uso", href: "/legal/terminos/" },
+        { text: "Política de cookies", href: "/legal/cookies/" },
       ],
     },
     {
       label: "Empresa",
       links: [
-        { text: "Sobre nosotros", href: "/empresa/sobre-nosotros" },
-        { text: "Contacto", href: "/empresa/contacto" },
+        { text: "Sobre nosotros", href: "/empresa/sobre-nosotros/" },
+        { text: "Contacto", href: "/empresa/contacto/" },
       ],
     },
   ],
