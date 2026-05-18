@@ -30,6 +30,7 @@
           type="file"
           accept=".xlsx"
           class="notif-checkin__xlsx-input"
+            aria-label="Importar archivo XLSX de check-ins tardíos"
           (change)="onXlsxSeleccionado($event)"
         />
       }
@@ -322,6 +323,7 @@
               placeholder="Genera el mensaje o escríbelo aquí…"
               [(ngModel)]="mensaje"
               name="mensaje"
+              aria-label="Mensaje de notificación de check-in tardío"
               (click)="onMsgCursor($event)"
               (keyup)="onMsgCursor($event)"
               (blur)="onMsgCursor($event)"
