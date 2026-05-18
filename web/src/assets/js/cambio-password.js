@@ -89,7 +89,7 @@ async function relogin(email, password) {
 
 (function init() {
   const token = localStorage.getItem('ss_token') || sessionStorage.getItem('ss_token');
-  if (!token) { window.location.href = '/login'; return; }
+  if (!token) { window.location.href = '/login/'; return; }
 
   let jwtEmail = null;
   try {
@@ -100,7 +100,7 @@ async function relogin(email, password) {
     }
     jwtEmail = payload.sub || null;
   } catch {
-    window.location.href = '/login';
+    window.location.href = '/login/';
     return;
   }
 
