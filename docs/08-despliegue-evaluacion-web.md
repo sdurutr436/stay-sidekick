@@ -7,8 +7,8 @@
 
 ## Índice
 
-- [c6 — Documentación del proyecto](#c6--documentación-del-proyecto)
-- [c5 — Control de versiones y CI/CD](#c5--control-de-versiones-y-cicd)
+- [c6: Documentación del proyecto](#c6--documentación-del-proyecto)
+- [c5: Control de versiones y CI/CD](#c5--control-de-versiones-y-cicd)
 - [c1 — Arquitectura de la aplicación](#c1--arquitectura-de-la-aplicación)
 - [c2 — Implementación en Docker](#c2--implementación-en-docker)
 - [c3 — Servidor web como front (reverse proxy)](#c3--servidor-web-como-front-reverse-proxy)
@@ -18,7 +18,7 @@
 
 ---
 
-## c6 — Documentación del proyecto
+## c6: Documentación del proyecto
 
 ### Qué es Stay Sidekick
 
@@ -26,26 +26,83 @@ Stay Sidekick es una plataforma web satélite para operaciones del alquiler vaca
 
 ### Estructura de documentación del repositorio
 
+La documentación válida para la memoria del TFG queda concentrada en el capítulo general de
+despliegue y en este documento complementario de evidencias. El objetivo de esta sección es
+recoger en un único punto los elementos que justifican la arquitectura desplegada, la
+containerización, la cadena CI/CD y las comprobaciones de red y publicación.
+
 | Fichero / carpeta | Contenido |
 | --- | --- |
-| [README.md](../README.md) | Qué hace el proyecto, arquitectura Docker, arranque rápido, credenciales dev y enlaces a documentación |
-| [DEPLOY.md](../DEPLOY.md) | Despliegue local y Railway, variables de entorno, verificación y troubleshooting |
-| [docs/08-despliegue.md](08-despliegue.md) | Capítulo general de despliegue para la memoria del TFG |
-| [docs/api/endpoints.md](api/endpoints.md) | API REST con endpoints, parámetros, códigos y ejemplos `curl` |
-| [docs/railway_deployment.md](railway_deployment.md) | Procedimiento detallado de despliegue en Railway |
-| Este fichero | Evidencias específicas para la rúbrica del módulo de despliegue |
+| [README.md](../README.md) | Qué hace el proyecto, requisitos, arranque rápido, arquitectura, CI/CD, HTTPS |
+| [DEPLOY.md](../DEPLOY.md) | Guía paso a paso de despliegue local y en remoto, variables de entorno, troubleshooting completo |
+| [docs/](../docs/) | Documentación técnica extendida (introducción, diseño, desarrollo, pruebas, despliegue) |
+| [docs/08-despliegue.md](08-despliegue.md) | Despliegue con diagrama de arquitectura, CI/CD, proceso de producción |
+| [backend/app/docs/openapi.yaml](../backend/app/docs/openapi.yaml) | Contrato OpenAPI 3.0 con autenticación JWT, CSRF, roles, servidores y endpoints documentados |
+| [backend/app/docs/routes.py](../backend/app/docs/routes.py) | Blueprint de documentación que expone Swagger UI en `/api/docs` y la spec en `/api/docs/openapi.yaml` |
+| Este fichero | Documentación orientada a la rúbrica de evaluación |
 
 ### API documentada con ejemplos reales
 
-La API queda documentada por dos vías complementarias:
+La API queda documentada por tres vías complementarias: ejemplos reales de uso, especificación
+OpenAPI integrada en el backend y una interfaz Swagger UI servida por el blueprint `docs`.
 
-- guía manual operativa en [docs/api/endpoints.md](api/endpoints.md)
-- especificación OpenAPI en [backend/app/docs/openapi.yaml](../backend/app/docs/openapi.yaml)
+En el estado actual del backend, las rutas documentales implementadas son:
+
+- `GET /api/docs` -> interfaz Swagger UI
+- `GET /api/docs/openapi.yaml` -> especificación OpenAPI 3.0 en YAML
+
+### Cómo acceder a Swagger UI y OpenAPI
+
+Como `nginx` reenvía todo `/api/*` al backend, la consola Swagger y la spec OpenAPI se consultan
+por las mismas URLs públicas que el resto de la API, sin exponer un puerto adicional del backend.
+
+| Entorno | Swagger UI | OpenAPI YAML |
+| --- | --- | --- |
+| Local (Docker Compose) | `http://localhost/api/docs` | `http://localhost/api/docs/openapi.yaml` |
+| Railway | `https://staysidekick.up.railway.app/api/docs` | `https://staysidekick.up.railway.app/api/docs/openapi.yaml` |
+| Dominio final | `https://stay-sidekick.com/api/docs` | `https://stay-sidekick.com/api/docs/openapi.yaml` |
+
+Acceso recomendado:
+
+- En navegador: abrir `/api/docs` para usar la consola Swagger UI.
+- En terminal: consultar `/api/docs/openapi.yaml` para descargar o inspeccionar la especificación.
+- En validación local: levantar primero el stack con `docker compose up -d --build`, ya que el
+  backend no se publica directamente y la documentación sale a través del proxy `nginx`.
 
 Ejemplos reales de verificación local:
 
 ```bash
-# Healthcheck público vía proxy
+# ── Documentación interactiva ─────────────────────────────────────────────
+
+# Swagger UI servida por el backend
+curl -I -s http://localhost/api/docs
+# HTTP/1.1 200 OK
+# Content-Type: text/html; charset=utf-8
+
+# Contrato OpenAPI en YAML
+curl -s http://localhost/api/docs/openapi.yaml | head -n 6
+# openapi: 3.0.3
+# info:
+#   title: Stay Sidekick API
+#   version: 1.0.0
+
+# ── CSRF y autenticación ──────────────────────────────────────────────────
+
+# Obtener token CSRF y guardarlo también como cookie
+CSRF=$(curl -s -c cookies.txt http://localhost/api/csrf-token \
+  | python -c "import sys,json; print(json.load(sys.stdin)['csrf_token'])")
+# -> token emitido en JSON y cookie csrf_token persistida en cookies.txt
+
+# Login con JWT (requiere usuario válido y double-submit cookie)
+curl -s -b cookies.txt -X POST http://localhost/api/auth/login \
+  -H "Content-Type: application/json" \
+  -H "X-CSRF-Token: $CSRF" \
+  -d '{"email":"<email_valido>","password":"<password_valida>"}'
+# -> {"ok":true,"token":"<jwt>","debe_cambiar_password":false}
+
+# ── Verificación mínima vía proxy ─────────────────────────────────────────
+
+# Healthcheck público
 curl -s http://localhost/api/health
 # {"status":"ok"}
 
@@ -55,70 +112,104 @@ curl -i -s http://localhost/api/usuarios
 # {"errors":["Token de acceso requerido."],"ok":false}
 ```
 
+Códigos de respuesta comunes documentados en la API:
+
+- `200 OK` -> operación correcta o consulta resuelta.
+- `201 Created` -> recurso creado correctamente.
+- `400 Bad Request` -> cuerpo no JSON o petición mal formada.
+- `401 Unauthorized` -> JWT ausente, inválido o credenciales incorrectas.
+- `403 Forbidden` -> CSRF inválido o permisos insuficientes.
+- `422 Unprocessable Entity` -> errores de validación de payload.
+- `429 Too Many Requests` -> límite de peticiones superado.
+
 Esto evidencia que la documentación no es solo descriptiva: permite probar endpoints reales con comandos reproducibles.
 
 ---
 
-## c5 — Control de versiones y CI/CD
+## c5: Control de versiones y CI/CD
 
-### Uso de Git y ramas
+### Uso de Git, trazabilidad de cambios y ramas
 
-El repositorio mantiene `main` como rama estable y utiliza ramas temáticas para trabajo incremental. En el historial del proyecto se observan ramas `dev-*`, `fix-*`, `docs-*` y ramas de refactor por dominio.
+El repositorio mantiene `main` como rama estable y emplea ramas temáticas para aislar trabajo de desarrollo y documentación. Esto deja trazabilidad clara entre cada línea de trabajo, los commits que la componen y el momento en que se integra en la rama principal. En el historial del proyecto se observan ramas `dev-*`, `fix-*`, `docs-*` y ramas de refactor por dominio.
 
-Extracto real de ramas presentes en el repositorio:
+Ejemplos reales de ramas visibles en el repositorio:
 
 ```text
 dev-herramientas
+dev-mail-service
+dev-ui-estandarizacion
 docs-documentacion-final
+docs-gobernanza-comunidad
 main
-remotes/origin/dev-dashboard
-remotes/origin/dev-mapa-calor
-remotes/origin/dev-vault-comunicaciones
-remotes/origin/fix-csp-turnstile
-remotes/origin/fix-smoobu-backend
-remotes/origin/refactor-entidad-usuarios
 ```
 
-Extracto real del historial reciente:
+Extracto real de commits representativos en ramas relevantes del proyecto:
 
 ```text
-8978a11 docs: agregar sección de conclusiones con evaluación crítica, cumplimiento de objetivos y lecciones aprendidas
-1ba2af9 docs: agregar manual de usuario con secciones detalladas y guías de uso
-27d529f docs: agregar sección de despliegue con estrategia, arquitectura y configuración de CI/CD
-96acfd4 merge: fix-python-3.12-alignment -> docs-documentacion-final; alinea backend y documentación con Python 3.12
+main
+  3dfff77 fix: corregir errores de accesibilidad WAVE (botón theme-toggle vacío, inputs file con aria-hidden redundante, th checkbox vacío, contraste dropdown y aria-label vacío en búsqueda de usuarios)
+  8fdd0e0 fix: externalizar script anti-FOUC a theme-init.js para cumplir Content-Security-Policy
+
+dev-herramientas
+  ee019f6 fix: actualizar rutas de redirección para incluir barras finales y mejorar la consistencia en la navegación
+  0fdb0a8 fix: añadir barras finales a las rutas en la configuración de Nginx y enlaces de navegación para mejorar la consistencia y evitar redirecciones innecesarias
+
+dev-ui-estandarizacion
+  212d048 feat: sincronizar preferencia de tema entre Angular y 11ty mediante evento storage
+  749a014 feat: añadir átomo Tag y migrar meta-chip a app-tag en herramientas Angular y macro NJK
 ```
 
-### Workflows de GitHub Actions
+Se ha elegido `dev-ui-estandarizacion` como tercera rama porque aporta mejoras recientes y
+transversales sobre la interfaz, el design system y la coherencia visual entre Angular y 11ty.
 
-El proyecto separa la integración continua por stack:
+### Workflows reales de GitHub Actions
 
-| Workflow | Fichero | Función |
-| --- | --- | --- |
-| CI Python | [.github/workflows/ci-python.yml](../.github/workflows/ci-python.yml) | `ruff` + `pytest` con `postgres:16-alpine` como servicio |
-| CI Angular tests | [.github/workflows/ci-angular-tests.yml](../.github/workflows/ci-angular-tests.yml) | Tests frontend con Vitest y artefacto de cobertura |
-| CI Angular | [.github/workflows/ci-angular.yml](../.github/workflows/ci-angular.yml) | Build de producción Angular |
-| CI 11ty | [.github/workflows/ci-web.yml](../.github/workflows/ci-web.yml) | Build del sitio estático |
-| Docker Hub | [.github/workflows/docker-publish.yml](../.github/workflows/docker-publish.yml) | Publicación de imágenes tras éxito de los tres CI |
+En esta rama, el directorio [.github/workflows](../.github/workflows) contiene cinco workflows
+activos. La separación por stack evita mezclar validaciones de backend, frontend, web estática y
+publicación de imágenes.
 
-Snippet real de CI Python:
+| Workflow | Fichero | Disparo | Función real |
+| --- | --- | --- | --- |
+| `CI Python` | [.github/workflows/ci-python.yml](../.github/workflows/ci-python.yml) | `push` y `pull_request` sobre `main` | Ejecuta `ruff`, levanta `postgres:16-alpine` como servicio y lanza `pytest` con Python 3.12 |
+| `CI — Tests y cobertura` | [.github/workflows/ci-angular-tests.yml](../.github/workflows/ci-angular-tests.yml) | `push` en cualquier rama y `pull_request` sobre `main` | Ejecuta tests Angular con cobertura, sube el artefacto `coverage-report` y después valida el build de producción |
+| `CI Angular` | [.github/workflows/ci-angular.yml](../.github/workflows/ci-angular.yml) | `push` y `pull_request` sobre `main` | Compila el frontend Angular en modo de producción |
+| `CI 11ty` | [.github/workflows/ci-web.yml](../.github/workflows/ci-web.yml) | `push` y `pull_request` sobre `main` | Construye el sitio estático 11ty con Node 22 |
+| `Docker Hub` | [.github/workflows/docker-publish.yml](../.github/workflows/docker-publish.yml) | `workflow_run` en `main` | Comprueba con la API de GitHub que `CI Angular`, `CI 11ty` y `CI Python` han terminado en `success` para el mismo commit y, si se cumple, publica cuatro imágenes Docker |
+
+### Cadena CI/CD aplicada al despliegue
+
+La promoción a artefactos desplegables sigue una secuencia explícita y verificable:
+
+1. Los cambios que llegan a `main` disparan los workflows base de backend, Angular y 11ty.
+2. El workflow `CI — Tests y cobertura` añade validación extra del frontend y conserva el
+   directorio `frontend/coverage/` como artefacto descargable durante 14 días.
+3. El workflow `Docker Hub` no se limita a esperar un disparo; consulta el estado de los runs del
+   mismo `head_sha` y solo avanza cuando `CI Angular`, `CI 11ty` y `CI Python` devuelven
+   `success`.
+4. Superada esa puerta, se construyen y publican las imágenes `stay-sidekick-backend`,
+   `stay-sidekick-frontend`, `stay-sidekick-web` y `stay-sidekick-nginx`, todas etiquetadas con el
+   SHA corto del commit.
+
+Esto implica que el workflow de tests y cobertura del frontend aporta calidad y evidencia, pero no
+forma parte de la puerta dura del `workflow_run` que desbloquea la publicación en Docker Hub.
+
+Snippet real del workflow de tests y cobertura:
 
 ```yaml
-services:
-  postgres:
-    image: postgres:16-alpine
-    env:
-      POSTGRES_DB: stay_sidekick
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+- name: Ejecutar tests con cobertura
+  working-directory: frontend
+  run: npx ng test --watch=false
 
-steps:
-  - name: Instalar dependencias
-    run: pip install -r backend/requirements.txt pytest
-  - name: Ejecutar tests
-    run: pytest backend/tests/ -v
+- name: Subir informe de cobertura
+  if: always()
+  uses: actions/upload-artifact@v4
+  with:
+    name: coverage-report
+    path: frontend/coverage/
+    retention-days: 14
 ```
 
-Snippet real de publicación Docker condicionada:
+Snippet real de la publicación Docker condicionada:
 
 ```yaml
 on:
@@ -127,23 +218,36 @@ on:
     types: [completed]
     branches: [main]
 
-jobs:
-  publicar:
-    needs: verificar
-    if: needs.verificar.outputs.todos-pasaron == 'true'
+- name: Imagen nginx
+  run: |
+    docker build -t $HUB_USER/stay-sidekick-nginx:${{ steps.meta.outputs.sha }} ./nginx
+    docker push $HUB_USER/stay-sidekick-nginx:${{ steps.meta.outputs.sha }}
 ```
 
-Secrets usados en CD:
+Credenciales y secretos utilizados en la cadena:
 
 - `DOCKERHUB_USERNAME`
 - `DOCKERHUB_TOKEN`
 - `TURNSTILE_SITE_KEY`
+- `github.token` para consultar, desde GitHub Actions, el estado de los workflows asociados al commit
 
-Placeholders de capturas para evidenciar runs en verde:
+El soporte principal de este apartado sigue estando en los propios ficheros YAML, en el historial Git
+reproducible y en la trazabilidad entre commit, ejecución de CI y etiquetas SHA de las imágenes
+publicadas. Aun así, para alinearlo literalmente con la rúbrica, conviene adjuntar tres capturas
+concretas: el panel general de GitHub Actions, un run correcto en verde y el registry con los tags
+publicados.
 
-![Placeholder — resumen GitHub Actions](assets/despliegue-web/01-github-actions-general-placeholder.svg)
+### Capturas recomendadas para cerrar c5
 
-![Placeholder — detalle de run en verde](assets/despliegue-web/02-github-actions-run-verde-placeholder.svg)
+Estas tres evidencias visuales cubren exactamente lo que la rúbrica pide en control de versiones y
+CI/CD. Mientras no se sustituyan por capturas reales, el documento conserva placeholders SVG para no
+dejar referencias rotas ni perder la estructura de la entrega.
+
+![Placeholder — GitHub Actions general](assets/despliegue-web/01-github-actions-general-placeholder.svg)
+
+![Placeholder — GitHub Actions run en verde](assets/despliegue-web/02-github-actions-run-verde-placeholder.svg)
+
+![Placeholder — Docker Hub y tags publicados](assets/despliegue-web/04-docker-hub-tags-placeholder.svg)
 
 ---
 
@@ -481,9 +585,10 @@ Además de las imágenes locales del `docker compose images`, el workflow `docke
 
 Placeholders de capturas recomendadas para evaluación:
 
-![Placeholder — Docker Hub y tags publicados](assets/despliegue-web/04-docker-hub-tags-placeholder.svg)
-
 ![Placeholder — Railway servicios desplegados](assets/despliegue-web/05-railway-servicios-placeholder.svg)
+
+La evidencia visual del registry y de los tags publicados ya se ha situado en `c5`, donde encaja
+mejor con la rúbrica de CI/CD y evita duplicar la misma captura en dos apartados.
 
 ---
 
@@ -586,4 +691,18 @@ El código `000` demuestra que no hay publicación directa de esos puertos hacia
 
 ## Capturas pendientes para “excelente”
 
-Las capturas recomendadas para redondear la evaluación visual están en [docs/assets/despliegue-web/README.md](assets/despliegue-web/README.md). Se han dejado placeholders SVG para no romper el documento mientras se sustituyen por capturas reales.
+Las capturas recomendadas para redondear la evaluación visual siguen pendientes. Se han dejado
+placeholders SVG para no romper el documento mientras se sustituyen por capturas reales.
+
+1. `01-github-actions-general-placeholder.svg`: vista general del panel de GitHub Actions con los
+  workflows visibles.
+2. `02-github-actions-run-verde-placeholder.svg`: detalle de una ejecución correcta en verde donde
+  se vean jobs y commit asociados.
+3. `03-docker-compose-ps-placeholder.svg`: evidencia visual del estado del stack local tras
+  `docker compose up -d --build`.
+4. `04-docker-hub-tags-placeholder.svg`: repositorios e imágenes publicadas con tag SHA corto.
+5. `05-railway-servicios-placeholder.svg`: vista del proyecto en Railway con `nginx` como entrada
+  pública y el resto de servicios en red privada.
+
+Con ese bloque de cinco capturas el documento queda cubierto visualmente para `c2`, `c5`, `C7` y
+`C8` sin tocar el nombre del fichero ni mezclarlo con `08-despliegue.md`.

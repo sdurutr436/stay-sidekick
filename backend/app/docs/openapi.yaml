@@ -160,6 +160,59 @@ components:
           type: string
           nullable: true
 
+  parameters:
+    UsuarioId:
+      name: usuario_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+
+    ApartamentoId:
+      name: apartamento_id
+      in: path
+      required: true
+      schema:
+        type: string
+
+    PlantillaId:
+      name: plantilla_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+
+  responses:
+    Unauthorized:
+      description: Token JWT ausente o inválido
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    Forbidden:
+      description: El rol del usuario no tiene permisos suficientes
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    NotFound:
+      description: Recurso no encontrado
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    ValidationError:
+      description: Error de validación del cuerpo de la petición
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
 tags:
   - name: Auth
     description: Autenticación y verificación de token
@@ -1869,60 +1922,3 @@ paths:
                     type: string
                     example: ok
 
-# ── Respuestas comunes ────────────────────────────────────────────────────
-
-  responses: {}
-
-components:
-  parameters:
-    UsuarioId:
-      name: usuario_id
-      in: path
-      required: true
-      schema:
-        type: string
-        format: uuid
-
-    ApartamentoId:
-      name: apartamento_id
-      in: path
-      required: true
-      schema:
-        type: string
-
-    PlantillaId:
-      name: plantilla_id
-      in: path
-      required: true
-      schema:
-        type: string
-        format: uuid
-
-  responses:
-    Unauthorized:
-      description: Token JWT ausente o inválido
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-
-    Forbidden:
-      description: El rol del usuario no tiene permisos suficientes
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-
-    NotFound:
-      description: Recurso no encontrado
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-
-    ValidationError:
-      description: Error de validación del cuerpo de la petición
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
