@@ -3,7 +3,7 @@
 ## Indice
 
 - [6.1. Secuencia de desarrollo](#61-secuencia-de-desarrollo)
-- [6.2. Dificultades encontradas y como se superaron](#62-dificultades-encontradas-y-como-se-superaron)
+- [6.2. Dificultades encontradas y como se abordaron](#62-dificultades-encontradas-y-como-se-abordaron)
 - [6.3. Decisiones tecnicas clave y su justificacion](#63-decisiones-tecnicas-clave-y-su-justificacion)
 - [6.4. Control de versiones](#64-control-de-versiones)
 - [6.5. Fragmentos de codigo relevantes](#65-fragmentos-de-codigo-relevantes)
@@ -66,7 +66,7 @@ Se reforzo la plataforma con:
 
 ---
 
-## 6.2. Dificultades encontradas y como se superaron
+## 6.2. Dificultades encontradas y como se abordaron
 
 ### Compartir estilos reales entre 11ty y Angular
 
@@ -74,11 +74,23 @@ El proyecto necesitaba una unica fuente de estilos para sitio publico y panel SP
 
 ### Bloqueo de CSS por CSP estricta en frontend
 
-Durante el build de Angular, la carga diferida de CSS usando `onload` en `<link>` provocaba bloqueo con CSP estricta en Nginx. Se soluciono desactivando inline critical CSS en la configuracion de estilos para generar enlaces compatibles con la politica de seguridad.
+Durante el build de Angular, la carga diferida de CSS usando `onload` en `<link>` provocaba bloqueo con CSP estricta en Nginx. Ademas, en el sitio publico aparecieron bloqueos de scripts inline usados para evitar FOUC. Se soluciono desactivando inline critical CSS en la configuracion de estilos y externalizando los scripts iniciales a ficheros JS dedicados, de forma compatible con la politica de seguridad.
+
+### Correcciones iterativas de accesibilidad y consistencia visual
+
+Las auditorias de accesibilidad y la validacion manual detectaron problemas no funcionales pero relevantes para calidad de producto: botones sin nombre accesible, `aria-label` vacios, atributos ARIA redundantes y contrastes mejorables en algunos estados. Estas incidencias no se resolvieron en un unico cambio, sino en varias tandas de fixes sobre web y frontend, afinando componentes, navegacion y modo visual hasta dejar una base mas consistente.
+
+### Despliegue en Railway con Nginx y rutas inconsistentes
+
+En despliegue aparecieron errores 502 y navegacion inestable por dos causas combinadas: arranque incompleto del contenedor Nginx en Railway y rutas sin barra final en la configuracion del proxy. Se introdujo un `start.sh` especifico para Nginx en Railway y se unificaron las rutas con trailing slash para eliminar causas detectadas y reducir redirecciones innecesarias, pero el 502 no puede darse por resuelto a fecha de cierre de esta memoria y permanece como incidencia abierta en produccion.
+
+### Restricciones SMTP del entorno gestionado
+
+El envio de correos transaccionales encontro limitaciones del proveedor de despliegue: Railway bloqueaba el puerto 587 en ciertos escenarios, lo que impedia usar la configuracion SMTP esperada. Se anadio soporte SSL/TLS alternativo en el servicio de correo y se probaron ajustes de configuracion para adaptarse al entorno, pero el envio SMTP en produccion tampoco quedo resuelto de forma estable y se documenta como limitacion pendiente del despliegue.
 
 ### Convivencia JWT + CSRF en SPA
 
-Aunque JWT protege autenticacion, los endpoints de escritura requerian proteccion adicional frente a CSRF. Se implemento patron double-submit cookie (`csrf_token` en cookie + header `X-CSRF-Token`) para mantener un flujo stateless seguro en frontend y backend.
+Aunque JWT protege autenticacion, los endpoints de escritura requerian proteccion adicional frente a CSRF. Se implemento patron double-submit cookie (`csrf_token` en cookie + header `X-CSRF-Token`) para mantener un flujo stateless seguro en frontend y backend. Mas adelante se endurecio la configuracion de cookies para entornos seguros, evitando que la proteccion quedara debilitada en despliegue.
 
 ### Variabilidad de entradas PMS/XLSX
 
@@ -86,7 +98,15 @@ Las fuentes externas no siempre entregan campos homogeneos (cabeceras, formatos,
 
 ### OAuth de Google en distintos entornos
 
-El callback OAuth y los redirects de frontend variaban entre local y despliegue. Se centralizo con `FRONTEND_BASE_URL` y verificacion firmada de `state` para evitar errores de retorno y reforzar seguridad del flujo OAuth.
+El callback OAuth y los redirects de frontend variaban entre local y despliegue. Ademas, el flujo exigio reforzar la gestion de `state` para evitar retornos invalidos o reutilizacion indebida. Se centralizo con `FRONTEND_BASE_URL` y verificacion firmada con caducidad del `state` para evitar errores de retorno y reforzar seguridad del flujo OAuth.
+
+### Errores 500 por tipado heterogeneo en sincronizacion
+
+La integracion con proveedores externos genero fallos de ejecucion al procesar campos de fecha con tipos distintos segun el origen. En un fix del sincronizador se detecto el caso de cadenas tratadas como si fueran objetos fecha, provocando errores 500. Se corrigio endureciendo la normalizacion y el tratamiento defensivo de tipos antes de transformar o serializar datos.
+
+### Migraciones no idempotentes en base de datos
+
+Durante la evolucion del modulo de mapa de calor aparecieron fallos en migraciones cuando una constraint ya habia sido eliminada o creada en una ejecucion previa. Esto rompia despliegues repetibles y entornos de integracion. Se resolvio haciendo las operaciones de alteracion de esquema idempotentes, con comprobaciones previas antes de eliminar o recrear restricciones.
 
 ### Gestion segura de claves de proveedores
 
@@ -124,19 +144,24 @@ Se definieron pipelines independientes para Python, Angular y 11ty. La publicaci
 
 ## 6.4. Control de versiones
 
-El proyecto usa Git con repositorio en GitHub y una estrategia de ramas por trabajo tematico.
+El proyecto usa Git con repositorio en GitHub y una estrategia de ramas por trabajo tematico e integracion progresiva.
 
 Patron aplicado durante el desarrollo:
 
 - Ramas de trabajo por objetivo (`dev-*`, `feat-*`, `fix-*`).
-- Integracion mediante merges documentados en ramas de consolidacion.
-- Promocion a rama principal tras validar CI y estabilidad.
+- Integracion frecuente en `dev-herramientas` como rama de consolidacion tecnica.
+- Promocion posterior a `main` mediante merges documentados tras validar CI y estabilidad.
 
-Evidencias del flujo en historial:
+Esta estructura permitio aislar experimentacion funcional, agrupar fixes relacionados y retrasar la promocion a `main` hasta tener una version mas estable del conjunto.
 
-- Merges de ramas de mejoras UI/UX y DevOps hacia ramas de integracion.
-- Commits de hardening de Docker, CSP, variables de entorno y documentacion.
-- Ramas especificas para Swagger/OpenAPI y mejoras de notificaciones.
+Evidencias verificables del flujo en historial:
+
+- `bb85b3c`: `merge: fix-accesibilidad-auditoria -> dev-herramientas`, incorporando correcciones WCAG, mejoras de la web estatica y cobertura frontend reforzada.
+- `ddefdd7`: `merge: dev-mail-service -> dev-herramientas`, integrando un servicio de correo reutilizable antes de consolidarlo en ramas superiores.
+- `9973356`: `merge: dev-herramientas -> main`, llevando a principal la refactorizacion API REST, ajustes de roles y mejoras de notificaciones y Swagger.
+- `28afe36`: `merge: dev-herramientas -> main`, consolidando cambios de DevOps, headers Nginx, endurecimiento de contenedores y CI con PostgreSQL.
+- `b87a427`: `merge: dev-herramientas -> main`, agrupando ajustes de `start.sh` para Railway y pruebas de soporte SSL para SMTP.
+- `88daebb`: `merge: dev-herramientas -> main`, incorporando fixes de rutas Nginx y nuevas correcciones de accesibilidad.
 
 Automatizacion de versionado y calidad:
 
@@ -148,6 +173,9 @@ Automatizacion de versionado y calidad:
 ---
 
 ## 6.5. Fragmentos de codigo relevantes
+
+Los siguientes fragmentos se seleccionaron comprobando su presencia en las ramas activas `main` y `dev-herramientas`.
+Se excluyen de esta seleccion los fragmentos ligados al envio SMTP en produccion, porque esa parte del sistema quedo como limitacion pendiente y no como comportamiento consolidado.
 
 ### 1) Login protegido con CSRF y rate limit
 
@@ -270,3 +298,134 @@ RUN npm run build -- --base-href=/menu/
 ```
 
 El frontend se sirve bajo `/menu` detras de Nginx. Este ajuste evita rutas rotas al desplegar y fue clave para convivir con el sitio 11ty servido en `/`.
+
+### 7) OAuth Google con `state` firmado y caducidad
+
+Archivo: `backend/app/h_sincronizador_contactos/service.py`
+
+```python
+def _oauth_serializer():
+    from itsdangerous import URLSafeTimedSerializer
+    return URLSafeTimedSerializer(current_app.config["SECRET_KEY"], salt="google-oauth")
+
+
+def build_oauth_url(empresa_id: str) -> str:
+    client_id = current_app.config["GOOGLE_CLIENT_ID"]
+    redirect_uri = current_app.config["GOOGLE_REDIRECT_URI"]
+    state = _oauth_serializer().dumps({"e": empresa_id, "n": secrets.token_urlsafe(8)})
+    params = {
+        "client_id": client_id,
+        "redirect_uri": redirect_uri,
+        "response_type": "code",
+        "scope": _SCOPES,
+        "access_type": "offline",
+        "prompt": "consent",
+        "state": state,
+    }
+    query = urlencode(params)
+    return f"{_GOOGLE_AUTH_URL}?{query}"
+
+
+_OAUTH_STATE_TTL = 600  # 10 minutos
+
+
+def verify_oauth_state(state: str) -> str | None:
+    from itsdangerous import BadSignature, SignatureExpired
+    try:
+        data = _oauth_serializer().loads(state, max_age=_OAUTH_STATE_TTL)
+        return data.get("e")
+    except (BadSignature, SignatureExpired):
+        return None
+```
+
+Este fragmento refleja como se reforzo el flujo OAuth mas alla del redireccionamiento basico: el `state` no solo viaja en la URL, sino que va firmado y con caducidad, reduciendo riesgo de retorno invalido o reutilizacion indebida.
+
+### 8) Parseo XLSX configurable y tolerante a cabeceras
+
+Archivo: `backend/app/h_sincronizador_contactos/service.py`
+
+```python
+cols = prefs.get("xlsx_reservas") or {}
+col_checkin   = int(cols.get("col_checkin", 0))
+col_nombre    = int(cols.get("col_nombre", 0))
+col_tipologia = int(cols.get("col_tipologia", 0))
+col_telefono  = int(cols.get("col_telefono", 0))
+
+_HEADER_MAP = {
+    "checkin": ["checkin", "check-in", "check_in", "fecha_entrada", "arrival", "entrada"],
+    "nombre": ["nombre", "name", "guest", "huesped", "huésped", "guest_name", "referencia"],
+    "tipologia": ["tipologia", "tipología", "id_tipologia", "unit_type", "tipo"],
+    "telefono": ["telefono", "teléfono", "phone", "tel", "movil", "móvil"],
+}
+
+def _find_col(configured: int, candidates: list[str]) -> int | None:
+    if configured > 0:
+        return configured - 1
+    for i, h in enumerate(headers):
+        if h in candidates:
+            return i
+    return None
+
+idx_nombre = _find_col(col_nombre, _HEADER_MAP["nombre"])
+if idx_nombre is None:
+    return [], [
+        "No se encontró columna de nombre del huésped. "
+        "Configura la posición de columna en el perfil o añade una cabecera reconocida."
+    ]
+```
+
+Resume bien la capa de normalizacion que hizo viable el fallback XLSX: cada empresa puede fijar columnas manualmente, pero el sistema tambien intenta reconocer cabeceras equivalentes para soportar archivos heterogeneos sin romper el flujo.
+
+### 9) Migracion idempotente para evitar despliegues fragiles
+
+Archivo: `backend/migrations/versions/f6a7b8c9d0e1_add_heatmap_pms_origen.py`
+
+```python
+def upgrade():
+    op.execute("""
+        DO $$ BEGIN
+            IF EXISTS (
+                SELECT 1 FROM pg_constraint
+                WHERE conname = 'logs_sincronizacion_origen_check'
+                AND conrelid = 'logs_sincronizacion'::regclass
+            ) THEN
+                ALTER TABLE logs_sincronizacion DROP CONSTRAINT logs_sincronizacion_origen_check;
+            END IF;
+        END $$;
+    """)
+    op.create_check_constraint(
+        "logs_sincronizacion_origen_check",
+        "logs_sincronizacion",
+        "origen IN ('pms', 'google_contacts', 'xlsx', 'heatmap_pms')",
+    )
+```
+
+Este cambio es representativo de un problema menos visible pero importante: las migraciones no siempre fallan por SQL incorrecto, sino por asumir un estado previo que puede no cumplirse. La comprobacion previa hace el despliegue mucho mas repetible.
+
+### 10) Contrato OpenAPI de autenticacion y CSRF
+
+Archivo: `backend/app/docs/openapi.yaml`
+
+```yaml
+info:
+  description: |
+    ## Autenticación
+    La mayoría de endpoints requieren un JWT en la cabecera `Authorization: Bearer <token>`.
+    El token se obtiene en `POST /api/auth/login`.
+
+    Los endpoints de escritura también exigen el **CSRF Double-Submit Cookie**:
+    obten el token en `GET /api/csrf-token` y envíalo en la cabecera `X-CSRF-Token`.
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    CsrfToken:
+      type: apiKey
+      in: header
+      name: X-CSRF-Token
+```
+
+Este fragmento muestra que la seguridad no se quedo en implementacion interna: el contrato de API documenta de forma explicita como deben autenticarse los clientes y que requisitos extra tienen las operaciones de escritura.
