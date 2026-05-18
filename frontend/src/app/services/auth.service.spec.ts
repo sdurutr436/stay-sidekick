@@ -119,7 +119,7 @@ describe('AuthService', () => {
   });
 
   describe('logout', () => {
-    it('debería eliminar el token de localStorage y redirigir a /login', () => {
+    it('debería eliminar el token de localStorage y redirigir a /login/', () => {
       localStorage.setItem('ss_token', makeToken());
       const removeSpy = vi.spyOn(Storage.prototype, 'removeItem');
       vi.stubGlobal('location', { href: '' });
@@ -127,7 +127,7 @@ describe('AuthService', () => {
       service.logout();
 
       expect(removeSpy).toHaveBeenCalledWith('ss_token');
-      expect((window.location as { href: string }).href).toBe('/login');
+      expect((window.location as { href: string }).href).toBe('/login/');
     });
   });
 });

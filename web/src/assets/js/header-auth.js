@@ -11,6 +11,11 @@
   var MENU_URL   = '/menu';
   var PERFIL_URL = '/menu/perfil';
 
+  function normalizePath(value) {
+    if (!value) return '/';
+    return value.length > 1 ? value.replace(/\/+$/, '') : value;
+  }
+
   function isTokenValid(token) {
     try {
       var payload = JSON.parse(atob(token.split('.')[1]));
@@ -25,7 +30,12 @@
     if (!token || !isTokenValid(token)) return;
 
     // Swap "Iniciar sesión" → "Perfil" preservando icono y estructura BEM
-    var loginLink = document.querySelector('.header__actions a[href="/login"]');
+    var loginLink = Array.prototype.find.call(
+      document.querySelectorAll('.header__actions a[href]'),
+      function (link) {
+        return normalizePath(link.getAttribute('href')) === '/login';
+      }
+    );
     if (loginLink) {
       loginLink.setAttribute('href', PERFIL_URL);
       var label = loginLink.querySelector('.btn__label');

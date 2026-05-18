@@ -11,6 +11,21 @@
 
 'use strict';
 
+const TOKEN_KEY = 'ss_token';
+
+function getSessionPayload() {
+  var token = localStorage.getItem(TOKEN_KEY);
+  if (!token) return null;
+
+  try {
+    var payload = JSON.parse(atob(token.split('.')[1]));
+    if (!payload.exp || payload.exp <= Date.now() / 1000) return null;
+    return payload;
+  } catch {
+    return null;
+  }
+}
+
 // =============================================================================
 // 1. SANITIZACIÓN
 // =============================================================================
@@ -209,6 +224,12 @@ async function submitPayload(payload, csrfToken) {
 }());
 
 (function init() {
+  var session = getSessionPayload();
+  if (session) {
+    window.location.replace(session.debe_cambiar_password ? '/cambio-password/' : '/menu');
+    return;
+  }
+
   const form = document.getElementById('form-login');
   if (!form) return;
 
