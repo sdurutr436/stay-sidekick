@@ -7,6 +7,7 @@
   - [7.2.1. Pruebas de integración — Backend](#721-pruebas-de-integración--backend)
   - [7.2.2. Pruebas unitarias de servicio — Backend](#722-pruebas-unitarias-de-servicio--backend)
   - [7.2.3. Pruebas unitarias — Frontend](#723-pruebas-unitarias--frontend)
+  - [7.2.4. Pruebas manuales de smoke y validaciones complementarias](#724-pruebas-manuales-de-smoke-y-validaciones-complementarias)
 - [7.3. Cobertura de código](#73-cobertura-de-código)
   - [7.3.1. Frontend — Istanbul / Vitest](#731-frontend--istanbul--vitest)
   - [7.3.2. Backend — cobertura manual](#732-backend--cobertura-manual)
@@ -20,7 +21,8 @@
 ## 7.1. Metodología de pruebas
 
 La estrategia de pruebas adoptada en Stay Sidekick combina diferentes enfoques según la capa
-de la aplicación y el grado de criticidad de cada módulo.
+de la aplicación y el grado de criticidad de cada módulo. Este capítulo toma como referencia el
+estado consolidado del proyecto en `main`, donde se reúne la batería de pruebas y workflows más completa del repositorio.
 
 **Desarrollo guiado por contratos de comportamiento**  
 Para las capas de seguridad — validación CSRF, verificación JWT y control de acceso por rol —
@@ -42,6 +44,12 @@ OAuth 2.0 de Google, mejora e traducción con proveedores de IA — se verificar
 el entorno Docker local. Estos escenarios son difíciles de automatizar de forma fiable sin
 infraestructura de sandbox dedicada y se documentaron como criterios de aceptación informales
 durante el desarrollo.
+
+La validación manual sobre el despliegue gestionado en Railway sigue siendo parcial dentro de los
+resultados de este capítulo. El acceso público a `stay-sidekick.com` quedó restablecido al
+corregir la escucha del servicio al puerto `80` en lugar de `8080`, pero el envío SMTP continúa
+sin operar de forma estable en producción. Por ello, las comprobaciones consolidadas combinan
+entorno Docker local, suite automatizada de CI y verificaciones puntuales en el entorno publicado.
 
 **Pruebas de regresión automatizadas vía CI**  
 La suite completa de pruebas automatizadas se ejecuta en cada *push* y *pull request* mediante
@@ -182,6 +190,19 @@ def test_export_csv_fecha_invalida_devuelve_error():
     assert error == "Parámetros de fecha inválidos."
 ```
 
+Además de `test_export_csv.py`, backend incorpora varias suites unitarias de servicio orientadas a
+reglas de negocio y efectos laterales controlados mediante mocks:
+
+| Suite de servicio | Casos | Comportamiento validado |
+|---|---:|---|
+| `backend/tests/common/notifications/test_mail_service.py` | 19 | Composición del email, ausencia de configuración y errores del envío SMTP mockeado |
+| `backend/tests/contact/test_service_contact.py` | 5 | Validación y tratamiento del servicio de contacto sin depender de la capa HTTP |
+| `backend/tests/solicitud/test_service_solicitud.py` | 7 | Flujo del servicio público de solicitud y control de reglas de negocio |
+| `backend/tests/usuarios/test_service_usuarios.py` | 4 | Reglas de servicio para gestión de usuarios y coherencia de resultados |
+
+Esto desplaza el foco de backend desde pruebas exclusivamente de rutas hacia una estrategia mixta:
+contratos HTTP para seguridad y permisos, y pruebas de servicio para reglas de negocio reutilizables.
+
 ### 7.2.3. Pruebas unitarias — Frontend
 
 El frontend utiliza el **builder `@angular/build:unit-test`** de Angular 19 (que internamente
@@ -273,6 +294,29 @@ it('debería asignar clase i100 cuando checkins supera el nivel3', () => {
 });
 ```
 
+La cobertura del frontend incluye además piezas como `tag.spec.ts`,
+`how-it-works-button.spec.ts`, `theme-toggle.spec.ts`, `templates-card.spec.ts` y
+`theme.service.spec.ts`. Con ello, la batería de tests deja de centrarse solo en CRUD, auth y
+componentes base, y cubre también tema visual, onboarding, tarjetas compuestas y persistencia del
+estado de interfaz.
+
+### 7.2.4. Pruebas manuales de smoke y validaciones complementarias
+
+Además de la exploración manual de integraciones externas, el proyecto mantuvo un guion de smoke
+test específico para el módulo de mapa de calor en `docs/smoke-test-mapa-calor.md`. Ese documento
+estructura la comprobación manual en tres bloques:
+
+1. **Caso A — con PMS conectado**: verifica badge de proveedor, generación de cuadrícula,
+   representación del rango y ausencia de subida XLSX cuando la integración PMS está operativa.
+2. **Caso B — sin PMS, con XLSX**: comprueba la configuración previa de columnas en perfil,
+   la carga de ficheros y el funcionamiento del fallback manual.
+3. **Caso C — validaciones**: fuerza errores esperables de usuario, como ausencia de fechas,
+   configuración XLSX incompleta o umbrales inválidos en perfil.
+
+Como validación no funcional complementaria, las auditorías WAVE documentadas en el capítulo 2 se
+utilizaron como comprobación manual de accesibilidad. No forman parte de la suite automatizada,
+pero sí de la evidencia de calidad revisada durante el cierre del proyecto.
+
 ---
 
 ## 7.3. Cobertura de código
@@ -331,64 +375,81 @@ blueprint:
   (403) — están cubiertos en todos los módulos que los implementan.
 - La validación de entrada está cubierta por los tests que verifican los códigos 400 y 422.
 
+Esta cobertura manual backend combina las suites HTTP con una segunda capa de servicios puros: 5
+suites y 38 casos repartidos entre notificaciones, contacto, solicitud, usuarios y exportación de
+contactos. Aunque sigue sin existir un informe automático de `pytest-cov`, el alcance funcional
+cubierto por backend va más allá de los endpoints y alcanza también reglas de negocio y efectos
+laterales relevantes.
+
 ---
 
 ## 7.4. Resultados y estadísticas
 
+Los resultados de esta sección miden la calidad del código validada mediante tests automatizados y
+comprobaciones locales controladas. No equivalen a una certificación completa del despliegue en
+Railway, donde sigue pendiente la estabilización del envío SMTP en producción.
+
 ### 7.4.1. Desglose por suite — Backend
 
-Todas las pruebas del backend finalizan con **0 fallos y 0 errores**.
+Backend suma **92 casos** repartidos en **12 archivos de test**.
 
 | Suite de pruebas | Tipo | Pruebas | Resultado |
 |---|---|---|---|
 | `tests/auth/test_routes_auth.py` | Integración (HTTP) | 7 | ✅ |
-| `tests/empresas/test_routes_empresas.py` | Integración (HTTP) | 6 | ✅ |
+| `tests/empresas/test_routes_empresas.py` | Integración (HTTP) | 8 | ✅ |
 | `tests/usuarios/test_routes_usuarios.py` | Integración (HTTP) | 10 | ✅ |
 | `tests/perfil/test_routes_perfil.py` | Integración (HTTP) | 9 | ✅ |
 | `tests/h_vault_comunicaciones/test_routes_vault.py` | Integración (HTTP) | 9 | ✅ |
 | `tests/h_maestro_apartamentos/test_routes_apartamentos.py` | Integración (HTTP) | 9 | ✅ |
 | `tests/h_mapa_de_calor/test_routes_heatmap.py` | Integración (HTTP) | 2 | ✅ |
-| `tests/h_sincronizador_contactos/test_export_csv.py` | Unitaria | 3 | ✅ |
-| **TOTAL** | — | **55** | **✅ 100 %** |
+| `tests/common/notifications/test_mail_service.py` | Unitaria de servicio | 19 | ✅ |
+| `tests/contact/test_service_contact.py` | Unitaria de servicio | 5 | ✅ |
+| `tests/h_sincronizador_contactos/test_export_csv.py` | Unitaria de servicio | 3 | ✅ |
+| `tests/solicitud/test_service_solicitud.py` | Unitaria de servicio | 7 | ✅ |
+| `tests/usuarios/test_service_usuarios.py` | Unitaria de servicio | 4 | ✅ |
+| **TOTAL** | — | **92** | **✅ 100 %** |
 
 **Resumen global del backend:**
 
 | Métrica | Valor |
 |---|---|
-| Total de pruebas | 55 |
-| Pruebas exitosas | 55 |
+| Total de pruebas | 92 |
+| Pruebas exitosas | 92 |
 | Fallos | 0 |
 | Errores | 0 |
 | Omitidas | 0 |
 | Tasa de éxito | 100 % |
-| Archivos de test | 8 |
-| Módulos cubiertos | auth, empresas, usuarios, perfil, vault, apartamentos, heatmap, contactos |
+| Archivos de test | 12 |
+| Módulos cubiertos | auth, empresas, usuarios, perfil, vault, apartamentos, heatmap, contactos, solicitud, notificaciones |
+
+Backend queda distribuido en **7 suites de integración HTTP** y **5 suites de
+servicio**, reforzando tanto la capa de seguridad/rutas como la lógica de negocio reutilizable.
 
 ### 7.4.2. Desglose por spec — Frontend
 
-Los 33 archivos `*.spec.ts` cubren servicios, componentes (átomos, moléculas, organismos), el
+Los **38 archivos `*.spec.ts`** cubren servicios, componentes (átomos, moléculas, organismos), el
 guard de autenticación y el interceptor HTTP. La distribución por categoría es la siguiente:
 
 | Categoría | Specs | Tests |
 |---|---|---|
-| Servicios (`auth`, `apartamentos`, `vault`, `mapa-calor`, `perfil`, `gestion-usuarios`, `contactos`, `sidenav`) | 8 | 101 |
-| Componentes organismos (`header`, `footer`, `sidenav`, `modal`, `tabla-crud`, `heatmap-grid`) | 6 | 40 |
-| Componentes moléculas (`alert`, `confirm-inline`, `accordion-item`, `form-field`, `form-input-icon`, `search-bar`, `dropdown-buscador`, `tarjeta-estado`) | 8 | 74 |
-| Componentes átomos (`button`, `badge`, `icon`, `form-input`, `form-select`, `form-label`, `form-textarea`, `form-checkbox`) | 8 | 55 |
+| Servicios (`auth`, `apartamentos`, `vault`, `mapa-calor`, `perfil`, `gestion-usuarios`, `contactos`, `sidenav`, `theme`) | 9 | 103 |
+| Componentes organismos (`header`, `footer`, `sidenav`, `modal`, `tabla-crud`, `heatmap-grid`, `templates-card`) | 7 | 48 |
+| Componentes moléculas (`alert`, `confirm-inline`, `accordion-item`, `form-field`, `form-input-icon`, `search-bar`, `dropdown-buscador`, `tarjeta-estado`, `how-it-works-button`, `theme-toggle`) | 10 | 75 |
+| Componentes átomos (`button`, `badge`, `icon`, `form-input`, `form-select`, `form-label`, `form-textarea`, `form-checkbox`, `tag`) | 9 | 60 |
 | Guards (`auth.guard`) | 1 | 4 |
 | Interceptores (`auth.interceptor`) | 1 | 5 |
 | App raíz (`app.spec`) | 1 | 2 |
-| **TOTAL** | **33** | **281** |
+| **TOTAL** | **38** | **297** |
 
 **Resumen global del frontend:**
 
 | Métrica | Valor |
 |---|---|
-| Total de pruebas | 281 |
-| Pruebas exitosas | 281 |
+| Total de pruebas | 297 |
+| Pruebas exitosas | 297 |
 | Fallos | 0 |
 | Errores | 0 |
-| Specs (archivos) | 33 |
+| Specs (archivos) | 38 |
 | Tasa de éxito | 100 % |
 | Umbral mínimo de cobertura | 90 % (sentencias, ramas, funciones, líneas) |
 
@@ -397,8 +458,7 @@ guard de autenticación y el interceptor HTTP. La distribución por categoría e
 
 ### 7.4.3. Integración continua
 
-El repositorio dispone de cuatro pipelines de CI independientes que se coordinan con el pipeline
-de publicación de imágenes Docker.
+El repositorio dispone de **seis workflows principales** de validación, publicación y seguridad.
 
 **CI Python (`ci-python.yml`)**  
 Se ejecuta en cada *push* a `main` y en *pull requests*. Consta de dos trabajos secuenciales:
@@ -426,6 +486,12 @@ Se activa únicamente cuando los tres pipelines de CI (Python, Angular y Web) ha
 comprobar las conclusiones de todos los workflows; solo si todos devuelven `"success"` se lanza el
 trabajo `publicar`, que construye y publica las imágenes con etiquetas de SHA corto.
 
+**Auditoría de seguridad (`trivy.yml`)**  
+El workflow `Trivy Audit` se dispara en *pull requests* a `main`, en *push* a `main`, por
+calendario semanal y manualmente (`workflow_dispatch`). El escaneo se hace sobre filesystem e IaC,
+limita el resultado a severidades `HIGH` y `CRITICAL`, genera un informe SARIF, lo sube como
+artefacto con 14 días de retención y lo publica además en GitHub Security.
+
 | Pipeline | Disparador | Herramienta | Acción principal |
 |---|---|---|---|
 | `ci-python.yml` | Push/PR a `main` | Python 3.12 + pytest | Lint ruff + tests con postgres:16-alpine |
@@ -433,3 +499,4 @@ trabajo `publicar`, que construye y publica las imágenes con etiquetas de SHA c
 | `ci-angular.yml` | Push/PR a `main` | Node 22 + Angular CLI | Build de producción |
 | `ci-web.yml` | Push/PR a `main` | Node 22 + 11ty | Build del sitio estático |
 | `docker-publish.yml` | Tras éxito de los 3 CI en mismo SHA | Docker + GitHub API | Publicación de imágenes en Docker Hub |
+| `trivy.yml` | PR/Push a `main`, semanal, manual | Trivy + SARIF | Escaneo de vulnerabilidades y misconfiguraciones con publicación en GitHub Security |
