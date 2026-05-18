@@ -243,6 +243,8 @@ La interfaz esta pensada para uso en escritorio y movil:
 
 ![Análisis Wave - Dashboard principal](assets/wave/02-auditoria-wave-dashboard-principal.png)
 
+![Análisis Lighthouse - Dashboard principal](assets/lighthouse/02-auditoria-lighthouse-dashboard-principal.png)
+
 **Herramienta: Maestro de Apartamentos**
 
 ![Análisis Wave - Maestro de Apartamentos](assets/wave/02-auditoria-wave-maestro-apartamentos.png)
