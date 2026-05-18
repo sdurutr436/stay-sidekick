@@ -29,7 +29,7 @@ describe('authGuard', () => {
     expect(result).toBe(true);
   });
 
-  it('debería retornar false y redirigir a /login cuando el usuario no está autenticado', () => {
+  it('debería retornar false y redirigir a /login/ cuando el usuario no está autenticado', () => {
     vi.stubGlobal('location', { href: '' });
     TestBed.configureTestingModule({
       providers: [{ provide: AuthService, useValue: buildAuthMock({ isLoggedIn: false }) }],
@@ -38,10 +38,10 @@ describe('authGuard', () => {
     const result = TestBed.runInInjectionContext(() => authGuard(emptyRoute, emptyState));
 
     expect(result).toBe(false);
-    expect((window.location as { href: string }).href).toContain('/login');
+    expect((window.location as { href: string }).href).toBe('/login/?acceso=requerido');
   });
 
-  it('debería retornar false y redirigir a /cambio-password cuando debe cambiar contraseña', () => {
+  it('debería retornar false y redirigir a /cambio-password/ cuando debe cambiar contraseña', () => {
     vi.stubGlobal('location', { href: '' });
     TestBed.configureTestingModule({
       providers: [{ provide: AuthService, useValue: buildAuthMock({ isLoggedIn: true, debeChangiarPassword: true }) }],
@@ -50,7 +50,7 @@ describe('authGuard', () => {
     const result = TestBed.runInInjectionContext(() => authGuard(emptyRoute, emptyState));
 
     expect(result).toBe(false);
-    expect((window.location as { href: string }).href).toContain('/cambio-password');
+    expect((window.location as { href: string }).href).toBe('/cambio-password/');
   });
 
   it('debería comprobar isLoggedIn antes que debeChangiarPassword', () => {
@@ -62,6 +62,6 @@ describe('authGuard', () => {
     const result = TestBed.runInInjectionContext(() => authGuard(emptyRoute, emptyState));
 
     expect(result).toBe(false);
-    expect((window.location as { href: string }).href).toContain('/login');
+    expect((window.location as { href: string }).href).toBe('/login/?acceso=requerido');
   });
 });

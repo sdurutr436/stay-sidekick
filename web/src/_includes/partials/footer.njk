@@ -7,10 +7,10 @@
   <div class="footer__inner">
     <div class="footer__grid">
 
-      {# Col 1: Brand #}
+      {# Col 1: Brand — doble picture (light/dark) gestionada por CSS .dark #}
       <div class="footer__brand">
         <a href="/" aria-label="{{ site.name }} — Ir a inicio">
-          <picture>
+          <picture class="footer__brand-img footer__brand-img--light">
             <source
               media="(max-width: 767px)"
               srcset="/assets/img/favicon/stay-sidekick-fav-icon-512x512.png"
@@ -33,6 +33,30 @@
               height="256"
               loading="lazy"
               decoding="async"
+            >
+          </picture>
+          <picture class="footer__brand-img footer__brand-img--dark">
+            <source
+              media="(max-width: 767px)"
+              srcset="/assets/img/favicon/stay-sidekick-fav-icon-dark-mode-512x512.png"
+              type="image/png">
+            <source
+              srcset="/assets/img/footer/stay-sidekick-1024x576-dark-mode.webp"
+              type="image/webp"
+              sizes="(max-width: 767px) 160px, 200px">
+            <source
+              srcset="/assets/img/footer/stay-sidekick-1024x576-dark-mode.png"
+              type="image/png"
+              sizes="(max-width: 767px) 160px, 200px">
+            <img
+              class="logo__img"
+              src="/assets/img/footer/stay-sidekick-1024x576-dark-mode.png"
+              alt=""
+              width="1024"
+              height="576"
+              loading="lazy"
+              decoding="async"
+              aria-hidden="true"
             >
           </picture>
         </a>

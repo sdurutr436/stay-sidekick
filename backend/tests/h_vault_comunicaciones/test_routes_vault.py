@@ -74,8 +74,9 @@ def test_list_plantillas_devuelve_200(client):
 
 
 def test_crear_plantilla_sin_nombre_devuelve_422(client):
-    resp = client.post("/api/vault/plantillas", headers=_auth(), json={"contenido": "hola"})
+    resp = client.post("/api/vault/plantillas", headers=_auth(), json={"nombre": "", "contenido": "hola"})
     assert resp.status_code == 422
+    assert resp.get_json()["errors"] == ["El nombre debe tener entre 1 y 200 caracteres."]
 
 
 def test_crear_plantilla_exitosa_devuelve_201(client):

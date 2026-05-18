@@ -1,0 +1,55 @@
+// =============================================================================
+// COMPONENTS: MODAL INSTRUCCIONES
+// Estilos específicos del cuerpo del modal "¿Cómo se usa?". Reutiliza
+// .modal del componente Modal (organismo) y añade tipografía para los
+// bloques de instrucciones dinámicos según el contexto de conexión.
+// [ESPEJO NJK] no aplica — solo Angular SPA.
+// =============================================================================
+
+@use '../shared' as *;
+
+.modal-instrucciones {
+  display: flex;
+  flex-direction: column;
+  gap: $space-4;
+  color: var(--card-foreground);
+
+  &__seccion {
+    display: flex;
+    flex-direction: column;
+    gap: $space-2;
+  }
+
+  &__titulo {
+    @include text-label-md;
+    margin: 0;
+    color: var(--foreground);
+  }
+
+  &__texto {
+    @include text-body-sm;
+    margin: 0;
+    color: var(--muted-foreground);
+  }
+
+  &__lista {
+    margin: 0;
+    padding-left: $space-5;
+    @include text-body-sm;
+    color: var(--card-foreground);
+
+    li + li {
+      margin-top: $space-1;
+    }
+  }
+
+  &__nota {
+    margin: 0;
+    padding: $space-3;
+    background-color: var(--muted);
+    border-left: 3px solid var(--accent);
+    border-radius: $border-radius-default;
+    @include text-body-sm;
+    color: var(--muted-foreground);
+  }
+}

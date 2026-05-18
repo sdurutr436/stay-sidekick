@@ -48,3 +48,16 @@
 {% macro badge(text, variant='default') %}
   <span class="badge badge--{{ variant }}">{{ text }}</span>
 {% endmacro %}
+
+{# ── tag ──────────────────────────────────────────────────────────────────── #}
+{# Indicador de estado con icono opcional + texto. Espejo del átomo Angular   #}
+{# <app-tag>. Variantes: default | success | warning | danger.                 #}
+{# @param {String} text              Texto del tag. Requerido.                #}
+{# @param {String} [variant='default'] Variante: default | success | warning | danger. #}
+{# @param {String} [icon='']         SVG inline para colocar antes del texto. #}
+{% macro tag(text, variant='default', icon='') %}
+  <span class="tag tag--{{ variant }}">
+    {%- if icon %}{{ icon | safe }}{% endif %}
+    <span class="tag__label">{{ text }}</span>
+  </span>
+{% endmacro %}

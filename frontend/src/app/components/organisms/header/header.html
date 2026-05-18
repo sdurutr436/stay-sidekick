@@ -21,21 +21,23 @@
           >
             @if (sidenavService.isOpen()) {
               <!-- Icono X — cerrar -->
-              <line x1="4" y1="4" x2="20" y2="20" stroke="#2e2e2e" stroke-width="2" stroke-linecap="square"/>
-              <line x1="20" y1="4" x2="4"  y2="20" stroke="#2e2e2e" stroke-width="2" stroke-linecap="square"/>
+              <line x1="4" y1="4" x2="20" y2="20" stroke="currentColor" stroke-width="2" stroke-linecap="square"/>
+              <line x1="20" y1="4" x2="4"  y2="20" stroke="currentColor" stroke-width="2" stroke-linecap="square"/>
             } @else {
               <!-- Icono hamburguesa — abrir -->
-              <line x1="3" y1="6"  x2="21" y2="6"  stroke="#2e2e2e" stroke-width="2" stroke-linecap="square"/>
-              <line x1="3" y1="12" x2="21" y2="12" stroke="#2e2e2e" stroke-width="2" stroke-linecap="square"/>
-              <line x1="3" y1="18" x2="21" y2="18" stroke="#2e2e2e" stroke-width="2" stroke-linecap="square"/>
+              <line x1="3" y1="6"  x2="21" y2="6"  stroke="currentColor" stroke-width="2" stroke-linecap="square"/>
+              <line x1="3" y1="12" x2="21" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="square"/>
+              <line x1="3" y1="18" x2="21" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="square"/>
             }
           </svg>
         </button>
       }
 
-      <!-- Brand: favicon en mobile (<768px), logo horizontal en tablet/desktop (≥768px) -->
+      <!-- Brand: dos <picture>s hermanas (light/dark) controladas por CSS según
+           la clase .dark en <html>. Cada una sirve favicon en mobile (<768px) y
+           logo horizontal en tablet/desktop (≥768px). -->
       <a routerLink="/" class="header__brand" aria-label="Stay Sidekick — Menú principal">
-        <picture>
+        <picture class="header__brand-img header__brand-img--light">
           <source
             media="(max-width: 767px)"
             srcset="/img/favicon/stay-sidekick-fav-icon-512x512.png"
@@ -61,6 +63,26 @@
             fetchpriority="high"
           >
         </picture>
+        <picture class="header__brand-img header__brand-img--dark">
+          <source
+            srcset="/img/header/stay-sidekick-1024x576-dark-mode.webp"
+            type="image/webp"
+            sizes="(max-width: 767px) 120px, 160px">
+          <source
+            srcset="/img/header/stay-sidekick-1024x576-dark-mode.png"
+            type="image/png"
+            sizes="(max-width: 767px) 120px, 160px">
+          <img
+            class="logo__img"
+            src="/img/header/stay-sidekick-1024x576-dark-mode.png"
+            alt=""
+            width="1024"
+            height="576"
+            loading="eager"
+            decoding="async"
+            aria-hidden="true"
+          >
+        </picture>
       </a>
     </div>
 
@@ -74,7 +96,7 @@
           <span class="btn__label">Perfil</span>
         </a>
       } @else {
-        <a href="/login" class="btn btn--secondary btn--md">
+        <a href="/login/" class="btn btn--secondary btn--md">
           <span class="btn__icon-mobile" aria-hidden="true">
             <svg viewBox="0 0 256 256" fill="currentColor" width="20" height="20" xmlns="http://www.w3.org/2000/svg"><path d="M230.92,212c-15.23-26.33-38.7-45.21-66.09-54.16a72,72,0,1,0-73.66,0C63.78,166.78,40.31,185.66,25.08,212a8,8,0,1,0,13.85,8c18.84-32.56,52.14-52,89.07-52s70.23,19.44,89.07,52a8,8,0,1,0,13.85-8ZM72,96a56,56,0,1,1,56,56A56.06,56.06,0,0,1,72,96Z"/></svg>
           </span>
@@ -87,6 +109,7 @@
         </span>
         <span class="btn__label">Presentar solicitud</span>
       </a>
+      <app-theme-toggle />
     </nav>
 
   </div>

@@ -3,6 +3,8 @@
 // Tamaños estándar para iconos SVG
 // =============================================================================
 
+@use '../shared' as *;
+
 .svg {
   display: inline-block;
   fill: currentColor;

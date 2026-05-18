@@ -14,6 +14,8 @@
 // display: block permite que actúe como ítem de grid/flex en layouts.
 // =============================================================================
 
+@use '../shared' as *;
+
 app-panel-seccion {
   display: block;
 }

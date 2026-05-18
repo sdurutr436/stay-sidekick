@@ -11,6 +11,11 @@
   var MENU_URL   = '/menu';
   var PERFIL_URL = '/menu/perfil';
 
+  function normalizePath(value) {
+    if (!value) return '/';
+    return value.length > 1 ? value.replace(/\/+$/, '') : value;
+  }
+
   function isTokenValid(token) {
     try {
       var payload = JSON.parse(atob(token.split('.')[1]));
@@ -24,14 +29,21 @@
     var token = localStorage.getItem(TOKEN_KEY);
     if (!token || !isTokenValid(token)) return;
 
-    // Swap "Iniciar sesión" → "Perfil"
-    var loginLink = document.querySelector('.header__actions a[href="/login"]');
+    // Swap "Iniciar sesión" → "Perfil" preservando icono y estructura BEM
+    var loginLink = Array.prototype.find.call(
+      document.querySelectorAll('.header__actions a[href]'),
+      function (link) {
+        return normalizePath(link.getAttribute('href')) === '/login';
+      }
+    );
     if (loginLink) {
-      var perfilLink = document.createElement('a');
-      perfilLink.href        = PERFIL_URL;
-      perfilLink.className   = loginLink.className;
-      perfilLink.textContent = 'Perfil';
-      loginLink.parentNode.replaceChild(perfilLink, loginLink);
+      loginLink.setAttribute('href', PERFIL_URL);
+      var label = loginLink.querySelector('.btn__label');
+      if (label) {
+        label.textContent = 'Perfil';
+      } else {
+        loginLink.textContent = 'Perfil';
+      }
     }
 
     // Swap logo → /menu

@@ -4,6 +4,8 @@
 // Estructura BEM: .btn.btn--{variante}.btn--{tamaño}
 // =============================================================================
 
+@use '../shared' as *;
+
 .btn {
   // Base
   display: inline-flex;
@@ -93,11 +95,11 @@
     color:            $color-text-primary;
 
     &:hover:not(:disabled) {
-      background-color: $color-gray-100;
+      background-color: $color-btn-ghost-bg-hover;
     }
 
     &:active:not(:disabled) {
-      background-color: $color-gray-200;
+      background-color: $color-btn-ghost-bg-active;
     }
   }
 

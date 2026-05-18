@@ -2,6 +2,8 @@
 // COMPONENTS: CONFIRM INLINE (molecule)
 // =============================================================================
 
+@use '../shared' as *;
+
 .confirm-inline {
   display: flex;
   align-items: center;

@@ -2,6 +2,8 @@
 // COMPONENTS: ACCORDION ITEM (molecule)
 // =============================================================================
 
+@use '../shared' as *;
+
 .accordion-item {
   border: $border-width $border-style $color-border;
 
@@ -49,7 +51,7 @@
   &__count {
     @include text-caption-md;
     font-weight: $font-weight-label;
-    background: $color-gray-200;
+    background: $color-btn-ghost-bg-active;
     color: $color-text-secondary;
     border-radius: 999px;
     padding: 0.1rem 0.5rem;

@@ -31,6 +31,8 @@
 //   .ds-organism-preview   (caja contenedora para organismos)
 // =============================================================================
 
+@use '../shared' as *;
+
 $_ds-nav-width: 200px;
 
 // -------------------------------------------------------------------------
@@ -83,7 +85,7 @@ $_ds-nav-width: 200px;
     transition: background-color var(--transition-base);
 
     &:hover {
-      background-color: $color-gray-100;
+      background-color: $color-btn-ghost-bg-hover;
     }
 
     &:focus-visible {
@@ -92,7 +94,7 @@ $_ds-nav-width: 200px;
     }
 
     &--active {
-      background-color: $color-gray-200;
+      background-color: $color-btn-ghost-bg-active;
       font-weight: $font-weight-heading;
     }
   }
@@ -154,10 +156,70 @@ $_ds-nav-width: 200px;
     border-bottom: $border-width $border-style $color-border;
   }
 
+  &__hint {
+    @include text-body-sm;
+    color: $color-text-secondary;
+    margin-top: -$space-2;  // compensa el margen del __label
+    margin-bottom: $space-4;
+    max-width: 72ch;
+  }
+
   &__body {
     display: flex;
     flex-direction: column;
     gap: $space-4;
+  }
+}
+
+// -------------------------------------------------------------------------
+// Color tokens — sección "Colores" del design system
+// -------------------------------------------------------------------------
+.ds-color-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: $space-4;
+}
+
+.ds-color-token {
+  display: flex;
+  flex-direction: column;
+  border: $border-width $border-style $color-border;
+  border-radius: $border-radius-default;
+  background-color: $color-surface-card;
+  overflow: hidden;
+
+  &__swatch {
+    height: 6rem;
+    border-bottom: $border-width $border-style $color-border;
+  }
+
+  &__meta {
+    padding: $space-3 $space-4;
+    display: flex;
+    flex-direction: column;
+    gap: $space-1;
+  }
+
+  &__name {
+    @include text-label-md;
+    color: $color-text-primary;
+    margin: 0;
+  }
+
+  &__variable {
+    @include text-caption-md;
+    color: $color-text-secondary;
+    font-family: monospace;
+    background-color: $color-surface-alt;
+    padding: 0 $space-1;
+    border-radius: $border-radius-sm;
+    align-self: flex-start;
+  }
+
+  &__desc {
+    @include text-body-sm;
+    color: $color-text-secondary;
+    margin: 0;
   }
 }
 
@@ -229,7 +291,7 @@ $_ds-nav-width: 200px;
   display: inline-block;
   padding: $space-1 $space-2;
   border: $border-width $border-style $color-border;
-  background-color: $color-gray-100;
+  background-color: $color-btn-ghost-bg-hover;
   @include text-caption-xs;
   color: $color-text-secondary;
   font-family: monospace;

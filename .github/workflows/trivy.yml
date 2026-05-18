@@ -1,0 +1,66 @@
+name: Trivy Audit
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - backend/**
+      - frontend/**
+      - web/**
+      - nginx/**
+      - .github/workflows/**
+      - docker-compose.yml
+      - docker-compose.dev.yml
+      - package.json
+      - package-lock.json
+      - railway.toml
+  push:
+    branches: [main]
+  schedule:
+    - cron: '23 4 * * 1'
+  workflow_dispatch:
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
+jobs:
+  trivy:
+    name: Trivy filesystem scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Escanear filesystem e IaC
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          format: sarif
+          output: trivy-results.sarif
+          severity: HIGH,CRITICAL
+          limit-severities-for-sarif: true
+          ignore-unfixed: true
+          hide-progress: true
+          scanners: vuln,misconfig
+          vuln-type: os,library
+
+      - name: Guardar informe Trivy
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-results
+          path: trivy-results.sarif
+          retention-days: 14
+
+      - name: Publicar SARIF en GitHub Security
+        if: always() && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false)
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: trivy-results.sarif
+          category: trivy-filesystem

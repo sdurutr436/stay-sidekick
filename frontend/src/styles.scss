@@ -2,42 +2,39 @@
 // ESTILOS GLOBALES — ITCSS
 // Orden de importación: Settings → Tools → Generic → Elements →
 //                       Layout → Components → Utilities → Animations
+//
+// Sintaxis moderna Dart Sass: @use / @forward (sin @import).
 // =============================================================================
 
 // Fuente: Archivo (variable font)
-@import url('https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,100..900;1,100..900&display=swap');
+@use 'styles/fonts';
 
-// 1. Settings — variables, sin CSS generado
-@import 'styles/settings/tipografia';
-@import 'styles/settings/colores';
-@import 'styles/settings/breakpoints';
-@import 'styles/settings/variables';
-@import 'styles/settings/css-variables'; // :root con custom properties (genera CSS)
+// 1+2. Settings + Tools — tokens y mixins inyectados en el scope global
+@use 'styles/shared' as *;
 
-// 2. Tools — mixins, sin CSS generado
-@import 'styles/tools/mixins';
+// Custom properties — generan CSS en :root y .dark (única definición)
+@use 'styles/settings/css-variables';
 
 // 3. Generic — resets y CSS de librerías externas
-@import 'styles/generic/resets';
-// flatpickr — CSS base (los estilos se sobreescriben en _mapa-calor.scss)
-@import 'flatpickr/dist/flatpickr.min.css';
+@use 'styles/generic/resets';
+@use 'styles/vendor/flatpickr';
 
 // 4. Elements — estilos de elementos HTML sin clase
-@import 'styles/elements/base';
+@use 'styles/elements/base';
 
 // 5. Layout — contenedor, grid, flex
-@import 'styles/layout/grid';
-@import 'styles/layout/flex';
-@import 'styles/layout/menu';
+@use 'styles/layout/grid';
+@use 'styles/layout/flex';
+@use 'styles/layout/menu';
 
 // 6. Components — todos los componentes y organismos
-@import 'styles/components/index';
+@use 'styles/components';
 
 // 7. Utilities — clases de ayuda de alta especificidad
-@import 'styles/utilities/index';
+@use 'styles/utilities';
 
 // 8. Animations — keyframes y clases de animación
-@import 'styles/animations/index';
+@use 'styles/animations';
 
 .skip-link {
   position: fixed;

@@ -2,15 +2,21 @@
 
 Rutas:
 - GET /api/empresas → lista todas las empresas (solo superadmin)
+- POST /api/empresas → crea empresa y envía correo de bienvenida
 """
+
+import logging
 
 from flask import Blueprint, jsonify, request
 from sqlalchemy.exc import IntegrityError
 
+from app.common.notifications.mail_service import send_welcome_company
 from app.empresas.model import Empresa
 from app.empresas.repository import crear_empresa
 from app.empresas.schemas import CrearEmpresaSchema, EmpresaResponseSchema
 from app.security.require_rol import require_rol
+
+logger = logging.getLogger(__name__)
 
 empresas_bp = Blueprint("empresas", __name__)
 
@@ -44,4 +50,11 @@ def crear_empresa_route():
         empresa = crear_empresa(data["nombre"], data["email"])
     except IntegrityError:
         return jsonify({"ok": False, "errors": ["Ya existe una empresa con ese email."]}), 409
+
+    try:
+        if not send_welcome_company(empresa.email, empresa.nombre):
+            logger.warning("No se pudo enviar el correo de bienvenida a %s", empresa.email)
+    except Exception:
+        logger.exception("Excepción inesperada al enviar bienvenida a %s", empresa.email)
+
     return jsonify({"ok": True, "empresa": _empresa_response.dump(empresa)}), 201

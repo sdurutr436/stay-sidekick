@@ -1,0 +1,21 @@
+<button
+  type="button"
+  class="how-it-works-btn"
+  (click)="abrir()"
+  [attr.aria-label]="label"
+>
+  <span class="how-it-works-btn__icon" aria-hidden="true">
+    <ng-icon name="phosphorInfo" size="20" />
+  </span>
+  <span class="how-it-works-btn__label">{{ label }}</span>
+</button>
+
+<app-modal
+  [title]="modalTitle"
+  [open]="open()"
+  (cerrar)="cerrar()"
+>
+  <div class="modal-instrucciones">
+    <ng-content />
+  </div>
+</app-modal>

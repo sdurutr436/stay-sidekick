@@ -1,0 +1,44 @@
+// =============================================================================
+// COMPONENTS: TAG
+// Átomo — indicador de estado compacto (icono opcional + texto).
+// Pensado para chips contextuales tipo "PMS conectado", "Sin Google", etc.
+// Estructura BEM: .tag.tag--{variante} > [tag-icon] + .tag__label
+// [ESPEJO NJK] _includes/macros/atoms.njk (macro tag)
+// =============================================================================
+
+@use '../shared' as *;
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: $space-2;
+  padding: $space-1 $space-3;
+  border: $border-width $border-style $color-border;
+  border-radius: $border-radius-default;
+  background-color: $color-surface-card;
+  @include text-caption-md;
+  color: $color-text-secondary;
+  white-space: nowrap;
+
+  &__label {
+    @include text-truncate;
+  }
+
+  // Las variantes solo recolorean el texto y el icono (vía currentColor);
+  // mantienen borde y fondo neutros para no competir con CTAs.
+  &--default {
+    color: $color-text-secondary;
+  }
+
+  &--success {
+    color: $color-success-green;
+  }
+
+  &--warning {
+    color: $color-warning-amber;
+  }
+
+  &--danger {
+    color: $color-error;
+  }
+}

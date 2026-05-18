@@ -425,7 +425,7 @@ git checkout main && git merge dev && git push origin main
 |----------|-------|
 | `FLASK_ENV` | `production` |
 | `SECRET_KEY` | clave aleatoria (mín. 32 chars) |
-| `ALLOWED_ORIGINS` | URL del dominio nginx (ej. `https://staysidekick.up.railway.app`) |
+| `ALLOWED_ORIGINS` | URL del dominio nginx (ej. `https://stay-sidekick.up.railway.app`) |
 | `DATABASE_URL` | `${{ Postgres.DATABASE_URL }}` |
 | `JWT_SECRET_KEY` | clave aleatoria (mín. 32 chars) |
 | `JWT_ACCESS_TOKEN_HOURS` | `1` |

@@ -4,34 +4,37 @@
 
 module.exports = {
   name: "Stay Sidekick",
-  description: "La plataforma para gestionar tus solicitudes de estancia.",
+  description: "Plataforma web para gestionar solicitudes de estancia y operaciones de alojamiento.",
   year: new Date().getFullYear(),
-  // URL base de producción — ajustar cuando se defina el dominio
+  // URL pública actual del servicio nginx en Railway
   url: "https://stay-sidekick.up.railway.app",
-  // URL de la aplicación Angular
-  appUrl: "/app",
+  // URL pública de la SPA Angular detrás de nginx
+  appUrl: "/menu",
+  brandLogo: "/assets/img/header/stay-sidekick-512x256-light-mode.png",
+  socialImage: "/assets/img/header/stay-sidekick-1024x576-light-mode.png",
+  socialImageAlt: "Identidad visual de Stay Sidekick en modo claro",
 
   footerNav: [
     {
       label: "Producto",
       links: [
         { text: "Funcionalidades", href: "#" },
-        { text: "Precios", href: "/precios" },
+        { text: "Precios", href: "/precios/" },
       ],
     },
     {
       label: "Legal",
       links: [
-        { text: "Política de privacidad", href: "/legal/privacidad" },
-        { text: "Términos de uso", href: "/legal/terminos" },
-        { text: "Política de cookies", href: "/legal/cookies" },
+        { text: "Política de privacidad", href: "/legal/privacidad/" },
+        { text: "Términos de uso", href: "/legal/terminos/" },
+        { text: "Política de cookies", href: "/legal/cookies/" },
       ],
     },
     {
       label: "Empresa",
       links: [
-        { text: "Sobre nosotros", href: "/empresa/sobre-nosotros" },
-        { text: "Contacto", href: "/empresa/contacto" },
+        { text: "Sobre nosotros", href: "/empresa/sobre-nosotros/" },
+        { text: "Contacto", href: "/empresa/contacto/" },
       ],
     },
   ],

@@ -29,6 +29,8 @@ import {
   phosphorX,
   phosphorCopy,
   phosphorFloppyDisk,
+  phosphorSun,
+  phosphorMoon,
 } from '@ng-icons/phosphor-icons/regular';
 
 import { routes } from './app.routes';
@@ -66,6 +68,8 @@ export const appConfig: ApplicationConfig = {
       phosphorX,
       phosphorCopy,
       phosphorFloppyDisk,
+      phosphorSun,
+      phosphorMoon,
     }),
   ]
 };

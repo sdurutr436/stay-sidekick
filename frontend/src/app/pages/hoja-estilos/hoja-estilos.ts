@@ -9,6 +9,7 @@ interface DsSection {
 
 const SECTIONS: DsSection[] = [
   { id: 'tipografia', label: 'Tipografía',  route: 'tipografia'  },
+  { id: 'colores',    label: 'Colores',     route: 'colores'     },
   { id: 'atomos',     label: 'Átomos',      route: 'atomos'      },
   { id: 'moleculas',  label: 'Moléculas',   route: 'moleculas'   },
   { id: 'organismos', label: 'Organismos',  route: 'organismos'  },

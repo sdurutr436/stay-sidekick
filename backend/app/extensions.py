@@ -11,7 +11,6 @@ cors = CORS()
 limiter = Limiter(
     key_func=get_remote_address,
     default_limits=["200/day", "50/hour"],
-    storage_uri="memory://",
 )
 
 db = SQLAlchemy()

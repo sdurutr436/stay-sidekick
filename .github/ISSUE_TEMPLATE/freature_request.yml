@@ -1,0 +1,74 @@
+name: Feature request
+description: Propón una mejora o nueva funcionalidad con base en una necesidad real.
+title: "feature: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Describe la necesidad con la mayor precisión posible. Cuanto más contexto, mejor se puede evaluar y priorizar.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problema actual
+      description: ¿Qué limitación o fricción existe hoy?
+      placeholder: "Ej: No hay forma de filtrar los registros por fecha desde el panel."
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Propuesta
+      description: Describe la solución o mejora de forma concisa.
+      placeholder: "Ej: Añadir un selector de rango de fechas en la cabecera del listado."
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternativas consideradas
+      placeholder: ¿Qué otras opciones barajaste y por qué las descartaste?
+
+  - type: dropdown
+    id: modules
+    attributes:
+      label: Módulos afectados
+      multiple: true
+      options:
+        - frontend
+        - backend
+        - base de datos
+        - docker / despliegue
+        - CI/CD
+        - docs
+        - diseño / UI
+
+  - type: textarea
+    id: risks
+    attributes:
+      label: Riesgos o dependencias
+      placeholder: ¿Qué puede romperse o qué necesita coordinarse antes?
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Criterio de aceptación mínimo
+      description: ¿Qué debe cumplirse para considerar esta feature terminada?
+      placeholder: |
+        - [ ] El usuario puede seleccionar un rango de fechas
+        - [ ] El listado se filtra correctamente
+        - [ ] El filtro persiste al recargar
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: extras
+    attributes:
+      label: ¿Qué más requiere este cambio?
+      options:
+        - label: Actualización de documentación
+        - label: Cambios en variables de entorno o configuración
+        - label: Cambios en CI/CD o despliegue

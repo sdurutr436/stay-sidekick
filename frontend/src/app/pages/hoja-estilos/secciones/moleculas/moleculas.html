@@ -146,6 +146,293 @@
   </div>
 
   <!-- =========================================================
+       ALERT
+  ========================================================== -->
+  <div class="ds-block">
+    <p class="ds-block__label">Alert — mensajes de feedback</p>
+    <p class="ds-block__hint">4 variantes (info, success, warning, error) y modo descartable opcional.</p>
+    <div class="ds-block__body">
+
+      <div class="ds-specimen">
+        <span class="ds-specimen__label">info</span>
+        <div class="ds-specimen__preview">
+          <div class="alert alert--info" role="status">
+            <div class="alert__content">Configura tus integraciones para empezar a sincronizar datos.</div>
+          </div>
+        </div>
+        <span class="ds-specimen__meta">.alert.alert--info</span>
+      </div>
+
+      <div class="ds-specimen">
+        <span class="ds-specimen__label">success (descartable)</span>
+        <div class="ds-specimen__preview">
+          <div class="alert alert--success" role="status">
+            <div class="alert__content">Plantilla guardada correctamente.</div>
+            <button class="alert__close" type="button" aria-label="Cerrar alerta">
+              <svg class="svg svg--xs" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <line x1="4" y1="4" x2="12" y2="12" stroke="currentColor" stroke-width="1.5"/>
+                <line x1="12" y1="4" x2="4" y2="12" stroke="currentColor" stroke-width="1.5"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <span class="ds-specimen__meta">.alert.alert--success + dismissible</span>
+      </div>
+
+      <div class="ds-specimen">
+        <span class="ds-specimen__label">warning</span>
+        <div class="ds-specimen__preview">
+          <div class="alert alert--warning" role="alert">
+            <div class="alert__content">Sin check-ins hoy en el PMS. Usa el botón XLSX para añadirlos.</div>
+          </div>
+        </div>
+        <span class="ds-specimen__meta">.alert.alert--warning</span>
+      </div>
+
+      <div class="ds-specimen">
+        <span class="ds-specimen__label">error</span>
+        <div class="ds-specimen__preview">
+          <div class="alert alert--error" role="alert">
+            <div class="alert__content">No se pudo conectar con la IA. Inténtalo de nuevo.</div>
+          </div>
+        </div>
+        <span class="ds-specimen__meta">.alert.alert--error</span>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- =========================================================
+       CARD
+  ========================================================== -->
+  <div class="ds-block">
+    <p class="ds-block__label">Card — tarjeta genérica con slots</p>
+    <p class="ds-block__hint">Contenedor neutral con borde y padding. Variante <code>horizontal</code> para layouts en fila.</p>
+    <div class="ds-block__body">
+
+      <div class="ds-row">
+        <div class="ds-specimen">
+          <span class="ds-specimen__label">default</span>
+          <div class="ds-specimen__preview">
+            <article class="card" style="max-width: 18rem">
+              <h3>Nueva plantilla</h3>
+              <p>Define el contenido y las variables disponibles para insertar en el mensaje.</p>
+              <button class="btn btn--primary btn--sm" type="button">Crear</button>
+            </article>
+          </div>
+          <span class="ds-specimen__meta">.card</span>
+        </div>
+
+        <div class="ds-specimen">
+          <span class="ds-specimen__label">horizontal</span>
+          <div class="ds-specimen__preview">
+            <article class="card card--horizontal" style="max-width: 28rem">
+              <span class="tag tag--success"><span class="tag__label">Conectado</span></span>
+              <div>
+                <h3 style="margin:0">Smoobu</h3>
+                <p style="margin-top:.25rem">Sincronización activa de reservas y apartamentos.</p>
+              </div>
+            </article>
+          </div>
+          <span class="ds-specimen__meta">.card.card--horizontal</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- =========================================================
+       TARJETA-ESTADO
+  ========================================================== -->
+  <div class="ds-block">
+    <p class="ds-block__label">Tarjeta estado — monitor compacto</p>
+    <p class="ds-block__hint">Indicador con etiqueta + valor + sublínea. Usado en el sincronizador para mostrar contactos nuevos, estado PMS/Google.</p>
+    <div class="ds-block__body">
+
+      <div class="ds-row">
+        <div class="ds-specimen">
+          <span class="ds-specimen__label">con icono y sublínea</span>
+          <div class="ds-specimen__preview">
+            <article class="tarjeta-estado" style="min-width:200px">
+              <header class="tarjeta-estado__header">
+                <span class="tarjeta-estado__label">Contactos nuevos</span>
+                <span class="tarjeta-estado__icon" aria-hidden="true">
+                  <svg class="svg svg--sm" viewBox="0 0 20 20" fill="currentColor">
+                    <circle cx="10" cy="7" r="3"/>
+                    <path d="M3 17a7 7 0 0114 0H3z"/>
+                  </svg>
+                </span>
+              </header>
+              <p class="tarjeta-estado__valor">12</p>
+              <p class="tarjeta-estado__sub">desde la última sincronización</p>
+            </article>
+          </div>
+          <span class="ds-specimen__meta">.tarjeta-estado · __label/__valor/__sub</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- =========================================================
+       DROPDOWN BUSCADOR
+  ========================================================== -->
+  <div class="ds-block">
+    <p class="ds-block__label">Dropdown buscador — selector filtrable</p>
+    <p class="ds-block__hint">Despliegue con buscador integrado. Usado para insertar variables en plantillas.</p>
+    <div class="ds-block__body">
+
+      <div class="ds-specimen" class="ds-specimen--form">
+        <span class="ds-specimen__label">cerrado</span>
+        <div class="ds-specimen__preview">
+          <div class="dropdown-buscador" style="max-width:18rem">
+            <button class="dropdown-buscador__trigger" type="button" aria-haspopup="listbox" aria-expanded="false">
+              <span class="dropdown-buscador__placeholder">Insertar variable…</span>
+              <span class="dropdown-buscador__arrow" aria-hidden="true">▾</span>
+            </button>
+          </div>
+        </div>
+        <span class="ds-specimen__meta">.dropdown-buscador (estado colapsado)</span>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- =========================================================
+       HOW-IT-WORKS BUTTON
+  ========================================================== -->
+  <div class="ds-block">
+    <p class="ds-block__label">How-it-works button — botón de ayuda contextual</p>
+    <p class="ds-block__hint">Abre un modal con instrucciones específicas de la herramienta. En desktop muestra texto, en mobile solo icono <code>Info</code>.</p>
+    <div class="ds-block__body">
+
+      <div class="ds-specimen">
+        <span class="ds-specimen__label">en page-header__end</span>
+        <div class="ds-specimen__preview">
+          <button class="how-it-works-btn" type="button" aria-label="¿Cómo se usa?">
+            <span class="how-it-works-btn__icon" aria-hidden="true">
+              <svg class="svg svg--sm" viewBox="0 0 20 20" fill="currentColor">
+                <circle cx="10" cy="10" r="8" fill="none" stroke="currentColor" stroke-width="2"/>
+                <line x1="10" y1="9" x2="10" y2="14" stroke="currentColor" stroke-width="2"/>
+                <circle cx="10" cy="6" r="1" fill="currentColor"/>
+              </svg>
+            </span>
+            <span class="how-it-works-btn__label">¿Cómo se usa?</span>
+          </button>
+        </div>
+        <span class="ds-specimen__meta">.how-it-works-btn (label oculta en &lt;md)</span>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- =========================================================
+       THEME TOGGLE
+  ========================================================== -->
+  <div class="ds-block">
+    <p class="ds-block__label">Theme toggle — alternar tema claro/oscuro</p>
+    <p class="ds-block__hint">Reutiliza el átomo <code>.btn .btn--ghost</code> en modo icono. Persiste la preferencia en <code>localStorage['theme']</code> y se sincroniza entre pestañas vía evento <code>storage</code>.</p>
+    <div class="ds-block__body">
+
+      <div class="ds-row">
+        <div class="ds-specimen">
+          <span class="ds-specimen__label">modo claro activo</span>
+          <div class="ds-specimen__preview">
+            <button class="btn btn--ghost btn--md btn--icon-only" type="button" aria-label="Activar modo oscuro">
+              <span class="theme-toggle__icon" aria-hidden="true">
+                <svg width="20" height="20" viewBox="0 0 256 256" fill="currentColor">
+                  <path d="M233.54,142.23a8,8,0,0,0-8-2,88.08,88.08,0,0,1-109.8-109.8,8,8,0,0,0-10-10,104,104,0,1,0,127.8,127.8A8,8,0,0,0,233.54,142.23Z"/>
+                </svg>
+              </span>
+            </button>
+          </div>
+          <span class="ds-specimen__meta">icono Moon (clic → activa dark)</span>
+        </div>
+
+        <div class="ds-specimen">
+          <span class="ds-specimen__label">modo oscuro activo</span>
+          <div class="ds-specimen__preview">
+            <button class="btn btn--ghost btn--md btn--icon-only" type="button" aria-label="Activar modo claro">
+              <span class="theme-toggle__icon" aria-hidden="true">
+                <svg width="20" height="20" viewBox="0 0 256 256" fill="currentColor">
+                  <path d="M120,40V16a8,8,0,0,1,16,0V40a8,8,0,0,1-16,0Zm72,88a64,64,0,1,1-64-64A64.07,64.07,0,0,1,192,128Zm-16,0a48,48,0,1,0-48,48A48.05,48.05,0,0,0,176,128Z"/>
+                </svg>
+              </span>
+            </button>
+          </div>
+          <span class="ds-specimen__meta">icono Sun (clic → activa light)</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- =========================================================
+       CONFIRM INLINE
+  ========================================================== -->
+  <div class="ds-block">
+    <p class="ds-block__label">Confirm inline — confirmación en línea</p>
+    <p class="ds-block__hint">Reemplaza un confirm() bloqueante: pregunta + dos botones (cancelar/confirmar). Usado en acciones destructivas dentro de tablas.</p>
+    <div class="ds-block__body">
+
+      <div class="ds-specimen">
+        <span class="ds-specimen__label">eliminar apartamento</span>
+        <div class="ds-specimen__preview">
+          <div class="confirm-inline" role="alert">
+            <span class="confirm-inline__mensaje">¿Eliminar este apartamento?</span>
+            <div class="confirm-inline__acciones">
+              <button class="btn btn--ghost btn--sm" type="button">Cancelar</button>
+              <button class="btn btn--danger btn--sm" type="button">Eliminar</button>
+            </div>
+          </div>
+        </div>
+        <span class="ds-specimen__meta">.confirm-inline · __mensaje + __acciones</span>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- =========================================================
+       ACCORDION ITEM
+  ========================================================== -->
+  <div class="ds-block">
+    <p class="ds-block__label">Accordion item — sección expandible</p>
+    <p class="ds-block__hint">Item individual de un acordeón. Botón con flecha y cuerpo colapsable.</p>
+    <div class="ds-block__body">
+
+      <div class="ds-specimen ds-specimen--form">
+        <span class="ds-specimen__label">cerrado</span>
+        <div class="ds-specimen__preview">
+          <div class="accordion-item">
+            <button class="accordion-item__header" type="button" aria-expanded="false">
+              <span class="accordion-item__titulo">¿Qué es Stay Sidekick?</span>
+              <span class="accordion-item__icono" aria-hidden="true">▾</span>
+            </button>
+          </div>
+        </div>
+        <span class="ds-specimen__meta">.accordion-item (cerrado)</span>
+      </div>
+
+      <div class="ds-specimen ds-specimen--form">
+        <span class="ds-specimen__label">abierto</span>
+        <div class="ds-specimen__preview">
+          <div class="accordion-item accordion-item--abierto">
+            <button class="accordion-item__header" type="button" aria-expanded="true">
+              <span class="accordion-item__titulo">¿Qué es Stay Sidekick?</span>
+              <span class="accordion-item__icono" aria-hidden="true">▴</span>
+            </button>
+            <div class="accordion-item__body">
+              <p>Una suite de herramientas para gestionar alojamientos turísticos sin fricciones.</p>
+            </div>
+          </div>
+        </div>
+        <span class="ds-specimen__meta">.accordion-item--abierto</span>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- =========================================================
        RADIO Y CHECKBOX
   ========================================================== -->
   <div class="ds-block">

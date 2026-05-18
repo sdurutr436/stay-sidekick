@@ -4,7 +4,10 @@ import { NgIconComponent } from '@ng-icons/core';
 import { AlertComponent } from '../../components/molecules/alert/alert';
 import { ButtonComponent } from '../../components/atoms/button/button';
 import { DropdownBuscadorComponent, DropdownOption } from '../../components/molecules/dropdown-buscador/dropdown-buscador';
+import { HowItWorksButtonComponent } from '../../components/molecules/how-it-works-button/how-it-works-button';
 import { PageHeaderComponent } from '../../components/organisms/page-header/page-header';
+import { PanelSeccionComponent } from '../../components/organisms/panel-seccion/panel-seccion';
+import { TemplatesCardComponent } from '../../components/organisms/templates-card/templates-card';
 import { VaultService, Plantilla } from '../../services/vault.service';
 import { PerfilService } from '../../services/perfil.service';
 
@@ -33,7 +36,11 @@ const COOLDOWN_SEGUNDOS = 60;
   templateUrl: './vault-comunicaciones.html',
   styleUrl: './vault-comunicaciones.scss',
   standalone: true,
-  imports: [RouterLink, NgIconComponent, PageHeaderComponent, ButtonComponent, AlertComponent, DropdownBuscadorComponent],
+  imports: [
+    RouterLink, NgIconComponent, PageHeaderComponent, ButtonComponent, AlertComponent,
+    DropdownBuscadorComponent, HowItWorksButtonComponent, TemplatesCardComponent,
+    PanelSeccionComponent,
+  ],
 })
 export class VaultComunicacionesPageComponent implements OnInit, OnDestroy {
   private readonly vault  = inject(VaultService);
@@ -64,6 +71,7 @@ export class VaultComunicacionesPageComponent implements OnInit, OnDestroy {
   readonly mensajeCopiadoTexto   = signal('');
   readonly toastVisible          = signal(false);
   readonly toastMensaje          = signal('');
+  readonly tonoSeleccionado      = signal<string | null>(null);
 
   readonly filtroCategoria = signal<string | null>(null);
   readonly filtroIdioma    = signal<string | null>(null);
@@ -95,11 +103,19 @@ export class VaultComunicacionesPageComponent implements OnInit, OnDestroy {
   });
 
   ngOnInit(): void {
-    this.vault.getPlantillas().subscribe({ next: res => this.plantillas.set(res.plantillas) });
+    this.vault.getPlantillas().subscribe({
+      next: res => this.plantillas.set(res.plantillas),
+      error: () => this.mostrarToast('No se pudieron cargar las plantillas. Recarga la página.'),
+    });
     this.perfil.getIntegraciones().subscribe({
       next: res => {
         this.byokActivo.set(res.data.ia.configurado);
         if (!this.byokActivo()) this.cargarUso();
+      },
+      error: () => {
+        // Sin configuración de integraciones asumimos modo sin BYOK y cargamos uso igualmente
+        this.byokActivo.set(false);
+        this.cargarUso();
       },
     });
   }
@@ -147,9 +163,9 @@ export class VaultComunicacionesPageComponent implements OnInit, OnDestroy {
           this.seleccionarPlantilla(res.plantilla);
           this.guardando.set(false);
         },
-        error: () => {
+        error: err => {
           this.guardando.set(false);
-          this.mostrarToast('Error al crear la plantilla. Inténtalo de nuevo.');
+          this.mostrarToast(this.mensajeError(err, 'crear'));
         },
       });
     } else {
@@ -161,9 +177,9 @@ export class VaultComunicacionesPageComponent implements OnInit, OnDestroy {
           this.nombreActual.set(res.plantilla.nombre);
           this.guardando.set(false);
         },
-        error: () => {
+        error: err => {
           this.guardando.set(false);
-          this.mostrarToast('Error al guardar los cambios. Inténtalo de nuevo.');
+          this.mostrarToast(this.mensajeError(err, 'guardar'));
         },
       });
     }
@@ -266,6 +282,7 @@ export class VaultComunicacionesPageComponent implements OnInit, OnDestroy {
       this.plantillaSeleccionada()!.id,
       this.mensajeActual(),
       this.editorIdioma(),
+      this.tonoSeleccionado(),
     ).subscribe({
       next: res => {
         this.mensajeActual.set(res.contenido);
@@ -274,9 +291,8 @@ export class VaultComunicacionesPageComponent implements OnInit, OnDestroy {
         if (!this.byokActivo()) this.cargarUso();
       },
       error: err => {
-        const msg = err?.error?.errors?.[0] ?? 'Error al conectar con la IA. Inténtalo de nuevo.';
         this.cargandoIA.set(false);
-        this.mostrarToast(msg);
+        this.mostrarToast(this.mensajeError(err, 'refinar'));
       },
     });
   }
@@ -306,9 +322,8 @@ export class VaultComunicacionesPageComponent implements OnInit, OnDestroy {
         if (!this.byokActivo()) this.cargarUso();
       },
       error: err => {
-        const msg = err?.error?.errors?.[0] ?? 'Error al traducir. Inténtalo de nuevo.';
         this.traduciendo.set(false);
-        this.mostrarToast(msg);
+        this.mostrarToast(this.mensajeError(err, 'traducir'));
       },
     });
   }
@@ -322,6 +337,7 @@ export class VaultComunicacionesPageComponent implements OnInit, OnDestroy {
   onIdiomaDestino(value: string):   void { this.idiomaDestino.set(value   || null); }
   onEditorIdioma(value: string):    void { this.editorIdioma.set(value); }
   onEditorCategoria(value: string): void { this.editorCategoria.set(value || null); }
+  onTonoSeleccionado(value: string): void { this.tonoSeleccionado.set(value || null); }
 
   copiarMensaje(): void {
     const texto = this.mensajeActual();
@@ -332,6 +348,8 @@ export class VaultComunicacionesPageComponent implements OnInit, OnDestroy {
       this.mensajeCopiadoTexto.set(MENSAJES_COPIADO[idx]);
       this.mensajeCopiadoVisible.set(true);
       setTimeout(() => this.mensajeCopiadoVisible.set(false), 2500);
+    }).catch(() => {
+      this.mostrarToast('No se pudo copiar el mensaje. Comprueba los permisos del portapapeles.');
     });
   }
 
@@ -354,6 +372,33 @@ export class VaultComunicacionesPageComponent implements OnInit, OnDestroy {
         this.cooldownRestante.set(restante);
       }
     }, 1000);
+  }
+
+  private mensajeError(err: any, contexto: 'crear' | 'guardar' | 'refinar' | 'traducir'): string {
+    const backendMsg: string | undefined = err?.error?.errors?.[0] ?? err?.error?.message;
+    if (backendMsg) return backendMsg;
+
+    switch (err?.status) {
+      case 0:   return 'Sin conexión con el servidor. Comprueba tu red e inténtalo de nuevo.';
+      case 401: return 'Tu sesión ha expirado. Vuelve a iniciar sesión.';
+      case 403: return 'No tienes permiso para realizar esta acción.';
+      case 404: return 'La plantilla ya no existe. Es posible que haya sido eliminada.';
+      case 409: return 'Ya existe una plantilla con ese nombre. Elige un nombre diferente.';
+      case 422: return 'Los datos introducidos no son válidos. Revisa el nombre y el contenido.';
+      case 429: return contexto === 'refinar' || contexto === 'traducir'
+        ? 'Has alcanzado el límite de uso de IA por hoy. Prueba mañana o añade tu clave API propia.'
+        : 'Demasiadas peticiones. Espera un momento e inténtalo de nuevo.';
+      case 503: return contexto === 'refinar' || contexto === 'traducir'
+        ? 'El servicio de IA no está disponible ahora mismo. Inténtalo más tarde.'
+        : 'Servicio no disponible temporalmente. Inténtalo más tarde.';
+      default:
+        switch (contexto) {
+          case 'crear':    return 'No se pudo crear la plantilla. Inténtalo de nuevo.';
+          case 'guardar':  return 'No se pudieron guardar los cambios. Inténtalo de nuevo.';
+          case 'refinar':  return 'No se pudo conectar con la IA. Inténtalo de nuevo.';
+          case 'traducir': return 'No se pudo traducir el mensaje. Inténtalo de nuevo.';
+        }
+    }
   }
 
   private mostrarToast(mensaje: string): void {

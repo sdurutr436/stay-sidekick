@@ -21,6 +21,8 @@
 //     .web-page__table           — tabla estilizada
 // =============================================================================
 
+@use '../shared' as *;
+
 .web-page {
   @include container;
   padding-block: $space-12;

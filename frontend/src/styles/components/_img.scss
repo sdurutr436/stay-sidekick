@@ -3,6 +3,8 @@
 // Comportamiento y tamaños estándar de imágenes
 // =============================================================================
 
+@use '../shared' as *;
+
 .img {
   display: block;
   max-width: 100%;

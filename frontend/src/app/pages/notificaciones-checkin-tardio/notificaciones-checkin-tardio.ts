@@ -4,10 +4,13 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { NgIconComponent } from '@ng-icons/core';
 import { ButtonComponent } from '../../components/atoms/button/button';
+import { TagComponent } from '../../components/atoms/tag/tag';
 import { AlertComponent } from '../../components/molecules/alert/alert';
 import { DropdownBuscadorComponent, DropdownOption } from '../../components/molecules/dropdown-buscador/dropdown-buscador';
+import { HowItWorksButtonComponent } from '../../components/molecules/how-it-works-button/how-it-works-button';
 import { PageHeaderComponent } from '../../components/organisms/page-header/page-header';
 import { PanelSeccionComponent } from '../../components/organisms/panel-seccion/panel-seccion';
+import { TemplatesCardComponent } from '../../components/organisms/templates-card/templates-card';
 import { AuthService } from '../../services/auth.service';
 
 const TOKENS: DropdownOption[] = [
@@ -60,8 +63,10 @@ interface StatusResponse {
     NgIconComponent,
     FormsModule,
     PageHeaderComponent, PanelSeccionComponent,
-    ButtonComponent, AlertComponent,
+    ButtonComponent, TagComponent, AlertComponent,
     DropdownBuscadorComponent,
+    HowItWorksButtonComponent,
+    TemplatesCardComponent,
   ],
 })
 export class NotificacionesCheckinTardioPageComponent implements OnInit, OnDestroy {

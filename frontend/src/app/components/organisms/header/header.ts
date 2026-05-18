@@ -4,13 +4,14 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { filter, map, startWith } from 'rxjs';
 import { SidenavService } from '../../../services/sidenav.service';
 import { AuthService } from '../../../services/auth.service';
+import { ThemeToggleComponent } from '../../molecules/theme-toggle/theme-toggle';
 
 @Component({
   selector: 'app-header',
   templateUrl: './header.html',
   styleUrl: './header.scss',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, ThemeToggleComponent],
 })
 export class HeaderComponent {
   private readonly router = inject(Router);

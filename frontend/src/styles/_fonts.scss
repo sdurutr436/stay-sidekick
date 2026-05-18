@@ -1,0 +1,6 @@
+// =============================================================================
+// FONTS — carga de tipografía Archivo (variable font 100..900) desde Google
+// Fonts. Aislado en su propio módulo para que `@use` lo evalúe una sola vez.
+// =============================================================================
+
+@import url('https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,100..900;1,100..900&display=swap');

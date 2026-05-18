@@ -2,9 +2,9 @@ name: CI — Tests y cobertura
 
 on:
   push:
-    branches: ["**"]
+    branches: [dev-herramientas, main]
   pull_request:
-    branches: [main]
+    branches: [dev-herramientas, main]
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true

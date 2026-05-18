@@ -23,6 +23,8 @@
 //       .tabla-crud__count        (p — contador de resultados)
 // =============================================================================
 
+@use '../shared' as *;
+
 .tabla-crud {
   display: flex;
   flex-direction: column;
@@ -121,10 +123,10 @@
     }
 
     &--selected {
-      background-color: $color-gray-100;
+      background-color: $color-btn-ghost-bg-hover;
 
       &:hover {
-        background-color: $color-gray-100;
+        background-color: $color-btn-ghost-bg-hover;
       }
     }
   }
@@ -238,7 +240,7 @@
     display: block;
     height: 0.875rem;
     width: 80%;
-    background: $color-gray-200;
+    background: $color-btn-ghost-bg-active;
     animation: skeleton-pulse 1.4s ease-in-out infinite;
   }
 
@@ -260,7 +262,7 @@
     margin: 0 auto;
 
     &:hover:not(:disabled) {
-      background: $color-gray-200;
+      background: $color-btn-ghost-bg-active;
       color: $color-text-primary;
     }
 

@@ -8,12 +8,43 @@
   <app-page-header
     title="Vault de comunicaciones"
     description="Biblioteca centralizada de plantillas de mensajes. Selecciona una plantilla, rellena las variables y refínala con IA antes de enviar."
-  />
+  >
+    <app-how-it-works-button modalTitle="Cómo usar el Vault de comunicaciones">
+      <section class="modal-instrucciones__seccion">
+        <h3 class="modal-instrucciones__titulo">¿Qué hace esta herramienta?</h3>
+        <p class="modal-instrucciones__texto">
+          Centraliza todas tus plantillas de mensajes para huéspedes:
+          bienvenida, instrucciones, recordatorios, incidencias, etc.
+        </p>
+      </section>
+
+      <section class="modal-instrucciones__seccion">
+        <h3 class="modal-instrucciones__titulo">Cómo trabajar con plantillas</h3>
+        <ol class="modal-instrucciones__lista">
+          <li>Busca o filtra por categoría/idioma en el panel izquierdo.</li>
+          <li>Selecciona una plantilla o pulsa <strong>Nueva plantilla</strong>.</li>
+          <li>Inserta variables como <code>&#123;NOMBRE&#125;</code> con el dropdown <em>Insertar variable</em>.</li>
+          <li>Refina el tono con IA o traduce el mensaje a otro idioma.</li>
+          <li>Copia el resultado y pégalo en tu canal de comunicación.</li>
+        </ol>
+      </section>
+
+      <p class="modal-instrucciones__nota">
+        Si no tienes una clave de IA propia (BYOK) configurada, el uso de
+        refinar/traducir está limitado por día y por semana.
+      </p>
+    </app-how-it-works-button>
+  </app-page-header>
 
   <div class="vault-layout">
 
     <!-- ── Sidebar: lista de plantillas (estilo nav-sidenav) ── -->
-    <aside class="vault-sidebar" aria-label="Plantillas disponibles">
+    <app-templates-card
+      class="vault-sidebar"
+      title="Plantillas"
+      [total]="plantillas().length"
+      emptyMessage="No hay plantillas guardadas. Crea la primera con el botón “Nueva plantilla”."
+    >
 
       <div class="vault-sidebar__search-wrap">
         <input
@@ -85,17 +116,24 @@
               }
             </li>
           }
+        } @else if (searchPlantillas() || filtroCategoria() || filtroIdioma()) {
+          <li class="vault-sidebar__empty" role="option" aria-selected="false">
+            Sin resultados para los filtros actuales
+          </li>
         } @else {
           <li class="vault-sidebar__empty" role="option" aria-selected="false">
-            Sin resultados para "{{ searchPlantillas() }}"
+            No hay plantillas guardadas. Crea la primera con el botón “Nueva plantilla”.
           </li>
         }
 
       </ul>
-    </aside>
+    </app-templates-card>
 
-    <!-- ── Editor: composer de mensaje ── -->
-    <section class="vault-editor" aria-label="Editor de mensaje">
+    <!-- ── Editor: composer de mensaje (toolbar, textarea, acciones, traducir) ── -->
+    <app-panel-seccion
+      class="vault-editor"
+      [title]="isEditing() ? (isNueva() ? 'Nueva plantilla' : 'Editor: ' + (plantillaSeleccionada()?.nombre ?? nombreActual())) : 'Editor de mensaje'"
+    >
 
       @if (isEditing()) {
         <!-- Nombre de la plantilla (editable) -->
@@ -249,98 +287,119 @@
       <!-- Acciones: refinar con IA + copiar mensaje -->
       <div class="vault-editor__acciones">
 
-        <!-- Lado izquierdo: refinar con IA (con cooldown de 1 min) -->
-        <div class="vault-editor__acciones-izq">
-          <app-button
-            [variant]="cooldownActivo() ? 'secondary' : 'primary'"
-            size="md"
-            [disabled]="cargandoIA() || !isEditing()"
-            [title]="cooldownActivo()
-              ? 'Espera ' + cooldownRestante() + 's antes de refinar de nuevo'
-              : 'Ajusta el tono, traduce o genera una variación del mensaje usando IA'"
-            (click)="refinarConIA()"
-          >
-            <span class="btn__icon" aria-hidden="true">
-              <ng-icon name="phosphorSparkle" size="20" />
-            </span>
-            @if (cargandoIA()) {
-              Refinando…
-            } @else if (cooldownActivo()) {
-              Refinar ({{ cooldownRestante() }}s)
-            } @else {
-              Refinar con IA
-            }
-          </app-button>
-          <div class="vault-editor__traducir">
+        <!-- Fila 1: tono + refinar | guardar + copiar -->
+        <div class="vault-editor__acciones-fila">
+
+          <!-- Izquierda: tono + refinar con IA -->
+          <div class="vault-editor__acciones-izq">
             <select
-              class="form-input vault-editor__traducir-select"
-              [value]="idiomaDestino() ?? ''"
-              (change)="onIdiomaDestino(selectValue($event))"
-              [disabled]="!isEditing()"
-              aria-label="Idioma de destino para traducción"
+              class="form-input vault-editor__tono-select"
+              [value]="tonoSeleccionado() ?? ''"
+              (change)="onTonoSeleccionado(selectValue($event))"
+              [disabled]="!plantillaSeleccionada()"
+              aria-label="Tono del mensaje refinado"
             >
-              <option value="">Traducir a…</option>
-              <option value="es">Español</option>
-              <option value="en">English</option>
-              <option value="fr">Français</option>
-              <option value="de">Deutsch</option>
-              <option value="it">Italiano</option>
-              <option value="pt">Português</option>
+              <option value="">Tono por defecto</option>
+              <option value="clasico">Clásico — formal, de usted</option>
+              <option value="cercano">Cercano — cálido, tuteando</option>
+              <option value="entusiasta">Entusiasta — acogedor y con energía</option>
+              <option value="minimalista">Minimalista — breve y directo</option>
             </select>
             <app-button
-              variant="secondary"
+              [variant]="cooldownActivo() ? 'secondary' : 'primary'"
               size="md"
-              [disabled]="traduciendo() || !isEditing() || !idiomaDestino()"
-              title="Traduce el contenido del editor al idioma seleccionado. Consume créditos de IA."
-              (click)="traducirConIA()"
-            >
-              @if (traduciendo()) { Traduciendo… } @else { Traducir }
-            </app-button>
-          </div>
-        </div>
-
-        <!-- Lado derecho: copiar mensaje + confirmación + guardar -->
-        <div class="vault-editor__acciones-der">
-
-          <!-- Copiar: botón y confirmación apilados en columna -->
-          <div class="vault-editor__copiar-wrap">
-            <app-button
-              variant="secondary"
-              size="md"
-              [disabled]="!mensajeActual().trim()"
-              title="Copiar el mensaje al portapapeles"
-              (click)="copiarMensaje()"
+              [disabled]="cargandoIA() || !plantillaSeleccionada()"
+              [title]="cooldownActivo()
+                ? 'Espera ' + cooldownRestante() + 's antes de refinar de nuevo'
+                : 'Ajusta el tono, traduce o genera una variación del mensaje usando IA'"
+              (click)="refinarConIA()"
             >
               <span class="btn__icon" aria-hidden="true">
-                <ng-icon name="phosphorCopy" size="20" />
+                <ng-icon name="phosphorSparkle" size="20" />
               </span>
-              Copiar mensaje
+              @if (cargandoIA()) {
+                Refinando…
+              } @else if (cooldownActivo()) {
+                Refinar ({{ cooldownRestante() }}s)
+              } @else {
+                Refinar con IA
+              }
             </app-button>
-            @if (mensajeCopiadoVisible()) {
-              <span class="vault-editor__copiado" aria-live="polite" role="status">
-                {{ mensajeCopiadoTexto() }}
-              </span>
-            }
           </div>
 
-          <!-- Guardar / Crear plantilla -->
-          <app-button
-            variant="primary"
-            size="md"
-            [disabled]="guardando() || !nombreActual().trim()"
-            [title]="isNueva() ? 'Crear la nueva plantilla en tu biblioteca' : 'Guardar los cambios de esta plantilla'"
-            (click)="guardarPlantilla()"
+          <!-- Derecha: guardar + copiar -->
+          <div class="vault-editor__acciones-der">
+
+            <!-- Guardar / Crear plantilla -->
+            <app-button
+              variant="primary"
+              size="md"
+              [disabled]="guardando() || !nombreActual().trim()"
+              [title]="isNueva() ? 'Crear la nueva plantilla en tu biblioteca' : 'Guardar los cambios de esta plantilla'"
+              (click)="guardarPlantilla()"
+            >
+              <span class="btn__icon" aria-hidden="true">
+                <ng-icon name="phosphorFloppyDisk" size="20" />
+              </span>
+              @if (guardando()) {
+                Guardando…
+              } @else if (isNueva()) {
+                Crear plantilla
+              } @else {
+                Guardar cambios
+              }
+            </app-button>
+
+            <!-- Copiar: botón y confirmación apilados en columna -->
+            <div class="vault-editor__copiar-wrap">
+              <app-button
+                variant="secondary"
+                size="md"
+                [disabled]="!mensajeActual().trim()"
+                title="Copiar el mensaje al portapapeles"
+                (click)="copiarMensaje()"
+              >
+                <span class="btn__icon" aria-hidden="true">
+                  <ng-icon name="phosphorCopy" size="20" />
+                </span>
+                Copiar mensaje
+              </app-button>
+              @if (mensajeCopiadoVisible()) {
+                <span class="vault-editor__copiado" aria-live="polite" role="status">
+                  {{ mensajeCopiadoTexto() }}
+                </span>
+              }
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- Fila 2: traducir a + botón traducir -->
+        <div class="vault-editor__traducir">
+          <select
+            class="form-input vault-editor__traducir-select"
+            [value]="idiomaDestino() ?? ''"
+            (change)="onIdiomaDestino(selectValue($event))"
+            [disabled]="!plantillaSeleccionada()"
+            aria-label="Idioma de destino para traducción"
           >
-            <span class="btn__icon" aria-hidden="true">
-              <ng-icon name="phosphorFloppyDisk" size="20" />
-            </span>
-            @if (guardando()) {
-              Guardando…
-            } @else if (isNueva()) {
-              Crear plantilla
-            } @else {
-              Guardar cambios
-            }
+            <option value="">Traducir a…</option>
+            <option value="es">Español</option>
+            <option value="en">English</option>
+            <option value="fr">Français</option>
+            <option value="de">Deutsch</option>
+            <option value="it">Italiano</option>
+            <option value="pt">Português</option>
+          </select>
+          <app-button
+            variant="secondary"
+            size="md"
+            [disabled]="traduciendo() || !plantillaSeleccionada() || !idiomaDestino()"
+            title="Traduce el contenido del editor al idioma seleccionado. Consume créditos de IA."
+            (click)="traducirConIA()"
+          >
+            @if (traduciendo()) { Traduciendo… } @else { Traducir }
           </app-button>
         </div>
 
@@ -353,7 +412,7 @@
         </p>
       }
 
-    </section>
+    </app-panel-seccion>
 
   </div>
 

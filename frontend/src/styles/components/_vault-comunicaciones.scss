@@ -17,6 +17,8 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // Wrapper de página
 // ─────────────────────────────────────────────────────────────────────────────
+@use '../shared' as *;
+
 .vault-comunicaciones {
   // Mismos límites de ancho que el header (__inner usa @include container):
   // max-width: 1200px centrado + padding-inline: $space-6
@@ -41,17 +43,13 @@
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Sidebar de plantillas (estilo análogo al nav-sidenav)
+// Sidebar de plantillas — envuelta en <app-templates-card class="vault-sidebar">.
+// El borde, padding y fondo los aplica .templates-card; aquí solo ajustamos
+// la lista interna (scroll, items, filtros, etc.).
 // ─────────────────────────────────────────────────────────────────────────────
 .vault-sidebar {
-  border: $border-width $border-style $color-border;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-
   &__search-wrap {
-    padding: $space-3;
-    border-bottom: $border-width $border-style $color-border;
+    padding-bottom: $space-2;
   }
 
   &__list {
@@ -72,15 +70,15 @@
     transition: background-color var(--transition-base);
 
     &:hover {
-      background-color: $color-gray-100;
+      background-color: $color-btn-ghost-bg-hover;
     }
 
     // Estado activo: plantilla seleccionada
     &--activo {
-      background-color: $color-gray-200;
+      background-color: $color-btn-ghost-bg-active;
 
       &:hover {
-        background-color: $color-gray-200;
+        background-color: $color-btn-ghost-bg-active;
       }
 
       .vault-sidebar__item-nombre {
@@ -139,7 +137,7 @@
                 border-color var(--transition-base);
 
     &:hover {
-      background-color: $color-gray-100;
+      background-color: $color-btn-ghost-bg-hover;
       border-color: $color-border-strong;
     }
 
@@ -150,20 +148,18 @@
 
     // Estado activo: modo "nueva plantilla" en curso
     &--activo {
-      background-color: $color-gray-200;
+      background-color: $color-btn-ghost-bg-active;
       border-color: $color-border-strong;
     }
   }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Panel editor
+// Panel editor — envuelto en <app-panel-seccion class="vault-editor">.
+// El layout vertical y el padding/border lo aplica .panel-seccion;
+// aquí solo personalizamos el contenido interno.
 // ─────────────────────────────────────────────────────────────────────────────
 .vault-editor {
-  display: flex;
-  flex-direction: column;
-  gap: $space-4;
-
   // Input del nombre de la plantilla (prominente, encima del toolbar)
   &__nombre-wrap {
     // El form-input hereda el estilo base; aquí solo ajustamos la fuente del input
@@ -209,8 +205,15 @@
     }
   }
 
-  // Fila de botones inferior
+  // Contenedor de acciones: columna de dos filas
   &__acciones {
+    display: flex;
+    flex-direction: column;
+    gap: $space-3;
+  }
+
+  // Fila 1: tono+refinar a la izquierda | guardar+copiar a la derecha
+  &__acciones-fila {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -225,12 +228,17 @@
     gap: $space-3;
   }
 
-  // Bloque de traducción: select de idioma + botón Traducir
+  // Selector de tono para el refinado con IA
+  &__tono-select {
+    min-width: 12.5rem;
+  }
+
+  // Fila 2: select de idioma destino + botón Traducir (solo lado izquierdo)
   &__traducir {
     display: flex;
     align-items: center;
     gap: $space-3;
-    margin-top: $space-2;
+    width: fit-content;
   }
 
   &__traducir-select {

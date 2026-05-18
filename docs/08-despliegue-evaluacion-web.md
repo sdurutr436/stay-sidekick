@@ -466,6 +466,10 @@ Variables y persistencia quedan resueltas de forma reproducible porque el arranq
 plantillas versionadas (`.env.example` y `backend/.env.example`) y la base de datos conserva estado
 en el volumen `postgres_data`.
 
+Variables y persistencia quedan resueltas de forma reproducible porque el arranque parte de
+plantillas versionadas (`.env.example` y `backend/.env.example`) y la base de datos conserva estado
+en el volumen `postgres_data`.
+
 ---
 
 ## c3 — Servidor web como front (reverse proxy)

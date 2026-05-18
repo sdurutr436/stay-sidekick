@@ -1,0 +1,36 @@
+<div class="ds-section">
+
+  <div class="ds-section__header">
+    <h2 class="ds-section__title">Colores</h2>
+    <p class="ds-section__desc">
+      Paleta acromática con acento ámbar. Cada token está expuesto como
+      <strong>custom property CSS</strong> y se recolorea automáticamente al
+      alternar el modo claro/oscuro desde el toggle del header.
+    </p>
+  </div>
+
+  @for (group of groups; track group.label) {
+    <div class="ds-block">
+      <p class="ds-block__label">{{ group.label }}</p>
+      <p class="ds-block__hint">{{ group.description }}</p>
+
+      <div class="ds-color-grid">
+        @for (token of group.tokens; track token.variable) {
+          <article class="ds-color-token">
+            <div
+              class="ds-color-token__swatch"
+              [style.background-color]="'var(' + token.variable + ')'"
+              [attr.aria-label]="'Muestra de color ' + token.name"
+            ></div>
+            <div class="ds-color-token__meta">
+              <p class="ds-color-token__name">{{ token.name }}</p>
+              <code class="ds-color-token__variable">{{ token.variable }}</code>
+              <p class="ds-color-token__desc">{{ token.description }}</p>
+            </div>
+          </article>
+        }
+      </div>
+    </div>
+  }
+
+</div>

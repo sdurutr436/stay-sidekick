@@ -9,6 +9,7 @@ import { ButtonComponent } from '../../components/atoms/button/button';
 import { FormInputComponent } from '../../components/atoms/form-input/form-input';
 import { AlertComponent } from '../../components/molecules/alert/alert';
 import { ConfirmInlineComponent } from '../../components/molecules/confirm-inline/confirm-inline';
+import { HowItWorksButtonComponent } from '../../components/molecules/how-it-works-button/how-it-works-button';
 import { PageHeaderComponent } from '../../components/organisms/page-header/page-header';
 import { TablaCrudComponent } from '../../components/organisms/tabla-crud/tabla-crud';
 import { ModalImportacionXlsxComponent } from './modal-importacion-xlsx/modal-importacion-xlsx';
@@ -53,6 +54,7 @@ function crearFila(): FilaEntrada {
     AlertComponent,
     ConfirmInlineComponent,
     ModalImportacionXlsxComponent,
+    HowItWorksButtonComponent,
   ],
 })
 export class MaestroApartamentosPageComponent implements OnInit {

@@ -3,6 +3,8 @@
 // Normalización base — elimina estilos predeterminados del navegador
 // =============================================================================
 
+@use '../shared' as *;
+
 *,
 *::before,
 *::after {

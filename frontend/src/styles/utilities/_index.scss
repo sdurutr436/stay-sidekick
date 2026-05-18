@@ -8,6 +8,8 @@
 // lo que ganan la cascada con igual especificidad sin necesitar !important.
 // =============================================================================
 
+@use '../shared' as *;
+
 // Skip link — WCAG 2.4.1
 .skip-link {
   position: absolute;

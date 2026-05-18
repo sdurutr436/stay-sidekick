@@ -3,6 +3,8 @@
 // Utilidades de layout flexbox reutilizables
 // =============================================================================
 
+@use '../shared' as *;
+
 .l-flex {
   display: flex;
 }

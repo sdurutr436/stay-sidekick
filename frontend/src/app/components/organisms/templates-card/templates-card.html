@@ -1,0 +1,20 @@
+<section class="templates-card" [attr.aria-label]="title">
+  <header class="templates-card__header">
+    <h2 class="templates-card__title">{{ title }}</h2>
+    @if (total !== null) {
+      <span class="templates-card__count" aria-live="polite">
+        {{ total }} {{ total === 1 ? 'plantilla' : 'plantillas' }}
+      </span>
+    }
+  </header>
+
+  <ng-content select="[templates-card-pre-body]" />
+
+  <div class="templates-card__body">
+    @if (isEmpty) {
+      <p class="templates-card__empty">{{ emptyMessage }}</p>
+    } @else {
+      <ng-content />
+    }
+  </div>
+</section>

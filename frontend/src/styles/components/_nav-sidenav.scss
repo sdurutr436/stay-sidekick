@@ -15,6 +15,8 @@
 //         .nav-sidenav__collapse-label (span)
 // =============================================================================
 
+@use '../shared' as *;
+
 $sidenav-width:           240px;
 $sidenav-width-collapsed: 56px;
 
@@ -97,7 +99,7 @@ $sidenav-width-collapsed: 56px;
     @include text-label-md;
 
     &:hover {
-      background-color: $color-gray-100;
+      background-color: $color-btn-ghost-bg-hover;
     }
 
     &:focus-visible {
@@ -107,11 +109,11 @@ $sidenav-width-collapsed: 56px;
 
     // Estado activo — ruta coincide con la página actual
     &--active {
-      background-color: $color-gray-200;
+      background-color: $color-btn-ghost-bg-active;
       font-weight: $font-weight-heading;
 
       &:hover {
-        background-color: $color-gray-200;
+        background-color: $color-btn-ghost-bg-active;
       }
     }
 
@@ -163,7 +165,7 @@ $sidenav-width-collapsed: 56px;
     @include text-label-sm;
 
     &:hover {
-      background-color: $color-gray-100;
+      background-color: $color-btn-ghost-bg-hover;
       color: $color-text-primary;
     }
 

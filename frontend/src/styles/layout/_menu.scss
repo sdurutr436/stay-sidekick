@@ -10,6 +10,8 @@
 //       .menu-layout__desc    (p)
 // =============================================================================
 
+@use '../shared' as *;
+
 .menu-layout {
   display: flex;
   align-items: stretch;

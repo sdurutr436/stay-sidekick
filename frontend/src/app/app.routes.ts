@@ -28,6 +28,7 @@ export const routes: Routes = [
         children: [
           { path: '', redirectTo: 'tipografia', pathMatch: 'full' },
           { path: 'tipografia', loadComponent: () => import('./pages/hoja-estilos/secciones/tipografia/tipografia').then(m => m.DsTipografiaComponent) },
+          { path: 'colores',    loadComponent: () => import('./pages/hoja-estilos/secciones/colores/colores').then(m => m.DsColoresComponent)           },
           { path: 'atomos',     loadComponent: () => import('./pages/hoja-estilos/secciones/atomos/atomos').then(m => m.DsAtomosComponent)             },
           { path: 'moleculas',  loadComponent: () => import('./pages/hoja-estilos/secciones/moleculas/moleculas').then(m => m.DsMoleculasComponent)     },
           { path: 'organismos', loadComponent: () => import('./pages/hoja-estilos/secciones/organismos/organismos').then(m => m.DsOrganismosComponent)  },

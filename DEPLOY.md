@@ -21,8 +21,8 @@ Para despliegue en producción (Railway): cuenta en [railway.app](https://railwa
 
 ```bash
 # 1. Clonar el repositorio
-git clone https://github.com/sdurutr436/tfg-alberti.git
-cd tfg-alberti
+git clone https://github.com/sdurutr436/stay-sidekick.git
+cd stay-sidekick
 
 # 2. Preparar los archivos de entorno
 cp .env.example .env                  # credenciales PostgreSQL — editar POSTGRES_PASSWORD
@@ -46,12 +46,12 @@ docker compose up -d --build          # background
 
 ```bash
 docker compose ps
-# NAME                    IMAGE                    COMMAND                  SERVICE    CREATED          STATUS                    PORTS
-# tfg-alberti-nginx-1     tfg-alberti-nginx        "/docker-entrypoint.…"   nginx      10 seconds ago   Up 9 seconds              0.0.0.0:80->80/tcp
-# tfg-alberti-backend-1   tfg-alberti-backend      "/bin/sh -c 'flask d…"   backend    10 seconds ago   Up 8 seconds
-# tfg-alberti-frontend-1  tfg-alberti-frontend     "/docker-entrypoint.…"   frontend   10 seconds ago   Up 9 seconds
-# tfg-alberti-web-1       tfg-alberti-web          "/docker-entrypoint.…"   web        10 seconds ago   Up 9 seconds
-# tfg-alberti-postgres-1  postgres:16-alpine       "docker-entrypoint.s…"   postgres   10 seconds ago   Up 9 seconds (healthy)
+# NAME                        IMAGE                        COMMAND                  SERVICE    CREATED          STATUS                    PORTS
+# stay-sidekick-nginx-1       stay-sidekick-nginx         "/docker-entrypoint.…"   nginx      10 seconds ago   Up 9 seconds              0.0.0.0:80->80/tcp
+# stay-sidekick-backend-1     stay-sidekick-backend       "/bin/sh -c 'flask d…"   backend    10 seconds ago   Up 8 seconds
+# stay-sidekick-frontend-1    stay-sidekick-frontend      "/docker-entrypoint.…"   frontend   10 seconds ago   Up 9 seconds
+# stay-sidekick-web-1         stay-sidekick-web           "/docker-entrypoint.…"   web        10 seconds ago   Up 9 seconds
+# stay-sidekick-postgres-1    postgres:16-alpine          "docker-entrypoint.s…"   postgres   10 seconds ago   Up 9 seconds (healthy)
 
 docker compose logs --tail=5 backend
 # backend-1  | [INFO] Starting gunicorn 21.2.0
@@ -64,7 +64,7 @@ curl -s http://localhost/api/health
 # {"status": "ok"}
 ```
 
-> Las salidas anteriores son de ejemplo. Reemplazar con capturas reales tras `docker compose up -d --build` (ver [docs/todo/t-evidencias-docker.md](docs/todo/t-evidencias-docker.md)).
+> Las salidas anteriores son de ejemplo. Las capturas públicas pendientes deben colocarse en `docs/assets/despliegue-web/` con los nombres documentados en [docs/assets/despliegue-web/README.md](docs/assets/despliegue-web/README.md).
 
 Referencia completa de comandos y troubleshooting: [docs/devops/docker-local.md](docs/devops/docker-local.md)
 

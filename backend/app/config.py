@@ -28,14 +28,21 @@ class Config:
         "https://challenges.cloudflare.com/turnstile/v0/siteverify",
     )
 
-    # Gmail SMTP
-    GMAIL_USER: str = os.environ.get("GMAIL_USER", "")
-    GMAIL_APP_PASSWORD: str = os.environ.get("GMAIL_APP_PASSWORD", "")
-    MAIL_RECIPIENT: str = os.environ.get("MAIL_RECIPIENT", "")
+    # SMTP transaccional (Gmail por defecto)
+    MAIL_HOST: str = os.environ.get("MAIL_HOST", "smtp.gmail.com")
+    MAIL_PORT: int = int(os.environ.get("MAIL_PORT", "587"))
+    MAIL_USER: str = os.environ.get("MAIL_USER", "")
+    MAIL_PASSWORD: str = os.environ.get("MAIL_PASSWORD", "")
+    MAIL_FROM: str = os.environ.get("MAIL_FROM", "")
 
     # Discord
     DISCORD_WEBHOOK_URL: str = os.environ.get("DISCORD_WEBHOOK_URL", "")
     DISCORD_WEBHOOK_CONTACT_URL: str = os.environ.get("DISCORD_WEBHOOK_CONTACT_URL", "")
+    DISCORD_WEBHOOK_OPERATIONS_URL: str = os.environ.get("DISCORD_WEBHOOK_OPERATIONS_URL", "")
+    DISCORD_WEBHOOK_AI_OBSERVABILITY_URL: str = os.environ.get(
+        "DISCORD_WEBHOOK_AI_OBSERVABILITY_URL",
+        "",
+    )
 
     # JWT (para rutas autenticadas del panel)
     JWT_SECRET_KEY: str = os.environ["JWT_SECRET_KEY"]
@@ -43,6 +50,8 @@ class Config:
 
     # Rate limiting
     RATE_LIMIT_CONTACT: str = os.environ.get("RATE_LIMIT_CONTACT", "5/hour")
+    RATE_LIMIT_STORAGE_URI: str = os.environ.get("RATE_LIMIT_STORAGE_URI", "memory://")
+    RATELIMIT_STORAGE_URI: str = RATE_LIMIT_STORAGE_URI
 
     # Cifrado simétrico (Fernet) para API keys en BD
     FERNET_KEY: str = os.environ.get("FERNET_KEY", "")

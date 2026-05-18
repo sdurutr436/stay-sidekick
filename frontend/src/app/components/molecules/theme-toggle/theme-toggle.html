@@ -1,0 +1,14 @@
+<app-button
+  variant="ghost"
+  size="md"
+  (click)="toggle()"
+>
+  <span class="u-sr-only">{{ themeService.isDark() ? 'Activar modo claro' : 'Activar modo oscuro' }}</span>
+  <span class="theme-toggle__icon" aria-hidden="true">
+    @if (themeService.isDark()) {
+      <ng-icon name="phosphorSun" size="20" />
+    } @else {
+      <ng-icon name="phosphorMoon" size="20" />
+    }
+  </span>
+</app-button>
