@@ -5,7 +5,9 @@ RUN rm /etc/nginx/conf.d/default.conf
 # RAILWAY=false (default) → nginx.conf (docker-compose, hostnames de servicio)
 ARG RAILWAY=true
 COPY nginx.conf nginx.railway.conf /tmp/
-RUN mkdir -p /etc/nginx/templates && \
+COPY start.sh /start.sh
+RUN chmod +x /start.sh && \
+    mkdir -p /etc/nginx/templates && \
     if [ "$RAILWAY" = "true" ]; then \
       cp /tmp/nginx.railway.conf /etc/nginx/templates/default.conf.template; \
     else \
@@ -23,3 +25,4 @@ EXPOSE 80
 # USER nginx no se aplica: el proceso maestro de nginx necesita root para
 # enlazar el puerto 80 (< 1024). Los worker processes ya corren como nginx
 # por defecto en nginx:alpine.
+CMD ["/start.sh"]
