@@ -228,16 +228,16 @@ def send_welcome_company(empresa_email: str, empresa_nombre: str) -> bool:
     )
     html = _render_html(
         f"Bienvenida, {empresa_nombre}",
-        f'<p style="font-size:14px;line-height:1.6;">'
-        f"Tu cuenta de empresa en <strong>Stay Sidekick</strong> ha sido "
-        f"creada correctamente. En breve recibirás un correo separado con las "
-        f"credenciales del primer usuario administrador, incluida una "
-        f"contraseña temporal que deberás cambiar en el primer inicio de sesión."
-        f"</p>"
-        f'<p style="font-size:14px;color:#6b7280;">'
-        f"Si no esperabas este correo, ignóralo o contáctanos respondiendo a "
-        f"este mensaje."
-        f"</p>",
+        '<p style="font-size:14px;line-height:1.6;">'
+        "Tu cuenta de empresa en <strong>Stay Sidekick</strong> ha sido "
+        "creada correctamente. En breve recibirás un correo separado con las "
+        "credenciales del primer usuario administrador, incluida una "
+        "contraseña temporal que deberás cambiar en el primer inicio de sesión."
+        "</p>"
+        '<p style="font-size:14px;color:#6b7280;">'
+        "Si no esperabas este correo, ignóralo o contáctanos respondiendo a "
+        "este mensaje."
+        "</p>",
     )
 
     ok, _ = send_via_smtp(empresa_email, subject, text, html)
