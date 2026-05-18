@@ -19,7 +19,15 @@ ENV FRONTEND_PORT=80
 ENV WEB_PORT=80
 ENV BACKEND_PORT=5000
 
+# start.sh runs envsubst with an explicit variable list so that only the four
+# known port variables are substituted and nginx's own $-variables are left
+# untouched.  This avoids the broken-syntax issue caused by the automatic
+# /etc/nginx/templates mechanism substituting every $-expression it finds.
+COPY start.sh /start.sh
+RUN chmod +x /start.sh
+
 EXPOSE 80
 # USER nginx no se aplica: el proceso maestro de nginx necesita root para
 # enlazar el puerto 80 (< 1024). Los worker processes ya corren como nginx
 # por defecto en nginx:alpine.
+CMD ["/start.sh"]
