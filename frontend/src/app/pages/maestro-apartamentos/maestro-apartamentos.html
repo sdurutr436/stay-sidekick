@@ -32,8 +32,6 @@
       type="file"
       accept=".xlsx"
       class="maestro-apartamentos__xlsx-input"
-      aria-hidden="true"
-      tabindex="-1"
       (change)="onXlsxFileSelected($event)"
     />
 
@@ -137,6 +135,7 @@
         <tr>
           @if (isAdmin) {
             <th class="tabla-crud__th tabla-crud__th--checkbox" scope="col">
+              <span class="u-sr-only">Selección</span>
               <input
                 type="checkbox"
                 class="tabla-crud__checkbox"
