@@ -24,18 +24,6 @@
         </span>
         Nueva empresa
       </app-button>
-      @if (empresaSeleccionadaId()) {
-        <app-button
-          variant="danger"
-          size="md"
-          (click)="abrirModalBorradoEmpresa()"
-        >
-          <span class="btn__icon" aria-hidden="true">
-            <ng-icon name="phosphorTrash" size="20" />
-          </span>
-          Eliminar empresa
-        </app-button>
-      }
     }
     <app-button
       variant="primary"
@@ -69,6 +57,17 @@
           ariaLabel="Seleccionar empresa"
           (valueChange)="onEmpresaChange($event)"
         />
+        <app-button
+          variant="danger"
+          size="md"
+          [disabled]="!puedeEliminarEmpresa()"
+          (click)="abrirModalBorradoEmpresa()"
+        >
+          <span class="btn__icon" aria-hidden="true">
+            <ng-icon name="phosphorTrash" size="20" />
+          </span>
+          <span class="u-sr-only">Eliminar empresa</span>
+        </app-button>
       </div>
     }
 

@@ -97,6 +97,8 @@ export class GestionUsuariosPageComponent implements OnInit {
     this.empresas().map(e => ({ value: e.id, label: `${e.nombre} (${e.email})` }))
   );
 
+  readonly puedeEliminarEmpresa = computed(() => this.empresas().length > 1);
+
   ngOnInit(): void {
     if (this.esSuperAdmin) {
       this.service.getEmpresas().pipe(catchError(() => of([] as EmpresaItem[]))).subscribe(empresas => {
@@ -276,6 +278,7 @@ export class GestionUsuariosPageComponent implements OnInit {
   }
 
   abrirModalBorradoEmpresa(): void {
+    if (!this.puedeEliminarEmpresa()) return;
     this.errorBorradoEmpresa.set(null);
     this.mensajeBorradoEmpresa.set(null);
     this.modalBorradoEmpresaAbierto.set(true);
