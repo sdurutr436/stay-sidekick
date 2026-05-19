@@ -163,17 +163,6 @@
         </div>
       }
 
-      <!-- Alerta de validación -->
-      @if (alertaValidacion()) {
-        <app-alert
-          [type]="pmsActivo() ? 'error' : 'warning'"
-          [dismissible]="true"
-          (dismissed)="alertaValidacion.set(null)"
-        >
-          {{ alertaValidacion() }}
-        </app-alert>
-      }
-
       <!-- Separador -->
       <div class="acciones-body__separator" aria-hidden="true">
         <hr /><span>Ejecutar</span><hr />
@@ -198,13 +187,6 @@
     </div>
   </app-panel-seccion>
   </section>
-
-  <!-- Alerta de error de API -->
-  @if (error()) {
-    <app-alert type="error" [dismissible]="true" (dismissed)="error.set(null)">
-      {{ error() }}
-    </app-alert>
-  }
 
   <!-- Cuadrícula del mapa de calor -->
   @if (diasCalor().length > 0) {
