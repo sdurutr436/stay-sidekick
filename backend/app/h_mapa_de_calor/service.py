@@ -100,11 +100,13 @@ def generar_desde_pms(
 
     checkins: dict[str, int] = {}
     for r in reservas_checkin:
+        if r.tipo != "reservation": continue
         if r.checkin:
             checkins[r.checkin] = checkins.get(r.checkin, 0) + 1
 
     checkouts: dict[str, int] = {}
     for r in reservas_checkout:
+        if r.tipo != "reservation": continue
         if r.checkout:
             checkouts[r.checkout] = checkouts.get(r.checkout, 0) + 1
 
