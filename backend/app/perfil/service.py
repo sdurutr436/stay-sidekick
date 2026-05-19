@@ -9,6 +9,7 @@ from marshmallow import ValidationError
 from app.auth.passwords import hash_password, verify_password
 from app.common.crypto import encrypt
 from app.perfil import repository as repo
+from app.perfil.model import IA_DEFAULT
 from app.perfil.schemas import CambiarPasswordSchema, ActualizarPMSSchema, ActualizarIASchema, XlsxApartamentosConfigSchema, NotifTardioConfigSchema
 
 logger = logging.getLogger(__name__)
@@ -65,7 +66,7 @@ def get_integraciones(empresa_id: str) -> dict:
         },
         "ia": {
             "configurado": ia is not None and bool(ia.api_key_cifrada),
-            "proveedor":   ia.proveedor if ia else None,
+            "proveedor":   ia.proveedor if ia else IA_DEFAULT,
             "modelo":      ia.modelo if ia else None,
         },
     }
