@@ -15,6 +15,7 @@ import { TablaCrudComponent } from '../../components/organisms/tabla-crud/tabla-
 import { ModalImportacionXlsxComponent } from './modal-importacion-xlsx/modal-importacion-xlsx';
 import { ApartamentosService, Apartamento, ImportacionPreview } from '../../services/apartamentos.service';
 import { AuthService } from '../../services/auth.service';
+import { ToastService } from '../../services/toast.service';
 
 interface FilaEntrada {
   id: string;
@@ -60,6 +61,7 @@ function crearFila(): FilaEntrada {
 export class MaestroApartamentosPageComponent implements OnInit {
   private readonly apartamentosService = inject(ApartamentosService);
   private readonly auth = inject(AuthService);
+  private readonly toast = inject(ToastService);
 
   readonly isAdmin = this.auth.isAdmin;
 
@@ -110,11 +112,9 @@ export class MaestroApartamentosPageComponent implements OnInit {
   // ── Eliminar con confirmación ─────────────────────────────────────────
   readonly confirmandoEliminar = signal(false);
   readonly eliminando = signal(false);
-  readonly alertaEliminar = signal<{ tipo: 'warning' | 'error'; mensaje: string } | null>(null);
 
   // ── Sincronización Smoobu ─────────────────────────────────────────────
   readonly sincronizando = signal(false);
-  readonly syncAlerta = signal<{ tipo: 'success' | 'error'; mensaje: string } | null>(null);
 
   // ── Importación XLSX ──────────────────────────────────────────────────
   readonly xlsxPreview = signal<ImportacionPreview | null>(null);
@@ -255,7 +255,6 @@ export class MaestroApartamentosPageComponent implements OnInit {
 
   pedirConfirmacionEliminar(): void {
     this.confirmandoEliminar.set(true);
-    this.alertaEliminar.set(null);
   }
 
   cancelarEliminar(): void {
@@ -276,16 +275,16 @@ export class MaestroApartamentosPageComponent implements OnInit {
       ),
     ).subscribe(resultados => {
       const fallidos = resultados.filter(r => !r.ok);
+      const total = ids.length;
       this.eliminando.set(false);
       this.confirmandoEliminar.set(false);
       this.selectedIds.set(new Set());
       this._cargarDatos();
 
-      if (fallidos.length > 0) {
-        this.alertaEliminar.set({
-          tipo: fallidos.length === ids.length ? 'error' : 'warning',
-          mensaje: `No se pudieron eliminar ${fallidos.length} de ${ids.length} apartamento${ids.length !== 1 ? 's' : ''}.`,
-        });
+      if (fallidos.length === 0) {
+        this.toast.showSuccess(`Eliminado${total !== 1 ? 's' : ''} ${total} apartamento${total !== 1 ? 's' : ''}.`);
+      } else {
+        this.toast.showError(`No se pudieron eliminar ${fallidos.length} de ${total} apartamento${total !== 1 ? 's' : ''}.`);
       }
     });
   }
@@ -294,20 +293,17 @@ export class MaestroApartamentosPageComponent implements OnInit {
 
   syncSmoobu(): void {
     this.sincronizando.set(true);
-    this.syncAlerta.set(null);
     this.apartamentosService.sincronizarSmoobu().subscribe({
       next: resultado => {
         this.sincronizando.set(false);
         this._cargarDatos();
-        this.syncAlerta.set({
-          tipo: 'success',
-          mensaje: `Sincronización completada: ${resultado.nuevos} nuevos, ${resultado.actualizados} actualizados.`,
-        });
-        setTimeout(() => this.syncAlerta.set(null), 5000);
+        this.toast.showSuccess(
+          `Sincronización completada: ${resultado.nuevos} nuevos, ${resultado.actualizados} actualizados.`,
+        );
       },
       error: () => {
         this.sincronizando.set(false);
-        this.syncAlerta.set({ tipo: 'error', mensaje: 'Error al sincronizar con Smoobu.' });
+        this.toast.showError('Error al sincronizar con Smoobu.');
       },
     });
   }
@@ -335,7 +331,7 @@ export class MaestroApartamentosPageComponent implements OnInit {
       error: () => {
         this.xlsxCargando.set(false);
         this._xlsxFileParaConfirmar = null;
-        this.syncAlerta.set({ tipo: 'error', mensaje: 'No se pudo leer el archivo Excel.' });
+        this.toast.showError('No se pudo leer el archivo Excel.');
       },
     });
   }
@@ -352,17 +348,15 @@ export class MaestroApartamentosPageComponent implements OnInit {
         this.xlsxPreview.set(null);
         this._xlsxFileParaConfirmar = null;
         this._cargarDatos();
-        this.syncAlerta.set({
-          tipo: 'success',
-          mensaje: `Importación completada: ${resultado.nuevos} nuevos, ${resultado.actualizados} actualizados.`,
-        });
-        setTimeout(() => this.syncAlerta.set(null), 5000);
+        this.toast.showSuccess(
+          `Importación completada: ${resultado.nuevos} nuevos, ${resultado.actualizados} actualizados.`,
+        );
       },
       error: () => {
         this.xlsxCargando.set(false);
         this.xlsxModalAbierto.set(false);
         this._xlsxFileParaConfirmar = null;
-        this.syncAlerta.set({ tipo: 'error', mensaje: 'Error al importar el archivo Excel.' });
+        this.toast.showError('Error al importar el archivo Excel.');
       },
     });
   }
