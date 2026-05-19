@@ -23,10 +23,14 @@ export class PerfilService {
     return this.http.get<{ ok: boolean; data: PerfilData }>('/api/perfil');
   }
 
-  cambiarPassword(passwordActual: string, passwordNueva: string): Observable<{ ok: boolean; errors?: string[] }> {
+  cambiarPassword(passwordActual: string, passwordNueva: string, passwordConfirm?: string): Observable<{ ok: boolean; errors?: string[] }> {
     return this.http.put<{ ok: boolean; errors?: string[] }>(
       '/api/perfil/password',
-      { password_actual: passwordActual, password_nueva: passwordNueva },
+      {
+        password_actual:  passwordActual,
+        password_nueva:   passwordNueva,
+        password_confirm: passwordConfirm ?? passwordNueva,
+      },
     );
   }
 

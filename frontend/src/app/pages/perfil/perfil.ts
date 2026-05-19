@@ -15,6 +15,7 @@ import { ButtonComponent } from '../../components/atoms/button/button';
 import { FormFieldComponent } from '../../components/molecules/form-field/form-field';
 import { FormInputComponent } from '../../components/atoms/form-input/form-input';
 import { FormSelectComponent } from '../../components/atoms/form-select/form-select';
+import { PasswordSectionComponent } from './password-section/password-section';
 
 interface Alerta {
   tipo: 'success' | 'error';
@@ -60,6 +61,7 @@ function colNumeroALetra(n: number): string {
     NgIconComponent,
     PageHeaderComponent,
     PanelSeccionComponent,
+    PasswordSectionComponent,
     AlertComponent,
     ButtonComponent,
     FormFieldComponent,
@@ -81,13 +83,6 @@ export class PerfilPageComponent implements OnInit {
   readonly passwordChangedAt = signal<string | null>(null);
   readonly isAdmin           = signal(false);
   readonly integraciones     = signal<IntegracionesData | null>(null);
-
-  // Cambiar contraseña
-  readonly passwordActual    = signal('');
-  readonly passwordNueva     = signal('');
-  readonly passwordConfirm   = signal('');
-  readonly passwordGuardando = signal(false);
-  readonly passwordAlerta    = signal<Alerta | null>(null);
 
   // PMS
   readonly pmsProveedor         = signal('');
@@ -231,40 +226,8 @@ export class PerfilPageComponent implements OnInit {
     });
   }
 
-  diasDesdeUltimoCambio(): number | null {
-    const at = this.passwordChangedAt();
-    if (!at) return null;
-    return Math.floor((Date.now() - new Date(at).getTime()) / 86_400_000);
-  }
-
-  guardarPassword(): void {
-    this.passwordAlerta.set(null);
-
-    if (this.passwordNueva() !== this.passwordConfirm()) {
-      this.passwordAlerta.set({ tipo: 'error', mensaje: 'Las contraseñas nuevas no coinciden.' });
-      return;
-    }
-
-    this.passwordGuardando.set(true);
-    this.service.cambiarPassword(this.passwordActual(), this.passwordNueva()).subscribe({
-      next: res => {
-        if (res.ok) {
-          this.passwordAlerta.set({ tipo: 'success', mensaje: 'Contraseña actualizada correctamente.' });
-          this.passwordActual.set('');
-          this.passwordNueva.set('');
-          this.passwordConfirm.set('');
-          this.passwordChangedAt.set(new Date().toISOString());
-        } else {
-          this.passwordAlerta.set({ tipo: 'error', mensaje: res.errors?.[0] ?? 'Error al cambiar la contraseña.' });
-        }
-        this.passwordGuardando.set(false);
-      },
-      error: err => {
-        const msg = err?.error?.errors?.[0] ?? 'Error al cambiar la contraseña.';
-        this.passwordAlerta.set({ tipo: 'error', mensaje: msg });
-        this.passwordGuardando.set(false);
-      },
-    });
+  onPasswordChanged(): void {
+    this.passwordChangedAt.set(new Date().toISOString());
   }
 
   guardarPMS(): void {
