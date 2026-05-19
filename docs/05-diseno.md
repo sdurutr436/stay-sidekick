@@ -303,6 +303,8 @@ flowchart TD
     F --> G[Render calendario de carga]
 ```
 
+La llamada al PMS para obtener check-ins usa el parámetro `arrivalFrom/arrivalTo` del endpoint `GET /api/reservations` de Smoobu. En el plan gratuito, este filtro puede no devolver reservas cuya fecha de llegada ya ha pasado en el momento de la consulta, aunque esa fecha esté dentro del rango solicitado. Como consecuencia, el heatmap puede no reflejar los check-ins de estancias ya finalizadas al consultar rangos que incluyen fechas históricas. Esta es una limitación del proveedor externo, no del código de la aplicación.
+
 ### Flujo 5 - Sincronizar contactos con Google
 
 ```mermaid
