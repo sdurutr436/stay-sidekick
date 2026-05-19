@@ -111,6 +111,7 @@
             id="pms-proveedor"
             [options]="pmsOpciones"
             [value]="pmsProveedor()"
+            placeholder="Selecciona un proveedor…"
             [disabled]="!isAdmin() || !!integraciones()?.pms?.configurado"
             (valueChange)="pmsProveedor.set($event)"
           />
@@ -123,7 +124,7 @@
               type="password"
               placeholder="Introduce la API Key del PMS"
               [value]="pmsApiKey()"
-              [disabled]="!!integraciones()?.pms?.configurado"
+              [disabled]="!!integraciones()?.pms?.configurado || !pmsProveedor()"
               (valueChange)="pmsApiKey.set($event)"
             />
           } @else {
