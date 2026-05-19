@@ -71,6 +71,7 @@ def get_status(empresa_id: str, fecha: str | None = None) -> dict:
                 except ValueError:
                     hoy = date.today().isoformat()
                 reservas = client.fetch_reservations(desde=hoy, hasta=hoy)
+                reservas = [r for r in reservas if r.tipo == "reservation"]
                 reservas_pms = [_reserva_a_dict(r, apts_por_externo) for r in reservas]
             except Exception as exc:
                 logger.warning(
