@@ -39,6 +39,7 @@
 @use 'card';
 @use 'panel-seccion';
 @use 'confirm-inline';
+@use 'toast';
 
 // ── Páginas de herramientas (solo SPA Angular) ───────────────────────────
 @use 'sincronizador-contactos';
