@@ -23,6 +23,7 @@
 @use 'form';           // [ESPEJO NJK] _includes/macros/molecules.njk (form-input/-select/-textarea/-checkbox/-label)
 @use 'form-solicitud'; // [ESPEJO NJK] _includes/partials/form-solicitud.njk
 @use 'form-login';     // [ESPEJO NJK] web/src/login/index.njk
+@use 'password-strength'; // [ESPEJO NJK] web/src/cambio-password/index.njk + perfil Angular
 
 // ── Navegación interna (solo SPA Angular) ────────────────────────────────
 @use 'nav-sidenav';
