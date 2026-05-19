@@ -32,8 +32,8 @@ Stay Sidekick es una aplicación web para operaciones de alquiler vacacional. Ce
 
 La aplicación se usa desde navegador y está diseñada para perfiles operativos y administradores de empresa.
 
-![Placeholder — pantalla de inicio de Stay Sidekick](assets/manual/01-login-portada-placeholder.png)
-_Placeholder de captura: pantalla de acceso a la aplicación._
+![Pantalla de inicio de Stay Sidekick](assets/manual/09-menu-login.png)
+_Pantalla de acceso a la aplicación._
 
 ---
 
@@ -45,8 +45,8 @@ _Placeholder de captura: pantalla de acceso a la aplicación._
 2. Pulsa **Iniciar sesión** desde la cabecera del sitio.
 3. Se abrirá la pantalla de login.
 
-![Placeholder — acceso desde cabecera pública](assets/manual/02-acceso-desde-web-placeholder.png)
-_Placeholder de captura: botón de acceso desde la web pública._
+![Acceso desde cabecera pública](assets/manual/09-menu-login.png)
+_Pantalla de acceso desde la web pública._
 
 ### 9.2.2. Inicio de sesión
 
@@ -56,9 +56,6 @@ _Placeholder de captura: botón de acceso desde la web pública._
 
 Si intentas acceder a una ruta privada sin sesión, el sistema redirige automáticamente a `/login?acceso=requerido`.
 
-![Placeholder — formulario login](assets/manual/03-login-form-placeholder.png)
-_Placeholder de captura: formulario de inicio de sesión._
-
 ### 9.2.3. Cambio de contraseña obligatorio
 
 En cuentas con marca de seguridad activa, tras autenticarte se redirige a **/cambio-password**.
@@ -67,8 +64,8 @@ En cuentas con marca de seguridad activa, tras autenticarte se redirige a **/cam
 2. Introduce y confirma la nueva contraseña.
 3. Guarda cambios para continuar al panel.
 
-![Placeholder — cambio de contraseña](assets/manual/04-cambio-password-placeholder.png)
-_Placeholder de captura: pantalla de cambio de contraseña obligatoria._
+![Cambio de contraseña](assets/manual/09-menu-cambio-contrasena.png)
+_Pantalla de cambio de contraseña obligatoria._
 
 ---
 
@@ -81,8 +78,8 @@ Después de iniciar sesión llegas al panel principal:
 - Tarjetas de acceso rápido a cada módulo.
 - En cuentas nuevas, bloque de **Primeros pasos** con enlaces directos a Perfil.
 
-![Placeholder — dashboard mis herramientas](assets/manual/05-dashboard-mis-herramientas-placeholder.png)
-_Placeholder de captura: panel principal con tarjetas y estado de integraciones._
+![Dashboard mis herramientas](assets/manual/09-dashboard.png)
+_Panel principal con tarjetas y estado de integraciones._
 
 ---
 
@@ -99,8 +96,8 @@ Funciones visibles:
 - Paginación.
 - Acciones de alta, importación y sincronización (según permisos/estado).
 
-![Placeholder — listado de apartamentos](assets/manual/06-maestro-listado-placeholder.png)
-_Placeholder de captura: tabla principal del maestro._
+![Listado de apartamentos](assets/manual/09-maestro-apartamentos.png)
+_Tabla principal del maestro._
 
 ### 9.4.2. Alta manual y edición
 
@@ -109,8 +106,8 @@ _Placeholder de captura: tabla principal del maestro._
 3. Usa **Guardar cambios** para persistir.
 4. Para editar registros existentes, selecciona la fila y aplica cambios.
 
-![Placeholder — alta manual apartamento](assets/manual/07-maestro-alta-manual-placeholder.png)
-_Placeholder de captura: fila de creación/edición en tabla CRUD._
+![Alta manual apartamento](assets/manual/09-maestro-apartamentos-alta-manual.png)
+_Alta fila de creación/edición en tabla CRUD._
 
 ### 9.4.3. Sincronización con Smoobu
 
@@ -120,8 +117,8 @@ Si hay PMS activo:
 2. Espera el resultado.
 3. Revisa el aviso de éxito/error en la alerta superior.
 
-![Placeholder — sincronizar smoobu](assets/manual/08-maestro-sync-smoobu-placeholder.png)
-_Placeholder de captura: botón y resultado de sincronización PMS._
+![Sincronizar smoobu](assets/manual/09-maestro-apartamentos-sincronizacion.png)
+_Botón y resultado de sincronización PMS. No PMS conectado, da error._
 
 ### 9.4.4. Importación por XLSX
 
@@ -130,7 +127,7 @@ _Placeholder de captura: botón y resultado de sincronización PMS._
 3. Revisa la vista previa en el modal de importación.
 4. Confirma para aplicar cambios.
 
-![Placeholder — importación xlsx apartamentos](assets/manual/09-maestro-importacion-xlsx-placeholder.png)
+![Importación xlsx apartamentos](assets/manual/09-importacion-xlsx.png)
 _Placeholder de captura: modal de importación con preview._
 
 ---
@@ -148,8 +145,8 @@ Estados posibles:
 - PMS desconectado + Google conectado: sincronización XLSX -> Google.
 - PMS desconectado + Google desconectado: exportación CSV desde XLSX.
 
-![Placeholder — sincronizador contactos](assets/manual/10-contactos-vista-general-placeholder.png)
-_Placeholder de captura: pantalla del sincronizador con chips de estado._
+![Sincronizador contactos](assets/manual/09-sincronizador-contactos-general.png)
+_Pantalla del sincronizador con chips de estado. Sin PMS ni Google._
 
 ### 9.5.2. Exportación CSV
 
@@ -157,18 +154,12 @@ _Placeholder de captura: pantalla del sincronizador con chips de estado._
 2. Pulsa **Descargar CSV**.
 3. El archivo se descarga con los contactos normalizados.
 
-![Placeholder — exportación csv contactos](assets/manual/11-contactos-export-csv-placeholder.png)
-_Placeholder de captura: acción de exportación CSV._
-
 ### 9.5.3. Sincronización con Google Contacts
 
 1. Verifica que Google está conectado desde Perfil.
 2. Define rango (PMS) o sube XLSX.
 3. Pulsa **Sincronizar con Google** / **Sincronizar PMS con Google**.
 4. Revisa alerta de resultado.
-
-![Placeholder — sync google contacts](assets/manual/12-contactos-sync-google-placeholder.png)
-_Placeholder de captura: sincronización con Google Contacts._
 
 ---
 
@@ -322,7 +313,3 @@ La gestión de usuarios está limitada por rol (admin/superadmin). Si tu rol no 
 Comprueba estado de configuración IA en Perfil y límites de uso diarios. Si el proveedor externo falla, reintenta más tarde.
 
 ---
-
-## Nota sobre capturas (placeholders)
-
-Este documento incluye placeholders de imagen en `assets/manual/` para mantener la estructura de entrega aunque todavía no estén todas las capturas definitivas. Sustituye cada placeholder por su captura real manteniendo el mismo nombre de archivo para no tener que editar el manual.
