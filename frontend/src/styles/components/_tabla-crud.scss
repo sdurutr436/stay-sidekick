@@ -119,7 +119,7 @@
     }
 
     &:hover {
-      background-color: $color-gray-50;
+      background-color: color.change($color-surface-alt, $alpha: 0.75);
     }
 
     &--selected {
@@ -210,10 +210,10 @@
   // Fila de entrada (alta inline)
   // -------------------------------------------------------------------------
   &__row--entrada {
-    background-color: $color-gray-50;
+    background-color: $color-surface-alt;
 
     &:hover {
-      background-color: $color-gray-50;
+      background-color: $color-surface-alt;
     }
   }
 
