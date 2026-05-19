@@ -100,7 +100,13 @@ class SmoobuReservationClient:
         desde: str | None = None,
         hasta: str | None = None,
     ) -> list[ReservaEstandar]:
-        """Obtiene reservas del rango [desde, hasta] paginando hasta el final."""
+        """Obtiene reservas del rango [desde, hasta] paginando hasta el final.
+
+        Nota: en el plan gratuito de Smoobu, el filtro arrivalFrom/arrivalTo puede
+        no devolver reservas cuya fecha de llegada ya ha pasado en el momento de la
+        consulta, aunque esa fecha esté dentro del rango solicitado. Es una limitación
+        del proveedor externo, no del código de la aplicación.
+        """
         if desde is None:
             desde = date.today().isoformat()
         if hasta is None:
@@ -136,6 +142,7 @@ class SmoobuReservationClient:
             "arrivalTo": hasta,
             "pageSize": _PAGE_SIZE,
             "page": page,
+            "excludeBlocked": True,
         }
         resp = self._session.get(url, params=params, timeout=_TIMEOUT)
         resp.raise_for_status()
@@ -148,9 +155,8 @@ class SmoobuReservationClient:
     ) -> list[ReservaEstandar]:
         """Obtiene reservas cuyo checkout cae en el rango [desde, hasta].
 
-        # TODO: validar con documentación oficial de Smoobu en https://docs.smoobu.com
-        # Endpoint: GET https://login.smoobu.com/api/reservations
-        # Parámetros asumidos: departureFrom, departureTo (análogos a arrivalFrom/arrivalTo)
+        # Parámetros departureFrom/departureTo están documentados en https://docs.smoobu.com
+        # como parámetros válidos del endpoint GET /api/reservations.
         """
         reservas: list[ReservaEstandar] = []
         page = 1
@@ -182,6 +188,7 @@ class SmoobuReservationClient:
             "departureTo": hasta,
             "pageSize": _PAGE_SIZE,
             "page": page,
+            "excludeBlocked": True,
         }
         resp = self._session.get(url, params=params, timeout=_TIMEOUT)
         resp.raise_for_status()
@@ -228,4 +235,5 @@ class SmoobuReservationClient:
             nombre_apartamento=apt.get("name") or None,
             id_apartamento_externo=str(apt.get("id")) if apt.get("id") else None,
             hora_llegada=hora_llegada,
+            tipo=booking.get("type"),
         )
