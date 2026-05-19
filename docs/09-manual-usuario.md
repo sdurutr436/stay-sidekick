@@ -175,8 +175,8 @@ Flujo recomendado:
 4. Generar mensaje automáticamente o editarlo manualmente.
 5. Copiar mensaje final para enviarlo por el canal operativo.
 
-![Placeholder — notificaciones checkin tardío](assets/manual/13-notificaciones-checkin-placeholder.png)
-_Placeholder de captura: vista con plantillas y editor de mensaje._
+![Notificaciones checkin tardío](assets/manual/09-notificaciones-tardias.png)
+_Vista con plantillas y editor de mensaje._
 
 ---
 
@@ -191,11 +191,11 @@ Flujo de uso:
 3. Pulsa **Generar mapa de calor**.
 4. Revisa la cuadrícula de intensidad en la sección **Resultados**.
 
-![Placeholder — mapa de calor configuracion](assets/manual/14-mapa-calor-config-placeholder.png)
-_Placeholder de captura: panel de configuración y subida de ficheros._
+![Mapa de calor configuracion](assets/manual/09-mapa-calor-perfil-config.png)
+_Panel de configuración y subida de ficheros._
 
-![Placeholder — mapa de calor resultados](assets/manual/15-mapa-calor-resultados-placeholder.png)
-_Placeholder de captura: rejilla de resultados del mapa de calor._
+![Mapa de calor resultados](assets/manual/09-mapa-calor.png)
+_Rejilla de resultados del mapa de calor._
 
 ---
 
@@ -211,11 +211,11 @@ Acciones principales:
 - Mejorar redacción con IA.
 - Traducir contenido a otro idioma.
 
-![Placeholder — vault comunicaciones listado](assets/manual/16-vault-listado-placeholder.png)
-_Placeholder de captura: listado de plantillas del vault._
+![Vault de comunicaciones - Mensaje previo](assets/manual/09-vault-mensaje-previo.png)
+_Plantilla creada antes de la mejora con IA._
 
-![Placeholder — vault asistente IA](assets/manual/17-vault-ia-placeholder.png)
-_Placeholder de captura: mejora/traducción asistida por IA._
+![Placeholder — vault asistente IA](assets/manual/09-vault-mejora-mensaje.png)
+_Mejora/traducción asistida por IA._
 
 ---
 
@@ -231,8 +231,8 @@ Desde **Perfil** puedes:
 - Conectar/desconectar Google Contacts.
 - Ajustar configuración XLSX y parámetros funcionales por empresa.
 
-![Placeholder — perfil integraciones](assets/manual/18-perfil-integraciones-placeholder.png)
-_Placeholder de captura: sección de integraciones en perfil._
+![Perfil integraciones](assets/manual/09-seccion-integraciones.png)
+_Sección de integraciones en perfil._
 
 ### Gestión de usuarios (admin/superadmin)
 
@@ -244,8 +244,11 @@ Desde **Gestión de usuarios** puedes:
 - Resetear contraseña.
 - Eliminar usuario.
 
-![Placeholder — gestion usuarios](assets/manual/19-gestion-usuarios-placeholder.png)
-_Placeholder de captura: pantalla de administración de usuarios._
+![Tabla gestion usuarios](assets/manual/09-tabla-gestion-usuarios.png)
+_Pantalla de administración de usuarios._
+
+![Modal de gestion de usuarios](assets/manual/09-modal-administracion-usuarios.png)
+_Modal de administración de usuarios._
 
 ---
 
@@ -311,5 +314,8 @@ La gestión de usuarios está limitada por rol (admin/superadmin). Si tu rol no 
 
 **Las funciones de IA no responden en Vault.**  
 Comprueba estado de configuración IA en Perfil y límites de uso diarios. Si el proveedor externo falla, reintenta más tarde.
+
+**No puedo refinar una plantilla nada más crearla**
+Primero deberás guardarla. El editor es el mismo para la traducción, pero mientras no esté guardada no dejará hacer nada con ella más que editarla a mano.
 
 ---
