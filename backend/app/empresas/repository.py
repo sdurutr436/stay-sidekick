@@ -22,3 +22,12 @@ def crear_empresa(nombre: str, email: str) -> Empresa:
     db.session.add(empresa)
     db.session.commit()
     return empresa
+
+
+def eliminar_empresa(empresa_id: str) -> bool:
+    empresa = Empresa.query.get(empresa_id)
+    if not empresa:
+        return False
+    db.session.delete(empresa)
+    db.session.commit()
+    return True
