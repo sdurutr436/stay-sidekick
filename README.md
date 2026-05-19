@@ -1,22 +1,53 @@
-# Stay Sidekick
+<div align="center">
 
-[![CI Python](https://github.com/sdurutr436/tfg-alberti/actions/workflows/ci-python.yml/badge.svg)](https://github.com/sdurutr436/tfg-alberti/actions/workflows/ci-python.yml)
-[![CI Angular](https://github.com/sdurutr436/tfg-alberti/actions/workflows/ci-angular.yml/badge.svg)](https://github.com/sdurutr436/tfg-alberti/actions/workflows/ci-angular.yml)
-[![Docker Hub](https://github.com/sdurutr436/tfg-alberti/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/sdurutr436/tfg-alberti/actions/workflows/docker-publish.yml)
+  # Stay Sidekick
 
-TFG DAW 2 — Plataforma para la gestión de solicitudes de estancia.
+  <img src="web/src/assets/img/favicon/stay-sidekick-fav-icon-600x600.webp" alt="Stay-sidekick" width="180"/>
 
-Imágenes publicadas en [Docker Hub — sdurutr436](https://hub.docker.com/u/sdurutr436).
+  ## La capa satélite para la gestión operacional en tu empresa vacacional
+
+  > **Accede directamente:** [https://stay-sidekick.com](https://stay-sidekick.com)
+
+</div>
+
+---
+
+<div align="center">
+
+[![CI Python](https://github.com/sdurutr436/stay-sidekick/actions/workflows/ci-python.yml/badge.svg)](https://github.com/sdurutr436/stay-sidekick/actions/workflows/ci-python.yml)
+[![CI Angular](https://github.com/sdurutr436/stay-sidekick/actions/workflows/ci-angular.yml/badge.svg)](https://github.com/sdurutr436/stay-sidekick/actions/workflows/ci-angular.yml)
+[![Tests Angular](https://github.com/sdurutr436/stay-sidekick/actions/workflows/ci-angular-tests.yml/badge.svg)](https://github.com/sdurutr436/stay-sidekick/actions/workflows/ci-angular-tests.yml)
+[![CI 11ty](https://github.com/sdurutr436/stay-sidekick/actions/workflows/ci-web.yml/badge.svg)](https://github.com/sdurutr436/stay-sidekick/actions/workflows/ci-web.yml)
+
+</div>
+
+---
+
+Stay Sidekick es una plataforma web para equipos de alojamiento turístico que agrupa, en un mismo stack, una landing pública, un panel de trabajo privado y una API REST para operaciones como gestión de solicitudes, herramientas multiempresa, sincronización de contactos y automatizaciones de apoyo.
+
+- Producción pública: [stay-sidekick.up.railway.app](https://stay-sidekick.up.railway.app)
+- Imágenes publicadas: [Docker Hub - sdurutr436](https://hub.docker.com/u/sdurutr436)
+
+## Qué incluye
+
+- `web/`: sitio estático con contenido público, legal y corporativo.
+- `frontend/`: SPA Angular para el panel operativo.
+- `backend/`: API REST Flask para autenticación, negocio y notificaciones.
+- `nginx/`: proxy inverso que publica `/`, `/menu/` y `/api/` en una única entrada.
 
 ## Arquitectura
 
 El proyecto está dividido en tres capas independientes:
 
-| Capa | Tecnología | Puerto | Descripción |
-|------|-----------|--------|-------------|
-| `web/` | [11ty](https://www.11ty.dev/) + Nunjucks | `8080` | Sitio estático: landing, legales, empresa, producto |
-| `frontend/` | [Angular](https://angular.dev/) | `4200` | Aplicación dinámica: panel de usuario, solicitudes |
-| `backend/` | [Flask](https://flask.palletsprojects.com/) | `5000` | API REST: formularios, autenticación, notificaciones |
+## Stack técnico
+
+| Área | Stack real del repositorio |
+|------|-----------------------------|
+| Sitio público | ![11ty](https://img.shields.io/badge/-11ty-000000?style=flat-square&logo=eleventy&logoColor=white) ![Nunjucks](https://img.shields.io/badge/-Nunjucks-1C6D28?style=flat-square&logo=nunjucks&logoColor=white) ![Sass](https://img.shields.io/badge/-Sass-CC6699?style=flat-square&logo=sass&logoColor=white) |
+| Aplicación | ![Angular](https://img.shields.io/badge/-Angular%2021-DD0031?style=flat-square&logo=angular&logoColor=white) |
+| Backend | ![Flask](https://img.shields.io/badge/-Flask-000000?style=flat-square&logo=flask&logoColor=white) ![Gunicorn](https://img.shields.io/badge/-Gunicorn-499848?style=flat-square) ![PostgreSQL](https://img.shields.io/badge/-PostgreSQL-4169E1?style=flat-square&logo=postgresql&logoColor=white) |
+| Infraestructura | ![Docker Compose](https://img.shields.io/badge/-Docker%20Compose-2496ED?style=flat-square&logo=docker&logoColor=white) ![Railway](https://img.shields.io/badge/-Railway-0B0D0E?style=flat-square&logo=railway&logoColor=white) ![Nginx](https://img.shields.io/badge/-Nginx-009639?style=flat-square&logo=nginx&logoColor=white) |
+| Calidad | ![GitHub Actions](https://img.shields.io/badge/-GitHub%20Actions-2088FF?style=flat-square&logo=github-actions&logoColor=white) ![Ruff](https://img.shields.io/badge/-Ruff-D7FF64?style=flat-square) ![Pytest](https://img.shields.io/badge/-Pytest-0A9EDC?style=flat-square&logo=pytest&logoColor=white) ![Angular Build](https://img.shields.io/badge/-Angular%20Build-DD0031?style=flat-square&logo=angular&logoColor=white) ![Angular Tests](https://img.shields.io/badge/-Angular%20Tests-C21325?style=flat-square&logo=angular&logoColor=white) |
 
 Los estilos SCSS son **compartidos** entre `web/` y `frontend/`: ambos compilan desde `frontend/src/styles/` siguiendo la arquitectura [ITCSS](https://www.xfive.co/blog/itcss-scalable-maintainable-css-architecture/) con nomenclatura [BEM](https://getbem.com/).
 
@@ -47,9 +78,10 @@ Una petición autenticada recorre el siguiente camino: el cliente envía la soli
 
 ### Prerrequisitos
 
-- Node.js ≥ 18
-- Python 3.12
-- npm ≥ 10
+- `Node.js` 18 o superior
+- `npm` 10 o superior
+- `Python` 3.12 o superior
+- `Docker` version 24 o más, para levantar el stack completo
 
 ### Levantar frontend + sitio estático (una sola orden)
 
@@ -64,7 +96,8 @@ chmod +x dev.sh
 dev.bat
 ```
 
-O directamente con npm:
+Alternativa directa con npm:
+
 ```bash
 npm install
 npm run dev
@@ -74,8 +107,7 @@ Esto levanta en paralelo:
 - **http://localhost:8080** — Sitio estático (11ty)
 - **http://localhost:4200** — App Angular
 
-### Levantar cada servicio por separado
-
+### Arranque por servicio
 ```bash
 # Sitio estático
 npm run dev:web        # cd web && npm start
@@ -98,14 +130,14 @@ npm run install:all
 Docker levanta todos los servicios juntos (nginx, frontend, web, backend, PostgreSQL) en
 un único comando. Es la forma más fácil de probar el stack completo en local.
 
-**Primer uso** — preparar los `.env`:
+**Primer uso** -> preparar los `.env`:
 ```bash
 cp .env.example .env                   # variables de PostgreSQL y Turnstile
 cp backend/.env.example backend/.env   # completar con tus valores
 # web/.env ya está incluido con la key de prueba de Turnstile (dev)
 ```
 
-**Arrancar:**
+**Levantar:**
 ```bash
 docker compose up --build        # construye imágenes y arranca (foreground)
 docker compose up -d --build     # igual pero en background
@@ -116,7 +148,7 @@ docker compose up -d --build     # igual pero en background
 > docker compose down -v && docker compose up -d --build
 > ```
 
-**Comandos del día a día:**
+**Comandos útiles:**
 ```bash
 docker compose ps                # ver qué contenedores están corriendo
 docker compose logs -f           # seguir logs de todos los servicios
@@ -127,7 +159,7 @@ docker compose down              # parar y eliminar contenedores (conserva volú
 docker compose down -v           # parar, eliminar contenedores Y la base de datos
 ```
 
-**URLs tras arrancar:**
+**URLs tras levantar:**
 
 | URL | Servicio |
 |-----|---------|
@@ -144,8 +176,6 @@ docker compose down -v           # parar, eliminar contenedores Y la base de dat
 | Rol | `admin` (con `es_superadmin=true`) |
 
 > Estas credenciales son solo para entorno local. En producción, generar credenciales nuevas.
-
-> Referencia completa de comandos, troubleshooting y variables de entorno: [docs/devops/docker-local.md](docs/devops/docker-local.md)
 
 ## Estructura del proyecto
 
@@ -191,10 +221,17 @@ tfg-alberti/
 
 | Documento | Contenido |
 |-----------|-----------|
-| [DEPLOY.md](DEPLOY.md) | Guía consolidada de despliegue (local + Railway) |
-| [docs/DESARROLLO.md](docs/DESARROLLO.md) | Guía completa de entorno de desarrollo |
-| [docs/devops/docker-local.md](docs/devops/docker-local.md) | Referencia Docker para desarrollo local |
-| [docs/backend/DEPENDENCIAS.md](docs/backend/DEPENDENCIAS.md) | Librerías del backend y justificación |
-| [docs/backend/VENV_SETUP.md](docs/backend/VENV_SETUP.md) | Configuración del entorno virtual Python |
-| [docs/design/decisiones_disenio.md](docs/design/decisiones_disenio.md) | Decisiones de arquitectura y diseño |
-| [docs/design/wireframes_figma.md](docs/design/wireframes_figma.md) | Referencias a wireframes en Figma |
+| [DEPLOY.md](DEPLOY.md) | Despliegue local y producción en Railway |
+| [docs/01-introduccion.md](docs/01-introduccion.md) a [docs/10-conclusiones.md](docs/10-conclusiones.md) | Memoria técnica principal del proyecto |
+| [docs/DESARROLLO.md](docs/DESARROLLO.md) | Guía de entorno y flujo de trabajo |
+| [docs/backend/DEPENDENCIAS.md](docs/backend/DEPENDENCIAS.md) | Dependencias del backend y justificación |
+| [docs/backend/VENV_SETUP.md](docs/backend/VENV_SETUP.md) | Entorno virtual Python |
+| [docs/design/decisiones_disenio.md](docs/design/decisiones_disenio.md) | Decisiones de diseño y arquitectura |
+| [docs/propuesta_formal/propuesta_formal_sergio_duran_2DAW.md](docs/propuesta_formal/propuesta_formal_sergio_duran_2DAW.md) | Propuesta formal del proyecto |
+
+## Colaboración y mantenimiento
+
+- [CONTRIBUTING.md](CONTRIBUTING.md)
+- [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)
+- [SECURITY.md](SECURITY.md)
+- [LICENSE](LICENSE)
