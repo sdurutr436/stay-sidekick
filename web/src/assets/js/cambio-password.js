@@ -2,7 +2,7 @@
 
 function stripTags(str)         { return String(str).replace(/<[^>]*>/g, ''); }
 function stripControl(str)      { return str.replace(/[\x00-\x1F\x7F]/g, ''); }
-function sanitizePwd(str)       { return stripControl(stripTags(String(str))).slice(0, 128); }
+function sanitizePwd(str)       { return stripControl(stripTags(String(str))); }
 
 function _getField(input) { return input.closest('.form-field'); }
 
@@ -33,10 +33,21 @@ function clearAllErrors(form) {
 function showFeedback(el, msg) { el.textContent = msg; el.removeAttribute('hidden'); }
 function hideFeedback(el)      { el.setAttribute('hidden', ''); el.textContent = ''; }
 
-function validatePwd(val) {
-  if (!val)           return 'La contraseña es obligatoria.';
-  if (val.length < 8) return 'La contraseña debe tener al menos 8 caracteres.';
-  return null;
+// Reglas de fortaleza compartidas — cargadas desde /assets/js/password-rules.js
+const RULES = window.SS_PASSWORD_RULES;
+
+function renderStrengthList(el, value) {
+  el.innerHTML = '';
+  const exceedsMax = value.length > RULES.MAX_LENGTH;
+  const items = exceedsMax ? RULES.CRITERIA.concat([RULES.MAX_CRITERION]) : RULES.CRITERIA;
+  items.forEach(c => {
+    const ok = c.test(value);
+    const li = document.createElement('li');
+    li.className = 'password-strength__item' + (ok ? ' password-strength__item--ok' : ' password-strength__item--ko');
+    li.dataset.criterion = c.id;
+    li.textContent = (ok ? '✓ ' : '✗ ') + c.label;
+    el.appendChild(li);
+  });
 }
 
 function validateConfirm(nueva, confirm) {
@@ -61,7 +72,10 @@ async function submitCambio(payload, token) {
   try { body = await res.json(); } catch { body = {}; }
 
   if (!res.ok) {
-    throw new Error((body.errors && body.errors[0]) || `Error ${res.status}`);
+    const msg = (body.errors && body.errors[0]) || body.error || `Error ${res.status}`;
+    const err = new Error(msg);
+    err.status = res.status;
+    throw err;
   }
   return body;
 }
@@ -110,15 +124,25 @@ async function relogin(email, password) {
   const inputActual  = form.querySelector('#pwd-actual');
   const inputNueva   = form.querySelector('#pwd-nueva');
   const inputConfirm = form.querySelector('#pwd-confirm');
+  const strengthEl   = document.getElementById('pwd-strength');
   const feedbackEl   = document.getElementById('pwd-feedback');
   const exitoEl      = document.getElementById('pwd-exito');
 
-  inputNueva.addEventListener('blur', function () {
-    const err = validatePwd(sanitizePwd(this.value));
-    err ? showFieldError(this, err) : clearFieldError(this);
+  renderStrengthList(strengthEl, '');
+
+  inputNueva.addEventListener('input', function () {
+    const v = sanitizePwd(this.value);
+    renderStrengthList(strengthEl, v);
+    const err = RULES.validate(v);
+    if (err && v.length > 0) showFieldError(this, err);
+    else                     clearFieldError(this);
+    if (inputConfirm.value) {
+      const errC = validateConfirm(v, sanitizePwd(inputConfirm.value));
+      errC ? showFieldError(inputConfirm, errC) : clearFieldError(inputConfirm);
+    }
   });
 
-  inputConfirm.addEventListener('blur', function () {
+  inputConfirm.addEventListener('input', function () {
     const err = validateConfirm(sanitizePwd(inputNueva.value), sanitizePwd(this.value));
     err ? showFieldError(this, err) : clearFieldError(this);
   });
@@ -135,7 +159,7 @@ async function relogin(email, password) {
     let hasErrors = false;
     if (!actual) { showFieldError(inputActual, 'La contraseña actual es obligatoria.'); hasErrors = true; }
 
-    const errNueva = validatePwd(nueva);
+    const errNueva = RULES.validate(nueva);
     if (errNueva) { showFieldError(inputNueva, errNueva); hasErrors = true; }
 
     const errConfirm = validateConfirm(nueva, confirm);
@@ -148,7 +172,7 @@ async function relogin(email, password) {
     btn.textContent = 'Guardando…';
 
     try {
-      await submitCambio({ password_actual: actual, password_nueva: nueva }, token);
+      await submitCambio({ password_actual: actual, password_nueva: nueva, password_confirm: confirm }, token);
       const newToken = jwtEmail ? await relogin(jwtEmail, nueva) : null;
       if (newToken) {
         localStorage.setItem('ss_token', newToken);
@@ -160,7 +184,7 @@ async function relogin(email, password) {
       exitoEl.hidden = false;
       setTimeout(() => { window.location.href = newToken ? '/menu' : '/login'; }, 2000);
     } catch (err) {
-      showFeedback(feedbackEl, err.message || 'No se pudo cambiar la contraseña. Inténtalo de nuevo.');
+      showFieldError(inputNueva, err.message || 'No se pudo cambiar la contraseña. Inténtalo de nuevo.');
     } finally {
       btn.disabled = false;
       btn.textContent = 'Guardar nueva contraseña';
