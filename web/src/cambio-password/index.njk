@@ -42,9 +42,10 @@ section: cambio-password
           type="password"
           id="pwd-nueva"
           name="password_nueva"
-          minlength="8"
           autocomplete="new-password"
+          aria-describedby="pwd-strength"
         />
+        <ul id="pwd-strength" class="password-strength" aria-live="polite"></ul>
       {% endcall %}
 
       {% call molecules.formField('Confirmar nueva contraseña', 'pwd-confirm') %}
@@ -91,5 +92,6 @@ section: cambio-password
 </section>
 
 {% block scripts %}
+<script src="/assets/js/password-rules.js" defer></script>
 <script src="/assets/js/cambio-password.js" defer></script>
 {% endblock %}

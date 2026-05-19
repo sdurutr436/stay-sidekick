@@ -6,6 +6,7 @@ import logging
 
 from marshmallow import ValidationError
 
+from app.auth.password_rules import validate_password
 from app.auth.passwords import hash_password, verify_password
 from app.common.crypto import encrypt
 from app.perfil import repository as repo
@@ -39,6 +40,15 @@ def cambiar_password(user_id: str, json_data: dict) -> list[str]:
     except ValidationError as exc:
         return _flatten(exc.messages)
 
+    nueva = data["password_nueva"]
+    err = validate_password(nueva)
+    if err:
+        return [err]
+
+    confirm = data.get("password_confirm")
+    if confirm is not None and confirm != nueva:
+        return ["Las contraseñas no coinciden."]
+
     usuario = repo.get_usuario_by_id(user_id)
     if not usuario:
         return ["Usuario no encontrado."]
@@ -46,7 +56,7 @@ def cambiar_password(user_id: str, json_data: dict) -> list[str]:
     if not verify_password(data["password_actual"], usuario.password_hash):
         return ["La contraseña actual no es correcta."]
 
-    repo.update_password(usuario, hash_password(data["password_nueva"]))
+    repo.update_password(usuario, hash_password(nueva))
     return []
 
 
