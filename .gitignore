@@ -127,3 +127,5 @@ docs/**/*.webm
 # Local-only documentation support material
 docs/todo/
 docs/devops/logs/
+
+.vscode
