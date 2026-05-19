@@ -18,6 +18,7 @@ export class FormSelectComponent {
   @Input() options: SelectOption[] = [];
   @Input() disabled = false;
   @Input() ariaLabel = '';
+  @Input() placeholder = '';
 
   @Output() valueChange = new EventEmitter<string>();
 
