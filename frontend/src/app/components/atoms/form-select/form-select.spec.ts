@@ -53,6 +53,24 @@ describe('FormSelectComponent', () => {
       const sel = fixture.debugElement.query(By.css('select'));
       expect((sel.nativeElement as HTMLSelectElement).value).toBe('y');
     });
+
+    it('debería marcar selected en la opción cuyo value coincide con el binding', () => {
+      fixture.componentRef.setInput('options', [{ value: 'smoobu', label: 'Smoobu' }, { value: 'beds24', label: 'Beds24' }]);
+      fixture.componentRef.setInput('value', 'beds24');
+      fixture.detectChanges();
+      const opts = fixture.debugElement.queryAll(By.css('option'));
+      const seleccionada = opts.find(o => (o.nativeElement as HTMLOptionElement).value === 'beds24');
+      expect((seleccionada!.nativeElement as HTMLOptionElement).selected).toBe(true);
+    });
+
+    it('debería mostrar el placeholder como opción inicial cuando value está vacío', () => {
+      fixture.componentRef.setInput('options', [{ value: 'smoobu', label: 'Smoobu' }]);
+      fixture.componentRef.setInput('placeholder', 'Selecciona…');
+      fixture.detectChanges();
+      const opts = fixture.debugElement.queryAll(By.css('option'));
+      expect((opts[0].nativeElement as HTMLOptionElement).textContent).toContain('Selecciona…');
+      expect((opts[0].nativeElement as HTMLOptionElement).selected).toBe(true);
+    });
   });
 
   describe('@Output valueChange', () => {
