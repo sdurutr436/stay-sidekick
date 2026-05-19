@@ -5,10 +5,6 @@
     <a routerLink="/" class="btn btn--ghost btn--md">← Menú</a>
   </div>
 
-  @if (mensajeBorradoEmpresa()) {
-    <app-alert type="success">{{ mensajeBorradoEmpresa() }}</app-alert>
-  }
-
   <app-page-header
     title="Gestión de usuarios"
     description="Administra los usuarios de tu empresa."
@@ -167,9 +163,6 @@
           (valueChange)="nuevoRol.set($event)"
         />
       </app-form-field>
-      @if (errorCreacion()) {
-        <app-alert type="error">{{ errorCreacion() }}</app-alert>
-      }
     </div>
   }
 
@@ -270,9 +263,6 @@
         </div>
       }
 
-      @if (errorEdicion()) {
-        <app-alert type="error">{{ errorEdicion() }}</app-alert>
-      }
     </div>
 
     <div modal-footer>
@@ -309,9 +299,6 @@
         (valueChange)="nuevaEmpresaEmail.set($event)"
       />
     </app-form-field>
-    @if (errorCreacionEmpresa()) {
-      <app-alert type="error">{{ errorCreacionEmpresa() }}</app-alert>
-    }
   </div>
   <div modal-footer>
     <app-button variant="primary" size="md" [disabled]="creandoEmpresa()" (click)="crearEmpresa()">
@@ -328,9 +315,6 @@
   <app-alert type="error">
     ¿Borrar empresa y todos sus datos? Esta acción es irreversible.
   </app-alert>
-  @if (errorBorradoEmpresa()) {
-    <app-alert type="error">{{ errorBorradoEmpresa() }}</app-alert>
-  }
   <div modal-footer>
     <app-button variant="danger" size="md" [disabled]="borrandoEmpresa()" (click)="confirmarBorradoEmpresa()">
       {{ borrandoEmpresa() ? 'Eliminando…' : 'Sí, eliminar' }}
