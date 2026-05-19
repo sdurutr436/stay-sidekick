@@ -28,6 +28,27 @@ Stay Sidekick es una plataforma web para equipos de alojamiento turístico que a
 - Producción pública: [stay-sidekick.up.railway.app](https://stay-sidekick.up.railway.app)
 - Imágenes publicadas: [Docker Hub - sdurutr436](https://hub.docker.com/u/sdurutr436)
 
+## Índice
+
+- [Qué incluye](#qué-incluye)
+- [Características principales](#características-principales)
+  - [Maestro de apartamentos](#maestro-de-apartamentos)
+  - [Mapa de calor operativo](#mapa-de-calor-operativo)
+  - [Notificaciones de check-in tardío](#notificaciones-de-check-in-tardío)
+  - [Sincronizador de contactos con Google](#sincronizador-de-contactos-con-google)
+  - [Vault de comunicaciones asistido por IA](#vault-de-comunicaciones-asistido-por-ia)
+  - [Multiempresa, usuarios y roles](#multiempresa-usuarios-y-roles)
+  - [Perfil e integraciones por empresa](#perfil-e-integraciones-por-empresa)
+  - [Formulario de contacto público](#formulario-de-contacto-público)
+  - [Seguridad y cumplimiento transversales](#seguridad-y-cumplimiento-transversales)
+  - [Interfaz y experiencia de usuario](#interfaz-y-experiencia-de-usuario)
+- [Stack técnico](#stack-técnico)
+- [Arquitectura](#arquitectura)
+- [Inicio rápido](#inicio-rápido)
+- [Estructura del proyecto](#estructura-del-proyecto)
+- [Documentación](#documentación)
+- [Colaboración y mantenimiento](#colaboración-y-mantenimiento)
+
 ## Qué incluye
 
 - `web/`: sitio estático con contenido público, legal y corporativo.
@@ -35,9 +56,71 @@ Stay Sidekick es una plataforma web para equipos de alojamiento turístico que a
 - `backend/`: API REST Flask para autenticación, negocio y notificaciones.
 - `nginx/`: proxy inverso que publica `/`, `/menu/` y `/api/` en una única entrada.
 
-## Arquitectura
+## Características principales
 
-El proyecto está dividido en tres capas independientes:
+Stay Sidekick es una **capa satélite** para operaciones del alquiler vacacional: no sustituye al PMS, cubre las tareas que suelen resolverse de forma manual o con herramientas dispersas. Las funcionalidades se agrupan por área operativa.
+
+### Maestro de apartamentos
+- **Catálogo centralizado por empresa** — alta, edición y baja lógica del inventario sobre el que operan el resto de módulos.
+- **Sincronización con PMS** — integración con Smoobu como primer PMS operativo demostrable, arquitectura extensible.
+- **Importación masiva por XLSX** — mecanismo de respaldo cuando no hay API, con vista previa antes de persistir cambios.
+
+### Mapa de calor operativo
+- **Visualización de la carga diaria** — entradas y salidas en un rango de fechas para anticipar picos de operación.
+- **Doble origen: PMS o XLSX** — la misma vista con o sin integración API, con configuración de columnas adaptable.
+- **Umbrales de intensidad configurables por empresa** — adapta el semáforo operativo al volumen real de cada cliente.
+- **Procesado en memoria, sin persistencia** — los datos de reservas no se guardan en BD (alineado con RGPD).
+
+### Notificaciones de check-in tardío
+- **Detección automática de check-ins del día** — desde el PMS o cargando un XLSX cuando no hay integración API.
+- **Plantillas de mensaje editables** — CRUD por empresa para estandarizar tono y reducir tiempos de respuesta.
+- **Hora de corte y reglas por empresa** — definen cuándo se considera tardío y cómo se notifica.
+
+### Sincronizador de contactos con Google
+- **Conexión vía OAuth 2.0 con Google People API** — alta y baja de la cuenta del administrador.
+- **Sincronización PMS → Google Contacts** — agrupa huéspedes por nombre y teléfono, con flujo alternativo XLSX para operaciones sin API.
+- **Exportación CSV** — fallback para auditoría, respaldo o cargas externas.
+- **Preferencias configurables por empresa** — qué sincronizar y cómo mostrar los contactos en la agenda.
+- **Datos de huéspedes en memoria, no persisten en BD** (RGPD).
+
+### Vault de comunicaciones asistido por IA
+- **Catálogo de plantillas por categoría e idioma** — CRUD completo con borrado lógico (`PlantillaVault`).
+- **Asistente IA para mejorar y traducir redacción** — opcional, configurable por empresa.
+- **Contadores de uso de IA compartida** — `AiUsageLog` para controlar el consumo del free tier.
+- **Configuración segura de proveedor IA propio** — para empresas que aporten su propia API key.
+- **System prompts editables desde admin** — sin necesidad de tocar código.
+
+### Multiempresa, usuarios y roles
+- **Arquitectura multi-tenant** — separación lógica de datos por empresa en todas las queries.
+- **Gestión de usuarios por empresa** — alta, baja, cambio de rol y reseteo de contraseña por parte del administrador.
+- **Rol superadmin** — gestiona el alta de empresas y la supervisión global del sistema.
+- **Permisos por rol** — los usuarios no administradores pueden consultar la configuración pero no modificarla.
+
+### Perfil e integraciones por empresa
+- **Configuración no-code** — claves de PMS y de IA, columnas XLSX, umbrales, reglas de módulos, todo desde el panel.
+- **Credenciales sensibles cifradas en BD** — las API keys de PMS se almacenan cifradas (`common/crypto.py`).
+- **Cambio de contraseña del usuario autenticado** — desde el área de perfil.
+
+### Formulario de contacto público
+- **Endpoint público para captación comercial y soporte inicial** — sin exponer la zona privada.
+- **Anti-spam por capas** — validación de datos, Cloudflare Turnstile, campo *honeypot* oculto y rate limit por IP.
+
+### Seguridad y cumplimiento transversales
+- **Autenticación JWT HS256** — con duración configurable (`JWT_ACCESS_TOKEN_HOURS`).
+- **Hashing BCrypt** para contraseñas (`auth/passwords.py`), con factor de coste configurable.
+- **Protección CSRF Double-Submit Cookie** en operaciones de escritura.
+- **CORS** restringido por orígenes permitidos.
+- **Rate limiting por IP** en endpoints sensibles para mitigar abuso y fuerza bruta.
+- **Aislamiento de datos entre empresas** a nivel de query.
+- **Enfoque RGPD-aware** — los datos operativos de huéspedes se procesan en memoria sin persistir.
+
+### Interfaz y experiencia de usuario
+- **SPA Angular 21** — navegación lateral, dashboard de estado de herramientas y conexiones externas.
+- **Modo claro/oscuro** persistido por usuario.
+- **Diseño responsive** — pensado para recepción, oficina y uso en movilidad.
+- **Modal "cómo funcionan las herramientas"** integrado en cada módulo para reducir curva de aprendizaje.
+- **Auditoría de accesibilidad WAVE + Lighthouse** publicada en la memoria técnica, con objetivo WCAG 2.1 AA.
+- **Feedback explícito** — indicadores de carga, mensajes de éxito/error accionables y confirmaciones en acciones destructivas.
 
 ## Stack técnico
 
@@ -50,6 +133,10 @@ El proyecto está dividido en tres capas independientes:
 | Calidad | ![GitHub Actions](https://img.shields.io/badge/-GitHub%20Actions-2088FF?style=flat-square&logo=github-actions&logoColor=white) ![Ruff](https://img.shields.io/badge/-Ruff-D7FF64?style=flat-square) ![Pytest](https://img.shields.io/badge/-Pytest-0A9EDC?style=flat-square&logo=pytest&logoColor=white) ![Angular Build](https://img.shields.io/badge/-Angular%20Build-DD0031?style=flat-square&logo=angular&logoColor=white) ![Angular Tests](https://img.shields.io/badge/-Angular%20Tests-C21325?style=flat-square&logo=angular&logoColor=white) |
 
 Los estilos SCSS son **compartidos** entre `web/` y `frontend/`: ambos compilan desde `frontend/src/styles/` siguiendo la arquitectura [ITCSS](https://www.xfive.co/blog/itcss-scalable-maintainable-css-architecture/) con nomenclatura [BEM](https://getbem.com/).
+
+## Arquitectura
+
+El proyecto está dividido en tres capas independientes:
 
 ### Arquitectura Docker
 
