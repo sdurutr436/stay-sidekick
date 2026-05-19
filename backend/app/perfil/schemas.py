@@ -7,8 +7,9 @@ _IA_PROVEEDORES  = ("default", "gemini", "openai", "claude")
 
 
 class CambiarPasswordSchema(Schema):
-    password_actual = fields.Str(required=True, validate=validate.Length(min=1, max=128))
-    password_nueva  = fields.Str(required=True, validate=validate.Length(min=8, max=128))
+    password_actual  = fields.Str(required=True, validate=validate.Length(min=1, max=128))
+    password_nueva   = fields.Str(required=True, validate=validate.Length(min=1, max=128))
+    password_confirm = fields.Str(load_default=None, allow_none=True, validate=validate.Length(max=128))
 
 
 class ActualizarPMSSchema(Schema):
