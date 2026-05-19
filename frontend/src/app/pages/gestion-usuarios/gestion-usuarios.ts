@@ -79,6 +79,12 @@ export class GestionUsuariosPageComponent implements OnInit {
   readonly creandoEmpresa = signal(false);
   readonly errorCreacionEmpresa = signal<string | null>(null);
 
+  // Modal de borrado de empresa (solo superadmin)
+  readonly modalBorradoEmpresaAbierto = signal(false);
+  readonly borrandoEmpresa = signal(false);
+  readonly errorBorradoEmpresa = signal<string | null>(null);
+  readonly mensajeBorradoEmpresa = signal<string | null>(null);
+
   readonly totalUsuarios = computed(() => this.usuarios().length);
   readonly limiteAlcanzado = computed(() => this.totalUsuarios() >= this.maxUsuarios());
 
@@ -267,5 +273,46 @@ export class GestionUsuariosPageComponent implements OnInit {
         this.errorCreacionEmpresa.set(err?.error?.errors?.[0] ?? 'Error al crear la empresa.');
       },
     });
+  }
+
+  abrirModalBorradoEmpresa(): void {
+    this.errorBorradoEmpresa.set(null);
+    this.mensajeBorradoEmpresa.set(null);
+    this.modalBorradoEmpresaAbierto.set(true);
+  }
+
+  cerrarModalBorradoEmpresa(): void {
+    if (this.borrandoEmpresa()) return;
+    this.modalBorradoEmpresaAbierto.set(false);
+  }
+
+  confirmarBorradoEmpresa(): void {
+    const id = this.empresaSeleccionadaId();
+    if (!id) return;
+    this.borrandoEmpresa.set(true);
+    this.errorBorradoEmpresa.set(null);
+    this.service.eliminarEmpresa(id).subscribe({
+      next: () => this._tras_borrado_exitoso(id),
+      error: err => {
+        this.borrandoEmpresa.set(false);
+        this.errorBorradoEmpresa.set(err?.error?.errors?.[0] ?? 'Error al borrar la empresa.');
+      },
+    });
+  }
+
+  private _tras_borrado_exitoso(id: string): void {
+    this.borrandoEmpresa.set(false);
+    this.modalBorradoEmpresaAbierto.set(false);
+    this.mensajeBorradoEmpresa.set('Empresa eliminada correctamente.');
+    this.empresas.update(lista => lista.filter(e => e.id !== id));
+    const restantes = this.empresas();
+    const siguiente = restantes[0]?.id ?? '';
+    this.empresaSeleccionadaId.set(siguiente);
+    if (siguiente) {
+      this._cargar(siguiente);
+    } else {
+      this.usuarios.set([]);
+      this.cargando.set(false);
+    }
   }
 }

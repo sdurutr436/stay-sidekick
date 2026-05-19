@@ -5,6 +5,10 @@
     <a routerLink="/" class="btn btn--ghost btn--md">← Menú</a>
   </div>
 
+  @if (mensajeBorradoEmpresa()) {
+    <app-alert type="success">{{ mensajeBorradoEmpresa() }}</app-alert>
+  }
+
   <app-page-header
     title="Gestión de usuarios"
     description="Administra los usuarios de tu empresa."
@@ -20,6 +24,18 @@
         </span>
         Nueva empresa
       </app-button>
+      @if (empresaSeleccionadaId()) {
+        <app-button
+          variant="danger"
+          size="md"
+          (click)="abrirModalBorradoEmpresa()"
+        >
+          <span class="btn__icon" aria-hidden="true">
+            <ng-icon name="phosphorTrash" size="20" />
+          </span>
+          Eliminar empresa
+        </app-button>
+      }
     }
     <app-button
       variant="primary"
@@ -303,6 +319,24 @@
       {{ creandoEmpresa() ? 'Creando…' : 'Crear empresa' }}
     </app-button>
     <app-button variant="ghost" size="md" [disabled]="creandoEmpresa()" (click)="cerrarModalEmpresa()">
+      Cancelar
+    </app-button>
+  </div>
+</app-modal>
+
+<!-- Modal: Confirmar borrado de empresa (solo superadmin) -->
+<app-modal title="Eliminar empresa" [open]="modalBorradoEmpresaAbierto()" (cerrar)="cerrarModalBorradoEmpresa()">
+  <app-alert type="error">
+    ¿Borrar empresa y todos sus datos? Esta acción es irreversible.
+  </app-alert>
+  @if (errorBorradoEmpresa()) {
+    <app-alert type="error">{{ errorBorradoEmpresa() }}</app-alert>
+  }
+  <div modal-footer>
+    <app-button variant="danger" size="md" [disabled]="borrandoEmpresa()" (click)="confirmarBorradoEmpresa()">
+      {{ borrandoEmpresa() ? 'Eliminando…' : 'Sí, eliminar' }}
+    </app-button>
+    <app-button variant="ghost" size="md" [disabled]="borrandoEmpresa()" (click)="cerrarModalBorradoEmpresa()">
       Cancelar
     </app-button>
   </div>

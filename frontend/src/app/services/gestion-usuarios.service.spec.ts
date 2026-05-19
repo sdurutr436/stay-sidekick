@@ -122,4 +122,24 @@ describe('GestionUsuariosService', () => {
       expect(result).toEqual(mockEmpresa);
     });
   });
+
+  describe('eliminarEmpresa', () => {
+    it('debería enviar DELETE a /api/empresas/<id> y completar sin valor', () => {
+      let completed = false;
+      service.eliminarEmpresa('e1').subscribe({ complete: () => (completed = true) });
+      const req = httpTesting.expectOne('/api/empresas/e1');
+      expect(req.request.method).toBe('DELETE');
+      req.flush({ ok: true });
+      expect(completed).toBe(true);
+    });
+
+    it('debería propagar error 404 cuando la empresa no existe', () => {
+      let err: unknown;
+      service.eliminarEmpresa('inexistente').subscribe({ error: e => (err = e) });
+      httpTesting
+        .expectOne('/api/empresas/inexistente')
+        .flush({ ok: false, errors: ['Empresa no encontrada.'] }, { status: 404, statusText: 'Not Found' });
+      expect(err).toBeTruthy();
+    });
+  });
 });
