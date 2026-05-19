@@ -218,6 +218,7 @@ def sync_contacts(empresa_id: str, json_data: dict) -> tuple[dict | None, str | 
             desde=desde_str or None,
             hasta=hasta_str or None,
         )
+        reservas = [r for r in reservas if r.tipo == "reservation"]
     except (requests.RequestException, NotImplementedError) as exc:
         logger.error("Error al obtener reservas del PMS: %s", exc)
         _log_sync(empresa_id, ESTADO_ERROR, 0, f"Error PMS: {exc}")
@@ -304,6 +305,7 @@ def export_csv(empresa_id: str, json_data: dict) -> tuple[bytes | None, str | No
             desde=desde.isoformat() if desde else None,
             hasta=hasta.isoformat() if hasta else None,
         )
+        reservas = [r for r in reservas if r.tipo == "reservation"]
     except (requests.RequestException, NotImplementedError) as exc:
         return None, f"Error al obtener reservas del PMS: {exc}"
 
