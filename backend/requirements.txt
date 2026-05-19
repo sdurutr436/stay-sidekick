@@ -47,3 +47,10 @@ pandas==2.2.3
 
 # Capa de abstracción para LLMs (Gemini, OpenAI, Anthropic, etc.)
 litellm>=1.40.0
+
+# Linter / formateador (usado en los checks de calidad)
+ruff==0.15.13
+
+# Cobertura de tests (usado en los checks de calidad)
+pytest==9.0.3
+pytest-cov==7.1.0
