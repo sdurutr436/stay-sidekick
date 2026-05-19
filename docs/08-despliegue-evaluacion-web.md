@@ -286,16 +286,23 @@ tag inmutable por commit (`sha-<corto>`) y dos tags móviles de canal estable (`
 
 | Imagen | Destino en Docker Hub | Tags aplicadas |
 | --- | --- | --- |
-| `stay-sidekick-backend` | `$DOCKERHUB_USERNAME/stay-sidekick-backend` | `sha-<corto>`, `main`, `latest` |
-| `stay-sidekick-frontend` | `$DOCKERHUB_USERNAME/stay-sidekick-frontend` | `sha-<corto>`, `main`, `latest` |
-| `stay-sidekick-web` | `$DOCKERHUB_USERNAME/stay-sidekick-web` | `sha-<corto>`, `main`, `latest` |
-| `stay-sidekick-nginx` | `$DOCKERHUB_USERNAME/stay-sidekick-nginx` | `sha-<corto>`, `main`, `latest` |
+| `stay-sidekick-backend` | [sdurutr436/stay-sidekick-backend](https://hub.docker.com/repository/docker/sdurutr436/stay-sidekick-backend/general) | `sha-<corto>`, `main`, `latest` |
+| `stay-sidekick-frontend` | [sdurutr436/stay-sidekick-frontend](https://hub.docker.com/repository/docker/sdurutr436/stay-sidekick-frontend/general) | `sha-<corto>`, `main`, `latest` |
+| `stay-sidekick-web` | [sdurutr436/stay-sidekick-web](https://hub.docker.com/repository/docker/sdurutr436/stay-sidekick-web/general) | `sha-<corto>`, `main`, `latest` |
+| `stay-sidekick-nginx` | [sdurutr436/stay-sidekick-nginx](https://hub.docker.com/repository/docker/sdurutr436/stay-sidekick-nginx/general) | `sha-<corto>`, `main`, `latest` |
 
 El soporte principal de este apartado sigue estando en los propios ficheros YAML, en el historial Git
 reproducible y en la trazabilidad entre commit, ejecución de CI y etiquetas SHA de las imágenes
 publicadas. Aun así, para alinearlo literalmente con la rúbrica, conviene adjuntar tres capturas
 concretas: el panel general de GitHub Actions, un run correcto en verde y el registry con los tags
 publicados.
+
+Como verificación directa del registry, los cuatro repositorios publicados en Docker Hub son:
+
+- [sdurutr436/stay-sidekick-backend](https://hub.docker.com/repository/docker/sdurutr436/stay-sidekick-backend/general)
+- [sdurutr436/stay-sidekick-frontend](https://hub.docker.com/repository/docker/sdurutr436/stay-sidekick-frontend/general)
+- [sdurutr436/stay-sidekick-web](https://hub.docker.com/repository/docker/sdurutr436/stay-sidekick-web/general)
+- [sdurutr436/stay-sidekick-nginx](https://hub.docker.com/repository/docker/sdurutr436/stay-sidekick-nginx/general)
 
 ### Capturas recomendadas para cerrar c5
 
@@ -305,8 +312,6 @@ CI/CD.
 ![GitHub Actions general](assets/08-workflows-general.png)
 
 ![GitHub Actions run en verde](assets/08-workflows-all-green.png)
-
-![Placeholder — Docker Hub y tags publicados](assets/despliegue-web/04-docker-hub-tags-placeholder.svg)
 
 ---
 
@@ -460,7 +465,7 @@ stay-sidekick-postgres-1   postgres                 16-alpine           linux/am
 stay-sidekick-web-1        stay-sidekick-web        latest              linux/amd64         64e0f10aa81f        35.8MB              6 minutes ago
 ```
 
-En remoto, el workflow de CD publica imágenes en Docker Hub usando el usuario configurado en `DOCKERHUB_USERNAME`, con nombres `stay-sidekick-backend`, `stay-sidekick-frontend`, `stay-sidekick-web` y `stay-sidekick-nginx`, etiquetadas como `sha-<corto>`, `main` y `latest`.
+En remoto, el workflow de CD publica imágenes en Docker Hub con los repositorios `sdurutr436/stay-sidekick-backend`, `sdurutr436/stay-sidekick-frontend`, `sdurutr436/stay-sidekick-web` y `sdurutr436/stay-sidekick-nginx`, etiquetadas como `sha-<corto>`, `main` y `latest`.
 
 Variables y persistencia quedan resueltas de forma reproducible porque el arranque parte de
 plantillas versionadas (`.env.example` y `backend/.env.example`) y la base de datos conserva estado
@@ -699,10 +704,10 @@ En el despliegue actual, el volumen persistente esencial es `postgres_data`, don
 
 Además de las imágenes locales del `docker compose images`, el workflow `docker-publish.yml` construye y publica cuatro imágenes con las tags `sha-<corto>`, `main` y `latest`:
 
-- `stay-sidekick-backend`
-- `stay-sidekick-frontend`
-- `stay-sidekick-web`
-- `stay-sidekick-nginx`
+- [sdurutr436/stay-sidekick-backend](https://hub.docker.com/repository/docker/sdurutr436/stay-sidekick-backend/general)
+- [sdurutr436/stay-sidekick-frontend](https://hub.docker.com/repository/docker/sdurutr436/stay-sidekick-frontend/general)
+- [sdurutr436/stay-sidekick-web](https://hub.docker.com/repository/docker/sdurutr436/stay-sidekick-web/general)
+- [sdurutr436/stay-sidekick-nginx](https://hub.docker.com/repository/docker/sdurutr436/stay-sidekick-nginx/general)
 
 ![Railway: servicios desplegados](assets/08-despliegue-contenedores-railway.png)
 
