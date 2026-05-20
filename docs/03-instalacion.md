@@ -142,11 +142,10 @@ Copiar desde `backend/.env.example`.
 | `GOOGLE_CLIENT_SECRET` | Opcional | OAuth Google Contacts |
 | `GOOGLE_REDIRECT_URI` | Opcional | Callback OAuth |
 | `FRONTEND_BASE_URL` | Si | URL base para redirects post OAuth |
-| `MAIL_HOST` | No | Host SMTP de salida (por defecto `smtp.gmail.com`) |
-| `MAIL_PORT` | No | Puerto SMTP de salida (por defecto `587`) |
-| `MAIL_USER` | Opcional | Cuenta de envio SMTP |
-| `MAIL_PASSWORD` | Opcional | Password de aplicacion (16 caracteres en Gmail) |
-| `MAIL_FROM` | Opcional | Direccion visible en el `From:` y destino de notificaciones publicas |
+| `MAIL_GUN_API_KEY` | Opcional | Clave privada de la cuenta de Mailgun (envio HTTP) |
+| `MAIL_GUN_DOMAIN` | Opcional | Dominio verificado en Mailgun (ej. `stay-sidekick.com`) |
+| `MAIL_GUN_API_URL` | No | Base de la API de Mailgun (`https://api.eu.mailgun.net` o `https://api.mailgun.net`) |
+| `MAIL_FROM` | Opcional | Direccion visible en el `From:` y destino de notificaciones publicas. Si esta vacia se usa `noreply@<MAIL_GUN_DOMAIN>` |
 | `DISCORD_WEBHOOK_URL` | Opcional | Webhook de solicitudes de empresa |
 | `DISCORD_WEBHOOK_CONTACT_URL` | Opcional | Webhook de contacto general |
 | `DISCORD_WEBHOOK_OPERATIONS_URL` | Opcional | Webhook de operacion/errores del backend |
@@ -188,10 +187,9 @@ La siguiente tabla resume que variables son imprescindibles segun el entorno de 
 | `GOOGLE_CLIENT_ID` | Opcional | Opcional | Opcional |
 | `GOOGLE_CLIENT_SECRET` | Opcional | Opcional | Opcional |
 | `GOOGLE_REDIRECT_URI` | Opcional | Opcional | Opcional |
-| `MAIL_HOST` | Opcional | Opcional | Opcional |
-| `MAIL_PORT` | Opcional | Opcional | Opcional |
-| `MAIL_USER` | Opcional | Opcional | Opcional |
-| `MAIL_PASSWORD` | Opcional | Opcional | Opcional |
+| `MAIL_GUN_API_KEY` | Opcional | Opcional | Opcional |
+| `MAIL_GUN_DOMAIN` | Opcional | Opcional | Opcional |
+| `MAIL_GUN_API_URL` | Opcional | Opcional | Opcional |
 | `MAIL_FROM` | Opcional | Opcional | Opcional |
 | `DISCORD_WEBHOOK_URL` | Opcional | Opcional | Opcional |
 | `DISCORD_WEBHOOK_CONTACT_URL` | Opcional | Opcional | Opcional |
@@ -415,7 +413,7 @@ docker compose down -v
 ### Notificaciones (email y Discord)
 
 - Los formularios funcionan pero no llega correo:
-  comprobar que `MAIL_USER`, `MAIL_PASSWORD` y `MAIL_FROM` estan rellenos. La contraseña debe ser una App Password de 16 caracteres, no la contraseña normal de Gmail. Si el codigo de esta rama todavia lee `GMAIL_USER`/`GMAIL_APP_PASSWORD`/`MAIL_RECIPIENT`, usar esos nombres hasta fusionar `main`.
+  comprobar que `MAIL_GUN_API_KEY`, `MAIL_GUN_DOMAIN` y `MAIL_FROM` estan rellenos. El envio se hace por HTTP contra la API de Mailgun usando `MAIL_GUN_API_URL` como base (por defecto la region EU). Si `MAIL_FROM` esta vacio se usa `noreply@<MAIL_GUN_DOMAIN>`; verifica tambien que el dominio este activo en el panel de Mailgun.
 - No llegan mensajes a Discord:
   verificar que el webhook esta activo en el servidor de Discord. `DISCORD_WEBHOOK_AI_OBSERVABILITY_URL` es opcional; si se deja vacio, los eventos de IA caen al webhook de operaciones.
 

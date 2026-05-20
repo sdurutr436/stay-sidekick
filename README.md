@@ -296,7 +296,7 @@ tfg-alberti/
 │   └── app/
 │       ├── contact/        # Módulo de formulario de contacto
 │       ├── security/       # CSRF, honeypot, JWT
-│       └── services/       # Gmail, Discord, Turnstile
+│       └── services/       # Mailgun (HTTP API), Discord, Turnstile
 │
 ├── docs/                   # Documentación del proyecto
 ├── package.json            # Orquestador de desarrollo (concurrently)

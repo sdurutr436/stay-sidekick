@@ -432,7 +432,7 @@ La separación es clara: solo se expone `nginx`, mientras que backend y base de 
 | Fichero | Para qué se usa |
 | --- | --- |
 | `.env` | Credenciales de PostgreSQL y `DATABASE_URL` del entorno Compose |
-| `backend/.env` | Configuración Flask, JWT, Turnstile, Google, Gmail, Discord, IA y cifrado |
+| `backend/.env` | Configuración Flask, JWT, Turnstile, Google, Mailgun (HTTP + API key), Discord, IA y cifrado |
 | `web/.env` | `TURNSTILE_SITE_KEY` pública usada por el sitio estático 11ty |
 
 ### Red interna, puertos y persistencia
@@ -449,7 +449,7 @@ La separación es clara: solo se expone `nginx`, mientras que backend y base de 
 | Fichero | Para qué se usa |
 | --- | --- |
 | `.env` | Credenciales de PostgreSQL y `DATABASE_URL` del entorno Compose |
-| `backend/.env` | Configuración Flask, JWT, Turnstile, Google, Gmail, Discord, IA y cifrado |
+| `backend/.env` | Configuración Flask, JWT, Turnstile, Google, Mailgun (HTTP + API key), Discord, IA y cifrado |
 | `web/.env` | `TURNSTILE_SITE_KEY` pública usada por el sitio estático 11ty |
 
 ### Arranque reproducible desde cero
@@ -702,7 +702,7 @@ Aunque el extracto mostrado pertenece a inicialización del cliente IA, evidenci
 | --- | --- | :---: | --- |
 | Compose | [docker-compose.yml](../docker-compose.yml) | Sí | Define servicios, red, volúmenes y puertos |
 | Variables raíz | [.env.example](../.env.example) | Sí | Plantilla para PostgreSQL y `DATABASE_URL` |
-| Variables backend | [backend/.env.example](../backend/.env.example) | Sí | Plantilla para Flask, JWT, Google, Gmail, Discord, IA y Smoobu |
+| Variables backend | [backend/.env.example](../backend/.env.example) | Sí | Plantilla para Flask, JWT, Google, Mailgun (HTTP + API key), Discord, IA y Smoobu |
 | Variables reales | `.env`, `backend/.env` | No | Secretos del entorno local o productivo |
 | Dockerfiles | [backend/Dockerfile](../backend/Dockerfile), [frontend/Dockerfile](../frontend/Dockerfile), [web/Dockerfile](../web/Dockerfile), [nginx/Dockerfile](../nginx/Dockerfile) | Sí | Generan las imágenes del stack |
 | Config del proxy | [nginx/nginx.conf](../nginx/nginx.conf) | Sí | Enrutado y cabeceras del front |
