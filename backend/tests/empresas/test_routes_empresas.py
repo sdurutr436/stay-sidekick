@@ -87,7 +87,12 @@ def test_crear_empresa_sin_email_devuelve_422(client):
 def test_crear_empresa_exitosa_devuelve_201(client):
     # SimpleNamespace evita que Marshmallow trate el objeto como Mapping (dict)
     from types import SimpleNamespace
-    empresa_mock = SimpleNamespace(id="emp-new", nombre="Nueva Empresa", email="nueva@test.com")
+    empresa_mock = SimpleNamespace(
+        id="emp-new",
+        nombre="Nueva Empresa",
+        email="nueva@test.com",
+        created_at=datetime(2026, 5, 20, 10, 30, tzinfo=timezone.utc),
+    )
     with patch("app.empresas.routes.crear_empresa", return_value=empresa_mock), \
          patch("app.empresas.routes.send_welcome_company", return_value=True) as send_mock:
         resp = client.post(
@@ -99,7 +104,13 @@ def test_crear_empresa_exitosa_devuelve_201(client):
     data = resp.get_json()
     assert data["ok"] is True
     assert data["empresa"]["email"] == "nueva@test.com"
-    send_mock.assert_called_once_with("nueva@test.com", "Nueva Empresa")
+    send_mock.assert_called_once()
+    args, kwargs = send_mock.call_args
+    assert args == ("nueva@test.com", "Nueva Empresa")
+    summary = kwargs["summary"]
+    assert ("Nombre", "Nueva Empresa") in summary
+    assert ("Email registrado", "nueva@test.com") in summary
+    assert any(lbl == "Fecha de creación" and "20/05/2026" in val for lbl, val in summary)
 
 
 def test_crear_empresa_envia_bienvenida_falla_no_interrumpe(client):
