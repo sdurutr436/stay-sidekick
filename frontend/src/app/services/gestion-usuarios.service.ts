@@ -75,4 +75,10 @@ export class GestionUsuariosService {
       .post<{ ok: boolean; empresa: EmpresaItem }>('/api/empresas', payload)
       .pipe(map(res => res.empresa));
   }
+
+  eliminarEmpresa(id: string): Observable<void> {
+    return this.http
+      .delete<{ ok: boolean }>(`/api/empresas/${id}`)
+      .pipe(map(() => undefined));
+  }
 }

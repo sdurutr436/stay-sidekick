@@ -125,16 +125,6 @@
         emptyMessage="No hay plantillas guardadas. Crea la primera con el botón “Nueva plantilla”."
       >
 
-        @if (plantillaAlerta()) {
-          <app-alert
-            [type]="plantillaAlerta()!.tipo"
-            [dismissible]="true"
-            (dismissed)="plantillaAlerta.set(null)"
-          >
-            {{ plantillaAlerta()!.mensaje }}
-          </app-alert>
-        }
-
         @if (modoEditor() !== 'ninguno') {
 
           <!-- ── Formulario crear / editar plantilla ─── -->

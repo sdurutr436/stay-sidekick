@@ -6,6 +6,7 @@ import bcrypt
 
 from app.empresas.model import Empresa  # noqa: F401
 from app.extensions import db
+from app.perfil.model import ConfiguracionIA, IA_DEFAULT
 
 
 def crear_empresa(nombre: str, email: str) -> Empresa:
@@ -20,5 +21,21 @@ def crear_empresa(nombre: str, email: str) -> Empresa:
         activa=True,
     )
     db.session.add(empresa)
+    db.session.flush()
+    db.session.add(ConfiguracionIA(
+        empresa_id=empresa.id,
+        proveedor=IA_DEFAULT,
+        api_key_cifrada=None,
+        activo=True,
+    ))
     db.session.commit()
     return empresa
+
+
+def eliminar_empresa(empresa_id: str) -> bool:
+    empresa = Empresa.query.get(empresa_id)
+    if not empresa:
+        return False
+    db.session.delete(empresa)
+    db.session.commit()
+    return True

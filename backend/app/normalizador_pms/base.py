@@ -30,6 +30,7 @@ class ReservaEstandar:
     nombre_apartamento: str | None
     id_apartamento_externo: str | None
     hora_llegada: str | None = None    # "HH:MM" o None si no se conoce
+    tipo: str | None = None
 
 
 class PMSClient(Protocol):

@@ -41,12 +41,23 @@ describe('PerfilService', () => {
   describe('cambiarPassword', () => {
     it('debería enviar las contraseñas y retornar ok true', () => {
       let result: { ok: boolean; errors?: string[] } | undefined;
-      service.cambiarPassword('actual123', 'nueva456').subscribe(r => (result = r));
+      service.cambiarPassword('actual123', 'nueva456', 'nueva456').subscribe(r => (result = r));
       const req = httpTesting.expectOne('/api/perfil/password');
       expect(req.request.method).toBe('PUT');
-      expect(req.request.body).toEqual({ password_actual: 'actual123', password_nueva: 'nueva456' });
+      expect(req.request.body).toEqual({
+        password_actual:  'actual123',
+        password_nueva:   'nueva456',
+        password_confirm: 'nueva456',
+      });
       req.flush({ ok: true });
       expect(result?.ok).toBe(true);
+    });
+
+    it('por defecto rellena password_confirm con password_nueva si no se especifica', () => {
+      service.cambiarPassword('actual123', 'nueva456').subscribe();
+      const req = httpTesting.expectOne('/api/perfil/password');
+      expect(req.request.body.password_confirm).toBe('nueva456');
+      req.flush({ ok: true });
     });
 
     it('debería retornar errors cuando la contraseña actual es incorrecta', () => {

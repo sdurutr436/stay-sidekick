@@ -1,8 +1,9 @@
 """Blueprint del módulo de empresas.
 
 Rutas:
-- GET /api/empresas → lista todas las empresas (solo superadmin)
-- POST /api/empresas → crea empresa y envía correo de bienvenida
+- GET    /api/empresas        → lista todas las empresas (solo superadmin)
+- POST   /api/empresas        → crea empresa y envía correo de bienvenida
+- DELETE /api/empresas/<id>   → borra una empresa y sus datos en cascada
 """
 
 import logging
@@ -14,6 +15,7 @@ from app.common.notifications.mail_service import send_welcome_company
 from app.empresas.model import Empresa
 from app.empresas.repository import crear_empresa
 from app.empresas.schemas import CrearEmpresaSchema, EmpresaResponseSchema
+from app.empresas.service import borrar_empresa_completa
 from app.security.require_rol import require_rol
 
 logger = logging.getLogger(__name__)
@@ -58,3 +60,12 @@ def crear_empresa_route():
         logger.exception("Excepción inesperada al enviar bienvenida a %s", empresa.email)
 
     return jsonify({"ok": True, "empresa": _empresa_response.dump(empresa)}), 201
+
+
+@empresas_bp.route("/api/empresas/<uuid:empresa_id>", methods=["DELETE"])
+@require_rol("superadmin")
+def eliminar_empresa_route(empresa_id):
+    eliminada = borrar_empresa_completa(str(empresa_id))
+    if not eliminada:
+        return jsonify({"ok": False, "errors": ["Empresa no encontrada."]}), 404
+    return jsonify({"ok": True, "mensaje": "Empresa eliminada correctamente."}), 200

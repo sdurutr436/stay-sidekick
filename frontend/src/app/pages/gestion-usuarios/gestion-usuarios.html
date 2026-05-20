@@ -53,6 +53,17 @@
           ariaLabel="Seleccionar empresa"
           (valueChange)="onEmpresaChange($event)"
         />
+        <app-button
+          variant="danger"
+          size="md"
+          [disabled]="!puedeEliminarEmpresa()"
+          (click)="abrirModalBorradoEmpresa()"
+        >
+          <span class="btn__icon" aria-hidden="true">
+            <ng-icon name="phosphorTrash" size="20" />
+          </span>
+          <span class="u-sr-only">Eliminar empresa</span>
+        </app-button>
       </div>
     }
 
@@ -152,9 +163,6 @@
           (valueChange)="nuevoRol.set($event)"
         />
       </app-form-field>
-      @if (errorCreacion()) {
-        <app-alert type="error">{{ errorCreacion() }}</app-alert>
-      }
     </div>
   }
 
@@ -255,9 +263,6 @@
         </div>
       }
 
-      @if (errorEdicion()) {
-        <app-alert type="error">{{ errorEdicion() }}</app-alert>
-      }
     </div>
 
     <div modal-footer>
@@ -294,15 +299,27 @@
         (valueChange)="nuevaEmpresaEmail.set($event)"
       />
     </app-form-field>
-    @if (errorCreacionEmpresa()) {
-      <app-alert type="error">{{ errorCreacionEmpresa() }}</app-alert>
-    }
   </div>
   <div modal-footer>
     <app-button variant="primary" size="md" [disabled]="creandoEmpresa()" (click)="crearEmpresa()">
       {{ creandoEmpresa() ? 'Creando…' : 'Crear empresa' }}
     </app-button>
     <app-button variant="ghost" size="md" [disabled]="creandoEmpresa()" (click)="cerrarModalEmpresa()">
+      Cancelar
+    </app-button>
+  </div>
+</app-modal>
+
+<!-- Modal: Confirmar borrado de empresa (solo superadmin) -->
+<app-modal title="Eliminar empresa" [open]="modalBorradoEmpresaAbierto()" (cerrar)="cerrarModalBorradoEmpresa()">
+  <app-alert type="error">
+    ¿Borrar empresa y todos sus datos? Esta acción es irreversible.
+  </app-alert>
+  <div modal-footer>
+    <app-button variant="danger" size="md" [disabled]="borrandoEmpresa()" (click)="confirmarBorradoEmpresa()">
+      {{ borrandoEmpresa() ? 'Eliminando…' : 'Sí, eliminar' }}
+    </app-button>
+    <app-button variant="ghost" size="md" [disabled]="borrandoEmpresa()" (click)="cerrarModalBorradoEmpresa()">
       Cancelar
     </app-button>
   </div>

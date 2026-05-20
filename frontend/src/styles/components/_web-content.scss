@@ -205,6 +205,10 @@
         font-size: 0.875em;
       }
     }
+
+    tr:hover {
+      background-color: color-mix(in oklch, var(--border) 30%, var(--background));
+    }
   }
 
   // ---------------------------------------------------------------------------
