@@ -359,20 +359,3 @@
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Toast de notificación (posición fixed esquina inferior derecha)
-// ─────────────────────────────────────────────────────────────────────────────
-.vault-toast {
-  position: fixed;
-  bottom: $space-8;
-  right: $space-8;
-  z-index: $z-tooltip;
-  max-width: 24rem;
-  width: calc(100% - #{$space-16});
-
-  @include respond-until('sm') {
-    right: $space-4;
-    bottom: $space-4;
-    width: calc(100% - #{$space-8});
-  }
-}

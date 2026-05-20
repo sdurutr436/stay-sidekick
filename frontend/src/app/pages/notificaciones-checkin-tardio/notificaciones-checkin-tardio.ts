@@ -12,6 +12,7 @@ import { PageHeaderComponent } from '../../components/organisms/page-header/page
 import { PanelSeccionComponent } from '../../components/organisms/panel-seccion/panel-seccion';
 import { TemplatesCardComponent } from '../../components/organisms/templates-card/templates-card';
 import { AuthService } from '../../services/auth.service';
+import { ToastService } from '../../services/toast.service';
 
 const TOKENS: DropdownOption[] = [
   { value: '{NOMBRE}',       label: '{NOMBRE} — Nombre del huésped'         },
@@ -74,8 +75,9 @@ export class NotificacionesCheckinTardioPageComponent implements OnInit, OnDestr
   @ViewChild('editTextarea')   private editTaRef!: ElementRef<HTMLTextAreaElement>;
   @ViewChild('mensajeTextarea') private msgTaRef!: ElementRef<HTMLTextAreaElement>;
 
-  private readonly http = inject(HttpClient);
-  private readonly auth = inject(AuthService);
+  private readonly http  = inject(HttpClient);
+  private readonly auth  = inject(AuthService);
+  private readonly toast = inject(ToastService);
   readonly isAdmin = this.auth.isAdmin;
 
   // ── Tokens disponibles ────────────────────────────────────────────────
@@ -123,7 +125,6 @@ export class NotificacionesCheckinTardioPageComponent implements OnInit, OnDestr
   readonly editNombre      = signal('');
   readonly editContenido   = signal('');
   readonly guardandoEdit   = signal(false);
-  readonly plantillaAlerta = signal<{ tipo: 'success' | 'error'; mensaje: string } | null>(null);
 
   // ── Mensaje ───────────────────────────────────────────────────────────
   mensaje = '';
@@ -222,7 +223,6 @@ export class NotificacionesCheckinTardioPageComponent implements OnInit, OnDestr
     this.editNombre.set('');
     this.editContenido.set('');
     this.editCursorPos = 0;
-    this.plantillaAlerta.set(null);
     this.modoEditor.set('nueva');
   }
 
@@ -231,13 +231,11 @@ export class NotificacionesCheckinTardioPageComponent implements OnInit, OnDestr
     this.editNombre.set(p.nombre);
     this.editContenido.set(p.contenido);
     this.editCursorPos = p.contenido.length;
-    this.plantillaAlerta.set(null);
     this.modoEditor.set('editar');
   }
 
   cancelarEdicion(): void {
     this.modoEditor.set('ninguno');
-    this.plantillaAlerta.set(null);
   }
 
   guardarEdicion(): void {
@@ -245,7 +243,6 @@ export class NotificacionesCheckinTardioPageComponent implements OnInit, OnDestr
     const contenido = this.editContenido().trim();
     if (!nombre || !contenido) return;
 
-    this.plantillaAlerta.set(null);
     this.guardandoEdit.set(true);
 
     if (this.modoEditor() === 'nueva') {
@@ -257,14 +254,14 @@ export class NotificacionesCheckinTardioPageComponent implements OnInit, OnDestr
             this.plantillas.update(l => [...l, res.plantilla]);
             this.plantillaSeleccionada.set(res.plantilla);
             this.modoEditor.set('ninguno');
-            this.plantillaAlerta.set({ tipo: 'success', mensaje: 'Plantilla creada.' });
+            this.toast.showSuccess('Plantilla creada.');
           } else {
-            this.plantillaAlerta.set({ tipo: 'error', mensaje: res.errors?.[0] ?? 'Error al crear.' });
+            this.toast.showError(res.errors?.[0] ?? 'Error al crear.');
           }
           this.guardandoEdit.set(false);
         },
         error: err => {
-          this.plantillaAlerta.set({ tipo: 'error', mensaje: err?.error?.errors?.[0] ?? 'Error al crear.' });
+          this.toast.showError(err?.error?.errors?.[0] ?? 'Error al crear.');
           this.guardandoEdit.set(false);
         },
       });
@@ -278,14 +275,14 @@ export class NotificacionesCheckinTardioPageComponent implements OnInit, OnDestr
             this.plantillas.update(l => l.map(p => p.id === id ? res.plantilla : p));
             this.plantillaSeleccionada.set(res.plantilla);
             this.modoEditor.set('ninguno');
-            this.plantillaAlerta.set({ tipo: 'success', mensaje: 'Plantilla actualizada.' });
+            this.toast.showSuccess('Plantilla actualizada.');
           } else {
-            this.plantillaAlerta.set({ tipo: 'error', mensaje: res.errors?.[0] ?? 'Error al actualizar.' });
+            this.toast.showError(res.errors?.[0] ?? 'Error al actualizar.');
           }
           this.guardandoEdit.set(false);
         },
         error: err => {
-          this.plantillaAlerta.set({ tipo: 'error', mensaje: err?.error?.errors?.[0] ?? 'Error al actualizar.' });
+          this.toast.showError(err?.error?.errors?.[0] ?? 'Error al actualizar.');
           this.guardandoEdit.set(false);
         },
       });

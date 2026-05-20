@@ -72,18 +72,6 @@
     </app-how-it-works-button>
   </app-page-header>
 
-  @if (syncAlerta()) {
-    <app-alert [type]="syncAlerta()!.tipo" [dismissible]="true" (dismissed)="syncAlerta.set(null)">
-      {{ syncAlerta()!.mensaje }}
-    </app-alert>
-  }
-
-  @if (alertaEliminar()) {
-    <app-alert [type]="alertaEliminar()!.tipo" [dismissible]="true" (dismissed)="alertaEliminar.set(null)">
-      {{ alertaEliminar()!.mensaje }}
-    </app-alert>
-  }
-
   <app-tabla-crud
     searchPlaceholder="Buscar por nombre, ciudad o dirección…"
     [searchValue]="searchQuery()"

@@ -9,16 +9,11 @@ import { FormInputComponent } from '../../components/atoms/form-input/form-input
 import { FormSelectComponent } from '../../components/atoms/form-select/form-select';
 import { FormFieldComponent } from '../../components/molecules/form-field/form-field';
 import { FormInputIconComponent } from '../../components/molecules/form-input-icon/form-input-icon';
-import { AlertComponent } from '../../components/molecules/alert/alert';
 import { HowItWorksButtonComponent } from '../../components/molecules/how-it-works-button/how-it-works-button';
 import { PageHeaderComponent } from '../../components/organisms/page-header/page-header';
 import { PanelSeccionComponent } from '../../components/organisms/panel-seccion/panel-seccion';
 import { ContactosService, PREFS_CONTACTOS_DEFECTO } from '../../services/contactos.service';
-
-interface Alerta {
-  tipo: 'success' | 'error';
-  mensaje: string;
-}
+import { ToastService } from '../../services/toast.service';
 
 interface SyncResultado {
   total: number;
@@ -52,7 +47,6 @@ const _FECHA_PREVIEW: Record<string, string> = {
     FormInputComponent,
     FormSelectComponent,
     FormFieldComponent,
-    AlertComponent,
     HowItWorksButtonComponent,
   ],
 })
@@ -62,6 +56,7 @@ export class SincronizadorContactosPageComponent implements OnInit {
   private readonly route            = inject(ActivatedRoute);
   private readonly destroyRef       = inject(DestroyRef);
   private readonly contactosService = inject(ContactosService);
+  private readonly toast            = inject(ToastService);
 
   // ── Estado PMS ──────────────────────────────────────────────────────────
   readonly pmsConectado = signal(false);
@@ -95,8 +90,6 @@ export class SincronizadorContactosPageComponent implements OnInit {
   readonly formatoFechaInput = signal(PREFS_CONTACTOS_DEFECTO.formato_fecha_salida);
   readonly separadorApt      = signal(PREFS_CONTACTOS_DEFECTO.separador_apt);
   readonly guardandoPlantilla = signal(false);
-  readonly plantillaAlerta    = signal<Alerta | null>(null);
-  readonly errorAlerta        = signal<Alerta | null>(null);
 
   readonly previewNombre = computed(() => {
     const plantilla = this.plantillaInput();
@@ -132,7 +125,7 @@ export class SincronizadorContactosPageComponent implements OnInit {
           codigo_invalido: 'Código OAuth inválido.',
           token_fallido:   'No se pudieron obtener los tokens de Google.',
         };
-        this.errorAlerta.set({ tipo: 'error', mensaje: mensajes[params['google_error']] ?? 'Error al conectar con Google.' });
+        this.toast.showError(mensajes[params['google_error']] ?? 'Error al conectar con Google.');
       }
     });
 
@@ -151,7 +144,7 @@ export class SincronizadorContactosPageComponent implements OnInit {
         this.googleConectado.set(res.google.conectado);
         this.ultimoSync.set(res.google.ultimo_sync ?? null);
       },
-      error: () => this.errorAlerta.set({ tipo: 'error', mensaje: 'Error al obtener el estado de Google Contacts.' }),
+      error: () => this.toast.showError('Error al obtener el estado de Google Contacts.'),
     });
   }
 
@@ -171,26 +164,25 @@ export class SincronizadorContactosPageComponent implements OnInit {
         this.formatoFechaInput.set(prefs.formato_fecha_salida);
         this.separadorApt.set(prefs.separador_apt);
       },
-      error: () => this.errorAlerta.set({ tipo: 'error', mensaje: 'Error al cargar las preferencias.' }),
+      error: () => this.toast.showError('Error al cargar las preferencias.'),
     });
   }
 
   // ── Plantilla / formato ───────────────────────────────────────────────────
 
   guardarPlantilla(): void {
-    this.plantillaAlerta.set(null);
     this.guardandoPlantilla.set(true);
     this.contactosService.savePreferencias({
       plantilla: this.plantillaInput(),
       formato_fecha_salida: this.formatoFechaInput(),
     }).subscribe({
       next: () => {
-        this.plantillaAlerta.set({ tipo: 'success', mensaje: 'Formato guardado correctamente.' });
         this.guardandoPlantilla.set(false);
+        this.toast.showSuccess('Formato guardado correctamente.');
       },
       error: err => {
-        this.plantillaAlerta.set({ tipo: 'error', mensaje: err?.error?.errors?.[0] ?? 'Error al guardar el formato.' });
         this.guardandoPlantilla.set(false);
+        this.toast.showError(err?.error?.errors?.[0] ?? 'Error al guardar el formato.');
       },
     });
   }
@@ -234,18 +226,24 @@ export class SincronizadorContactosPageComponent implements OnInit {
         this.syncEnCurso.set(false);
         this.ultimoSync.set(new Date().toISOString());
         this.nuevosContactos.set(res.resultado.nuevos);
+        this.toast.showSuccess(
+          `Sincronización con Google completada: ${res.resultado.nuevos} nuevos, ${res.resultado.actualizados} actualizados.`,
+        );
       },
       error: err => {
         this.syncEnCurso.set(false);
-        this.errorAlerta.set({ tipo: 'error', mensaje: err?.error?.errors?.[0] ?? 'Error durante la sincronización.' });
+        this.toast.showError(err?.error?.errors?.[0] ?? 'Error durante la sincronización.');
       },
     });
   }
 
   exportarCsv(): void {
     this.http.post('/api/contactos/exportacion/csv', this._parseFechasPayload(), { responseType: 'blob' }).subscribe({
-      next: blob => this._descargarBlob(blob, 'contactos_google.csv'),
-      error: err => this.errorAlerta.set({ tipo: 'error', mensaje: err?.error?.errors?.[0] ?? 'Error al exportar el CSV.' }),
+      next: blob => {
+        this._descargarBlob(blob, 'contactos_google.csv');
+        this.toast.showSuccess('CSV generado correctamente.');
+      },
+      error: err => this.toast.showError(err?.error?.errors?.[0] ?? 'Error al exportar el CSV.'),
     });
   }
 
@@ -274,10 +272,13 @@ export class SincronizadorContactosPageComponent implements OnInit {
         this.xlsxEnCurso.set(false);
         this.ultimoSync.set(new Date().toISOString());
         this.nuevosContactos.set(res.resultado.nuevos);
+        this.toast.showSuccess(
+          `Sincronización con Google completada: ${res.resultado.nuevos} nuevos, ${res.resultado.actualizados} actualizados.`,
+        );
       },
       error: err => {
         this.xlsxEnCurso.set(false);
-        this.errorAlerta.set({ tipo: 'error', mensaje: err?.error?.errors?.[0] ?? 'Error durante la sincronización del XLSX.' });
+        this.toast.showError(err?.error?.errors?.[0] ?? 'Error durante la sincronización del XLSX.');
       },
     });
   }
@@ -290,8 +291,11 @@ export class SincronizadorContactosPageComponent implements OnInit {
     form.append('file', archivo);
 
     this.http.post('/api/contactos/xlsx/exportacion/csv', form, { responseType: 'blob' }).subscribe({
-      next: blob => this._descargarBlob(blob, 'contactos_google.csv'),
-      error: err => this.errorAlerta.set({ tipo: 'error', mensaje: err?.error?.errors?.[0] ?? 'Error al exportar el CSV desde XLSX.' }),
+      next: blob => {
+        this._descargarBlob(blob, 'contactos_google.csv');
+        this.toast.showSuccess('CSV generado correctamente.');
+      },
+      error: err => this.toast.showError(err?.error?.errors?.[0] ?? 'Error al exportar el CSV desde XLSX.'),
     });
   }
 

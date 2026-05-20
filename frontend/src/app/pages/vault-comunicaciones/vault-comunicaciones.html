@@ -416,13 +416,4 @@
 
   </div>
 
-  <!-- Toast de notificación (cooldown IA + errores) — posicionado fijo -->
-  @if (toastVisible()) {
-    <div class="vault-toast" role="status" aria-live="assertive">
-      <app-alert type="warning" [dismissible]="true" (dismissed)="toastVisible.set(false)">
-        {{ toastMensaje() }}
-      </app-alert>
-    </div>
-  }
-
 </div>

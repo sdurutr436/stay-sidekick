@@ -70,16 +70,6 @@
     </app-how-it-works-button>
   </app-page-header>
 
-  @if (errorAlerta()) {
-    <app-alert
-      [type]="errorAlerta()!.tipo"
-      [dismissible]="true"
-      (dismissed)="errorAlerta.set(null)"
-    >
-      {{ errorAlerta()!.mensaje }}
-    </app-alert>
-  }
-
   <section class="sincro-contenido">
 
   <!-- Cuerpo: instrucciones + monitorización + acciones -->
@@ -87,16 +77,6 @@
 
     <!-- Columna izquierda: formato de contacto -->
     <app-panel-seccion title="Formato del nombre de contacto" class="sincro-layout__instrucciones" [divider]="true">
-
-      @if (plantillaAlerta()) {
-        <app-alert
-          [type]="plantillaAlerta()!.tipo"
-          [dismissible]="true"
-          (dismissed)="plantillaAlerta.set(null)"
-        >
-          {{ plantillaAlerta()!.mensaje }}
-        </app-alert>
-      }
 
       <form class="perfil-form" (submit)="$event.preventDefault(); guardarPlantilla()">
 

@@ -1,0 +1,128 @@
+// =============================================================================
+// COMPONENTS: TOAST (organism)
+// Pila de notificaciones en esquina superior derecha, transversal a la SPA.
+//
+// Variantes (alineadas con las tokens de estado de settings/colores.scss):
+//   .toast--success   → verde     ($color-success-green)
+//   .toast--error     → destructive ($color-error / $color-destructive)
+//   .toast--warning   → ámbar     ($color-warning-amber)
+//   .toast--info      → azul      ($color-info-blue)
+//
+// Estructura BEM: .toast-stack > .toast.toast--{variant}
+// =============================================================================
+
+@use '../shared' as *;
+
+.toast-stack {
+  position: fixed;
+  top: calc(#{$header-height} + #{$space-4});
+  right: $space-6;
+  z-index: $z-tooltip;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;
+  max-width: 24rem;
+  width: calc(100% - #{$space-8});
+  pointer-events: none;
+
+  @include respond-until('sm') {
+    top: calc(#{$header-height-mobile} + #{$space-2});
+    right: $space-3;
+    left: $space-3;
+    width: auto;
+    max-width: none;
+  }
+}
+
+.toast {
+  pointer-events: auto;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: $space-3;
+  padding: $space-3 $space-4;
+  background-color: $color-surface-card;
+  border: $border-width $border-style $color-border;
+  border-left-width: 4px;
+  box-shadow: $shadow-md;
+  @include text-body-sm;
+  color: $color-text-primary;
+  animation: toast-enter 180ms ease-out;
+
+  &__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 999px;
+    font-weight: $font-weight-heading;
+    color: $color-white;
+    flex-shrink: 0;
+  }
+
+  &__mensaje {
+    min-width: 0;
+    word-break: break-word;
+  }
+
+  &__cerrar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 1.5rem;
+    height: 1.5rem;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: $color-text-secondary;
+    cursor: pointer;
+    transition: color var(--transition-base);
+
+    &:hover  { color: $color-text-primary; }
+    &:focus-visible { @include focus-ring; }
+  }
+
+  // ── Variantes de estado ───────────────────────────────────────────────────
+  &--success {
+    border-left-color: $color-success-green;
+
+    .toast__icon { background-color: $color-success-green; }
+  }
+
+  &--error {
+    border-left-color: $color-error;
+
+    .toast__icon { background-color: $color-error; }
+  }
+
+  &--warning {
+    border-left-color: $color-warning-amber;
+
+    .toast__icon {
+      background-color: $color-warning-amber;
+      color: $color-gray-900;
+    }
+  }
+
+  &--info {
+    border-left-color: $color-info-blue;
+
+    .toast__icon { background-color: $color-info-blue; }
+  }
+}
+
+@keyframes toast-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

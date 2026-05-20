@@ -17,6 +17,7 @@ import { TablaCrudComponent } from '../../components/organisms/tabla-crud/tabla-
 import { ModalComponent } from '../../components/organisms/modal/modal';
 import { GestionUsuariosService, EmpresaItem, Usuario, EmpresaCreatePayload } from '../../services/gestion-usuarios.service';
 import { AuthService } from '../../services/auth.service';
+import { ToastService } from '../../services/toast.service';
 
 @Component({
   selector: 'app-gestion-usuarios',
@@ -42,6 +43,7 @@ import { AuthService } from '../../services/auth.service';
 export class GestionUsuariosPageComponent implements OnInit {
   private readonly service = inject(GestionUsuariosService);
   private readonly auth = inject(AuthService);
+  private readonly toast = inject(ToastService);
 
   readonly esSuperAdmin = this.auth.esSuperAdmin;
 
@@ -82,8 +84,6 @@ export class GestionUsuariosPageComponent implements OnInit {
   // Modal de borrado de empresa (solo superadmin)
   readonly modalBorradoEmpresaAbierto = signal(false);
   readonly borrandoEmpresa = signal(false);
-  readonly errorBorradoEmpresa = signal<string | null>(null);
-  readonly mensajeBorradoEmpresa = signal<string | null>(null);
 
   readonly totalUsuarios = computed(() => this.usuarios().length);
   readonly limiteAlcanzado = computed(() => this.totalUsuarios() >= this.maxUsuarios());
@@ -166,10 +166,13 @@ export class GestionUsuariosPageComponent implements OnInit {
         this.creando.set(false);
         this.passwordTemporal.set(password_temporal);
         this._cargar(this._empresaIdActual());
+        this.toast.showSuccess('Usuario creado correctamente.');
       },
       error: err => {
         this.creando.set(false);
-        this.errorCreacion.set(err?.error?.errors?.[0] ?? 'Error al crear el usuario.');
+        const mensaje = err?.error?.errors?.[0] ?? 'Error al crear el usuario.';
+        this.errorCreacion.set(mensaje);
+        this.toast.showError(mensaje);
       },
     });
   }
@@ -200,10 +203,13 @@ export class GestionUsuariosPageComponent implements OnInit {
         this.guardando.set(false);
         this.usuarios.update(lista => lista.map(x => x.id === updated.id ? updated : x));
         this.cerrarEdicion();
+        this.toast.showSuccess('Usuario actualizado correctamente.');
       },
       error: err => {
         this.guardando.set(false);
-        this.errorEdicion.set(err?.error?.errors?.[0] ?? 'Error al guardar.');
+        const mensaje = err?.error?.errors?.[0] ?? 'Error al guardar.';
+        this.errorEdicion.set(mensaje);
+        this.toast.showError(mensaje);
       },
     });
   }
@@ -217,8 +223,12 @@ export class GestionUsuariosPageComponent implements OnInit {
       next: ({ password_temporal }) => {
         this.resetandoEnEdicion.set(false);
         this.resetInfoEdicion.set(password_temporal);
+        this.toast.showSuccess('Contraseña reseteada correctamente.');
       },
-      error: () => { this.resetandoEnEdicion.set(false); },
+      error: err => {
+        this.resetandoEnEdicion.set(false);
+        this.toast.showError(err?.error?.errors?.[0] ?? 'Error al resetear la contraseña.');
+      },
     });
   }
 
@@ -269,18 +279,19 @@ export class GestionUsuariosPageComponent implements OnInit {
         this.empresas.update(lista => [...lista, empresa]);
         this.empresaSeleccionadaId.set(empresa.id);
         this._cargar(empresa.id);
+        this.toast.showSuccess('Empresa creada correctamente.');
       },
       error: err => {
         this.creandoEmpresa.set(false);
-        this.errorCreacionEmpresa.set(err?.error?.errors?.[0] ?? 'Error al crear la empresa.');
+        const mensaje = err?.error?.errors?.[0] ?? 'Error al crear la empresa.';
+        this.errorCreacionEmpresa.set(mensaje);
+        this.toast.showError(mensaje);
       },
     });
   }
 
   abrirModalBorradoEmpresa(): void {
     if (!this.puedeEliminarEmpresa()) return;
-    this.errorBorradoEmpresa.set(null);
-    this.mensajeBorradoEmpresa.set(null);
     this.modalBorradoEmpresaAbierto.set(true);
   }
 
@@ -293,12 +304,11 @@ export class GestionUsuariosPageComponent implements OnInit {
     const id = this.empresaSeleccionadaId();
     if (!id) return;
     this.borrandoEmpresa.set(true);
-    this.errorBorradoEmpresa.set(null);
     this.service.eliminarEmpresa(id).subscribe({
       next: () => this._tras_borrado_exitoso(id),
       error: err => {
         this.borrandoEmpresa.set(false);
-        this.errorBorradoEmpresa.set(err?.error?.errors?.[0] ?? 'Error al borrar la empresa.');
+        this.toast.showError(err?.error?.errors?.[0] ?? 'Error al borrar la empresa.');
       },
     });
   }
@@ -306,7 +316,6 @@ export class GestionUsuariosPageComponent implements OnInit {
   private _tras_borrado_exitoso(id: string): void {
     this.borrandoEmpresa.set(false);
     this.modalBorradoEmpresaAbierto.set(false);
-    this.mensajeBorradoEmpresa.set('Empresa eliminada correctamente.');
     this.empresas.update(lista => lista.filter(e => e.id !== id));
     const restantes = this.empresas();
     const siguiente = restantes[0]?.id ?? '';

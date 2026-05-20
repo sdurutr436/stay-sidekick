@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { AuthService } from './auth.service';
+import { ToastService } from './toast.service';
 
 function makeToken(overrides: Record<string, unknown> = {}, expired = false): string {
   const exp = expired
@@ -13,9 +14,9 @@ describe('AuthService', () => {
   let service: AuthService;
 
   beforeEach(() => {
+    localStorage.clear();
     TestBed.configureTestingModule({});
     service = TestBed.inject(AuthService);
-    localStorage.clear();
   });
 
   afterEach(() => {
@@ -128,6 +129,57 @@ describe('AuthService', () => {
 
       expect(removeSpy).toHaveBeenCalledWith('ss_token');
       expect((window.location as { href: string }).href).toBe('/login/');
+    });
+  });
+
+  describe('programarAvisoExpiracion', () => {
+    afterEach(() => vi.useRealTimers());
+
+    it('debería emitir un toast de advertencia 2 minutos antes de la expiración', () => {
+      vi.useFakeTimers();
+      const ahora = Math.floor(Date.now() / 1000);
+      // Token que expira en 5 minutos (300s); el aviso debe saltar a los 3 minutos
+      const token = `hdr.${btoa(JSON.stringify({ exp: ahora + 300, sub: 'u1', user_id: '1', empresa_id: 'e1', rol: 'operativo' }))}.sig`;
+      localStorage.setItem('ss_token', token);
+
+      const toast = TestBed.inject(ToastService);
+      const warnSpy = vi.spyOn(toast, 'showWarning');
+
+      service.programarAvisoExpiracion();
+      // Avanzar 3 minutos: el aviso debe dispararse
+      vi.advanceTimersByTime(3 * 60 * 1000);
+      expect(warnSpy).toHaveBeenCalledTimes(1);
+    });
+
+    it('NO debería emitir el toast si el token ya expira en menos de 2 minutos', () => {
+      vi.useFakeTimers();
+      const ahora = Math.floor(Date.now() / 1000);
+      const token = `hdr.${btoa(JSON.stringify({ exp: ahora + 60, sub: 'u1', user_id: '1', empresa_id: 'e1', rol: 'operativo' }))}.sig`;
+      localStorage.setItem('ss_token', token);
+
+      const toast = TestBed.inject(ToastService);
+      const warnSpy = vi.spyOn(toast, 'showWarning');
+
+      service.programarAvisoExpiracion();
+      vi.advanceTimersByTime(60 * 1000);
+      expect(warnSpy).not.toHaveBeenCalled();
+    });
+
+    it('logout debería cancelar un aviso pendiente', () => {
+      vi.useFakeTimers();
+      const ahora = Math.floor(Date.now() / 1000);
+      const token = `hdr.${btoa(JSON.stringify({ exp: ahora + 300, sub: 'u1', user_id: '1', empresa_id: 'e1', rol: 'operativo' }))}.sig`;
+      localStorage.setItem('ss_token', token);
+
+      const toast = TestBed.inject(ToastService);
+      const warnSpy = vi.spyOn(toast, 'showWarning');
+      vi.stubGlobal('location', { href: '' });
+
+      service.programarAvisoExpiracion();
+      service.logout();
+      vi.advanceTimersByTime(5 * 60 * 1000);
+
+      expect(warnSpy).not.toHaveBeenCalled();
     });
   });
 });

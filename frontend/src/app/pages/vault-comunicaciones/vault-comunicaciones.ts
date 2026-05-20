@@ -1,7 +1,6 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { NgIconComponent } from '@ng-icons/core';
-import { AlertComponent } from '../../components/molecules/alert/alert';
 import { ButtonComponent } from '../../components/atoms/button/button';
 import { DropdownBuscadorComponent, DropdownOption } from '../../components/molecules/dropdown-buscador/dropdown-buscador';
 import { HowItWorksButtonComponent } from '../../components/molecules/how-it-works-button/how-it-works-button';
@@ -10,6 +9,7 @@ import { PanelSeccionComponent } from '../../components/organisms/panel-seccion/
 import { TemplatesCardComponent } from '../../components/organisms/templates-card/templates-card';
 import { VaultService, Plantilla } from '../../services/vault.service';
 import { PerfilService } from '../../services/perfil.service';
+import { ToastService } from '../../services/toast.service';
 
 // Placeholders disponibles para insertar en el mensaje
 const PLACEHOLDERS: DropdownOption[] = [
@@ -37,7 +37,7 @@ const COOLDOWN_SEGUNDOS = 60;
   styleUrl: './vault-comunicaciones.scss',
   standalone: true,
   imports: [
-    RouterLink, NgIconComponent, PageHeaderComponent, ButtonComponent, AlertComponent,
+    RouterLink, NgIconComponent, PageHeaderComponent, ButtonComponent,
     DropdownBuscadorComponent, HowItWorksButtonComponent, TemplatesCardComponent,
     PanelSeccionComponent,
   ],
@@ -45,6 +45,7 @@ const COOLDOWN_SEGUNDOS = 60;
 export class VaultComunicacionesPageComponent implements OnInit, OnDestroy {
   private readonly vault  = inject(VaultService);
   private readonly perfil = inject(PerfilService);
+  private readonly toast  = inject(ToastService);
 
   @ViewChild('mensajeTextarea') private mensajeTextareaRef!: ElementRef<HTMLTextAreaElement>;
 
@@ -69,8 +70,6 @@ export class VaultComunicacionesPageComponent implements OnInit, OnDestroy {
   readonly cooldownRestante      = signal(0);
   readonly mensajeCopiadoVisible = signal(false);
   readonly mensajeCopiadoTexto   = signal('');
-  readonly toastVisible          = signal(false);
-  readonly toastMensaje          = signal('');
   readonly tonoSeleccionado      = signal<string | null>(null);
 
   readonly filtroCategoria = signal<string | null>(null);
@@ -88,7 +87,6 @@ export class VaultComunicacionesPageComponent implements OnInit, OnDestroy {
   // Posición del cursor en el textarea (se actualiza en blur/click/keyup)
   private cursorPos = 0;
   private cooldownInterval: ReturnType<typeof setInterval> | null = null;
-  private toastTimeout: ReturnType<typeof setTimeout> | null = null;
 
   readonly plantillasFiltradas = computed(() => {
     const q    = this.searchPlantillas().toLowerCase().trim();
@@ -105,7 +103,7 @@ export class VaultComunicacionesPageComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.vault.getPlantillas().subscribe({
       next: res => this.plantillas.set(res.plantillas),
-      error: () => this.mostrarToast('No se pudieron cargar las plantillas. Recarga la página.'),
+      error: () => this.toast.showError('No se pudieron cargar las plantillas. Recarga la página.'),
     });
     this.perfil.getIntegraciones().subscribe({
       next: res => {
@@ -122,7 +120,6 @@ export class VaultComunicacionesPageComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     if (this.cooldownInterval) clearInterval(this.cooldownInterval);
-    if (this.toastTimeout)     clearTimeout(this.toastTimeout);
   }
 
   seleccionarPlantilla(plantilla: Plantilla): void {
@@ -162,10 +159,11 @@ export class VaultComunicacionesPageComponent implements OnInit, OnDestroy {
           this.plantillas.update(list => [res.plantilla, ...list]);
           this.seleccionarPlantilla(res.plantilla);
           this.guardando.set(false);
+          this.toast.showSuccess('Plantilla creada correctamente.');
         },
         error: err => {
           this.guardando.set(false);
-          this.mostrarToast(this.mensajeError(err, 'crear'));
+          this.toast.showError(this.mensajeError(err, 'crear'));
         },
       });
     } else {
@@ -176,10 +174,11 @@ export class VaultComunicacionesPageComponent implements OnInit, OnDestroy {
           this.plantillaSeleccionada.set(res.plantilla);
           this.nombreActual.set(res.plantilla.nombre);
           this.guardando.set(false);
+          this.toast.showSuccess('Cambios guardados.');
         },
         error: err => {
           this.guardando.set(false);
-          this.mostrarToast(this.mensajeError(err, 'guardar'));
+          this.toast.showError(this.mensajeError(err, 'guardar'));
         },
       });
     }
@@ -266,11 +265,7 @@ export class VaultComunicacionesPageComponent implements OnInit, OnDestroy {
   }
 
   refinarConIA(): void {
-    // Si el cooldown está activo, mostrar toast explicativo en lugar de hacer la petición
-    if (this.cooldownActivo()) {
-      this.mostrarToast(`Espera ${this.cooldownRestante()} segundos antes de volver a refinar.`);
-      return;
-    }
+    if (this.cooldownActivo()) return;
 
     const contenido = this.mensajeActual();
     if (!contenido.trim()) return;
@@ -290,22 +285,13 @@ export class VaultComunicacionesPageComponent implements OnInit, OnDestroy {
         this.iniciarCooldown();
         if (!this.byokActivo()) this.cargarUso();
       },
-      error: err => {
-        this.cargandoIA.set(false);
-        this.mostrarToast(this.mensajeError(err, 'refinar'));
-      },
+      error: () => this.cargandoIA.set(false),
     });
   }
 
   traducirConIA(): void {
-    if (!this.idiomaDestino()) {
-      this.mostrarToast('Selecciona un idioma de destino.');
-      return;
-    }
-    if (this.cooldownActivo()) {
-      this.mostrarToast(`Espera ${this.cooldownRestante()} segundos antes de traducir.`);
-      return;
-    }
+    if (!this.idiomaDestino()) return;
+    if (this.cooldownActivo()) return;
     if (!this.plantillaSeleccionada()) return;
 
     this.traduciendo.set(true);
@@ -321,10 +307,7 @@ export class VaultComunicacionesPageComponent implements OnInit, OnDestroy {
         this.iniciarCooldown();
         if (!this.byokActivo()) this.cargarUso();
       },
-      error: err => {
-        this.traduciendo.set(false);
-        this.mostrarToast(this.mensajeError(err, 'traducir'));
-      },
+      error: () => this.traduciendo.set(false),
     });
   }
 
@@ -349,7 +332,7 @@ export class VaultComunicacionesPageComponent implements OnInit, OnDestroy {
       this.mensajeCopiadoVisible.set(true);
       setTimeout(() => this.mensajeCopiadoVisible.set(false), 2500);
     }).catch(() => {
-      this.mostrarToast('No se pudo copiar el mensaje. Comprueba los permisos del portapapeles.');
+      this.toast.showError('No se pudo copiar el mensaje. Comprueba los permisos del portapapeles.');
     });
   }
 
@@ -399,13 +382,5 @@ export class VaultComunicacionesPageComponent implements OnInit, OnDestroy {
           case 'traducir': return 'No se pudo traducir el mensaje. Inténtalo de nuevo.';
         }
     }
-  }
-
-  private mostrarToast(mensaje: string): void {
-    this.toastMensaje.set(mensaje);
-    this.toastVisible.set(true);
-
-    if (this.toastTimeout) clearTimeout(this.toastTimeout);
-    this.toastTimeout = setTimeout(() => this.toastVisible.set(false), 4000);
   }
 }
