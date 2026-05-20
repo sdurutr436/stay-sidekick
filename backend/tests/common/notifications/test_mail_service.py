@@ -251,6 +251,31 @@ def test_send_welcome_company_envia_a_la_empresa(app_configurado):
     assert "Nueva" in data["subject"]
 
 
+def test_send_welcome_company_incluye_resumen(app_configurado):
+    summary = [
+        ("Nombre", "ACME"),
+        ("Email registrado", "info@acme.com"),
+        ("Fecha de creación", "20/05/2026 10:30 UTC"),
+    ]
+    with app_configurado.app_context(), patch(
+        "app.common.notifications.mail_service.requests.post",
+        return_value=_mock_response(),
+    ) as mock_post:
+        assert (
+            mail_service.send_welcome_company(
+                "nuevo@empresa.com", "ACME", summary=summary
+            )
+            is True
+        )
+    data = mock_post.call_args.kwargs["data"]
+    assert "Resumen de tu cuenta" in data["text"]
+    assert "Nombre: ACME" in data["text"]
+    assert "info@acme.com" in data["text"]
+    assert "20/05/2026 10:30 UTC" in data["text"]
+    assert "Resumen de tu cuenta" in data["html"]
+    assert "info@acme.com" in data["html"]
+
+
 # ── send_temp_password (caso 4) ───────────────────────────────────────────
 
 

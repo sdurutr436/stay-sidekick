@@ -218,30 +218,65 @@ def send_contact(clean_data: dict) -> bool:
 # ── Caso 3 — Bienvenida a nueva empresa ───────────────────────────────────
 
 
-def send_welcome_company(empresa_email: str, empresa_nombre: str) -> bool:
-    """Envía un correo de bienvenida al admin de la empresa recién creada."""
+def send_welcome_company(
+    empresa_email: str,
+    empresa_nombre: str,
+    summary: list[tuple[str, str]] | None = None,
+) -> bool:
+    """Envía un correo de bienvenida al admin de la empresa recién creada.
+
+    ``summary`` permite adjuntar un resumen (lista de pares ``(etiqueta, valor)``)
+    que se renderiza como tabla en el cuerpo del correo.
+    """
     if not _mail_configured():
         logger.warning("Mailgun no configurado; no se enviará bienvenida.")
         return False
 
     subject = f"Bienvenida a Stay Sidekick, {empresa_nombre}"
-    text = (
-        f"Hola {empresa_nombre},\n\n"
-        "Tu cuenta de empresa en Stay Sidekick ha sido creada correctamente.\n"
-        "En breve recibirás un correo separado con las credenciales del primer\n"
-        "usuario administrador, incluida una contraseña temporal que deberás\n"
-        "cambiar en el primer inicio de sesión.\n\n"
-        "Si no esperabas este correo, ignóralo o contáctanos respondiendo a\n"
-        "este mensaje.\n\n"
-        "— El equipo de Stay Sidekick"
+
+    summary = summary or []
+    summary_text = (
+        "\n".join(f"  • {lbl}: {val}" for lbl, val in summary)
+        if summary
+        else ""
+    )
+    text_parts = [
+        f"Hola {empresa_nombre},",
+        "",
+        "Tu cuenta de empresa en Stay Sidekick ha sido creada correctamente.",
+    ]
+    if summary_text:
+        text_parts += ["", "Resumen de tu cuenta:", summary_text]
+    text_parts += [
+        "",
+        "En breve recibirás un correo separado con las credenciales del primer",
+        "usuario administrador, incluida una contraseña temporal que deberás",
+        "cambiar en el primer inicio de sesión.",
+        "",
+        "Si no esperabas este correo, ignóralo o contáctanos respondiendo a",
+        "este mensaje.",
+        "",
+        "— El equipo de Stay Sidekick",
+    ]
+    text = "\n".join(text_parts)
+
+    summary_html = (
+        '<h2 style="font-size:14px;margin:20px 0 8px 0;color:#0f172a;">Resumen de tu cuenta</h2>'
+        + _rows_html(summary)
+        if summary
+        else ""
     )
     html = _render_html(
         f"Bienvenida, {empresa_nombre}",
         '<p style="font-size:14px;line-height:1.6;">'
         "Tu cuenta de empresa en <strong>Stay Sidekick</strong> ha sido "
-        "creada correctamente. En breve recibirás un correo separado con las "
-        "credenciales del primer usuario administrador, incluida una "
-        "contraseña temporal que deberás cambiar en el primer inicio de sesión."
+        "creada correctamente."
+        "</p>"
+        + summary_html
+        + '<p style="font-size:14px;line-height:1.6;margin-top:16px;">'
+        "En breve recibirás un correo separado con las credenciales del "
+        "primer usuario administrador, incluida una contraseña temporal que "
+        "deberás cambiar en el primer inicio de sesión."
         "</p>"
         '<p style="font-size:14px;color:#6b7280;">'
         "Si no esperabas este correo, ignóralo o contáctanos respondiendo a "
