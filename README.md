@@ -240,7 +240,7 @@ npm run dev:web        # cd web && npm start
 # App Angular
 npm run dev:app        # cd frontend && npm start
 
-# Backend Flask (ver docs/backend/VENV_SETUP.md)
+# Backend Flask
 cd backend && python run.py
 ```
 
@@ -434,8 +434,6 @@ Cabeceras de seguridad (HSTS, CSP estricta, `X-Frame-Options`, `X-Content-Type-O
 | [docs/01-introduccion.md](docs/01-introduccion.md) a [docs/10-conclusiones.md](docs/10-conclusiones.md) | Memoria técnica principal del proyecto |
 | [docs/DESARROLLO.md](docs/DESARROLLO.md) | Guía de entorno y flujo de trabajo |
 | [docs/backend/DEPENDENCIAS.md](docs/backend/DEPENDENCIAS.md) | Dependencias del backend y justificación |
-| [docs/backend/VENV_SETUP.md](docs/backend/VENV_SETUP.md) | Entorno virtual Python |
-| [docs/design/decisiones_disenio.md](docs/design/decisiones_disenio.md) | Decisiones de diseño y arquitectura |
 | [docs/propuesta_formal/propuesta_formal_sergio_duran_2DAW.md](docs/propuesta_formal/propuesta_formal_sergio_duran_2DAW.md) | Propuesta formal del proyecto |
 
 ### Diseño UI/UX (Figma)
