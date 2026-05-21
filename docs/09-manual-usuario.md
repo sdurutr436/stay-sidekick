@@ -32,9 +32,6 @@ Stay Sidekick es una aplicación web para operaciones de alquiler vacacional. Ce
 
 La aplicación se usa desde navegador y está diseñada para perfiles operativos y administradores de empresa.
 
-![Placeholder — pantalla de inicio de Stay Sidekick](assets/manual/)
-_Placeholder de captura: pantalla de acceso a la aplicación._
-
 ---
 
 ## 9.2. Primeros pasos
@@ -45,7 +42,7 @@ _Placeholder de captura: pantalla de acceso a la aplicación._
 2. Pulsa **Iniciar sesión** desde la cabecera del sitio.
 3. Se abrirá la pantalla de login.
 
-![Placeholder — acceso desde cabecera pública](assets/manual/02-acceso-desde-web-placeholder.png)
+![Placeholder — acceso desde cabecera pública](assets/manual/login.png)
 _Placeholder de captura: botón de acceso desde la web pública._
 
 ### 9.2.2. Inicio de sesión
@@ -56,9 +53,6 @@ _Placeholder de captura: botón de acceso desde la web pública._
 
 Si intentas acceder a una ruta privada sin sesión, el sistema redirige automáticamente a `/login?acceso=requerido`.
 
-![Placeholder — formulario login](assets/manual/03-login-form-placeholder.png)
-_Placeholder de captura: formulario de inicio de sesión._
-
 ### 9.2.3. Cambio de contraseña obligatorio
 
 En cuentas con marca de seguridad activa, tras autenticarte se redirige a **/cambio-password**.
@@ -66,9 +60,6 @@ En cuentas con marca de seguridad activa, tras autenticarte se redirige a **/cam
 1. Introduce la contraseña actual.
 2. Introduce y confirma la nueva contraseña.
 3. Guarda cambios para continuar al panel.
-
-![Placeholder — cambio de contraseña](assets/manual/04-cambio-password-placeholder.png)
-_Placeholder de captura: pantalla de cambio de contraseña obligatoria._
 
 ---
 
@@ -81,8 +72,8 @@ Después de iniciar sesión llegas al panel principal:
 - Tarjetas de acceso rápido a cada módulo.
 - En cuentas nuevas, bloque de **Primeros pasos** con enlaces directos a Perfil.
 
-![Placeholder — dashboard mis herramientas](assets/manual/05-dashboard-mis-herramientas-placeholder.png)
-_Placeholder de captura: panel principal con tarjetas y estado de integraciones._
+![Placeholder — dashboard mis herramientas](assets/manual/stay-sidekick-dashboard-light-mode-medium.png)
+_Panel principal con tarjetas y estado de integraciones._
 
 ---
 
@@ -109,9 +100,6 @@ _Tabla principal del maestro._
 3. Usa **Guardar cambios** para persistir.
 4. Para editar registros existentes, selecciona la fila y aplica cambios.
 
-![Placeholder — alta manual apartamento](assets/manual/07-maestro-alta-manual-placeholder.png)
-_Placeholder de captura: fila de creación/edición en tabla CRUD._
-
 ### 9.4.3. Sincronización con Smoobu
 
 Si hay PMS activo:
@@ -120,18 +108,12 @@ Si hay PMS activo:
 2. Espera el resultado.
 3. Revisa el aviso de éxito/error en la alerta superior.
 
-![Placeholder — sincronizar smoobu](assets/manual/08-maestro-sync-smoobu-placeholder.png)
-_Placeholder de captura: botón y resultado de sincronización PMS._
-
 ### 9.4.4. Importación por XLSX
 
 1. Pulsa **Importar XLSX**.
 2. Selecciona el archivo.
 3. Revisa la vista previa en el modal de importación.
 4. Confirma para aplicar cambios.
-
-![Placeholder — importación xlsx apartamentos](assets/manual/09-maestro-importacion-xlsx-placeholder.png)
-_Placeholder de captura: modal de importación con preview._
 
 ---
 
@@ -148,8 +130,8 @@ Estados posibles:
 - PMS desconectado + Google conectado: sincronización XLSX -> Google.
 - PMS desconectado + Google desconectado: exportación CSV desde XLSX.
 
-![Placeholder — sincronizador contactos](assets/manual/10-contactos-vista-general-placeholder.png)
-_Placeholder de captura: pantalla del sincronizador con chips de estado._
+![Sincronizar smoobu](assets/manual/stay-sidekick-sincronizador-contactos-light-mode-medium.png)
+_Botón y resultado de sincronización PMS._
 
 ### 9.5.2. Exportación CSV
 
@@ -157,18 +139,12 @@ _Placeholder de captura: pantalla del sincronizador con chips de estado._
 2. Pulsa **Descargar CSV**.
 3. El archivo se descarga con los contactos normalizados.
 
-![Placeholder — exportación csv contactos](assets/manual/11-contactos-export-csv-placeholder.png)
-_Placeholder de captura: acción de exportación CSV._
-
 ### 9.5.3. Sincronización con Google Contacts
 
 1. Verifica que Google está conectado desde Perfil.
 2. Define rango (PMS) o sube XLSX.
 3. Pulsa **Sincronizar con Google** / **Sincronizar PMS con Google**.
 4. Revisa alerta de resultado.
-
-![Placeholder — sync google contacts](assets/manual/12-contactos-sync-google-placeholder.png)
-_Placeholder de captura: sincronización con Google Contacts._
 
 ---
 
@@ -184,8 +160,8 @@ Flujo recomendado:
 4. Generar mensaje automáticamente o editarlo manualmente.
 5. Copiar mensaje final para enviarlo por el canal operativo.
 
-![Placeholder — notificaciones checkin tardío](assets/manual/13-notificaciones-checkin-placeholder.png)
-_Placeholder de captura: vista con plantillas y editor de mensaje._
+![Notificaciones checkin tardío](assets/manual/stay-sidekick-notificaciones-light-mode-medium.png)
+_Vista con plantillas y editor de mensaje._
 
 ---
 
