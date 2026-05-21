@@ -117,6 +117,9 @@
       width: 100%;
       height: auto;
     }
+
+    // Picture switching light/dark — solo una visible a la vez
+    &-img--dark { display: none; }
   }
 
   // ---------------------------------------------------------------------------
@@ -233,4 +236,17 @@
       margin-bottom: $space-3;
     }
   }
+}
+
+// Overrides para modo oscuro — invertir visibilidad de las dos pictures de
+// .web-page__screenshot. Selector fuera del bloque .web-page para no incurrir
+// en doble anidación con :root.dark / [data-theme="dark"].
+:root.dark .web-page__screenshot-img--light,
+[data-theme="dark"] .web-page__screenshot-img--light {
+  display: none;
+}
+
+:root.dark .web-page__screenshot-img--dark,
+[data-theme="dark"] .web-page__screenshot-img--dark {
+  display: block;
 }

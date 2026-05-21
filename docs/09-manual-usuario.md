@@ -32,7 +32,7 @@ Stay Sidekick es una aplicación web para operaciones de alquiler vacacional. Ce
 
 La aplicación se usa desde navegador y está diseñada para perfiles operativos y administradores de empresa.
 
-![Placeholder — pantalla de inicio de Stay Sidekick](assets/manual/01-login-portada-placeholder.png)
+![Placeholder — pantalla de inicio de Stay Sidekick](assets/manual/)
 _Placeholder de captura: pantalla de acceso a la aplicación._
 
 ---
@@ -99,8 +99,8 @@ Funciones visibles:
 - Paginación.
 - Acciones de alta, importación y sincronización (según permisos/estado).
 
-![Placeholder — listado de apartamentos](assets/manual/06-maestro-listado-placeholder.png)
-_Placeholder de captura: tabla principal del maestro._
+![Listado de apartamentos](assets/manual/stay-sidekick-maestro-apartamentos-light-mode-medium.png)
+_Tabla principal del maestro._
 
 ### 9.4.2. Alta manual y edición
 
@@ -253,8 +253,8 @@ Desde **Gestión de usuarios** puedes:
 - Resetear contraseña.
 - Eliminar usuario.
 
-![Placeholder — gestion usuarios](assets/manual/19-gestion-usuarios-placeholder.png)
-_Placeholder de captura: pantalla de administración de usuarios._
+![Gestion usuarios](assets/manual/stay-sidekick-gestion-usuarios-light-mode-medium.png)
+_Pantalla de administración de usuarios._
 
 ---
 

@@ -18,7 +18,7 @@ module.exports = {
     {
       label: "Producto",
       links: [
-        { text: "Funcionalidades", href: "#" },
+        { text: "Funcionalidades", href: "/producto/funcionalidades/" },
         { text: "Precios", href: "/precios/" },
       ],
     },
