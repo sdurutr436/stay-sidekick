@@ -3,12 +3,25 @@
 // Estilos para la página de inicio (index.njk).
 // =============================================================================
 
-// ── Hero ─────────────────────────────────────────────────────────────────────
 @use '../shared' as *;
 
+// ── Hero ─────────────────────────────────────────────────────────────────────
+// Estructura:
+//   .hero               — section full-width, position:relative, overflow:hidden
+//     .hero__bg         — capa de fondo (decorativa, aria-hidden) con carrusel
+//       .hero__bg-track--light / --dark   — tracks animados (uno visible por tema)
+//         .hero__bg-item                   — picture con captura small
+//     .hero__inner      — l-container con el contenido textual y CTAs
 .hero {
+  position: relative;
+  overflow: hidden;
   padding-block: $space-16;
   text-align: center;
+
+  &__inner {
+    position: relative;
+    z-index: 1;
+  }
 
   &__subtitle {
     margin-top: $space-4;
@@ -21,6 +34,70 @@
     margin-top: $space-8;
     justify-content: center;
   }
+
+  // ── Capa de fondo (carrusel animado) ───────────────────────────────────────
+  &__bg {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.25;
+    display: flex;
+    align-items: center;
+  }
+
+  // Cada track es una franja horizontal con las 10 capturas (5 duplicadas)
+  // que se desplaza de derecha a izquierda. Visibilidad por tema (CSS-only).
+  &__bg-track {
+    position: absolute;
+    inset-block: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
+    gap: $space-6;
+    width: max-content;
+    animation: hero-bg-slide 60s linear infinite;
+    will-change: transform;
+
+    &--dark { display: none; }
+  }
+
+  &__bg-item {
+    flex: 0 0 auto;
+    display: block;
+    width: clamp(220px, 28vw, 360px);
+    aspect-ratio: 640 / 327;
+    border: $border-width $border-style $color-border;
+    overflow: hidden;
+
+    img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    &__bg-track { animation: none; }
+  }
+}
+
+@keyframes hero-bg-slide {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); } // duplicamos la lista; -50% = 1 ciclo completo
+}
+
+// Overrides modo oscuro — invierte qué track está visible.
+:root.dark .hero__bg-track--light,
+[data-theme="dark"] .hero__bg-track--light {
+  display: none;
+}
+
+:root.dark .hero__bg-track--dark,
+[data-theme="dark"] .hero__bg-track--dark {
+  display: flex;
 }
 
 // ── Divisor de secciones ──────────────────────────────────────────────────────
@@ -57,6 +134,7 @@
     padding-bottom: $space-1;
     scrollbar-width: none;
     cursor: grab;
+    list-style: none;
 
     &:active {
       cursor: grabbing;
@@ -78,16 +156,44 @@
     }
   }
 
-  &__video-wrapper {
+  // Miniatura clickable: botón sin estilos por defecto que envuelve las dos
+  // <picture> light/dark. Al pulsar, el JS abre la variante big en lightbox.
+  &__thumb {
+    display: block;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    background: transparent;
     border: $border-width $border-style $color-border;
+    cursor: pointer;
     overflow: hidden;
+    aspect-ratio: 640 / 327;
+    position: relative;
+    transition: transform 150ms ease, border-color 150ms ease;
 
-    video {
+    &:hover,
+    &:focus-visible {
+      transform: translateY(-2px);
+      border-color: $color-text-primary;
+    }
+
+    &:focus-visible {
+      @include focus-ring;
+    }
+
+    &-img {
       display: block;
       width: 100%;
-      aspect-ratio: 16 / 9;
-      object-fit: cover;
-      background-color: $color-btn-ghost-bg-hover;
+      height: 100%;
+
+      img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      &--dark { display: none; }
     }
   }
 
@@ -96,6 +202,17 @@
     font-weight: 500;
     text-align: left;
   }
+}
+
+// Overrides modo oscuro — invierte qué picture es visible en cada thumb.
+:root.dark .tools-showcase__thumb-img--light,
+[data-theme="dark"] .tools-showcase__thumb-img--light {
+  display: none;
+}
+
+:root.dark .tools-showcase__thumb-img--dark,
+[data-theme="dark"] .tools-showcase__thumb-img--dark {
+  display: block;
 }
 
 // ── Clients ───────────────────────────────────────────────────────────────────
@@ -180,4 +297,107 @@
     color: $color-text-secondary;
     font-size: 0.875rem;
   }
+}
+
+// ── Lightbox (modal de captura ampliada) ──────────────────────────────────────
+// Activado por JS al pulsar una miniatura del showcase. Backdrop con blur,
+// imagen big centrada, light/dark vía el mismo patrón de pictures.
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $space-6;
+  background-color: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+
+  &[hidden] { display: none; }
+
+  &__close {
+    position: absolute;
+    top: $space-4;
+    right: $space-4;
+    width: 2.75rem;
+    height: 2.75rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    background: transparent;
+    border: $border-width $border-style rgba(255, 255, 255, 0.4);
+    color: #fff;
+    cursor: pointer;
+    border-radius: 999px;
+
+    &:hover,
+    &:focus-visible {
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    &:focus-visible {
+      @include focus-ring($color: #fff);
+    }
+  }
+
+  &__figure {
+    margin: 0;
+    max-width: min(1200px, 100%);
+    max-height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: $space-3;
+  }
+
+  &__image {
+    width: 100%;
+    max-height: calc(100vh - 8rem);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    picture {
+      display: block;
+      width: 100%;
+      height: 100%;
+
+      img {
+        display: block;
+        max-width: 100%;
+        max-height: calc(100vh - 8rem);
+        width: auto;
+        height: auto;
+        object-fit: contain;
+        border: $border-width $border-style rgba(255, 255, 255, 0.2);
+      }
+
+      &.lightbox__pic--dark { display: none; }
+    }
+  }
+
+  &__caption {
+    margin: 0;
+    color: #fff;
+    font-weight: 500;
+    text-align: center;
+  }
+}
+
+// Bloquea scroll del documento mientras el lightbox está abierto.
+.lightbox-open {
+  overflow: hidden;
+}
+
+// Overrides modo oscuro — invierte la picture visible dentro del lightbox.
+:root.dark .lightbox__image picture.lightbox__pic--light,
+[data-theme="dark"] .lightbox__image picture.lightbox__pic--light {
+  display: none;
+}
+
+:root.dark .lightbox__image picture.lightbox__pic--dark,
+[data-theme="dark"] .lightbox__image picture.lightbox__pic--dark {
+  display: block;
 }
