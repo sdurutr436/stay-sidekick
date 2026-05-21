@@ -47,9 +47,11 @@ durante el desarrollo.
 
 La validación manual sobre el despliegue gestionado en Railway sigue siendo parcial dentro de los
 resultados de este capítulo. El acceso público a `stay-sidekick.com` quedó restablecido al
-corregir la escucha del servicio al puerto `80` en lugar de `8080`, pero el envío SMTP continúa
-sin operar de forma estable en producción. Por ello, las comprobaciones consolidadas combinan
-entorno Docker local, suite automatizada de CI y verificaciones puntuales en el entorno publicado.
+corregir la escucha del servicio al puerto `80` en lugar de `8080`. El antiguo problema del envío
+SMTP en producción se resolvió migrando el servicio de correo a **Mailgun por HTTP con API key**,
+lo que elimina la dependencia de los puertos SMTP bloqueados por Railway. Las comprobaciones
+consolidadas combinan entorno Docker local, suite automatizada de CI y verificaciones puntuales
+en el entorno publicado.
 
 **Pruebas de regresión automatizadas vía CI**  
 La suite completa de pruebas automatizadas se ejecuta en cada *push* y *pull request* mediante
@@ -195,7 +197,7 @@ reglas de negocio y efectos laterales controlados mediante mocks:
 
 | Suite de servicio | Casos | Comportamiento validado |
 |---|---:|---|
-| `backend/tests/common/notifications/test_mail_service.py` | 19 | Composición del email, ausencia de configuración y errores del envío SMTP mockeado |
+| `backend/tests/common/notifications/test_mail_service.py` | 21 | Composición del email, ausencia de configuración y errores del envío HTTP a Mailgun mockeado |
 | `backend/tests/contact/test_service_contact.py` | 5 | Validación y tratamiento del servicio de contacto sin depender de la capa HTTP |
 | `backend/tests/solicitud/test_service_solicitud.py` | 7 | Flujo del servicio público de solicitud y control de reglas de negocio |
 | `backend/tests/usuarios/test_service_usuarios.py` | 4 | Reglas de servicio para gestión de usuarios y coherencia de resultados |
@@ -387,7 +389,8 @@ laterales relevantes.
 
 Los resultados de esta sección miden la calidad del código validada mediante tests automatizados y
 comprobaciones locales controladas. No equivalen a una certificación completa del despliegue en
-Railway, donde sigue pendiente la estabilización del envío SMTP en producción.
+Railway, pero el antiguo bloqueo del envío SMTP en producción dejó de aplicar tras migrar el
+servicio de correo a Mailgun por HTTP con API key.
 
 ### 7.4.1. Desglose por suite — Backend
 

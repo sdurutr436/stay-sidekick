@@ -1,18 +1,18 @@
-"""Servicio reutilizable de envío de correo transaccional vía SMTP.
+"""Servicio reutilizable de envío de correo transaccional vía Mailgun HTTP API.
 
-Usa ``smtplib`` + ``email`` de la librería estándar — sin dependencias extra.
-Toda la configuración (host, puerto, credenciales, From) se lee desde
-``current_app.config`` (poblada desde variables de entorno en :mod:`app.config`):
+Usa la API HTTP de Mailgun (``requests``) — sin SMTP. Toda la configuración
+se lee desde ``current_app.config`` (poblada desde variables de entorno en
+:mod:`app.config`):
 
-    MAIL_HOST       → servidor SMTP (p.ej. ``smtp.gmail.com``)
-    MAIL_PORT       → puerto SMTP (587 = STARTTLS)
-    MAIL_USER       → usuario que autentica el envío
-    MAIL_PASSWORD   → contraseña de aplicación
-    MAIL_FROM       → dirección visible en "From:" y destinatario de los
-                      formularios públicos (solicitud y contacto)
+    MAIL_GUN_API_KEY   → clave privada de la cuenta Mailgun
+    MAIL_GUN_DOMAIN    → dominio verificado en Mailgun (p.ej. ``stay-sidekick.com``)
+    MAIL_GUN_API_URL   → base de la API (``https://api.eu.mailgun.net`` ó
+                         ``https://api.mailgun.net``)
+    MAIL_FROM          → dirección visible en "From:" y destinatario de los
+                         formularios públicos (solicitud y contacto)
 
 Funciones públicas:
-    :func:`send_via_smtp`         — primitiva reutilizable
+    :func:`send_mail`             — primitiva reutilizable
     :func:`send_form_request`     — formulario de solicitud (alta)
     :func:`send_contact`          — formulario de contacto general
     :func:`send_welcome_company`  — bienvenida tras alta de empresa
@@ -22,82 +22,86 @@ Funciones públicas:
 from __future__ import annotations
 
 import logging
-import smtplib
-from email.message import EmailMessage
-from email.utils import formataddr
 from html import escape
 
+import requests
 from flask import current_app
 
 logger = logging.getLogger(__name__)
 
 _TIMEOUT = 10
 _FROM_DISPLAY_NAME = "Stay Sidekick"
+_DEFAULT_API_URL = "https://api.eu.mailgun.net"
 
 
-# ── Primitiva SMTP ────────────────────────────────────────────────────────
+# ── Primitiva Mailgun ─────────────────────────────────────────────────────
 
 
-def send_via_smtp(
+def send_mail(
     to: str,
     subject: str,
     body_text: str,
     body_html: str | None = None,
 ) -> tuple[bool, str | None]:
-    """Envía un email transaccional vía SMTP con STARTTLS.
+    """Envía un email transaccional vía Mailgun HTTP API.
 
     Devuelve ``(True, None)`` si el envío fue exitoso o
     ``(False, mensaje_error)`` si falló. Nunca lanza excepción al caller.
     """
     cfg = current_app.config
-    host = cfg.get("MAIL_HOST", "")
-    port = int(cfg.get("MAIL_PORT", 587) or 587)
-    user = cfg.get("MAIL_USER", "")
-    password = cfg.get("MAIL_PASSWORD", "")
-    mail_from = cfg.get("MAIL_FROM", "") or user
+    api_key = cfg.get("MAIL_GUN_API_KEY", "")
+    domain = cfg.get("MAIL_GUN_DOMAIN", "")
+    api_url = (cfg.get("MAIL_GUN_API_URL") or _DEFAULT_API_URL).rstrip("/")
+    mail_from = cfg.get("MAIL_FROM") or (f"noreply@{domain}" if domain else "")
 
-    if not host or not user or not password:
-        return False, "SMTP no configurado (MAIL_HOST / MAIL_USER / MAIL_PASSWORD)."
+    if not api_key or not domain:
+        return False, "Mailgun no configurado (MAIL_GUN_API_KEY / MAIL_GUN_DOMAIN)."
 
     if not to:
         return False, "Destinatario vacío."
 
-    msg = EmailMessage()
-    msg["Subject"] = subject
-    msg["From"] = formataddr((_FROM_DISPLAY_NAME, mail_from))
-    msg["To"] = to
-    msg.set_content(body_text)
+    data = {
+        "from": f"{_FROM_DISPLAY_NAME} <{mail_from}>",
+        "to": to,
+        "subject": subject,
+        "text": body_text,
+    }
     if body_html:
-        msg.add_alternative(body_html, subtype="html")
+        data["html"] = body_html
+
+    url = f"{api_url}/v3/{domain}/messages"
 
     try:
-        if port == 465:
-            with smtplib.SMTP_SSL(host, port, timeout=_TIMEOUT) as server:
-                server.login(user, password)
-                server.send_message(msg)
-        else:
-            with smtplib.SMTP(host, port, timeout=_TIMEOUT) as server:
-                server.ehlo()
-                server.starttls()
-                server.ehlo()
-                server.login(user, password)
-                server.send_message(msg)
-        return True, None
-    except (smtplib.SMTPException, OSError) as exc:
-        logger.exception("Error al enviar email vía SMTP")
+        response = requests.post(
+            url,
+            auth=("api", api_key),
+            data=data,
+            timeout=_TIMEOUT,
+        )
+    except requests.RequestException as exc:
+        logger.exception("Error al enviar email vía Mailgun")
         return False, f"Error al enviar el email: {exc}"
 
+    if not response.ok:
+        logger.error(
+            "Mailgun respondió %s al enviar a %s: %s",
+            response.status_code,
+            to,
+            response.text,
+        )
+        return False, f"Error al enviar el email: HTTP {response.status_code}"
 
-def _smtp_configured() -> bool:
+    return True, None
+
+
+def _mail_configured() -> bool:
     cfg = current_app.config
-    return bool(cfg.get("MAIL_USER") and cfg.get("MAIL_PASSWORD"))
+    return bool(cfg.get("MAIL_GUN_API_KEY") and cfg.get("MAIL_GUN_DOMAIN"))
 
 
 def _admin_recipient() -> str:
-    """Buzón al que llegan los formularios públicos: ``MAIL_FROM``
-    (configurado como Send As en la cuenta MAIL_USER de Gmail)."""
-    cfg = current_app.config
-    return cfg.get("MAIL_FROM") or cfg.get("MAIL_USER", "")
+    """Buzón al que llegan los formularios públicos (``MAIL_FROM``)."""
+    return current_app.config.get("MAIL_FROM", "") or ""
 
 
 # ── Plantillas HTML ───────────────────────────────────────────────────────
@@ -140,8 +144,8 @@ def _rows_html(rows: list[tuple[str, str]]) -> str:
 
 def send_form_request(clean_data: dict) -> bool:
     """Envía al admin la notificación de una nueva solicitud de empresa."""
-    if not _smtp_configured():
-        logger.warning("SMTP no configurado; no se enviará form_request.")
+    if not _mail_configured():
+        logger.warning("Mailgun no configurado; no se enviará form_request.")
         return False
 
     company = clean_data.get("company_name", "N/A")
@@ -169,7 +173,7 @@ def send_form_request(clean_data: dict) -> bool:
         + f'<p style="font-size:14px;margin-top:16px;"><strong>Mensaje:</strong><br>{escape(mensaje)}</p>',
     )
 
-    ok, _ = send_via_smtp(_admin_recipient(), subject, "\n".join(text_lines), html)
+    ok, _ = send_mail(_admin_recipient(), subject, "\n".join(text_lines), html)
     if ok:
         logger.info("form_request enviado para %s", company)
     return ok
@@ -180,8 +184,8 @@ def send_form_request(clean_data: dict) -> bool:
 
 def send_contact(clean_data: dict) -> bool:
     """Envía al admin el mensaje del formulario de contacto general."""
-    if not _smtp_configured():
-        logger.warning("SMTP no configurado; no se enviará contacto.")
+    if not _mail_configured():
+        logger.warning("Mailgun no configurado; no se enviará contacto.")
         return False
 
     nombre = clean_data.get("nombre", "N/A")
@@ -205,7 +209,7 @@ def send_contact(clean_data: dict) -> bool:
         + f'<p style="font-size:14px;margin-top:16px;"><strong>Mensaje:</strong><br>{escape(mensaje)}</p>',
     )
 
-    ok, _ = send_via_smtp(_admin_recipient(), subject, "\n".join(text_lines), html)
+    ok, _ = send_mail(_admin_recipient(), subject, "\n".join(text_lines), html)
     if ok:
         logger.info("contacto enviado de %s", email)
     return ok
@@ -214,30 +218,65 @@ def send_contact(clean_data: dict) -> bool:
 # ── Caso 3 — Bienvenida a nueva empresa ───────────────────────────────────
 
 
-def send_welcome_company(empresa_email: str, empresa_nombre: str) -> bool:
-    """Envía un correo de bienvenida al admin de la empresa recién creada."""
-    if not _smtp_configured():
-        logger.warning("SMTP no configurado; no se enviará bienvenida.")
+def send_welcome_company(
+    empresa_email: str,
+    empresa_nombre: str,
+    summary: list[tuple[str, str]] | None = None,
+) -> bool:
+    """Envía un correo de bienvenida al admin de la empresa recién creada.
+
+    ``summary`` permite adjuntar un resumen (lista de pares ``(etiqueta, valor)``)
+    que se renderiza como tabla en el cuerpo del correo.
+    """
+    if not _mail_configured():
+        logger.warning("Mailgun no configurado; no se enviará bienvenida.")
         return False
 
     subject = f"Bienvenida a Stay Sidekick, {empresa_nombre}"
-    text = (
-        f"Hola {empresa_nombre},\n\n"
-        "Tu cuenta de empresa en Stay Sidekick ha sido creada correctamente.\n"
-        "En breve recibirás un correo separado con las credenciales del primer\n"
-        "usuario administrador, incluida una contraseña temporal que deberás\n"
-        "cambiar en el primer inicio de sesión.\n\n"
-        "Si no esperabas este correo, ignóralo o contáctanos respondiendo a\n"
-        "este mensaje.\n\n"
-        "— El equipo de Stay Sidekick"
+
+    summary = summary or []
+    summary_text = (
+        "\n".join(f"  • {lbl}: {val}" for lbl, val in summary)
+        if summary
+        else ""
+    )
+    text_parts = [
+        f"Hola {empresa_nombre},",
+        "",
+        "Tu cuenta de empresa en Stay Sidekick ha sido creada correctamente.",
+    ]
+    if summary_text:
+        text_parts += ["", "Resumen de tu cuenta:", summary_text]
+    text_parts += [
+        "",
+        "En breve recibirás un correo separado con las credenciales del primer",
+        "usuario administrador, incluida una contraseña temporal que deberás",
+        "cambiar en el primer inicio de sesión.",
+        "",
+        "Si no esperabas este correo, ignóralo o contáctanos respondiendo a",
+        "este mensaje.",
+        "",
+        "— El equipo de Stay Sidekick",
+    ]
+    text = "\n".join(text_parts)
+
+    summary_html = (
+        '<h2 style="font-size:14px;margin:20px 0 8px 0;color:#0f172a;">Resumen de tu cuenta</h2>'
+        + _rows_html(summary)
+        if summary
+        else ""
     )
     html = _render_html(
         f"Bienvenida, {empresa_nombre}",
         '<p style="font-size:14px;line-height:1.6;">'
         "Tu cuenta de empresa en <strong>Stay Sidekick</strong> ha sido "
-        "creada correctamente. En breve recibirás un correo separado con las "
-        "credenciales del primer usuario administrador, incluida una "
-        "contraseña temporal que deberás cambiar en el primer inicio de sesión."
+        "creada correctamente."
+        "</p>"
+        + summary_html
+        + '<p style="font-size:14px;line-height:1.6;margin-top:16px;">'
+        "En breve recibirás un correo separado con las credenciales del "
+        "primer usuario administrador, incluida una contraseña temporal que "
+        "deberás cambiar en el primer inicio de sesión."
         "</p>"
         '<p style="font-size:14px;color:#6b7280;">'
         "Si no esperabas este correo, ignóralo o contáctanos respondiendo a "
@@ -245,7 +284,7 @@ def send_welcome_company(empresa_email: str, empresa_nombre: str) -> bool:
         "</p>",
     )
 
-    ok, _ = send_via_smtp(empresa_email, subject, text, html)
+    ok, _ = send_mail(empresa_email, subject, text, html)
     if ok:
         logger.info("welcome_company enviado a %s", empresa_email)
     return ok
@@ -260,8 +299,8 @@ def send_temp_password(usuario_email: str, password_temporal: str) -> bool:
     La contraseña ya viene en claro desde el servicio (se generó con
     ``secrets.token_urlsafe`` y se ha hasheado inmediatamente en BD).
     """
-    if not _smtp_configured():
-        logger.warning("SMTP no configurado; no se enviará contraseña temporal.")
+    if not _mail_configured():
+        logger.warning("Mailgun no configurado; no se enviará contraseña temporal.")
         return False
 
     subject = "Tu contraseña temporal de Stay Sidekick"
@@ -288,7 +327,7 @@ def send_temp_password(usuario_email: str, password_temporal: str) -> bool:
         "</p>",
     )
 
-    ok, _ = send_via_smtp(usuario_email, subject, text, html)
+    ok, _ = send_mail(usuario_email, subject, text, html)
     if ok:
         logger.info("temp_password enviado a %s", usuario_email)
     return ok

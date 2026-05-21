@@ -28,11 +28,13 @@ class Config:
         "https://challenges.cloudflare.com/turnstile/v0/siteverify",
     )
 
-    # SMTP transaccional (Gmail por defecto)
-    MAIL_HOST: str = os.environ.get("MAIL_HOST", "smtp.gmail.com")
-    MAIL_PORT: int = int(os.environ.get("MAIL_PORT", "587"))
-    MAIL_USER: str = os.environ.get("MAIL_USER", "")
-    MAIL_PASSWORD: str = os.environ.get("MAIL_PASSWORD", "")
+    # Correo transaccional vía Mailgun HTTP API
+    MAIL_GUN_API_KEY: str = os.environ.get("MAIL_GUN_API_KEY", "")
+    MAIL_GUN_DOMAIN: str = os.environ.get("MAIL_GUN_DOMAIN", "")
+    MAIL_GUN_API_URL: str = os.environ.get(
+        "MAIL_GUN_API_URL",
+        "https://api.eu.mailgun.net",
+    )
     MAIL_FROM: str = os.environ.get("MAIL_FROM", "")
 
     # Discord

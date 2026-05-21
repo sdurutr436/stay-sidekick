@@ -26,7 +26,7 @@ cd stay-sidekick
 
 # 2. Preparar los archivos de entorno
 cp .env.example .env                  # credenciales PostgreSQL — editar POSTGRES_PASSWORD
-cp backend/.env.example backend/.env  # claves Flask, JWT, SMTP, Discord…
+cp backend/.env.example backend/.env  # claves Flask, JWT, Mailgun, Discord…
 # web/.env ya está incluido con la site key de prueba de Turnstile
 
 # 3. Construir imágenes y arrancar
@@ -123,9 +123,10 @@ Guía paso a paso completa: [docs/railway_deployment.md](docs/railway_deployment
 | `SECRET_KEY` | Clave aleatoria Flask (mín. 32 chars) |
 | `JWT_SECRET_KEY` | Clave para firmar tokens JWT |
 | `TURNSTILE_SECRET_KEY` | Secret key de Cloudflare Turnstile |
-| `GMAIL_USER` | Cuenta Gmail para notificaciones |
-| `GMAIL_APP_PASSWORD` | Contraseña de aplicación Gmail (16 chars) |
-| `MAIL_RECIPIENT` | Correo que recibe los formularios |
+| `MAIL_GUN_API_KEY` | API key privada de Mailgun (envío por HTTP, no SMTP) |
+| `MAIL_GUN_DOMAIN` | Dominio verificado en Mailgun |
+| `MAIL_GUN_API_URL` | Base de la API de Mailgun (EU o US) |
+| `MAIL_FROM` | Correo que recibe los formularios y dirección visible en `From:` |
 | `DISCORD_WEBHOOK_URL` | Webhook de Discord (solicitudes empresa) |
 | `DISCORD_WEBHOOK_CONTACT_URL` | Webhook de Discord (contacto general) |
 | `FERNET_KEY` | Clave Fernet para cifrado de API keys en BD |

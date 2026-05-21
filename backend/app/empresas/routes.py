@@ -54,7 +54,16 @@ def crear_empresa_route():
         return jsonify({"ok": False, "errors": ["Ya existe una empresa con ese email."]}), 409
 
     try:
-        if not send_welcome_company(empresa.email, empresa.nombre):
+        created_at = getattr(empresa, "created_at", None)
+        summary = [
+            ("Nombre", empresa.nombre),
+            ("Email registrado", empresa.email),
+            (
+                "Fecha de creación",
+                created_at.strftime("%d/%m/%Y %H:%M UTC") if created_at else "",
+            ),
+        ]
+        if not send_welcome_company(empresa.email, empresa.nombre, summary=summary):
             logger.warning("No se pudo enviar el correo de bienvenida a %s", empresa.email)
     except Exception:
         logger.exception("Excepción inesperada al enviar bienvenida a %s", empresa.email)

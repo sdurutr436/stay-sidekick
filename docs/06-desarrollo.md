@@ -84,9 +84,11 @@ Las auditorias de accesibilidad y la validacion manual detectaron problemas no f
 
 En despliegue aparecieron errores 502 y navegacion inestable por varias causas acumuladas: arranque incompleto del contenedor Nginx en Railway, rutas sin barra final en la configuracion del proxy y una escucha incorrecta del servicio publico en el puerto `8080` cuando debia exponerse en el `80`. Se introdujo un `start.sh` especifico para Nginx en Railway, se unificaron las rutas con trailing slash para reducir redirecciones innecesarias y se corrigio la escucha al puerto `80`. Con ese ajuste, el acceso publico a `stay-sidekick.com` quedo estabilizado y el 502 asociado al dominio se dio por resuelto.
 
-### Restricciones SMTP del entorno gestionado
+### Restricciones SMTP del entorno gestionado y migracion a Mailgun
 
-El envio de correos transaccionales encontro limitaciones del proveedor de despliegue: Railway bloqueaba el puerto 587 en ciertos escenarios, lo que impedia usar la configuracion SMTP esperada. Se anadio soporte SSL/TLS alternativo en el servicio de correo y se probaron ajustes de configuracion para adaptarse al entorno, pero el envio SMTP en produccion tampoco quedo resuelto de forma estable y se documenta como limitacion pendiente del despliegue.
+El envio de correos transaccionales encontro limitaciones del proveedor de despliegue: Railway bloqueaba el puerto 587 en ciertos escenarios, lo que impedia usar la configuracion SMTP esperada con Gmail. Se anadio soporte SSL/TLS alternativo en el servicio de correo y se probaron ajustes de configuracion para adaptarse al entorno, pero el envio SMTP en produccion no quedo resuelto de forma estable.
+
+La solucion definitiva fue abandonar SMTP y migrar a **Mailgun via HTTP API con API key**. El servicio de correo ahora hace un `POST` autenticado contra `https://api.eu.mailgun.net/v3/<MAIL_GUN_DOMAIN>/messages` (o la region US segun `MAIL_GUN_API_URL`) usando `MAIL_GUN_API_KEY` como credencial, lo que elimina por completo la dependencia de puertos SMTP salientes y la app password de Gmail. La configuracion se reduce a tres variables (`MAIL_GUN_API_KEY`, `MAIL_GUN_DOMAIN`, `MAIL_GUN_API_URL`) mas `MAIL_FROM`, y el modulo de envio paso de `smtplib` a `requests`.
 
 ### Convivencia JWT + CSRF en SPA
 
@@ -160,7 +162,7 @@ Evidencias verificables del flujo en historial:
 - `ddefdd7`: `merge: dev-mail-service -> dev-herramientas`, integrando un servicio de correo reutilizable antes de consolidarlo en ramas superiores.
 - `9973356`: `merge: dev-herramientas -> main`, llevando a principal la refactorizacion API REST, ajustes de roles y mejoras de notificaciones y Swagger.
 - `28afe36`: `merge: dev-herramientas -> main`, consolidando cambios de DevOps, headers Nginx, endurecimiento de contenedores y CI con PostgreSQL.
-- `b87a427`: `merge: dev-herramientas -> main`, agrupando ajustes de `start.sh` para Railway y pruebas de soporte SSL para SMTP.
+- `b87a427`: `merge: dev-herramientas -> main`, agrupando ajustes de `start.sh` para Railway y pruebas de soporte SSL para SMTP (sustituido despues por la migracion a Mailgun HTTP API).
 - `88daebb`: `merge: dev-herramientas -> main`, incorporando fixes de rutas Nginx y nuevas correcciones de accesibilidad.
 
 Automatizacion de versionado y calidad:
@@ -175,7 +177,7 @@ Automatizacion de versionado y calidad:
 ## 6.5. Fragmentos de codigo relevantes
 
 Los siguientes fragmentos se seleccionaron comprobando su presencia en las ramas activas `main` y `dev-herramientas`.
-Se excluyen de esta seleccion los fragmentos ligados al envio SMTP en produccion, porque esa parte del sistema quedo como limitacion pendiente y no como comportamiento consolidado.
+El envio SMTP que en su dia quedo pendiente se reemplazo por la integracion con Mailgun (HTTP + API key), por lo que esa parte ya forma parte del comportamiento consolidado y no se excluye de la seleccion.
 
 ### 1) Login protegido con CSRF y rate limit
 

@@ -17,7 +17,7 @@ from app.h_maestro_apartamentos import repository as apt_repo
 from app.perfil import repository as perfil_repo
 from app.common.col_utils import col_letra_a_indice
 from app.common.crypto import decrypt
-from app.common.notifications.mail_service import send_via_smtp
+from app.common.notifications.mail_service import send_mail
 from app.common.xlsx_reservas import parse_xlsx_reservas
 from app.normalizador_pms.factory import build_pms_client
 
@@ -31,14 +31,14 @@ def get_status(empresa_id: str, fecha: str | None = None) -> dict:
     """Devuelve el estado de la herramienta para la empresa.
 
     Incluye:
-    - Si SMTP está configurado (MAIL_USER + MAIL_PASSWORD).
+    - Si el envío de correo está configurado (Mailgun).
     - Si hay PMS configurado y las reservas de check-in de hoy.
     - Lista de apartamentos activos del maestro.
     - hora_corte configurada para la empresa.
     """
-    gmail_ok = bool(
-        current_app.config.get("MAIL_USER")
-        and current_app.config.get("MAIL_PASSWORD")
+    mail_ok = bool(
+        current_app.config.get("MAIL_GUN_API_KEY")
+        and current_app.config.get("MAIL_GUN_DOMAIN")
     )
 
     apts = apt_repo.list_by_empresa(empresa_id)
@@ -80,7 +80,7 @@ def get_status(empresa_id: str, fecha: str | None = None) -> dict:
                 pms_error = "No se pudieron cargar las reservas del PMS."
 
     return {
-        "gmail_configurado": gmail_ok,
+        "mail_configurado": mail_ok,
         "pms_configurado": pms_configurado,
         "pms_error": pms_error,
         "apartamentos": apartamentos,
@@ -145,8 +145,8 @@ def parse_checkins_xlsx(
 def enviar_notificacion(
     destinatario: str, asunto: str, mensaje: str
 ) -> tuple[bool, str | None]:
-    """Envía un email de notificación vía Gmail SMTP."""
-    ok, error = send_via_smtp(destinatario, asunto, mensaje)
+    """Envía un email de notificación vía Mailgun."""
+    ok, error = send_mail(destinatario, asunto, mensaje)
     if ok:
         logger.info(
             "Notificación check-in tardío enviada a '%s' (asunto: '%s')",
