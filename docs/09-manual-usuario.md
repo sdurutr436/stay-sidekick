@@ -32,6 +32,9 @@ Stay Sidekick es una aplicación web para operaciones de alquiler vacacional. Ce
 
 La aplicación se usa desde navegador y está diseñada para perfiles operativos y administradores de empresa.
 
+![Pantalla de inicio de Stay Sidekick](assets/manual/09-menu-login.png)
+_Pantalla de acceso a la aplicación._
+
 ---
 
 ## 9.2. Primeros pasos
@@ -42,8 +45,8 @@ La aplicación se usa desde navegador y está diseñada para perfiles operativos
 2. Pulsa **Iniciar sesión** desde la cabecera del sitio.
 3. Se abrirá la pantalla de login.
 
-![Placeholder — acceso desde cabecera pública](assets/manual/login.png)
-_Placeholder de captura: botón de acceso desde la web pública._
+![Acceso desde cabecera pública](assets/manual/09-menu-login.png)
+_Pantalla de acceso desde la web pública._
 
 ### 9.2.2. Inicio de sesión
 
@@ -61,6 +64,9 @@ En cuentas con marca de seguridad activa, tras autenticarte se redirige a **/cam
 2. Introduce y confirma la nueva contraseña.
 3. Guarda cambios para continuar al panel.
 
+![Cambio de contraseña](assets/manual/09-menu-cambio-contrasena.png)
+_Pantalla de cambio de contraseña obligatoria._
+
 ---
 
 ## 9.3. Panel principal (Mis herramientas)
@@ -72,7 +78,7 @@ Después de iniciar sesión llegas al panel principal:
 - Tarjetas de acceso rápido a cada módulo.
 - En cuentas nuevas, bloque de **Primeros pasos** con enlaces directos a Perfil.
 
-![Placeholder — dashboard mis herramientas](assets/manual/stay-sidekick-dashboard-light-mode-medium.png)
+![Dashboard mis herramientas](assets/manual/09-dashboard.png)
 _Panel principal con tarjetas y estado de integraciones._
 
 ---
@@ -90,7 +96,7 @@ Funciones visibles:
 - Paginación.
 - Acciones de alta, importación y sincronización (según permisos/estado).
 
-![Listado de apartamentos](assets/manual/stay-sidekick-maestro-apartamentos-light-mode-medium.png)
+![Listado de apartamentos](assets/manual/09-maestro-apartamentos.png)
 _Tabla principal del maestro._
 
 ### 9.4.2. Alta manual y edición
@@ -100,6 +106,9 @@ _Tabla principal del maestro._
 3. Usa **Guardar cambios** para persistir.
 4. Para editar registros existentes, selecciona la fila y aplica cambios.
 
+![Alta manual apartamento](assets/manual/09-maestro-apartamentos-alta-manual.png)
+_Alta fila de creación/edición en tabla CRUD._
+
 ### 9.4.3. Sincronización con Smoobu
 
 Si hay PMS activo:
@@ -108,12 +117,18 @@ Si hay PMS activo:
 2. Espera el resultado.
 3. Revisa el aviso de éxito/error en la alerta superior.
 
+![Sincronizar smoobu](assets/manual/09-maestro-apartamentos-sincronizacion.png)
+_Botón y resultado de sincronización PMS. No PMS conectado, da error._
+
 ### 9.4.4. Importación por XLSX
 
 1. Pulsa **Importar XLSX**.
 2. Selecciona el archivo.
 3. Revisa la vista previa en el modal de importación.
 4. Confirma para aplicar cambios.
+
+![Importación xlsx apartamentos](assets/manual/09-importacion-xlsx.png)
+_Placeholder de captura: modal de importación con preview._
 
 ---
 
@@ -130,8 +145,8 @@ Estados posibles:
 - PMS desconectado + Google conectado: sincronización XLSX -> Google.
 - PMS desconectado + Google desconectado: exportación CSV desde XLSX.
 
-![Sincronizar smoobu](assets/manual/stay-sidekick-sincronizador-contactos-light-mode-medium.png)
-_Botón y resultado de sincronización PMS._
+![Sincronizador contactos](assets/manual/09-sincronizador-contactos-general.png)
+_Pantalla del sincronizador con chips de estado. Sin PMS ni Google._
 
 ### 9.5.2. Exportación CSV
 
@@ -160,7 +175,7 @@ Flujo recomendado:
 4. Generar mensaje automáticamente o editarlo manualmente.
 5. Copiar mensaje final para enviarlo por el canal operativo.
 
-![Notificaciones checkin tardío](assets/manual/stay-sidekick-notificaciones-light-mode-medium.png)
+![Notificaciones checkin tardío](assets/manual/09-notificaciones-tardias.png)
 _Vista con plantillas y editor de mensaje._
 
 ---
@@ -176,11 +191,11 @@ Flujo de uso:
 3. Pulsa **Generar mapa de calor**.
 4. Revisa la cuadrícula de intensidad en la sección **Resultados**.
 
-![Placeholder — mapa de calor configuracion](assets/manual/14-mapa-calor-config-placeholder.png)
-_Placeholder de captura: panel de configuración y subida de ficheros._
+![Mapa de calor configuracion](assets/manual/09-mapa-calor-perfil-config.png)
+_Panel de configuración y subida de ficheros._
 
-![Placeholder — mapa de calor resultados](assets/manual/15-mapa-calor-resultados-placeholder.png)
-_Placeholder de captura: rejilla de resultados del mapa de calor._
+![Mapa de calor resultados](assets/manual/09-mapa-calor.png)
+_Rejilla de resultados del mapa de calor._
 
 ---
 
@@ -196,11 +211,11 @@ Acciones principales:
 - Mejorar redacción con IA.
 - Traducir contenido a otro idioma.
 
-![Placeholder — vault comunicaciones listado](assets/manual/16-vault-listado-placeholder.png)
-_Placeholder de captura: listado de plantillas del vault._
+![Vault de comunicaciones - Mensaje previo](assets/manual/09-vault-mensaje-previo.png)
+_Plantilla creada antes de la mejora con IA._
 
-![Placeholder — vault asistente IA](assets/manual/17-vault-ia-placeholder.png)
-_Placeholder de captura: mejora/traducción asistida por IA._
+![Placeholder — vault asistente IA](assets/manual/09-vault-mejora-mensaje.png)
+_Mejora/traducción asistida por IA._
 
 ---
 
@@ -216,8 +231,8 @@ Desde **Perfil** puedes:
 - Conectar/desconectar Google Contacts.
 - Ajustar configuración XLSX y parámetros funcionales por empresa.
 
-![Placeholder — perfil integraciones](assets/manual/18-perfil-integraciones-placeholder.png)
-_Placeholder de captura: sección de integraciones en perfil._
+![Perfil integraciones](assets/manual/09-seccion-integraciones.png)
+_Sección de integraciones en perfil._
 
 ### Gestión de usuarios (admin/superadmin)
 
@@ -229,8 +244,11 @@ Desde **Gestión de usuarios** puedes:
 - Resetear contraseña.
 - Eliminar usuario.
 
-![Gestion usuarios](assets/manual/stay-sidekick-gestion-usuarios-light-mode-medium.png)
+![Tabla gestion usuarios](assets/manual/09-tabla-gestion-usuarios.png)
 _Pantalla de administración de usuarios._
+
+![Modal de gestion de usuarios](assets/manual/09-modal-administracion-usuarios.png)
+_Modal de administración de usuarios._
 
 ---
 
@@ -297,8 +315,7 @@ La gestión de usuarios está limitada por rol (admin/superadmin). Si tu rol no 
 **Las funciones de IA no responden en Vault.**  
 Comprueba estado de configuración IA en Perfil y límites de uso diarios. Si el proveedor externo falla, reintenta más tarde.
 
+**No puedo refinar una plantilla nada más crearla**
+Primero deberás guardarla. El editor es el mismo para la traducción, pero mientras no esté guardada no dejará hacer nada con ella más que editarla a mano.
+
 ---
-
-## Nota sobre capturas (placeholders)
-
-Este documento incluye placeholders de imagen en `assets/manual/` para mantener la estructura de entrega aunque todavía no estén todas las capturas definitivas. Sustituye cada placeholder por su captura real manteniendo el mismo nombre de archivo para no tener que editar el manual.
