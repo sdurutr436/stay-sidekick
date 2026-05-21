@@ -23,13 +23,18 @@
 
 ---
 
-Stay Sidekick es una plataforma web para equipos de alojamiento turístico que agrupa, en un mismo stack, una landing pública, un panel de trabajo privado y una API REST para operaciones como gestión de solicitudes, herramientas multiempresa, sincronización de contactos y automatizaciones de apoyo.
+Stay Sidekick es una plataforma web full-stack **multiempresa** para equipos de alojamiento turístico que funciona como **capa satélite** a los PMS existentes (Smoobu, Beds24, KrossBooking…). Reúne en un mismo stack una landing pública (**11ty**), un panel privado (**Angular 21**) y una API REST (**Flask**) que cubren tareas operativas que los PMS no resuelven de forma suficiente: maestro de apartamentos, mapa de calor operativo, notificaciones de check-in tardío, sincronización con Google Contacts y vault de comunicaciones asistido por IA. Todo el stack se contenedoriza con **Docker Compose** y se despliega en producción en [stay-sidekick.com](https://stay-sidekick.com).
 
-- Producción pública: [stay-sidekick.up.railway.app](https://stay-sidekick.up.railway.app)
-- Imágenes publicadas: [Docker Hub - sdurutr436](https://hub.docker.com/u/sdurutr436)
+El proyecto nace de una experiencia profesional directa: **2 años y 5 meses** como recepcionista en una empresa gestora de apartamentos turísticos. En ese periodo se detectó que el inicio y el final de cada jornada se consumían en tareas repetitivas distribuidas entre PMS, Google y Excel — fricción compartida por distintos compañeros en rotación. De aquel diagnóstico surgieron primero un prototipo en **JavaFX** y después una versión **MERN** que, pese a su carácter básico, sigue en uso real hoy. Stay Sidekick es la evolución de ese recorrido: no sustituye al PMS, lo complementa y se adapta a la operativa concreta de cada empresa.
+
+Técnicamente, el sistema sigue una arquitectura **multi-tenant** real con seguridad por capas (JWT HS256, CSRF *double-submit cookie*, BCrypt, rate limiting, CORS por orígenes y enfoque RGPD por defecto en datos de huéspedes) y calidad verificable: **92 tests de backend** (Python/pytest) y **297 tests de frontend** (Angular/Vitest), con umbral mínimo del 90 % de cobertura en la SPA. Pipeline **CI/CD** con GitHub Actions (lint, tests, build, publicación en Docker Hub y auditoría Trivy semanal), despliegue gestionado en **Railway** con HTTPS terminado en su *edge*, y cumplimiento normativo (RGPD, LSSI-CE, WCAG 2.1 AA).
+
+- Producción pública: [stay-sidekick.com](https://stay-sidekick.com) · espejo en [stay-sidekick.up.railway.app](https://stay-sidekick.up.railway.app)
+- Imágenes publicadas: [Docker Hub — sdurutr436](https://hub.docker.com/u/sdurutr436)
 
 ## Índice
 
+- [Vistazo del producto](#vistazo-del-producto)
 - [Qué incluye](#qué-incluye)
 - [Características principales](#características-principales)
   - [Maestro de apartamentos](#maestro-de-apartamentos)
@@ -46,8 +51,31 @@ Stay Sidekick es una plataforma web para equipos de alojamiento turístico que a
 - [Arquitectura](#arquitectura)
 - [Inicio rápido](#inicio-rápido)
 - [Estructura del proyecto](#estructura-del-proyecto)
+- [Tests y análisis de código](#tests-y-análisis-de-código)
+- [CI/CD](#cicd)
+- [HTTPS](#https)
 - [Documentación](#documentación)
+- [Licencia](#licencia)
 - [Colaboración y mantenimiento](#colaboración-y-mantenimiento)
+
+## Vistazo del producto
+
+<div align="center">
+  <img src="docs/assets/manual/09-dashboard.png" alt="Dashboard de Stay Sidekick — catálogo de herramientas operativas por empresa" width="900"/>
+  <br/>
+  <em>Panel principal — catálogo de herramientas activadas por empresa, con estado de las integraciones externas.</em>
+</div>
+
+<table>
+  <tr>
+    <td align="center" width="50%"><img src="docs/assets/manual/09-mapa-calor.png" alt="Mapa de calor operativo de Stay Sidekick" width="100%"/></td>
+    <td align="center" width="50%"><img src="docs/assets/manual/09-vault-mejora-mensaje.png" alt="Vault de comunicaciones con asistente IA" width="100%"/></td>
+  </tr>
+  <tr>
+    <td align="center"><em>Mapa de calor operativo — entradas y salidas diarias con umbrales configurables por empresa.</em></td>
+    <td align="center"><em>Vault de comunicaciones — plantillas por categoría e idioma con asistente IA opcional para mejora y traducción.</em></td>
+  </tr>
+</table>
 
 ## Qué incluye
 
@@ -161,6 +189,16 @@ graph TD
 
 Una petición autenticada recorre el siguiente camino: el cliente envía la solicitud HTTP al puerto 80 del host, donde **nginx** actúa como proxy inverso y la enruta según el prefijo — `/api/*` se redirige al **backend** Flask (Gunicorn en puerto 5000), que consulta **PostgreSQL** (puerto 5432) y devuelve una respuesta JSON. nginx reenvía esa respuesta al cliente. El resto de rutas sirven la SPA Angular (`/menu/*`) o el sitio estático 11ty (`/*`). Todo el tráfico entre servicios circula por la red interna `app-net`; el único puerto expuesto al host es el 80.
 
+| Servicio   | Imagen / build         | Puerto host | Rol                                                |
+| ---------- | ---------------------- | :---------: | -------------------------------------------------- |
+| `nginx`    | `./nginx` (nginx:alpine) | `80`       | Reverse proxy + cabeceras de seguridad (CSP, HSTS…) |
+| `frontend` | `./frontend`           | —           | Angular 21 SPA servida por nginx interno (`/menu/*`) |
+| `web`      | `./web`                | —           | Sitio estático 11ty servido por nginx interno (`/*`) |
+| `backend`  | `./backend`            | —           | API REST Flask + Gunicorn (`/api/*`)                |
+| `postgres` | `postgres:16-alpine`   | —           | Persistencia (volumen `postgres_data` + seed inicial) |
+
+Sólo `nginx` publica un puerto al host. El resto de servicios viven en la red Docker interna `app-net` y se comunican por nombre de servicio. En **Railway** se usa la variante `nginx.railway.conf` (activada por `RAILWAY=true`), que resuelve los hostnames internos `.railway.internal` con TTL bajo para evitar IPs caducadas tras redespliegues.
+
 ## Inicio rápido
 
 ### Prerrequisitos
@@ -202,7 +240,7 @@ npm run dev:web        # cd web && npm start
 # App Angular
 npm run dev:app        # cd frontend && npm start
 
-# Backend Flask (ver docs/backend/VENV_SETUP.md)
+# Backend Flask
 cd backend && python run.py
 ```
 
@@ -264,6 +302,32 @@ docker compose down -v           # parar, eliminar contenedores Y la base de dat
 
 > Estas credenciales son solo para entorno local. En producción, generar credenciales nuevas.
 
+### Variables de entorno
+
+El stack se configura mediante tres ficheros `.env` (`.env` raíz, `backend/.env`, `web/.env`), todos versionados como `.env.example`. Resumen de las variables más relevantes:
+
+| Variable                  | Fichero        | Obligatoria      | Descripción                                                          |
+| ------------------------- | -------------- | :--------------: | -------------------------------------------------------------------- |
+| `POSTGRES_DB/USER/PASSWORD` | `.env`       | sí (prod)        | Credenciales BD (cambiar `POSTGRES_PASSWORD` antes de producción)    |
+| `DATABASE_URL`            | `.env`         | sí               | URI de conexión completa (en Railway: `${{ Postgres.DATABASE_URL }}`) |
+| `TURNSTILE_SITE_KEY`      | `.env` / `web/.env` | no (default test key) | Site key Cloudflare Turnstile (anti-spam del formulario público) |
+| `SECRET_KEY`              | `backend/.env` | **sí**           | Clave principal de Flask (≥ 32 caracteres aleatorios)                |
+| `JWT_SECRET_KEY`          | `backend/.env` | **sí**           | Firma HS256 de los JWT del panel                                     |
+| `JWT_ACCESS_TOKEN_HOURS`  | `backend/.env` | no               | TTL del token de acceso (default `1`)                                |
+| `FERNET_KEY`              | `backend/.env` | **sí**           | Clave Fernet para cifrar API keys de PMS/IA almacenadas en BD        |
+| `TURNSTILE_SECRET_KEY`    | `backend/.env` | no               | Verificación server-side del challenge de Turnstile                  |
+| `MAIL_GUN_API_KEY/DOMAIN/API_URL` | `backend/.env` | no       | Envío transaccional vía API HTTP de Mailgun (sin SMTP)               |
+| `MAIL_FROM`               | `backend/.env` | no               | Remitente visible y destinatario de los formularios públicos         |
+| `GOOGLE_CLIENT_ID/SECRET` | `backend/.env` | no               | OAuth 2.0 Google People API (sincronizador de contactos)             |
+| `GOOGLE_REDIRECT_URI`     | `backend/.env` | no               | Callback OAuth registrado en Google Cloud                            |
+| `DISCORD_WEBHOOK_*`       | `backend/.env` | no               | Webhooks de Discord para solicitudes, contacto y operaciones         |
+| `AI_DEFAULT_PROVIDER/MODEL/API_KEY` | `backend/.env` | no     | Proveedor IA por defecto (`gemini`/`openai`/`claude`) + free tier    |
+| `AI_FREE_LIMIT_DAILY/WEEKLY` | `backend/.env` | no             | Límites del free tier compartido por empresa                         |
+| `SMOOBU_API_KEY`          | `backend/.env` | no               | Integración API REST del PMS de referencia                           |
+| `RATE_LIMIT_CONTACT`      | `backend/.env` | no               | Rate limit del formulario público (default `5/hour`)                 |
+
+> Plantillas completas y comentadas en [.env.example](.env.example), [backend/.env.example](backend/.env.example) y [web/.env.example](web/.env.example).
+
 ## Estructura del proyecto
 
 ```
@@ -304,6 +368,64 @@ tfg-alberti/
 └── dev.bat                 # Inicio rápido Windows
 ```
 
+## Tests y análisis de código
+
+La estrategia de pruebas combina **integración HTTP** (backend) y **unitarias** (servicios de backend, servicios y componentes de frontend), con análisis estático en CI antes de ejecutar tests.
+
+### Backend — Python / pytest
+
+```bash
+cd backend
+python -m pytest tests/ -v
+```
+
+- **92 casos** repartidos en **12 archivos de test**: 7 suites de integración HTTP (`auth`, `empresas`, `usuarios`, `perfil`, `vault`, `apartamentos`, `heatmap`) y 5 suites unitarias de servicio (`mail_service`, `contact`, `solicitud`, `usuarios`, `export_csv`).
+- Cada blueprint Flask se instancia de forma aislada con un JWT HS256 firmado de prueba; las dependencias externas (BD, PMS, IA) se sustituyen con `unittest.mock.patch` para que los tests sean rápidos y deterministas.
+- Lint con **ruff** (`ruff check backend/app`) ejecutado como paso previo a los tests en CI.
+
+### Frontend — Angular / Vitest
+
+```bash
+cd frontend
+npm ci
+npx ng test --watch=false
+```
+
+- **297 tests** en **38 specs** (servicios, organismos, moléculas, átomos, guards e interceptor HTTP).
+- Cobertura **Istanbul** con umbral mínimo **90 %** en sentencias, ramas, funciones y líneas — definido en `frontend/vitest.config.ts`. Cualquier *pull request* que baje de ese umbral hace fallar el pipeline.
+- Informe generado en `frontend/coverage/` (formatos `text`, `html` y `lcov`) y subido como artefacto de CI con 14 días de retención.
+
+### Auditoría de seguridad
+
+- **Trivy** (`trivy.yml`) escanea filesystem e IaC en cada *push* a `main`, en *pull requests*, semanalmente (lunes 04:23 UTC) y bajo demanda. Filtra severidades **HIGH/CRITICAL**, publica SARIF en *GitHub Security* y conserva el artefacto 14 días.
+
+Detalle completo de la metodología, casos por suite y resultados: [docs/07-pruebas.md](docs/07-pruebas.md).
+
+## CI/CD
+
+El repositorio dispone de **seis workflows** de validación, publicación y seguridad. Las insignias del estado se muestran al inicio de este README.
+
+| Workflow | Disparador | Stack | Acción principal |
+| --- | --- | --- | --- |
+| [`ci-python.yml`](.github/workflows/ci-python.yml) | Push/PR a `dev-herramientas`, `main` | Python 3.12 + pytest | Lint con `ruff` + tests con `postgres:16-alpine` como service container |
+| [`ci-angular-tests.yml`](.github/workflows/ci-angular-tests.yml) | Push/PR a `dev-herramientas`, `main` | Node 22 + Vitest | Tests con cobertura + artefacto + build de producción de verificación |
+| [`ci-angular.yml`](.github/workflows/ci-angular.yml) | Push/PR a `dev-herramientas`, `main` | Node 22 + Angular CLI | Build de producción de la SPA |
+| [`ci-web.yml`](.github/workflows/ci-web.yml) | Push/PR a `dev-herramientas`, `main` | Node 22 + 11ty | Build del sitio estático |
+| [`docker-publish.yml`](.github/workflows/docker-publish.yml) | Tras éxito de los 3 CI en el mismo SHA | Docker + GitHub API | Publica 4 imágenes (`backend`, `frontend`, `web`, `nginx`) en Docker Hub con tags `sha-<corto>`, `main` y `latest` |
+| [`trivy.yml`](.github/workflows/trivy.yml) | PR/Push a `main`, semanal, manual | Trivy + SARIF | Escaneo de vulnerabilidades y misconfiguraciones, publicación en GitHub Security |
+
+El pipeline de publicación es **condicional**: `docker-publish.yml` solo construye y empuja las imágenes cuando los tres CI (`CI Python`, `CI Angular`, `CI 11ty`) han finalizado con éxito sobre el mismo *commit*. Un job previo `verificar` consulta la API de GitHub y aborta la publicación si alguno está aún en progreso o ha fallado.
+
+## HTTPS
+
+El despliegue local sirve **HTTP** sobre `localhost:80`, ya que está pensado para entorno de desarrollo.
+
+En **producción**, el TLS lo termina **Railway en su edge** automáticamente sobre el dominio público asignado al servicio `nginx`. Internamente, `nginx` sigue escuchando únicamente en `:80` (configuración `nginx.railway.conf`), por lo que **no gestiona certificados ni escucha en `:443`**. El cifrado, la redirección 80→443 y la renovación periódica del certificado se delegan completamente a Railway, evitando hornear `certbot` dentro del contenedor.
+
+Cabeceras de seguridad (HSTS, CSP estricta, `X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`…) sí se aplican desde `nginx` (`nginx.conf` y `nginx.railway.conf`) sobre todas las respuestas, independientemente de quién termine TLS.
+
+> **Cloudflare en este proyecto solo se usa como Turnstile** (anti-spam del formulario público de contacto y solicitud de empresa); no actúa como CDN ni termina TLS. La capa anti-abuso del formulario se completa con un campo *honeypot* oculto y *rate limiting* por IP en el backend.
+
 ## Documentación
 
 | Documento | Contenido |
@@ -312,9 +434,19 @@ tfg-alberti/
 | [docs/01-introduccion.md](docs/01-introduccion.md) a [docs/10-conclusiones.md](docs/10-conclusiones.md) | Memoria técnica principal del proyecto |
 | [docs/DESARROLLO.md](docs/DESARROLLO.md) | Guía de entorno y flujo de trabajo |
 | [docs/backend/DEPENDENCIAS.md](docs/backend/DEPENDENCIAS.md) | Dependencias del backend y justificación |
-| [docs/backend/VENV_SETUP.md](docs/backend/VENV_SETUP.md) | Entorno virtual Python |
-| [docs/design/decisiones_disenio.md](docs/design/decisiones_disenio.md) | Decisiones de diseño y arquitectura |
 | [docs/propuesta_formal/propuesta_formal_sergio_duran_2DAW.md](docs/propuesta_formal/propuesta_formal_sergio_duran_2DAW.md) | Propuesta formal del proyecto |
+
+### Diseño UI/UX (Figma)
+
+| Recurso | Enlace |
+| --- | --- |
+| Fichero principal (wireframes + mockups) | [Ver en Figma](https://www.figma.com/design/6qsTtmTkH9XwydWiHdKtGv/Dise%C3%B1o?node-id=0-1&t=PsTLXvWAzzjkZTdo-1) |
+
+## Licencia
+
+Este proyecto se distribuye bajo licencia **MIT** — ver [LICENSE](LICENSE) para el texto íntegro.
+
+© 2026 Sergio Durán. Este repositorio contiene el Trabajo de Fin de Ciclo del CFGS de Desarrollo de Aplicaciones Web. Se permite el uso, copia, modificación y distribución del código en los términos de la licencia MIT, citando al autor.
 
 ## Colaboración y mantenimiento
 
