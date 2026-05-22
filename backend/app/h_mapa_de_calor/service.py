@@ -98,16 +98,18 @@ def generar_desde_pms(
         logger.error("Error al obtener reservas del PMS para heatmap [empresa=%s]: %s", empresa_id, exc, exc_info=True)
         return None, "Error al obtener datos del PMS. Inténtalo de nuevo."
 
+    # Excluir cancelaciones. Smoobu marca las canceladas con tipo='cancellation';
+    # las reservas normales llegan con tipo=None (no etiquetadas).
     checkins: dict[str, int] = {}
     for r in reservas_checkin:
-        if r.tipo != "reservation":
+        if r.tipo == "cancellation":
             continue
         if r.checkin:
             checkins[r.checkin] = checkins.get(r.checkin, 0) + 1
 
     checkouts: dict[str, int] = {}
     for r in reservas_checkout:
-        if r.tipo != "reservation":
+        if r.tipo == "cancellation":
             continue
         if r.checkout:
             checkouts[r.checkout] = checkouts.get(r.checkout, 0) + 1

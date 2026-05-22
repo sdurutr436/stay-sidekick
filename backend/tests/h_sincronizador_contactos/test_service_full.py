@@ -508,6 +508,56 @@ def test_export_csv_ok_devuelve_bytes(app_ctx):
     assert data == b"csv-bytes"
 
 
+def test_export_csv_incluye_reservas_con_tipo_none_y_excluye_cancelaciones(app_ctx):
+    """Regresión: Smoobu devuelve tipo=None para reservas normales y tipo='cancellation'
+    para canceladas. El filtro debe aceptar las primeras y excluir las segundas."""
+    from app.normalizador_pms.base import ReservaEstandar
+
+    r_normal = ReservaEstandar(
+        id_externo="1", nombre_raw="Juan", email=None, telefono="+34600000001",
+        checkin="2026-06-03", checkout="2026-06-06", nombre_apartamento="A1",
+        id_apartamento_externo=None, hora_llegada=None, tipo=None,
+    )
+    r_cancelled = ReservaEstandar(
+        id_externo="2", nombre_raw="Ana", email=None, telefono="+34600000002",
+        checkin="2026-06-03", checkout="2026-06-04", nombre_apartamento="A2",
+        id_apartamento_externo=None, hora_llegada=None, tipo="cancellation",
+    )
+    pms_client = MagicMock()
+    pms_client.fetch_reservations.return_value = [r_normal, r_cancelled]
+
+    captured: list = []
+
+    def _capture_build_csv(contactos, prefs):
+        captured.extend(contactos)
+        return b"csv"
+
+    with patch(
+        "app.h_sincronizador_contactos.service.apt_repo.get_pms_config",
+        return_value=_pms_config(),
+    ), patch(
+        "app.h_sincronizador_contactos.service.decrypt",
+        return_value="key",
+    ), patch(
+        "app.h_sincronizador_contactos.service.build_pms_client",
+        return_value=pms_client,
+    ), patch(
+        "app.h_sincronizador_contactos.service.repo.get_preferencias_contactos",
+        return_value={},
+    ), patch(
+        "app.h_sincronizador_contactos.service.build_csv",
+        side_effect=_capture_build_csv,
+    ):
+        data, err = srv.export_csv(
+            "emp-1",
+            {"desde": "2026-06-01", "hasta": "2026-06-30"},
+        )
+    assert err is None
+    nombres = [c.nombre for c in captured]
+    assert "Juan" in nombres   # reserva normal (tipo=None) incluida
+    assert "Ana" not in nombres  # cancelada excluida
+
+
 # ── sync_from_xlsx ─────────────────────────────────────────────────────────
 
 

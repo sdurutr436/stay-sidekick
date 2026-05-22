@@ -163,14 +163,20 @@ def test_generar_desde_pms_ok_devuelve_dias(app_ctx):
         checkin=None, checkout="2026-05-25", nombre_apartamento=None,
         id_apartamento_externo=None, hora_llegada=None, tipo="reservation",
     )
-    r_block = ReservaEstandar(
-        id_externo="3", nombre_raw="block", email=None, telefono=None,
+    r_cancelled = ReservaEstandar(
+        id_externo="3", nombre_raw="cancelado", email=None, telefono=None,
         checkin="2026-05-23", checkout=None, nombre_apartamento=None,
-        id_apartamento_externo=None, hora_llegada=None, tipo="block",
+        id_apartamento_externo=None, hora_llegada=None, tipo="cancellation",
+    )
+    # tipo=None es el caso real de Smoobu para reservas normales — debe contarse.
+    r_normal = ReservaEstandar(
+        id_externo="4", nombre_raw="normal", email=None, telefono=None,
+        checkin=None, checkout="2026-05-25", nombre_apartamento=None,
+        id_apartamento_externo=None, hora_llegada=None, tipo=None,
     )
     client_mock = MagicMock()
-    client_mock.fetch_reservations.return_value = [r_in, r_block]
-    client_mock.fetch_by_departure.return_value = [r_out]
+    client_mock.fetch_reservations.return_value = [r_in, r_cancelled]
+    client_mock.fetch_by_departure.return_value = [r_out, r_normal]
 
     with patch(
         "app.h_mapa_de_calor.service.apt_repo.get_pms_config",
@@ -192,8 +198,10 @@ def test_generar_desde_pms_ok_devuelve_dias(app_ctx):
     assert err is None
     dia_23 = next(d for d in data if d["fecha"] == "2026-05-23")
     dia_25 = next(d for d in data if d["fecha"] == "2026-05-25")
+    # r_in (reservation) cuenta como check-in; r_cancelled queda fuera.
     assert dia_23["checkins"] == 1
-    assert dia_25["checkouts"] == 1
+    # r_out (reservation) y r_normal (tipo=None) cuentan como check-outs.
+    assert dia_25["checkouts"] == 2
 
 
 # ── generar_desde_xlsx ─────────────────────────────────────────────────────
