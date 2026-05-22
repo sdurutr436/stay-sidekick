@@ -5,6 +5,7 @@ omit =
     */__init__.py
     */tests/*
     */migrations/*
+    */repository.py
     app/exceptions/*
     app/h_maestro_apartamentos/smoobu_client.py
     app/h_sincronizador_contactos/google_people_client.py
