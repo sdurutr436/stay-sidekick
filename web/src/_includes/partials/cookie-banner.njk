@@ -1,0 +1,33 @@
+{#
+  PARTIAL: COOKIE BANNER
+  Aviso informativo sobre cookies técnicas. No bloquea la navegación.
+  El JS asociado (cookie-banner.js) lo oculta si el usuario ya lo aceptó
+  o si todavía no hay decisión, lo muestra al cargar la página.
+
+  Estilos: frontend/src/styles/components/_cookie-banner.scss
+#}
+<aside
+  class="cookie-banner"
+  role="region"
+  aria-label="Aviso de cookies"
+  data-cookie-banner
+  hidden
+>
+  <div class="cookie-banner__inner">
+    <p class="cookie-banner__text">
+      Usamos únicamente <strong>cookies técnicas</strong> necesarias para mantener tu sesión.
+      No empleamos cookies de seguimiento, analíticas ni publicitarias.
+    </p>
+    <div class="cookie-banner__actions">
+      <a href="/legal/cookies/" class="cookie-banner__link">Más información</a>
+      <button
+        type="button"
+        class="btn btn--primary btn--sm"
+        data-cookie-banner-accept
+        aria-label="Aceptar y cerrar el aviso de cookies"
+      >
+        Entendido
+      </button>
+    </div>
+  </div>
+</aside>
