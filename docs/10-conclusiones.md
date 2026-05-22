@@ -34,8 +34,8 @@ Se ha conseguido un producto funcional y desplegable que cubre el núcleo de la 
 
 Además, el resultado no se sostiene solo en demostración manual; se sostiene en evidencia técnica:
 
-- Pruebas backend: 55/55 correctas.
-- Pruebas frontend: 281/281 correctas.
+- Pruebas backend: 92/92 correctas.
+- Pruebas frontend: 297/297 correctas.
 - CI segmentada por stack (Python, Angular, 11ty).
 - Publicación Docker condicionada al éxito de los tres CI para el mismo commit.
 
@@ -103,7 +103,7 @@ No alcanza el 100% de todas las aspiraciones a medio plazo, pero sí alcanza un 
 | Backend API modular | ✅ Cumplido | Flask por blueprints, validación y servicios por dominio |
 | Persistencia y migraciones | ✅ Cumplido | PostgreSQL + Alembic |
 | Contenerización integral | ✅ Cumplido | Dockerfiles por servicio + docker-compose |
-| Testing automatizado real | ✅ Cumplido | 336 tests totales (55 backend + 281 frontend) |
+| Testing automatizado real | ✅ Cumplido | 389 tests totales (92 backend + 297 frontend) |
 | Integración continua por stack | ✅ Cumplido | Workflows dedicados y artefactos de cobertura frontend |
 
 ---
