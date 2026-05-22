@@ -26,9 +26,10 @@ services:
     env_file:
       - path: ./backend/.env.dev
         required: true
-    environment:
-      DATABASE_URL: ${DATABASE_URL}
-      ALLOWED_ORIGINS: "http://localhost"
+    # No redefinimos `environment` aquí: el bloque del compose base ya inyecta
+    # DATABASE_URL y ALLOWED_ORIGINS con fallbacks seguros. Override redundante
+    # eliminaría el fallback de DATABASE_URL y haría reventar el arranque si el
+    # `.env` raíz no existiese al lanzar el override de dev.
 
   postgres:
     # Healthcheck más estricto: el backend no arranca hasta que alembic_version
@@ -36,7 +37,7 @@ services:
     healthcheck:
       test:
         - "CMD-SHELL"
-        - "pg_isready -U postgres -d stay_sidekick && psql -U postgres -d stay_sidekick -c 'SELECT version_num FROM alembic_version LIMIT 1' > /dev/null 2>&1"
+        - "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-stay_sidekick} && psql -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-stay_sidekick} -c 'SELECT version_num FROM alembic_version LIMIT 1' > /dev/null 2>&1"
       interval: 3s
       timeout: 5s
       retries: 30

@@ -1,0 +1,25 @@
+[run]
+source = app
+branch = False
+omit =
+    */__init__.py
+    */tests/*
+    */migrations/*
+    */repository.py
+    app/exceptions/*
+    app/h_maestro_apartamentos/smoobu_client.py
+    app/h_sincronizador_contactos/google_people_client.py
+    app/h_vault_comunicaciones/ia_client.py
+    app/normalizador_pms/*
+    app/common/notifications/discord.py
+    app/solicitud/turnstile.py
+    app/common/ai_service.py
+
+[report]
+show_missing = True
+skip_covered = False
+exclude_lines =
+    pragma: no cover
+    raise NotImplementedError
+    if __name__ == .__main__.:
+    if TYPE_CHECKING:

@@ -1,7 +1,6 @@
 # =============================================================================
 # BACKEND — Flask
-# Imagen ligera Python. run.py ya arranca con host=0.0.0.0.
-# Para producción real sustituir `python run.py` por gunicorn.
+# Imagen ligera Python. Producción usa Gunicorn (ver CMD al final del archivo).
 # =============================================================================
 
 FROM python:3.12-slim
