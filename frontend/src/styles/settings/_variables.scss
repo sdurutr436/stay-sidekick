@@ -64,9 +64,10 @@ $color-overlay-bg: rgba(0, 0, 0, 0.4);
 // -----------------------------------------------------------------------------
 // Z-index — escala de 1 en 1
 // -----------------------------------------------------------------------------
-$z-base:     0;
-$z-raised:   1;
-$z-sidenav:  2;
-$z-header:   3;
-$z-modal:    4;
-$z-tooltip:  5;
+$z-base:          0;
+$z-raised:        1;
+$z-sidenav:       2;
+$z-header:        3;
+$z-modal:         4;
+$z-tooltip:       5;
+$z-cookie-banner: 6;   // por encima de todo (aviso de consentimiento)
