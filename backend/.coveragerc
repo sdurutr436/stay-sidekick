@@ -1,19 +1,23 @@
 [run]
 source = app
 branch = False
+# Los patrones llevan prefijo */ porque pytest puede ejecutarse tanto desde
+# `backend/` (paths reportados como `app/...`) como desde la raíz del repo
+# en CI (paths reportados como `backend/app/...`). fnmatch hace que `*` cubra
+# cualquier prefijo, incluyendo los separadores de ruta.
 omit =
     */__init__.py
     */tests/*
     */migrations/*
     */repository.py
-    app/exceptions/*
-    app/h_maestro_apartamentos/smoobu_client.py
-    app/h_sincronizador_contactos/google_people_client.py
-    app/h_vault_comunicaciones/ia_client.py
-    app/normalizador_pms/*
-    app/common/notifications/discord.py
-    app/solicitud/turnstile.py
-    app/common/ai_service.py
+    */exceptions/*
+    */h_maestro_apartamentos/smoobu_client.py
+    */h_sincronizador_contactos/google_people_client.py
+    */h_vault_comunicaciones/ia_client.py
+    */normalizador_pms/*
+    */common/notifications/discord.py
+    */solicitud/turnstile.py
+    */common/ai_service.py
 
 [report]
 show_missing = True
