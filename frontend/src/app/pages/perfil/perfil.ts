@@ -191,6 +191,13 @@ export class PerfilPageComponent implements OnInit {
     this.iaModelosPorProveedor[this.iaProveedor()] ?? [],
   );
 
+  /** Indica si la empresa tiene un BYOK real configurado (no la IA compartida). */
+  readonly iaTieneBYOK = computed(() => {
+    const ia = this.integraciones()?.ia;
+    if (!ia) return false;
+    return !!ia.proveedor && ia.proveedor !== 'default';
+  });
+
   ngOnInit(): void {
     this.isAdmin.set(this.auth.isAdmin);
 
@@ -338,6 +345,24 @@ export class PerfilPageComponent implements OnInit {
   guardarIA(): void {
     this.iaAlerta.set(null);
     this.iaGuardando.set(true);
+    // Si el usuario vuelve a "default" (IA compartida), eliminamos la fila BYOK
+    // existente en lugar de crear una fila huérfana sin api_key.
+    if (this.iaProveedor() === 'default') {
+      this.service.eliminarIA().subscribe({
+        next: () => {
+          this.iaAlerta.set({ tipo: 'success', mensaje: 'Se está usando la IA compartida del sistema.' });
+          this.iaApiKey.set('');
+          this.iaModelo.set('');
+          this.cargarIntegraciones();
+          this.iaGuardando.set(false);
+        },
+        error: err => {
+          this.iaAlerta.set({ tipo: 'error', mensaje: err?.error?.errors?.[0] ?? 'Error al cambiar a IA compartida.' });
+          this.iaGuardando.set(false);
+        },
+      });
+      return;
+    }
     this.service.actualizarIA(this.iaProveedor(), this.iaModelo(), this.iaApiKey() || undefined).subscribe({
       next: res => {
         if (res.ok) {
