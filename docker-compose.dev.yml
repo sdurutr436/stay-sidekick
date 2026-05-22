@@ -26,9 +26,10 @@ services:
     env_file:
       - path: ./backend/.env.dev
         required: true
-    environment:
-      DATABASE_URL: ${DATABASE_URL}
-      ALLOWED_ORIGINS: "http://localhost"
+    # No redefinimos `environment` aquí: el bloque del compose base ya inyecta
+    # DATABASE_URL y ALLOWED_ORIGINS con fallbacks seguros. Override redundante
+    # eliminaría el fallback de DATABASE_URL y haría reventar el arranque si el
+    # `.env` raíz no existiese al lanzar el override de dev.
 
   postgres:
     # Healthcheck más estricto: el backend no arranca hasta que alembic_version
