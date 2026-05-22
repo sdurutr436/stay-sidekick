@@ -364,24 +364,45 @@ su fusión. La exclusión de `src/app/pages/**` en `angular.json` elimina del c�
 de la aplicación, cuya lógica es principalmente declarativa (enrutamiento y composición de
 componentes).
 
-### 7.3.2. Backend — cobertura manual
+### 7.3.2. Backend — pytest-cov
 
-El pipeline de CI del backend (`ci-python.yml`) ejecuta `pytest backend/tests/ -v` sin el plugin
-`pytest-cov`, por lo que no se genera un informe de cobertura automatizado en cada *push*.
-Sin embargo, la estructura de los tests está diseñada para ejercer las rutas principales de cada
-blueprint:
+El pipeline de CI del backend (`ci-python.yml`) ejecuta `pytest backend/tests/ --cov=app
+--cov-config=backend/.coveragerc --cov-fail-under=90` y publica el informe HTML como artefacto
+con 14 días de retención. La configuración de exclusiones se define en
+`backend/.coveragerc`:
 
-- Cada endpoint dispone al menos de un test para el camino de éxito y otro para el camino de
-  error más relevante (credenciales inválidas, recurso no encontrado, cuerpo malformado).
-- Los controles de acceso — ausencia de JWT (401), rol insuficiente (403), flag `es_superadmin`
-  (403) — están cubiertos en todos los módulos que los implementan.
-- La validación de entrada está cubierta por los tests que verifican los códigos 400 y 422.
+```ini
+[run]
+source = app
+omit =
+    */__init__.py
+    */tests/*
+    */migrations/*
+    */repository.py
+    app/exceptions/*
+    app/h_maestro_apartamentos/smoobu_client.py
+    app/h_sincronizador_contactos/google_people_client.py
+    app/h_vault_comunicaciones/ia_client.py
+    app/normalizador_pms/*
+    app/common/notifications/discord.py
+    app/solicitud/turnstile.py
+    app/common/ai_service.py
+```
 
-Esta cobertura manual backend combina las suites HTTP con una segunda capa de servicios puros: 5
-suites y 38 casos repartidos entre notificaciones, contacto, solicitud, usuarios y exportación de
-contactos. Aunque sigue sin existir un informe automático de `pytest-cov`, el alcance funcional
-cubierto por backend va más allá de los endpoints y alcanza también reglas de negocio y efectos
-laterales relevantes.
+**Justificación de exclusiones**:
+
+- **Repositorios** (`*/repository.py`): capa de acceso a datos basada en SQLAlchemy. Su
+  validación real requiere integration tests con PostgreSQL, no unit tests con mocks. Sigue
+  el mismo principio que `angular.json` aplica en frontend al excluir `src/app/pages/**`.
+- **Adapters externos** (Smoobu, Google People, IA): son envoltorios sobre SDKs/APIs
+  de terceros; se validan manualmente en entorno Docker local (ver 7.2.4).
+- **Normalizadores PMS**: dependen de la forma exacta del JSON externo; se cubren mediante
+  pruebas manuales con respuestas reales.
+- **Turnstile/Discord**: integraciones HTTP simples sin lógica de negocio testable
+  unitariamente.
+
+Cualquier *pull request* que reduzca la cobertura por debajo del **90 %** falla el pipeline,
+quedando alineada con el umbral aplicado al frontend (90 % en `vitest.config.ts`).
 
 ---
 
@@ -394,39 +415,64 @@ servicio de correo a Mailgun por HTTP con API key.
 
 ### 7.4.1. Desglose por suite — Backend
 
-Backend suma **92 casos** repartidos en **12 archivos de test**.
+Backend suma **499 casos** repartidos en **33 archivos de test**, distribuidos entre
+integración HTTP, unitarios de servicio y unitarios de helpers/parsers.
 
 | Suite de pruebas | Tipo | Pruebas | Resultado |
 |---|---|---|---|
 | `tests/auth/test_routes_auth.py` | Integración (HTTP) | 7 | ✅ |
+| `tests/auth/test_service_auth.py` | Unitaria de servicio | 12 | ✅ |
+| `tests/auth/test_password_rules.py` | Unitaria | 20 | ✅ |
 | `tests/empresas/test_routes_empresas.py` | Integración (HTTP) | 8 | ✅ |
+| `tests/empresas/test_service_empresas.py` | Unitaria de servicio | 2 | ✅ |
+| `tests/empresas/test_empresas_delete.py` | Unitaria | 5 | ✅ |
+| `tests/empresas/test_repository_empresas.py` | Unitaria de repo | 3 | ✅ |
 | `tests/usuarios/test_routes_usuarios.py` | Integración (HTTP) | 10 | ✅ |
+| `tests/usuarios/test_service_usuarios.py` | Unitaria de servicio | 4 | ✅ |
+| `tests/usuarios/test_service_usuarios_full.py` | Unitaria de servicio | 23 | ✅ |
 | `tests/perfil/test_routes_perfil.py` | Integración (HTTP) | 9 | ✅ |
+| `tests/perfil/test_service_perfil.py` | Unitaria de servicio | 8 | ✅ |
+| `tests/perfil/test_service_perfil_extra.py` | Unitaria de servicio | 18 | ✅ |
 | `tests/h_vault_comunicaciones/test_routes_vault.py` | Integración (HTTP) | 9 | ✅ |
 | `tests/h_maestro_apartamentos/test_routes_apartamentos.py` | Integración (HTTP) | 9 | ✅ |
+| `tests/h_maestro_apartamentos/test_routes_apartamentos_extra.py` | Integración (HTTP) | 33 | ✅ |
+| `tests/h_maestro_apartamentos/test_service_apartamentos.py` | Unitaria de servicio | 32 | ✅ |
+| `tests/h_maestro_apartamentos/test_xlsx_parser.py` | Unitaria de parser | 23 | ✅ |
 | `tests/h_mapa_de_calor/test_routes_heatmap.py` | Integración (HTTP) | 2 | ✅ |
-| `tests/common/notifications/test_mail_service.py` | Unitaria de servicio | 19 | ✅ |
-| `tests/contact/test_service_contact.py` | Unitaria de servicio | 5 | ✅ |
+| `tests/h_mapa_de_calor/test_routes_heatmap_extra.py` | Integración (HTTP) | 30 | ✅ |
+| `tests/h_mapa_de_calor/test_service_heatmap.py` | Unitaria de servicio | 27 | ✅ |
+| `tests/h_notificaciones_tardias/test_routes_notificaciones.py` | Integración (HTTP) | 20 | ✅ |
+| `tests/h_notificaciones_tardias/test_service_notificaciones.py` | Unitaria de servicio | 18 | ✅ |
+| `tests/h_sincronizador_contactos/test_routes_contactos.py` | Integración (HTTP) | 34 | ✅ |
+| `tests/h_sincronizador_contactos/test_service_full.py` | Unitaria de servicio | 42 | ✅ |
+| `tests/h_sincronizador_contactos/test_contacto_formatter.py` | Unitaria de helper | 41 | ✅ |
 | `tests/h_sincronizador_contactos/test_export_csv.py` | Unitaria de servicio | 3 | ✅ |
+| `tests/contact/test_routes_contact.py` | Integración (HTTP) | 4 | ✅ |
+| `tests/contact/test_service_contact.py` | Unitaria de servicio | 5 | ✅ |
+| `tests/solicitud/test_routes_solicitud.py` | Integración (HTTP) | 6 | ✅ |
 | `tests/solicitud/test_service_solicitud.py` | Unitaria de servicio | 7 | ✅ |
-| `tests/usuarios/test_service_usuarios.py` | Unitaria de servicio | 4 | ✅ |
-| **TOTAL** | — | **92** | **✅ 100 %** |
+| `tests/common/notifications/test_mail_service.py` | Unitaria de servicio | 21 | ✅ |
+| `tests/docs/test_routes_docs.py` | Integración (HTTP) | 4 | ✅ |
+| **TOTAL** | — | **499** | **✅ 100 %** |
 
 **Resumen global del backend:**
 
 | Métrica | Valor |
 |---|---|
-| Total de pruebas | 92 |
-| Pruebas exitosas | 92 |
+| Total de pruebas | 499 |
+| Pruebas exitosas | 499 |
 | Fallos | 0 |
 | Errores | 0 |
 | Omitidas | 0 |
 | Tasa de éxito | 100 % |
+| Cobertura (`pytest-cov`) | **92 %** (umbral mínimo 90 %) |
 | Archivos de test | 12 |
 | Módulos cubiertos | auth, empresas, usuarios, perfil, vault, apartamentos, heatmap, contactos, solicitud, notificaciones |
 
-Backend queda distribuido en **7 suites de integración HTTP** y **5 suites de
-servicio**, reforzando tanto la capa de seguridad/rutas como la lógica de negocio reutilizable.
+Backend queda distribuido en **suites de integración HTTP**, **suites de servicio** y
+**suites de helpers/parsers**, cubriendo seguridad/rutas, lógica de negocio reutilizable y
+utilidades transversales con una cobertura efectiva del **92 %** sobre el código no excluido
+(ver 7.3.2).
 
 ### 7.4.2. Desglose por spec — Frontend
 

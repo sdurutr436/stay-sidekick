@@ -62,5 +62,15 @@ jobs:
       - name: Instalar dependencias
         run: pip install -r backend/requirements.txt pytest
 
-      - name: Ejecutar tests
-        run: pytest backend/tests/ -v
+      - name: Ejecutar tests con cobertura
+        run: pytest backend/tests/ -v --cov=app --cov-config=backend/.coveragerc --cov-report=term --cov-report=html:backend/htmlcov --cov-report=xml:backend/coverage.xml --cov-fail-under=90
+
+      - name: Subir reporte de cobertura
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-coverage
+          path: |
+            backend/htmlcov
+            backend/coverage.xml
+          retention-days: 14
