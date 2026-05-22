@@ -58,6 +58,7 @@
 // ── Contenido del sitio 11ty (legales, marketing) ────────────────────────
 @use 'web-content';    // [ESPEJO NJK] web/src/legal/*, web/src/empresa/*
 @use 'landing';        // [ESPEJO NJK] web/src/index.njk
+@use 'cookie-banner';  // [ESPEJO NJK] _includes/partials/cookie-banner.njk
 
 // ── Estandarización UI (sprint pre-entrega) ──────────────────────────────
 @use 'theme-toggle';            // [ESPEJO NJK] _includes/partials/header.njk + web/src/assets/js/theme-toggle.js
