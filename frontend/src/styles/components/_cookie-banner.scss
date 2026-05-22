@@ -1,7 +1,10 @@
 // =============================================================================
 // COMPONENTS: COOKIE BANNER
-// Aviso informativo de cookies técnicas que aparece la primera visita.
-// Estructura BEM: .cookie-banner > .cookie-banner__inner > __text, __actions
+// Banner informativo de cookies técnicas que aparece la primera visita.
+// Layout horizontal en desktop (texto izquierda + acciones derecha) y
+// vertical en mobile. z-index muy alto para garantizar visibilidad sobre
+// cualquier overlay del sitio. Sombra propia más prominente que las del
+// sistema porque debe destacar sobre el fondo de la página.
 // [ESPEJO NJK] _includes/partials/cookie-banner.njk
 // JS: web/src/assets/js/cookie-banner.js
 // =============================================================================
@@ -13,44 +16,68 @@
   bottom: $space-4;
   left: 50%;
   transform: translateX(-50%);
+
   width: calc(100% - #{$space-6});
-  max-width: 640px;
-  padding: $space-4;
+  max-width: 760px;
+
+  padding: $space-4 $space-5;
+
   background-color: $color-surface-card;
   color: $color-text-primary;
   border: $border-width $border-style $color-border;
-  border-left-width: 3px;
-  box-shadow: 0 4px 0 $color-border;
-  z-index: 1000;
+  border-radius: $border-radius-lg;
+
+  // Sombra propia más visible que --shadow-xl del sistema (0.03 alpha es
+  // imperceptible sobre fondo claro). Necesaria para destacar como overlay.
+  box-shadow:
+    0 8px 24px -4px hsla(0, 0%, 0%, 0.18),
+    0 4px 8px -4px hsla(0, 0%, 0%, 0.10);
+
+  // Por encima de header, sidebar, modales internos y tooltips.
+  z-index: $z-cookie-banner;
+
   @include text-body-sm;
 
-  // Mientras hidden, el navegador ya lo oculta vía atributo HTML5.
-  // Cuando lo quitamos vía JS aparece animado.
-  animation: cookie-banner-slide-up var(--transition-base) ease-out;
+  animation: cookie-banner-slide-up 240ms ease-out;
 
   &__inner {
     display: flex;
-    flex-direction: column;
-    gap: $space-3;
+    align-items: center;
+    justify-content: space-between;
+    gap: $space-5;
+
+    @include respond-until('md') {
+      flex-direction: column;
+      align-items: stretch;
+      gap: $space-3;
+    }
   }
 
   &__text {
     margin: 0;
-    line-height: 1.45;
+    line-height: 1.5;
+    flex: 1;
+    min-width: 0;
   }
 
   &__actions {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: $space-3;
-    flex-wrap: wrap;
+    gap: $space-4;
+    flex-shrink: 0;
+
+    @include respond-until('md') {
+      justify-content: space-between;
+      width: 100%;
+    }
   }
 
   &__link {
     color: $color-text-secondary;
     text-decoration: underline;
     text-underline-offset: 2px;
+    transition: color var(--transition-base);
+    white-space: nowrap;
 
     &:hover,
     &:focus-visible {
@@ -59,10 +86,18 @@
   }
 }
 
+// Modo oscuro: sombra adaptada (más sutil sobre fondo oscuro y borde más
+// definido para que el banner se perciba como una superficie elevada).
+.dark .cookie-banner {
+  box-shadow:
+    0 8px 24px -4px hsla(0, 0%, 0%, 0.55),
+    0 4px 8px -4px hsla(0, 0%, 0%, 0.35);
+}
+
 @keyframes cookie-banner-slide-up {
   from {
     opacity: 0;
-    transform: translate(-50%, $space-3);
+    transform: translate(-50%, 16px);
   }
   to {
     opacity: 1;
