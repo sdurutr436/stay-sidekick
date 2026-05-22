@@ -215,7 +215,7 @@
             id="ia-proveedor"
             [options]="iaGrupoOpciones"
             [value]="iaProveedor()"
-            [disabled]="!isAdmin() || !!integraciones()?.ia?.proveedor"
+            [disabled]="!isAdmin() || iaTieneBYOK()"
             (valueChange)="onIaProveedorChange($event)"
           />
         </app-form-field>
@@ -289,7 +289,7 @@
               type="button"
               variant="danger"
               size="md"
-              [disabled]="iaConfigEliminando() || !integraciones()?.ia?.proveedor"
+              [disabled]="iaConfigEliminando() || !iaTieneBYOK()"
               (click)="confirmarEliminarIAConfig()"
             >
               <ng-icon name="phosphorTrash" size="16" aria-hidden="true" />
