@@ -121,14 +121,25 @@ jobs:
         working-directory: docs/docusaurus/backend
         run: pnpm install --frozen-lockfile
 
+      # Genera una FERNET_KEY efímera SOLO para satisfacer create_app() durante
+      # el build de pydoc-markdown. Se descarta al final del job; nada cifrado
+      # con esta clave se persiste. ::add-mask:: la redacta en los logs públicos.
+      # NO commitear claves Fernet en este YAML — replicaría el incidente previo.
+      - name: Generar FERNET_KEY efímera para el build
+        run: |
+          KEY=$(python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())")
+          echo "::add-mask::$KEY"
+          echo "FERNET_KEY=$KEY" >> "$GITHUB_ENV"
+
       - name: Build Docusaurus (backend, ejecuta pydoc-markdown en prebuild)
         working-directory: docs/docusaurus/backend
         env:
-          # Variables mínimas para que create_app() no reviente al cargar módulos
+          # Placeholders sin valor real — sólo evitan KeyError al cargar config.
+          # NUNCA poner aquí valores con forma de secreto válido.
           SECRET_KEY: doc-build-no-secret
           JWT_SECRET_KEY: doc-build-no-secret
-          FERNET_KEY: 1QbtsBSnNcwOaTC5_T9pTfTLcQ1HRwAyqLgKbQQk5KE=
           DATABASE_URL: sqlite:///docbuild.sqlite
+          # FERNET_KEY se hereda del paso anterior via $GITHUB_ENV (efímera).
         run: pnpm build
 
       - name: Subir artifact
