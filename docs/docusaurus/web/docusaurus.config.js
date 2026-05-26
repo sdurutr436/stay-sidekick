@@ -25,6 +25,12 @@ const config = {
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
 
+  // Diagramas Mermaid en bloques ```mermaid (necesita @docusaurus/theme-mermaid)
+  markdown: {
+    mermaid: true,
+  },
+  themes: ['@docusaurus/theme-mermaid'],
+
   i18n: {
     defaultLocale: 'es',
     locales: ['es'],
@@ -52,8 +58,15 @@ const config = {
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
+      // OG / Twitter card al compartir cualquier URL del sitio
+      image: 'img/og-image.png',
       navbar: {
         title: 'Stay Sidekick · web',
+        logo: {
+          alt: 'Stay Sidekick',
+          src: 'img/logo.png',
+          srcDark: 'img/logo-dark.png',
+        },
         items: [
           {
             type: 'docSidebar',
