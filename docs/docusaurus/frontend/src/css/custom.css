@@ -1,0 +1,26 @@
+/* =============================================================================
+   Override de Infima alineado con la identidad de la SPA Angular
+   ========================================================================== */
+
+:root {
+  --ifm-color-primary: #dd0031;
+  --ifm-color-primary-dark: #c70026;
+  --ifm-color-primary-darker: #bd0024;
+  --ifm-color-primary-darkest: #9b001e;
+  --ifm-color-primary-light: #f10b3b;
+  --ifm-color-primary-lighter: #f1163f;
+  --ifm-color-primary-lightest: #f33f5e;
+  --ifm-code-font-size: 95%;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme='dark'] {
+  --ifm-color-primary: #ff4d6e;
+  --ifm-color-primary-dark: #ff2d54;
+  --ifm-color-primary-darker: #ff1d47;
+  --ifm-color-primary-darkest: #e10031;
+  --ifm-color-primary-light: #ff6d88;
+  --ifm-color-primary-lighter: #ff7d95;
+  --ifm-color-primary-lightest: #ffadbb;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+}
