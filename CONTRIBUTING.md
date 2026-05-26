@@ -7,7 +7,7 @@ Esta guia resume como preparar el entorno, que comprobaciones ejecutar y que con
 ## Requisitos previos reales del proyecto
 
 - Node.js 18 o superior
-- npm 10 o superior
+- pnpm 10 o superior (se activa automaticamente vía `corepack enable`)
 - Python 3.12
 - Docker y Docker Compose v2 si quieres validar el stack completo
 - PostgreSQL solo es necesario si no trabajas con Docker Compose
@@ -21,16 +21,16 @@ Antes de tocar codigo o documentacion, revisa tambien [README.md](README.md), [D
 Desde la raiz del repositorio:
 
 ```bash
-npm install
-npm run install:all
-npm run dev
+pnpm install
+pnpm run install:all
+pnpm run dev
 ```
 
 Atajos disponibles desde la raiz:
 
 ```bash
-npm run dev:web
-npm run dev:app
+pnpm run dev:web
+pnpm run dev:app
 ```
 
 ## Backend Flask
@@ -73,17 +73,17 @@ pytest backend/tests/ -v
 
 ```bash
 cd frontend
-npm ci
-npm run build
-npx ng test --watch=false
+pnpm install --frozen-lockfile
+pnpm run build
+pnpm exec ng test --watch=false
 ```
 
 ### Sitio web 11ty
 
 ```bash
 cd web
-npm ci
-npm run build
+pnpm install --frozen-lockfile
+pnpm run build
 ```
 
 ## Convenciones de ramas y commits
