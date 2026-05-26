@@ -5,6 +5,9 @@
 # Esto es necesario porque sass compila desde frontend/src/styles/
 # via --load-path=../frontend/src/styles (ver web/package.json).
 # En docker-compose el contexto se define como context: .
+#
+# Gestor de paquetes: pnpm (activado vía corepack a partir del campo
+# "packageManager" de package.json — versión reproducible en builds).
 # =============================================================================
 
 # ── Stage 1: Build ────────────────────────────────────────────────────────────
@@ -16,9 +19,13 @@ ENV TURNSTILE_SITE_KEY=$TURNSTILE_SITE_KEY
 
 WORKDIR /app
 
+# Activar pnpm vía corepack; usa la versión declarada en "packageManager"
+# de web/package.json para garantizar instalaciones reproducibles.
+RUN corepack enable
+
 # Instalar dependencias de 11ty primero (capa de caché independiente)
-COPY web/package*.json ./web/
-RUN cd web && npm ci
+COPY web/package.json web/pnpm-lock.yaml ./web/
+RUN cd web && pnpm install --frozen-lockfile
 
 # Copiar los estilos SCSS de Angular — necesarios para sass --load-path
 # Cuando sass ejecuta desde /app/web, busca ../frontend/src/styles → /app/frontend/src/styles
@@ -28,7 +35,7 @@ COPY frontend/src/styles/ ./frontend/src/styles/
 COPY web/ ./web/
 
 # Compilar CSS (sass) + sitio estático (eleventy)
-RUN cd web && npm run build
+RUN cd web && pnpm run build
 
 # ── Stage 2: Serve ────────────────────────────────────────────────────────────
 FROM nginx:alpine
