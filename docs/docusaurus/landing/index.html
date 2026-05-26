@@ -9,15 +9,50 @@
       content="Documentación técnica de Stay Sidekick: sitio estático 11ty, SPA Angular y API Flask."
     />
     <link rel="icon" type="image/png" href="favicon.png" />
+    <link
+      rel="preconnect"
+      href="https://fonts.googleapis.com"
+      crossorigin
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Archivo:wght@100..900&display=swap"
+      rel="stylesheet"
+    />
     <style>
+      /* ===========================================================
+         Tokens corporativos — mismos valores que custom.css y
+         frontend/src/styles/settings/_css-variables.scss
+         =========================================================== */
       :root {
-        --c-bg: #0e1116;
-        --c-card: #161b22;
-        --c-border: #30363d;
-        --c-text: #c9d1d9;
-        --c-text-muted: #8b949e;
-        --c-accent: #4ec05f;
-        --c-link: #58a6ff;
+        /* Light */
+        --c-bg: hsl(0, 0%, 97.6471%);
+        --c-card: hsl(0, 0%, 100%);
+        --c-border: hsl(0, 0%, 87%);
+        --c-border-strong: hsl(0, 0%, 31.3725%);
+        --c-text: hsl(0, 0%, 22.7451%);
+        --c-text-muted: hsl(0, 0%, 31.3725%);
+        --c-accent: hsl(47.4419, 64.1791%, 86.8627%);
+        --c-accent-fg: hsl(14.2105, 25.6757%, 29.0196%);
+        --c-link: hsl(38, 92%, 38%);
+        --radius: 0.625rem;
+        --shadow-sm: 1px 4px 5px 0 hsl(0 0% 0% / 0.03),
+          1px 1px 2px -1px hsl(0 0% 0% / 0.03);
+        --shadow-md: 1px 4px 5px 0 hsl(0 0% 0% / 0.05),
+          1px 2px 4px -1px hsl(0 0% 0% / 0.05);
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --c-bg: hsl(0, 0%, 16.8627%);
+          --c-card: hsl(0, 0%, 20%);
+          --c-border: hsl(0, 0%, 30.9804%);
+          --c-border-strong: hsl(0, 0%, 50%);
+          --c-text: hsl(0, 0%, 86.2745%);
+          --c-text-muted: hsl(0, 0%, 62.7451%);
+          --c-accent: hsl(0, 0%, 87.8431%);
+          --c-accent-fg: hsl(0, 0%, 20%);
+          --c-link: hsl(38, 92%, 65%);
+        }
       }
 
       * {
@@ -30,21 +65,26 @@
         padding: 0;
         background: var(--c-bg);
         color: var(--c-text);
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans,
-          Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
+        font-family: 'Archivo', ui-sans-serif, system-ui, -apple-system,
+          BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        font-weight: 500;
         line-height: 1.5;
+        letter-spacing: 0.005em;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
       }
 
       .page {
-        max-width: 960px;
+        max-width: 1200px;
         margin: 0 auto;
-        padding: 4rem 1.25rem 6rem;
+        padding: 4rem 1.5rem 6rem;
       }
 
       header h1 {
-        font-size: 2.5rem;
+        font-size: 2.25rem;
+        font-weight: 800;
         margin: 0 0 0.5rem;
-        letter-spacing: -0.02em;
+        letter-spacing: -0.01em;
       }
 
       header p {
@@ -54,14 +94,18 @@
       }
 
       header strong {
-        color: var(--c-accent);
-        font-weight: 600;
+        color: var(--c-text);
+        font-weight: 700;
+        background: var(--c-accent);
+        color: var(--c-accent-fg);
+        padding: 0.125rem 0.5rem;
+        border-radius: calc(var(--radius) - 4px);
       }
 
       .grid {
         display: grid;
-        gap: 1.25rem;
-        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 1.5rem;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
       }
 
       .card {
@@ -71,21 +115,25 @@
         padding: 1.5rem;
         background: var(--c-card);
         border: 1px solid var(--c-border);
-        border-radius: 12px;
+        border-radius: var(--radius);
         text-decoration: none;
         color: inherit;
-        transition: transform 120ms ease, border-color 120ms ease;
+        box-shadow: var(--shadow-sm);
+        transition: transform 150ms ease, border-color 150ms ease,
+          box-shadow 150ms ease;
       }
 
       .card:hover,
       .card:focus-visible {
         transform: translateY(-2px);
-        border-color: var(--c-accent);
+        border-color: var(--c-border-strong);
+        box-shadow: var(--shadow-md);
         outline: none;
       }
 
       .card__eyebrow {
         font-size: 0.75rem;
+        font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.08em;
         color: var(--c-text-muted);
@@ -94,20 +142,22 @@
       .card h2 {
         margin: 0;
         font-size: 1.5rem;
+        font-weight: 700;
         color: var(--c-text);
+        letter-spacing: -0.01em;
       }
 
       .card p {
         margin: 0;
         color: var(--c-text-muted);
-        font-size: 0.95rem;
+        font-size: 0.875rem;
       }
 
       .card__cta {
         margin-top: auto;
         color: var(--c-link);
-        font-size: 0.9rem;
-        font-weight: 600;
+        font-size: 0.875rem;
+        font-weight: 700;
       }
 
       footer {
@@ -115,7 +165,7 @@
         padding-top: 2rem;
         border-top: 1px solid var(--c-border);
         color: var(--c-text-muted);
-        font-size: 0.85rem;
+        font-size: 0.875rem;
       }
 
       footer a {
