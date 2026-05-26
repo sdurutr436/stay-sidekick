@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Stay Sidekick — Documentación técnica</title>
+    <meta
+      name="description"
+      content="Documentación técnica de Stay Sidekick: sitio estático 11ty, SPA Angular y API Flask."
+    />
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <style>
+      :root {
+        --c-bg: #0e1116;
+        --c-card: #161b22;
+        --c-border: #30363d;
+        --c-text: #c9d1d9;
+        --c-text-muted: #8b949e;
+        --c-accent: #4ec05f;
+        --c-link: #58a6ff;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: var(--c-bg);
+        color: var(--c-text);
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans,
+          Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
+        line-height: 1.5;
+      }
+
+      .page {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 4rem 1.25rem 6rem;
+      }
+
+      header h1 {
+        font-size: 2.5rem;
+        margin: 0 0 0.5rem;
+        letter-spacing: -0.02em;
+      }
+
+      header p {
+        font-size: 1.125rem;
+        color: var(--c-text-muted);
+        margin: 0 0 3rem;
+      }
+
+      header strong {
+        color: var(--c-accent);
+        font-weight: 600;
+      }
+
+      .grid {
+        display: grid;
+        gap: 1.25rem;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      }
+
+      .card {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        padding: 1.5rem;
+        background: var(--c-card);
+        border: 1px solid var(--c-border);
+        border-radius: 12px;
+        text-decoration: none;
+        color: inherit;
+        transition: transform 120ms ease, border-color 120ms ease;
+      }
+
+      .card:hover,
+      .card:focus-visible {
+        transform: translateY(-2px);
+        border-color: var(--c-accent);
+        outline: none;
+      }
+
+      .card__eyebrow {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--c-text-muted);
+      }
+
+      .card h2 {
+        margin: 0;
+        font-size: 1.5rem;
+        color: var(--c-text);
+      }
+
+      .card p {
+        margin: 0;
+        color: var(--c-text-muted);
+        font-size: 0.95rem;
+      }
+
+      .card__cta {
+        margin-top: auto;
+        color: var(--c-link);
+        font-size: 0.9rem;
+        font-weight: 600;
+      }
+
+      footer {
+        margin-top: 4rem;
+        padding-top: 2rem;
+        border-top: 1px solid var(--c-border);
+        color: var(--c-text-muted);
+        font-size: 0.85rem;
+      }
+
+      footer a {
+        color: var(--c-link);
+        text-decoration: none;
+      }
+
+      footer a:hover {
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <header>
+        <h1>Stay Sidekick</h1>
+        <p>
+          <strong>Documentación técnica</strong> · tres sitios Docusaurus
+          independientes generados desde el código fuente.
+        </p>
+      </header>
+
+      <section class="grid" aria-label="Sitios de documentación">
+        <a class="card" href="./web/" aria-label="Documentación del sitio 11ty">
+          <span class="card__eyebrow">Landing pública</span>
+          <h2>web · 11ty + Nunjucks</h2>
+          <p>
+            Configuración de Eleventy, plantillas Nunjucks, SCSS compartido con
+            la SPA y antibot con Cloudflare Turnstile.
+          </p>
+          <span class="card__cta">Abrir →</span>
+        </a>
+
+        <a
+          class="card"
+          href="./frontend/"
+          aria-label="Documentación de la SPA Angular"
+        >
+          <span class="card__eyebrow">Panel privado</span>
+          <h2>frontend · Angular 21</h2>
+          <p>
+            Componentes standalone, servicios, guards e interceptores. API
+            auto-generada con TypeDoc desde el código TypeScript.
+          </p>
+          <span class="card__cta">Abrir →</span>
+        </a>
+
+        <a
+          class="card"
+          href="./backend/"
+          aria-label="Documentación de la API Flask"
+        >
+          <span class="card__eyebrow">API REST</span>
+          <h2>backend · Flask 3 + Python</h2>
+          <p>
+            Multi-tenant, JWT HS256, CSRF, rate limit y herramientas operativas.
+            API auto-generada con pydoc-markdown desde los módulos Python.
+          </p>
+          <span class="card__cta">Abrir →</span>
+        </a>
+      </section>
+
+      <footer>
+        <p>
+          Código fuente en
+          <a href="https://github.com/sdurutr436/stay-sidekick">
+            github.com/sdurutr436/stay-sidekick </a
+          >. Distribuido bajo licencia MIT.
+        </p>
+      </footer>
+    </main>
+  </body>
+</html>
