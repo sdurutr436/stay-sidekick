@@ -1,0 +1,26 @@
+/* =============================================================================
+   Override de variables Infima para alinear con la identidad de Stay Sidekick
+   ========================================================================== */
+
+:root {
+  --ifm-color-primary: #1c6d28;
+  --ifm-color-primary-dark: #196224;
+  --ifm-color-primary-darker: #185d22;
+  --ifm-color-primary-darkest: #144d1c;
+  --ifm-color-primary-light: #1f782c;
+  --ifm-color-primary-lighter: #207d2e;
+  --ifm-color-primary-lightest: #248836;
+  --ifm-code-font-size: 95%;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme='dark'] {
+  --ifm-color-primary: #4ec05f;
+  --ifm-color-primary-dark: #36b449;
+  --ifm-color-primary-darker: #33aa45;
+  --ifm-color-primary-darkest: #2a8c39;
+  --ifm-color-primary-light: #66cc75;
+  --ifm-color-primary-lighter: #72d281;
+  --ifm-color-primary-lightest: #95dea1;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+}
