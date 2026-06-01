@@ -10,13 +10,35 @@
 (function () {
   var BASE_PATH = '/assets/img/paginas/';
 
+  /**
+   * Construye el markup de las dos <picture> hermanas (light + dark) para
+   * la herramienta seleccionada. CSS decide cuál se ve según la clase `.dark`
+   * en <html>, así que las inyectamos ambas a la vez.
+   *
+   * Cada <picture> incluye <source webp> + <source png> + <img> con un
+   * srcset responsive (small 640w / medium 1280w / big 2560w). El <img>
+   * fallback apunta al `big.png` para clientes que ignoran srcset.
+   *
+   * @param {string} folder  Carpeta bajo `/assets/img/paginas/`.
+   * @param {string} name    Nombre base del archivo (sin variante ni tamaño).
+   * @param {string} caption Texto que sirve de `alt` (sólo en la variante light;
+   *                         la dark va `alt=""` + aria-hidden para no duplicar).
+   * @returns {string} HTML string con las dos <picture> concatenadas.
+   */
   function buildPictures(folder, name, caption) {
+    /**
+     * Renderiza una <picture> para una variante concreta del tema.
+     * @param {'light-mode'|'dark'} variant Sufijo del nombre de archivo de imagen.
+     * @param {'light'|'dark'}      modeId  Modificador BEM aplicado al elemento.
+     * @returns {string} Markup HTML de la <picture>.
+     */
     function pictureFor(variant, modeId) {
       var base = BASE_PATH + folder + '/stay-sidekick-' + name + '-' + variant + '-';
       var webpSet = base + 'small.webp 640w, ' + base + 'medium.webp 1280w, ' + base + 'big.webp 2560w';
       var pngSet  = base + 'small.png 640w, '  + base + 'medium.png 1280w, '  + base + 'big.png 2560w';
       var imgSrc  = base + 'big.png';
       var isLight = modeId === 'light';
+      // Sólo la variante light lleva alt — la dark es decorativa (la verdadera la pinta CSS).
       var altAttr = isLight ? caption : '';
       var ariaHidden = isLight ? '' : ' aria-hidden="true"';
       return (

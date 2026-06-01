@@ -1,0 +1,161 @@
+/* =============================================================================
+   STAY SIDEKICK — Tema corporativo para Docusaurus (Infima override)
+   Replica los tokens de frontend/src/styles/settings/_css-variables.scss:
+     · Paleta acromática + acento ámbar (--accent: hsl(47 64% 87%))
+     · Tipografía Archivo (variable 100..900) desde Google Fonts
+     · Radio 0.625rem, sombras suaves, escala de espaciado 4px
+   Sincronizar este archivo en los 3 sitios (web, frontend, backend).
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Archivo:wght@100..900&display=swap');
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   LIGHT MODE
+   ──────────────────────────────────────────────────────────────────────────── */
+:root {
+  /* Paleta primaria — ámbar saturado derivado de $color-warning-amber */
+  --ifm-color-primary: hsl(38, 92%, 45%);
+  --ifm-color-primary-dark: hsl(38, 92%, 41%);
+  --ifm-color-primary-darker: hsl(38, 92%, 38%);
+  --ifm-color-primary-darkest: hsl(38, 92%, 32%);
+  --ifm-color-primary-light: hsl(38, 92%, 49%);
+  --ifm-color-primary-lighter: hsl(38, 92%, 52%);
+  --ifm-color-primary-lightest: hsl(38, 92%, 57%);
+
+  /* Estados semánticos — alineados con _colores.scss */
+  --ifm-color-success: hsl(122, 39%, 49%);
+  --ifm-color-info: hsl(210, 75%, 50%);
+  --ifm-color-warning: hsl(38, 92%, 50%);
+  --ifm-color-danger: hsl(0, 41%, 63%);
+
+  /* Tipografía — Archivo como base, escala desde _tipografia.scss */
+  --ifm-font-family-base: 'Archivo', ui-sans-serif, system-ui, -apple-system,
+    BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --ifm-font-family-monospace: 'Courier New', Courier, monospace;
+  --ifm-font-weight-base: 500;          /* $font-weight-body */
+  --ifm-font-weight-semibold: 700;      /* $font-weight-heading */
+  --ifm-font-weight-bold: 800;          /* $font-weight-display */
+  --ifm-heading-font-weight: 700;
+  --ifm-line-height-base: 1.5;          /* $line-height-body */
+  --ifm-h1-font-size: 2.25rem;          /* $font-size-h1 */
+  --ifm-h2-font-size: 2rem;
+  --ifm-h3-font-size: 1.5rem;
+  --ifm-h4-font-size: 1.25rem;
+
+  /* Backgrounds y superficies — _css-variables.scss tokens */
+  --ifm-background-color: hsl(0, 0%, 97.6471%);              /* --background */
+  --ifm-background-surface-color: hsl(0, 0%, 100%);          /* --card */
+  --ifm-color-content: hsl(0, 0%, 22.7451%);                 /* --foreground */
+  --ifm-color-content-secondary: hsl(0, 0%, 31.3725%);       /* --muted-foreground */
+  --ifm-hover-overlay: hsl(47.4419, 64.1791%, 86.8627%, 0.35); /* accent translúcido */
+
+  /* Bordes y radio */
+  --ifm-color-emphasis-200: hsl(0, 0%, 89%);                 /* --muted */
+  --ifm-color-emphasis-300: hsl(0, 0%, 75.2941%);            /* --sidebar-border */
+  --ifm-color-emphasis-500: hsl(0, 0.8696%, 45.0980%);       /* --border */
+  --ifm-color-emphasis-700: hsl(0, 0%, 31.3725%);            /* --border-strong */
+  --ifm-global-radius: 0.625rem;                             /* --radius */
+  --ifm-card-border-radius: 0.625rem;
+  --ifm-button-border-radius: calc(0.625rem - 2px);          /* --radius-md */
+
+  /* Navbar y sidebar */
+  --ifm-navbar-background-color: hsl(0, 0%, 100%);           /* --header-bg */
+  --ifm-navbar-shadow: 0 1px 0 hsl(0, 0%, 87%);              /* --header-border */
+  --ifm-navbar-link-color: hsl(0, 0%, 22.7451%);
+  --ifm-navbar-link-hover-color: hsl(14.2105, 25.6757%, 29.0196%);
+  --ifm-menu-color: hsl(0, 0%, 22.7451%);
+  --ifm-menu-color-background-active: hsl(47.4419, 64.1791%, 86.8627%, 0.35);
+  --ifm-menu-color-active: hsl(14.2105, 25.6757%, 29.0196%); /* --accent-foreground */
+  --ifm-toc-border-color: hsl(0, 0%, 89%);
+
+  /* Footer */
+  --ifm-footer-background-color: hsl(0, 0%, 12.9412%);       /* --sidebar dark */
+  --ifm-footer-color: hsl(0, 0%, 86.2745%);
+  --ifm-footer-link-color: hsl(0, 0%, 86.2745%);
+  --ifm-footer-link-hover-color: hsl(47.4419, 64.1791%, 86.8627%);
+  --ifm-footer-title-color: hsl(0, 0%, 100%);
+
+  /* Tarjetas, código, tablas */
+  --ifm-card-background-color: hsl(0, 0%, 100%);
+  --ifm-code-background: hsl(0, 0%, 94%);
+  --ifm-code-color: hsl(14.2105, 25.6757%, 29.0196%);
+  --ifm-table-border-color: hsl(0, 0%, 89%);
+  --ifm-table-stripe-background: hsl(0, 0%, 97.6471%);
+
+  /* Bloques resaltados y citas */
+  --ifm-blockquote-border-color: hsl(47.4419, 64.1791%, 86.8627%);
+  --ifm-blockquote-color: hsl(0, 0%, 31.3725%);
+  --docusaurus-highlighted-code-line-bg: hsl(0, 0%, 87%);
+
+  /* Otros */
+  --ifm-code-font-size: 92%;
+  --ifm-spacing-horizontal: 1rem;                            /* $space-4 */
+  --ifm-global-spacing: 1rem;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   DARK MODE — overrides
+   Selector [data-theme='dark'] coincide con el toggle de la SPA.
+   ──────────────────────────────────────────────────────────────────────────── */
+[data-theme='dark'] {
+  /* Paleta primaria — ámbar más claro para contraste sobre fondo oscuro */
+  --ifm-color-primary: hsl(38, 92%, 60%);
+  --ifm-color-primary-dark: hsl(38, 92%, 55%);
+  --ifm-color-primary-darker: hsl(38, 92%, 52%);
+  --ifm-color-primary-darkest: hsl(38, 92%, 45%);
+  --ifm-color-primary-light: hsl(38, 92%, 65%);
+  --ifm-color-primary-lighter: hsl(38, 92%, 68%);
+  --ifm-color-primary-lightest: hsl(38, 92%, 73%);
+
+  /* Backgrounds */
+  --ifm-background-color: hsl(0, 0%, 16.8627%);              /* --background dark */
+  --ifm-background-surface-color: hsl(0, 0%, 20%);           /* --card dark */
+  --ifm-color-content: hsl(0, 0%, 86.2745%);                 /* --foreground dark */
+  --ifm-color-content-secondary: hsl(0, 0%, 62.7451%);       /* --muted-foreground dark */
+  --ifm-hover-overlay: hsl(0, 0%, 87.8431%, 0.08);
+
+  /* Bordes */
+  --ifm-color-emphasis-200: hsl(0, 0%, 27%);                 /* --muted dark */
+  --ifm-color-emphasis-300: hsl(0, 0%, 30.9804%);            /* --sidebar-border dark */
+  --ifm-color-emphasis-500: hsl(0, 0%, 30.9804%);            /* --border dark */
+  --ifm-color-emphasis-700: hsl(0, 0%, 50%);                 /* --border-strong dark */
+
+  /* Navbar */
+  --ifm-navbar-background-color: hsl(0, 0%, 20%);            /* --header-bg dark */
+  --ifm-navbar-shadow: 0 1px 0 hsl(0, 0%, 30.9804%);
+  --ifm-navbar-link-color: hsl(0, 0%, 86.2745%);
+  --ifm-navbar-link-hover-color: hsl(38, 92%, 65%);
+  --ifm-menu-color: hsl(0, 0%, 86.2745%);
+  --ifm-menu-color-active: hsl(38, 92%, 65%);
+  --ifm-menu-color-background-active: hsl(38, 92%, 60%, 0.12);
+  --ifm-toc-border-color: hsl(0, 0%, 30.9804%);
+
+  /* Tarjetas, código, tablas */
+  --ifm-card-background-color: hsl(0, 0%, 20%);
+  --ifm-code-background: hsl(0, 0%, 27%);
+  --ifm-code-color: hsl(38, 92%, 70%);
+  --ifm-table-border-color: hsl(0, 0%, 30.9804%);
+  --ifm-table-stripe-background: hsl(0, 0%, 18%);
+
+  /* Citas */
+  --ifm-blockquote-border-color: hsl(38, 92%, 60%);
+  --ifm-blockquote-color: hsl(0, 0%, 75%);
+  --docusaurus-highlighted-code-line-bg: hsl(0, 0%, 27%);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Ajustes finos — letter-spacing y refinamientos visuales corporativos
+   ──────────────────────────────────────────────────────────────────────────── */
+body {
+  letter-spacing: 0.005em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4 {
+  letter-spacing: -0.01em;
+}
+
+.navbar__title {
+  font-weight: 700;
+}

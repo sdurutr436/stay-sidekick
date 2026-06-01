@@ -1,0 +1,58 @@
+# =============================================================================
+# pydoc-markdown — Configuración para generar Markdown desde el backend Flask
+#
+# El script `prebuild` del package.json invoca `pydoc-markdown` sin argumentos,
+# por lo que lee este YAML del CWD. Recorre backend/app/ con `PythonLoader`,
+# procesa docstrings (Google / NumPy / reST) con FilterProcessor y CrossrefProcessor,
+# y vuelca un fichero Markdown por módulo en `docs/api/` con renderer "docusaurus".
+#
+# Cualquier nuevo submódulo en backend/app/ se documenta automáticamente.
+# =============================================================================
+
+loaders:
+  - type: python
+    search_path:
+      - ../../../backend
+    modules:
+      - app
+      - app.config
+      - app.extensions
+      - app.auth
+      - app.common
+      - app.contact
+      - app.empresas
+      - app.exceptions
+      - app.h_maestro_apartamentos
+      - app.h_mapa_de_calor
+      - app.h_notificaciones_tardias
+      - app.h_sincronizador_contactos
+      - app.h_vault_comunicaciones
+      - app.models
+      - app.normalizador_pms
+      - app.perfil
+      - app.security
+      - app.solicitud
+    packages: []
+
+processors:
+  - type: filter
+    expression: not name.startswith('_') or name == '__init__'
+    documented_only: false
+    do_not_filter_modules: true
+  - type: smart
+  - type: crossref
+
+renderer:
+  type: docusaurus
+  docs_base_path: docs
+  relative_output_path: api
+  relative_sidebar_path: sidebar.json
+  sidebar_top_level_label: API (Flask)
+  markdown:
+    use_fixed_header_levels: true
+    header_level_by_type:
+      Module: 1
+      Class: 2
+      Method: 3
+      Function: 2
+      Variable: 3

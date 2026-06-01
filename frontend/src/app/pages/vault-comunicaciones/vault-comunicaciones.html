@@ -110,10 +110,23 @@
               [attr.aria-selected]="plantillaSeleccionada()?.id === p.id"
               (click)="seleccionarPlantilla(p)"
             >
-              <span class="vault-sidebar__item-nombre">{{ p.nombre }}</span>
-              @if (p.categoria) {
-                <span class="vault-sidebar__item-meta">{{ p.categoria }}</span>
-              }
+              <div class="vault-sidebar__item-content">
+                <span class="vault-sidebar__item-nombre">{{ p.nombre }}</span>
+                @if (p.categoria) {
+                  <span class="vault-sidebar__item-meta">{{ p.categoria }}</span>
+                }
+              </div>
+              <div class="vault-sidebar__item-acciones" (click)="$event.stopPropagation()">
+                <button
+                  type="button"
+                  class="vault-sidebar__item-btn vault-sidebar__item-btn--danger"
+                  [attr.aria-label]="'Eliminar plantilla ' + p.nombre"
+                  title="Eliminar plantilla"
+                  (click)="eliminarPlantilla(p)"
+                >
+                  <ng-icon name="phosphorTrash" size="16" aria-hidden="true" />
+                </button>
+              </div>
             </li>
           }
         } @else if (searchPlantillas() || filtroCategoria() || filtroIdioma()) {

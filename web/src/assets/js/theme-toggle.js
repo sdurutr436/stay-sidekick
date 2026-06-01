@@ -13,6 +13,13 @@
 (function () {
   var STORAGE_KEY = 'theme';
 
+  /**
+   * Resuelve el tema vigente con la siguiente prioridad:
+   *   1. Valor guardado en localStorage['theme'] (si es 'light' o 'dark').
+   *   2. Preferencia del SO vía matchMedia('prefers-color-scheme').
+   *   3. Fallback a 'light'.
+   * @returns {'light'|'dark'}
+   */
   function currentTheme() {
     var stored = localStorage.getItem(STORAGE_KEY);
     if (stored === 'light' || stored === 'dark') return stored;
@@ -22,6 +29,12 @@
     return 'light';
   }
 
+  /**
+   * Aplica un tema al <html> (clase `.dark` + atributo `data-theme`) y lo
+   * persiste en localStorage. La persistencia dispara el evento `storage`
+   * en otras pestañas/apps del mismo origen para mantenerlas sincronizadas.
+   * @param {'light'|'dark'} theme
+   */
   function applyTheme(theme) {
     var root = document.documentElement;
     root.classList.toggle('dark', theme === 'dark');
@@ -29,6 +42,12 @@
     localStorage.setItem(STORAGE_KEY, theme);
   }
 
+  /**
+   * Sincroniza el icono y el `aria-label` del botón con el tema activo.
+   * El sol se ve en modo oscuro (acción: pasar a claro) y viceversa.
+   * @param {HTMLElement}     button Botón del toggle (`[data-theme-toggle]`).
+   * @param {'light'|'dark'}  theme  Tema actualmente aplicado.
+   */
   function updateButtonIcon(button, theme) {
     var sun = button.querySelector('[data-theme-icon="sun"]');
     var moon = button.querySelector('[data-theme-icon="moon"]');
