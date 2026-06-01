@@ -10,6 +10,6 @@
     "install:all": "npm --prefix frontend install && npm --prefix web install"
   },
   "devDependencies": {
-    "concurrently": "^9.0.0"
+    "concurrently": "^10.0.1"
   }
 }
