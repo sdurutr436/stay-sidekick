@@ -2,8 +2,10 @@ import { Component, ElementRef, OnDestroy, OnInit, ViewChild, computed, inject, 
 import { RouterLink } from '@angular/router';
 import { NgIconComponent } from '@ng-icons/core';
 import { ButtonComponent } from '../../components/atoms/button/button';
+import { AlertComponent } from '../../components/molecules/alert/alert';
 import { DropdownBuscadorComponent, DropdownOption } from '../../components/molecules/dropdown-buscador/dropdown-buscador';
 import { HowItWorksButtonComponent } from '../../components/molecules/how-it-works-button/how-it-works-button';
+import { ModalComponent } from '../../components/organisms/modal/modal';
 import { PageHeaderComponent } from '../../components/organisms/page-header/page-header';
 import { PanelSeccionComponent } from '../../components/organisms/panel-seccion/panel-seccion';
 import { TemplatesCardComponent } from '../../components/organisms/templates-card/templates-card';
@@ -39,7 +41,7 @@ const COOLDOWN_SEGUNDOS = 60;
   imports: [
     RouterLink, NgIconComponent, PageHeaderComponent, ButtonComponent,
     DropdownBuscadorComponent, HowItWorksButtonComponent, TemplatesCardComponent,
-    PanelSeccionComponent,
+    PanelSeccionComponent, ModalComponent, AlertComponent,
   ],
 })
 export class VaultComunicacionesPageComponent implements OnInit, OnDestroy {
@@ -64,6 +66,10 @@ export class VaultComunicacionesPageComponent implements OnInit, OnDestroy {
   readonly nombreActual = signal('');
   readonly isNueva      = signal(false);
   readonly guardando    = signal(false);
+
+  // Modal de confirmación de borrado de plantilla
+  readonly plantillaABorrar = signal<Plantilla | null>(null);
+  readonly borrando         = signal(false);
 
   readonly cargandoIA            = signal(false);
   readonly cooldownActivo        = signal(false);
@@ -184,9 +190,20 @@ export class VaultComunicacionesPageComponent implements OnInit, OnDestroy {
     }
   }
 
-  eliminarPlantilla(plantilla: Plantilla): void {
-    if (!confirm(`¿Eliminar la plantilla "${plantilla.nombre}"? Esta acción no se puede deshacer.`)) return;
+  pedirBorrado(plantilla: Plantilla): void {
+    this.plantillaABorrar.set(plantilla);
+  }
 
+  cerrarModalBorrado(): void {
+    if (this.borrando()) return;
+    this.plantillaABorrar.set(null);
+  }
+
+  confirmarBorrado(): void {
+    const plantilla = this.plantillaABorrar();
+    if (!plantilla) return;
+
+    this.borrando.set(true);
     this.vault.eliminarPlantilla(plantilla.id).subscribe({
       next: () => {
         this.plantillas.update(list => list.filter(p => p.id !== plantilla.id));
@@ -196,9 +213,14 @@ export class VaultComunicacionesPageComponent implements OnInit, OnDestroy {
           this.mensajeActual.set('');
           this.isNueva.set(false);
         }
+        this.borrando.set(false);
+        this.plantillaABorrar.set(null);
         this.toast.showSuccess('Plantilla eliminada correctamente.');
       },
-      error: err => this.toast.showError(this.mensajeError(err, 'guardar')),
+      error: err => {
+        this.borrando.set(false);
+        this.toast.showError(this.mensajeError(err, 'guardar'));
+      },
     });
   }
 
