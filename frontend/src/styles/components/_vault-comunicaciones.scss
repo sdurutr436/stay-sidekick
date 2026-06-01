@@ -65,8 +65,8 @@
     padding: $space-3 $space-4;
     cursor: pointer;
     display: flex;
-    flex-direction: column;
-    gap: $space-1;
+    align-items: center;
+    gap: $space-2;
     transition: background-color var(--transition-base);
 
     &:hover {
@@ -87,6 +87,14 @@
     }
   }
 
+  &__item-content {
+    display: flex;
+    flex-direction: column;
+    gap: $space-1;
+    flex: 1;
+    min-width: 0;
+  }
+
   &__item-nombre {
     @include text-body-sm;
     color: $color-text-primary;
@@ -98,6 +106,25 @@
     color: $color-text-secondary;
     text-transform: uppercase;
     letter-spacing: 0.04em;
+  }
+
+  &__item-acciones {
+    display: flex;
+    gap: $space-1;
+    flex-shrink: 0;
+  }
+
+  &__item-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: $space-1;
+    color: $color-text-secondary;
+    display: flex;
+    align-items: center;
+
+    &:hover { color: $color-text-primary; }
+    &--danger:hover { color: $color-gray-700; }
   }
 
   &__empty {

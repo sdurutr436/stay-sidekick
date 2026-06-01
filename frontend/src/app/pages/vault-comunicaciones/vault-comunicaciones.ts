@@ -184,6 +184,24 @@ export class VaultComunicacionesPageComponent implements OnInit, OnDestroy {
     }
   }
 
+  eliminarPlantilla(plantilla: Plantilla): void {
+    if (!confirm(`¿Eliminar la plantilla "${plantilla.nombre}"? Esta acción no se puede deshacer.`)) return;
+
+    this.vault.eliminarPlantilla(plantilla.id).subscribe({
+      next: () => {
+        this.plantillas.update(list => list.filter(p => p.id !== plantilla.id));
+        if (this.plantillaSeleccionada()?.id === plantilla.id) {
+          this.plantillaSeleccionada.set(null);
+          this.nombreActual.set('');
+          this.mensajeActual.set('');
+          this.isNueva.set(false);
+        }
+        this.toast.showSuccess('Plantilla eliminada correctamente.');
+      },
+      error: err => this.toast.showError(this.mensajeError(err, 'guardar')),
+    });
+  }
+
   onSearchPlantillas(event: Event): void {
     this.searchPlantillas.set((event.target as HTMLInputElement).value);
   }
