@@ -36,7 +36,9 @@ RUN pnpm install --frozen-lockfile
 COPY . .
 
 # Compilar en modo producción con base-href para el prefijo /app/
-RUN pnpm run build -- --base-href=/menu/
+# pnpm exec invoca ng directamente: evita el doble `--` que pnpm 10 reenvía
+# literalmente al script (`ng build -- --base-href`), rechazado por Angular CLI.
+RUN pnpm exec ng build --base-href=/menu/
 
 # ── Stage 2: Serve ────────────────────────────────────────────────────────────
 # nginx:alpine — imagen final (Alpine minimiza la superficie de ataque; rebuild periódico para parches)
