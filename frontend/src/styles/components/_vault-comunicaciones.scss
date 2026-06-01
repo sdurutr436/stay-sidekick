@@ -386,3 +386,61 @@
   }
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Ajustes responsive (móvil): evitar desbordes horizontales del editor.
+// Los controles del editor (meta, toolbar, acciones, traducir) y el panel de
+// nueva variable usan anchos fijos pensados para escritorio; en pantallas
+// estrechas se apilan en vertical y ocupan el ancho completo.
+// ─────────────────────────────────────────────────────────────────────────────
+@include respond-until('md') {
+  .vault-editor {
+    &__meta {
+      flex-direction: column;
+    }
+
+    &__toolbar {
+      flex-wrap: wrap;
+    }
+
+    &__acciones-fila {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    &__acciones-izq,
+    &__acciones-der {
+      flex-wrap: wrap;
+      width: 100%;
+    }
+
+    // El tono usa min-width fijo en escritorio; en móvil que fluya
+    &__tono-select {
+      min-width: 0;
+      flex: 1;
+    }
+
+    &__traducir {
+      width: 100%;
+      flex-wrap: wrap;
+    }
+  }
+
+  .vault-nueva-variable {
+    flex-direction: column;
+    align-items: stretch;
+
+    &__inner {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    &__input {
+      width: 100%;
+    }
+
+    &__acciones {
+      justify-content: flex-end;
+    }
+  }
+}
+
