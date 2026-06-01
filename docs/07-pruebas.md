@@ -523,7 +523,7 @@ Se ejecuta en *push* a cualquier rama y en *pull requests* a `main`. Consta de d
 
 1. `test-frontend` — `npx ng test --watch=false` con Node 22. Genera el informe de cobertura en
    `frontend/coverage/` y lo sube como artefacto con 14 días de retención.
-2. `deploy-check` — Build de producción (`npm run build`) tras pasar los tests, como verificación
+2. `deploy-check` — Build de producción (`pnpm run build`) tras pasar los tests, como verificación
    adicional de que el código es compilable.
 
 **CI Angular Build (`ci-angular.yml`) y CI Web (`ci-web.yml`)**  

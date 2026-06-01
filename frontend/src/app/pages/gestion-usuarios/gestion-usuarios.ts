@@ -241,8 +241,13 @@ export class GestionUsuariosPageComponent implements OnInit {
         this.eliminandoEdicion.set(false);
         this._cargar(this._empresaIdActual());
         this.cerrarEdicion();
+        this.toast.showSuccess('Usuario eliminado correctamente.');
       },
-      error: () => { this.eliminandoEdicion.set(false); },
+      error: err => {
+        this.eliminandoEdicion.set(false);
+        this.confirmandoEliminarEdicion.set(false);
+        this.toast.showError(err?.error?.errors?.[0] ?? 'No se pudo eliminar el usuario. Inténtalo de nuevo.');
+      },
     });
   }
 

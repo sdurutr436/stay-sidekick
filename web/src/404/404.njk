@@ -3,6 +3,16 @@ layout: base.njk
 title: Página no encontrada
 description: La página que buscas no existe en Stay Sidekick.
 ---
+{#
+  PAGE: /404/ (gestionada por nginx como `error_page 404`)
+  Propósito  : mensaje amigable cuando la URL no existe.
+  Datos      : ninguno externo.
+  Scripts    : inline (no externo a propósito — script breve y bien delimitado);
+               si hay JWT válido en localStorage, redirige a /menu en lugar de
+               quedarse en el 404 (mejora UX para usuarios autenticados).
+  Cuidado    : el inline `<script>` se permite porque la CSP del 404 lo tolera;
+               revisar si en el futuro endurecemos `script-src` a `'self'` estricto.
+#}
 
 <section class="l-container u-text-center">
   <div class="not-found">

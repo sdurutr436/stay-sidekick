@@ -12,8 +12,13 @@ Para el detalle completo consulta los documentos enlazados en cada sección.
 | Docker      | 24+           |
 | Docker Compose | v2 (plugin) |
 | Git         | cualquiera    |
+| Node.js (sin Docker) | 20 LTS |
+| pnpm (sin Docker)    | 10 (vía `corepack enable`) |
 
 Para despliegue en producción (Railway): cuenta en [railway.app](https://railway.app) y repositorio en GitHub.
+
+> **Nota sobre pnpm v10 y scripts de postinstalación.**
+> Desde pnpm 10, los scripts `postinstall` de las dependencias se bloquean por defecto. El proyecto declara en `frontend/package.json` y `web/package.json` (bloque `pnpm.onlyBuiltDependencies`) los paquetes a los que se permite ejecutar scripts: `esbuild`, `@parcel/watcher`, `lmdb` y `msgpackr-extract` en `frontend/`, y `@parcel/watcher` en `web/`. Son binarios nativos necesarios para el builder de Angular y los watchers de desarrollo. Cualquier nuevo paquete con `postinstall` que aparezca en futuros `pnpm install` saldrá como `Ignored build scripts: <lista>` y deberá revisarse antes de añadirse a esa lista (manualmente o vía `pnpm approve-builds`).
 
 ---
 

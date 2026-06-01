@@ -45,7 +45,7 @@ Este capitulo define el procedimiento de instalacion y preparacion del entorno d
 Para desarrollo local sin contenedores:
 
 - Node.js >= 18 (recomendado: 20 LTS).
-- npm >= 10.
+- pnpm >= 10 (se activa con `corepack enable`).
 - Python 3.12.
 - pip para Python 3.
 - Git para clonar el repositorio.
@@ -94,10 +94,10 @@ Este diseño permite separar build y runtime en frontend/web (multi-stage), y ma
 |---|---|
 | `dev.sh` | Arranca web + frontend en Linux/macOS e instala dependencias faltantes |
 | `dev.bat` | Arranca web + frontend en Windows e instala dependencias faltantes |
-| `npm run dev` (raiz) | Ejecuta `web` y `frontend` en paralelo con `concurrently` |
-| `npm run dev:web` (raiz) | Levanta 11ty |
-| `npm run dev:app` (raiz) | Levanta Angular |
-| `npm run install:all` (raiz) | Instala dependencias de `frontend` y `web` |
+| `pnpm run dev` (raiz) | Ejecuta `web` y `frontend` en paralelo con `concurrently` |
+| `pnpm run dev:web` (raiz) | Levanta 11ty |
+| `pnpm run dev:app` (raiz) | Levanta Angular |
+| `pnpm run install:all` (raiz) | Instala dependencias de `frontend` y `web` |
 | `docker compose up -d --build` | Construye y levanta stack completo |
 
 ## 3.4. Variables de entorno necesarias
@@ -295,9 +295,29 @@ docker compose up -d --build
 En la raiz del proyecto:
 
 ```bash
-npm install
-npm run install:all
+corepack enable
+pnpm install
+pnpm run install:all
 ```
+
+#### Scripts de postinstalacion permitidos (pnpm v10)
+
+A partir de pnpm 10, los scripts de `postinstall` de las dependencias se bloquean por defecto como medida de seguridad. Solo se ejecutan los paquetes declarados explicitamente en `pnpm.onlyBuiltDependencies` del `package.json` correspondiente.
+
+| Paquete | Donde | Por que se necesita |
+|---|---|---|
+| `esbuild` | `frontend/` | Binario nativo usado por `@angular/build` para compilar Angular |
+| `@parcel/watcher` | `frontend/` y `web/` | Watcher nativo de archivos en `ng serve` y `eleventy --serve` |
+| `lmdb` | `frontend/` | Cache persistente del builder de Angular |
+| `msgpackr-extract` | `frontend/` | Serializacion binaria usada por la cache del builder |
+
+Si tras un `pnpm install` aparece el aviso `Ignored build scripts: <lista>`, revisar que esos paquetes esten en `onlyBuiltDependencies`. Para aprobar nuevos paquetes de forma interactiva:
+
+```bash
+pnpm approve-builds
+```
+
+El comando reescribe el `package.json` del directorio actual con la lista actualizada.
 
 ### Paso 2. Preparar backend Python
 
@@ -328,10 +348,10 @@ Opcion A (script automatico):
 - Linux/macOS: `./dev.sh`
 - Windows: `dev.bat`
 
-Opcion B (comando npm):
+Opcion B (comando pnpm):
 
 ```bash
-npm run dev
+pnpm run dev
 ```
 
 ### Paso 4. Levantar backend

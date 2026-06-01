@@ -169,28 +169,36 @@
               <div class="acciones-body__fechas-row">
                 <div class="form-group acciones-body__fecha-field">
                   <label class="form-label" for="fecha-desde">Desde (DD/MM/AAAA)</label>
-                  <app-form-input-icon
-                    id="fecha-desde"
-                    type="text"
-                    placeholder="Ej. 01/01/2026"
-                    [value]="fechaDesde()"
-                    (valueChange)="onFechaDesdeChange($event)"
-                  >
-                    <ng-icon name="phosphorCalendar" size="20" />
-                  </app-form-input-icon>
+                  <div class="form-input-wrapper">
+                    <span class="form-input-wrapper__icon" aria-hidden="true">
+                      <ng-icon name="phosphorCalendar" size="20" />
+                    </span>
+                    <input
+                      #inputDesde
+                      id="fecha-desde"
+                      type="text"
+                      class="form-input"
+                      placeholder="Ej. 01/01/2026"
+                      readonly
+                    />
+                  </div>
                 </div>
 
                 <div class="form-group acciones-body__fecha-field">
                   <label class="form-label" for="fecha-hasta">Hasta (DD/MM/AAAA)</label>
-                  <app-form-input-icon
-                    id="fecha-hasta"
-                    type="text"
-                    placeholder="Ej. 31/01/2026"
-                    [value]="fechaHasta()"
-                    (valueChange)="onFechaHastaChange($event)"
-                  >
-                    <ng-icon name="phosphorCalendar" size="20" />
-                  </app-form-input-icon>
+                  <div class="form-input-wrapper">
+                    <span class="form-input-wrapper__icon" aria-hidden="true">
+                      <ng-icon name="phosphorCalendar" size="20" />
+                    </span>
+                    <input
+                      #inputHasta
+                      id="fecha-hasta"
+                      type="text"
+                      class="form-input"
+                      placeholder="Ej. 31/01/2026"
+                      readonly
+                    />
+                  </div>
                 </div>
               </div>
             </div>
