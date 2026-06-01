@@ -4,6 +4,17 @@ title: Contacto
 description: Ponte en contacto con Stay Sidekick.
 section: empresa
 ---
+{#
+  PAGE: /empresa/contacto/ (formulario de contacto público general)
+  Propósito  : canal abierto para preguntas, propuestas o colaboraciones;
+               envía a POST /api/contacto (distinto endpoint que /solicitud/).
+  Datos      : `config.turnstileSiteKey` para el widget antibot.
+  Macros     : atoms.button, molecules.formField, molecules.formInputIcon,
+               organisms.pageHeader.
+  Scripts    : form-contacto.js + Turnstile API.
+  Cuidado    : la información de contacto directo (email, GitHub, LinkedIn) es
+               personal del autor — actualizarla si el proyecto cambia de manos.
+#}
 
 {% import "macros/atoms.njk" as atoms %}
 {% import "macros/molecules.njk" as molecules %}
