@@ -1,0 +1,200 @@
+name: Deploy Docs (Docusaurus → GitHub Pages)
+
+# Construye los tres sitios Docusaurus de docs/docusaurus/ (web, frontend, backend),
+# ensambla la landing en docs/docusaurus/landing/ y publica todo en GitHub Pages.
+#
+# Disparado por push a main que toque cualquiera de las fuentes documentadas
+# o la propia config de Docusaurus. También manualmente con workflow_dispatch.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "docs/docusaurus/**"
+      - "frontend/src/**"
+      - "web/src/**"
+      - "web/eleventy.config.js"
+      - "backend/app/**"
+      - ".github/workflows/deploy-docs.yml"
+  workflow_dispatch:
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build-web:
+    name: Build · docs/web (11ty)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configurar pnpm
+        uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: pnpm
+          cache-dependency-path: docs/docusaurus/web/pnpm-lock.yaml
+
+      - name: Instalar dependencias
+        working-directory: docs/docusaurus/web
+        run: pnpm install --frozen-lockfile
+
+      - name: Build Docusaurus (web)
+        working-directory: docs/docusaurus/web
+        run: pnpm build
+
+      - name: Subir artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: docs-web
+          path: docs/docusaurus/web/build
+          retention-days: 1
+
+  build-frontend:
+    name: Build · docs/frontend (Angular + TypeDoc)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configurar pnpm
+        uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: pnpm
+          cache-dependency-path: docs/docusaurus/frontend/pnpm-lock.yaml
+
+      - name: Instalar dependencias
+        working-directory: docs/docusaurus/frontend
+        run: pnpm install --frozen-lockfile
+
+      - name: Build Docusaurus (frontend, ejecuta TypeDoc en prebuild)
+        working-directory: docs/docusaurus/frontend
+        run: pnpm build
+
+      - name: Subir artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: docs-frontend
+          path: docs/docusaurus/frontend/build
+          retention-days: 1
+
+  build-backend:
+    name: Build · docs/backend (Flask + pydoc-markdown)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configurar pnpm
+        uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: pnpm
+          cache-dependency-path: docs/docusaurus/backend/pnpm-lock.yaml
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Instalar pydoc-markdown
+        run: pip install "pydoc-markdown[docusaurus]==4.8.2"
+
+      - name: Instalar requirements del backend (para importes de módulos)
+        run: pip install -r backend/requirements.txt
+
+      - name: Instalar dependencias del sitio
+        working-directory: docs/docusaurus/backend
+        run: pnpm install --frozen-lockfile
+
+      # Genera una FERNET_KEY efímera SOLO para satisfacer create_app() durante
+      # el build de pydoc-markdown. Se descarta al final del job; nada cifrado
+      # con esta clave se persiste. ::add-mask:: la redacta en los logs públicos.
+      # NO commitear claves Fernet en este YAML — replicaría el incidente previo.
+      - name: Generar FERNET_KEY efímera para el build
+        run: |
+          KEY=$(python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())")
+          echo "::add-mask::$KEY"
+          echo "FERNET_KEY=$KEY" >> "$GITHUB_ENV"
+
+      - name: Build Docusaurus (backend, ejecuta pydoc-markdown en prebuild)
+        working-directory: docs/docusaurus/backend
+        env:
+          # Placeholders sin valor real — sólo evitan KeyError al cargar config.
+          # NUNCA poner aquí valores con forma de secreto válido.
+          SECRET_KEY: doc-build-no-secret
+          JWT_SECRET_KEY: doc-build-no-secret
+          DATABASE_URL: sqlite:///docbuild.sqlite
+          # FERNET_KEY se hereda del paso anterior via $GITHUB_ENV (efímera).
+        run: pnpm build
+
+      - name: Subir artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: docs-backend
+          path: docs/docusaurus/backend/build
+          retention-days: 1
+
+  assemble-and-deploy:
+    name: Ensamblar landing + publicar en GitHub Pages
+    needs: [build-web, build-frontend, build-backend]
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: docs/docusaurus/landing
+          sparse-checkout-cone-mode: false
+
+      - name: Crear estructura de salida
+        run: mkdir -p _site/web _site/frontend _site/backend
+
+      - name: Bajar artifact · web
+        uses: actions/download-artifact@v4
+        with:
+          name: docs-web
+          path: _site/web
+
+      - name: Bajar artifact · frontend
+        uses: actions/download-artifact@v4
+        with:
+          name: docs-frontend
+          path: _site/frontend
+
+      - name: Bajar artifact · backend
+        uses: actions/download-artifact@v4
+        with:
+          name: docs-backend
+          path: _site/backend
+
+      - name: Copiar landing al root
+        run: cp -r docs/docusaurus/landing/* _site/
+
+      - name: Configurar GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Subir artefacto de Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - name: Desplegar en GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

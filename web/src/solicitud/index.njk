@@ -4,6 +4,17 @@ title: Presentar solicitud
 description: Presenta tu solicitud de estancia o de nueva herramienta en Stay Sidekick.
 section: solicitud
 ---
+{#
+  PAGE: /solicitud/ (formulario público de alta de empresa)
+  Propósito  : captar empresas interesadas en usar Stay Sidekick; envía a
+               POST /api/contact con `is_member=false` (o `true` si ya son
+               beneficiarias y vienen con una incidencia).
+  Datos      : `config.turnstileSiteKey` (consumido por partial form-solicitud).
+  Partials   : partials/form-solicitud.njk (organismo completo del formulario).
+  Scripts    : form-solicitud.js + Turnstile API de Cloudflare (CDN externa).
+  Cuidado    : rate limit en backend (3/day por IP); el partial incluye honeypot
+               + Turnstile + privacy_accepted obligatorio.
+#}
 
 <section class="l-container">
   <div class="form-hero-layout">

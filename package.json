@@ -3,11 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "description": "Stay Sidekick — orquestador de entorno de desarrollo",
+  "packageManager": "pnpm@10.4.1",
   "scripts": {
-    "dev": "concurrently --kill-others-on-fail --names \"11ty,angular\" --prefix-colors \"cyan,magenta\" \"npm run dev:web\" \"npm run dev:app\"",
-    "dev:web": "npm --prefix web start",
-    "dev:app": "npm --prefix frontend start",
-    "install:all": "npm --prefix frontend install && npm --prefix web install"
+    "dev": "concurrently --kill-others-on-fail --names \"11ty,angular\" --prefix-colors \"cyan,magenta\" \"pnpm run dev:web\" \"pnpm run dev:app\"",
+    "dev:web": "pnpm -C web start",
+    "dev:app": "pnpm -C frontend start",
+    "install:all": "pnpm -C frontend install && pnpm -C web install"
   },
   "devDependencies": {
     "concurrently": "^9.0.0"

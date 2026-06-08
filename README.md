@@ -204,7 +204,7 @@ Sólo `nginx` publica un puerto al host. El resto de servicios viven en la red D
 ### Prerrequisitos
 
 - `Node.js` 18 o superior
-- `npm` 10 o superior
+- `pnpm` 10 o superior (se activa automáticamente vía `corepack enable`)
 - `Python` 3.12 o superior
 - `Docker` version 24 o más, para levantar el stack completo
 
@@ -221,11 +221,11 @@ chmod +x dev.sh
 dev.bat
 ```
 
-Alternativa directa con npm:
+Alternativa directa con pnpm:
 
 ```bash
-npm install
-npm run dev
+pnpm install
+pnpm run dev
 ```
 
 Esto levanta en paralelo:
@@ -235,10 +235,10 @@ Esto levanta en paralelo:
 ### Arranque por servicio
 ```bash
 # Sitio estático
-npm run dev:web        # cd web && npm start
+pnpm run dev:web        # cd web && pnpm start
 
 # App Angular
-npm run dev:app        # cd frontend && npm start
+pnpm run dev:app        # cd frontend && pnpm start
 
 # Backend Flask
 cd backend && python run.py
@@ -247,7 +247,7 @@ cd backend && python run.py
 ### Instalar todas las dependencias Node de una vez
 
 ```bash
-npm run install:all
+pnpm run install:all
 ```
 
 ### Levantar con Docker (entorno completo)
@@ -387,8 +387,8 @@ python -m pytest tests/ -v
 
 ```bash
 cd frontend
-npm ci
-npx ng test --watch=false
+pnpm install --frozen-lockfile
+pnpm exec ng test --watch=false
 ```
 
 - **297 tests** en **38 specs** (servicios, organismos, moléculas, átomos, guards e interceptor HTTP).

@@ -3,6 +3,16 @@ layout: base.njk
 title: Inicio
 description: Stay Sidekick — La plataforma SaaS para gestionar alojamientos turísticos.
 ---
+{#
+  PAGE: / (landing pública — index)
+  Propósito  : punto de entrada al sitio; presenta el producto a visitantes nuevos.
+  Secciones  : hero animado, herramientas (showcase con lightbox), clientes, CTA final.
+  Datos      : `tools[]` local (5 herramientas); no consume `site.*` más allá del layout.
+  Macros     : atoms.button (CTAs), molecules.card (logos clientes).
+  Partials   : ninguno extra (layout aporta header/footer).
+  Scripts    : landing-lightbox.js (defer) para ampliar capturas del showcase.
+  Cuidado    : el carrusel duplica `tools` para que el translateX -50% sea seamless.
+#}
 {% import "macros/atoms.njk" as atoms %}
 {% import "macros/molecules.njk" as molecules %}
 {% import "macros/organisms.njk" as organisms %}

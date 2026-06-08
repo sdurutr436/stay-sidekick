@@ -2,6 +2,15 @@
 permalink: /sitemap.xml
 eleventyExcludeFromCollections: true
 ---
+{#
+  PAGE: /sitemap.xml (sitemap estático para indexación SEO)
+  Propósito  : exponer las URLs públicas con su `changefreq` y `priority` para
+               que motores de búsqueda las descubran y prioricen.
+  Datos      : `site.url` (origen canónico) — el resto de URLs son fijas.
+  Cuidado    : `eleventyExcludeFromCollections: true` evita que el sitemap se
+               cuele en otras colecciones; si añades una página pública nueva,
+               hay que listarla aquí a mano (no es auto-generado).
+#}
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>

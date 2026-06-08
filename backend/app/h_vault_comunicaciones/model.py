@@ -26,7 +26,8 @@ class PlantillaVault(db.Model):
     nombre = db.Column(db.String(200), nullable=False)
     contenido = db.Column(db.Text, nullable=False)
     idioma = db.Column(db.String(10), nullable=False, default="es")
-    # Categoría semántica: 'checkin_tardio' | 'bienvenida' | 'instrucciones' | etc.
+    # Categoría semántica en MAYÚSCULAS: 'CHECKIN_TARDIO' | 'BIENVENIDA' | etc.
+    # (canon en h_vault_comunicaciones.schemas._CATEGORIAS)
     categoria = db.Column(db.String(50), nullable=True)
     activa = db.Column(db.Boolean, nullable=False, default=True)
     created_at = db.Column(

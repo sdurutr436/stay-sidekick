@@ -4,6 +4,17 @@ title: Iniciar sesión
 description: Accede a tu panel de Stay Sidekick.
 section: login
 ---
+{#
+  PAGE: /login/ (formulario de acceso al panel)
+  Propósito  : autenticar a usuarios ya registrados; el resultado es un JWT
+               que se persiste en `localStorage['ss_token']` y se usa en la SPA.
+  Datos      : `config.turnstileSiteKey` (no — esta página no usa Turnstile).
+  Macros     : atoms.button (CTA submit).
+  Scripts    : form-login.js (defer). Si detecta JWT vigente, redirige al panel
+               sin renderizar el formulario.
+  Cuidado    : si la URL trae `?acceso=requerido` se muestra un alert previo —
+               se emite cuando un guard de la SPA rebota al usuario sin sesión.
+#}
 {% import "macros/atoms.njk" as atoms %}
 
 <section class="l-container">

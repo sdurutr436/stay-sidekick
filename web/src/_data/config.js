@@ -4,7 +4,7 @@
 // {{ config.* }}
 //
 // Carga .env desde web/ (local dev). En Docker el ARG TURNSTILE_SITE_KEY
-// se inyecta como ENV antes de npm run build, por lo que process.env ya
+// se inyecta como ENV antes de pnpm run build, por lo que process.env ya
 // tiene el valor sin necesidad de leer el archivo.
 // =============================================================================
 

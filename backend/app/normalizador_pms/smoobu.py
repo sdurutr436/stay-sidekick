@@ -218,7 +218,11 @@ class SmoobuReservationClient:
 
         # Smoobu no garantiza hora de llegada; algunos canales la incluyen
         hora_llegada: str | None = None
-        raw_hora = booking.get("check_in_time") or booking.get("checkInTime")
+        raw_hora = (
+            booking.get("arrivalTime")
+            or booking.get("check_in_time")
+            or booking.get("checkInTime")
+        )
         if raw_hora:
             s = str(raw_hora).strip()
             m = re.match(r"^(\d{1,2}):(\d{2})", s)

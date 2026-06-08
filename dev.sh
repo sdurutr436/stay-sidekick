@@ -26,18 +26,18 @@ echo ""
 # Instala dependencias si no están presentes
 if [ ! -d "node_modules" ]; then
   echo -e "${YELLOW}Instalando dependencias raíz...${RESET}"
-  npm install
+  pnpm install
 fi
 
 if [ ! -d "frontend/node_modules" ]; then
   echo -e "${YELLOW}Instalando dependencias de frontend/...${RESET}"
-  npm --prefix frontend install
+  pnpm -C frontend install
 fi
 
 if [ ! -d "web/node_modules" ]; then
   echo -e "${YELLOW}Instalando dependencias de web/...${RESET}"
-  npm --prefix web install
+  pnpm -C web install
 fi
 
 echo -e "Levantando servidores con ${BOLD}concurrently${RESET}..."
-npm run dev
+pnpm run dev

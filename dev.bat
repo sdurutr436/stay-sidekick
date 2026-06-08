@@ -17,20 +17,20 @@ echo.
 REM Instala dependencias raiz si no existen
 if not exist "node_modules\" (
     echo Instalando dependencias raiz...
-    call npm install
+    call pnpm install
 )
 
 REM Instala dependencias de frontend si no existen
 if not exist "frontend\node_modules\" (
     echo Instalando dependencias de frontend...
-    call npm --prefix frontend install
+    call pnpm -C frontend install
 )
 
 REM Instala dependencias de web si no existen
 if not exist "web\node_modules\" (
     echo Instalando dependencias de web...
-    call npm --prefix web install
+    call pnpm -C web install
 )
 
 echo Levantando servidores...
-call npm run dev
+call pnpm run dev
