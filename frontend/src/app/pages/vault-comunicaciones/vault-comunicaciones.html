@@ -110,10 +110,23 @@
               [attr.aria-selected]="plantillaSeleccionada()?.id === p.id"
               (click)="seleccionarPlantilla(p)"
             >
-              <span class="vault-sidebar__item-nombre">{{ p.nombre }}</span>
-              @if (p.categoria) {
-                <span class="vault-sidebar__item-meta">{{ p.categoria }}</span>
-              }
+              <div class="vault-sidebar__item-content">
+                <span class="vault-sidebar__item-nombre">{{ p.nombre }}</span>
+                @if (p.categoria) {
+                  <span class="vault-sidebar__item-meta">{{ p.categoria }}</span>
+                }
+              </div>
+              <div class="vault-sidebar__item-acciones" (click)="$event.stopPropagation()">
+                <button
+                  type="button"
+                  class="vault-sidebar__item-btn vault-sidebar__item-btn--danger"
+                  [attr.aria-label]="'Eliminar plantilla ' + p.nombre"
+                  title="Eliminar plantilla"
+                  (click)="pedirBorrado(p)"
+                >
+                  <ng-icon name="phosphorTrash" size="16" aria-hidden="true" />
+                </button>
+              </div>
             </li>
           }
         } @else if (searchPlantillas() || filtroCategoria() || filtroIdioma()) {
@@ -417,3 +430,18 @@
   </div>
 
 </div>
+
+<!-- Modal: Confirmar borrado de plantilla -->
+<app-modal title="Eliminar plantilla" [open]="plantillaABorrar() !== null" (cerrar)="cerrarModalBorrado()">
+  <app-alert type="error">
+    ¿Eliminar la plantilla «{{ plantillaABorrar()?.nombre }}»? Esta acción no se puede deshacer.
+  </app-alert>
+  <div modal-footer>
+    <app-button variant="danger" size="md" [disabled]="borrando()" (click)="confirmarBorrado()">
+      {{ borrando() ? 'Eliminando…' : 'Sí, eliminar' }}
+    </app-button>
+    <app-button variant="ghost" size="md" [disabled]="borrando()" (click)="cerrarModalBorrado()">
+      Cancelar
+    </app-button>
+  </div>
+</app-modal>

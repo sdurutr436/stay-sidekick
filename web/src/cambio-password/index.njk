@@ -4,6 +4,19 @@ title: Cambiar contraseña
 description: Cambia tu contraseña de acceso.
 section: cambio-password
 ---
+{#
+  PAGE: /cambio-password/ (cambio forzado tras primer login o reset admin)
+  Propósito  : permitir al usuario fijar una contraseña propia cuando el JWT
+               trae `debe_cambiar_password: true`; tras el cambio se rota el
+               token y se redirige al panel.
+  Datos      : ninguno desde `site.*` ni `config.*`.
+  Macros     : atoms.button, molecules.formField, molecules.alert,
+               organisms.pageHeader.
+  Scripts    : password-rules.js (fuente única de reglas, debe cargarse ANTES) +
+               cambio-password.js (defer).
+  Cuidado    : el `<noscript>` muestra un alert porque el formulario depende
+               totalmente de JS (sanitización + render de lista de fortaleza).
+#}
 {% import "macros/atoms.njk" as atoms %}
 {% import "macros/molecules.njk" as molecules %}
 {% import "macros/organisms.njk" as organisms %}

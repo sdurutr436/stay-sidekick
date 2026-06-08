@@ -13,6 +13,9 @@
 #   La CSP estricta de nginx lo bloquea y el CSS nunca se aplica en pantalla.
 #   Con inlineCritical: false se genera un <link rel="stylesheet"> directo,
 #   compatible con la CSP sin necesidad de añadir 'unsafe-inline' a script-src.
+#
+# Gestor de paquetes: pnpm (activado vía corepack a partir del campo
+# "packageManager" de package.json — versión reproducible en builds).
 # =============================================================================
 
 # ── Stage 1: Build ────────────────────────────────────────────────────────────
@@ -21,15 +24,21 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
+# Activar pnpm vía corepack (incluido en Node ≥ 16); usa la versión declarada
+# en el campo "packageManager" de package.json para garantizar reproducibilidad.
+RUN corepack enable
+
 # Copiar manifiestos primero para aprovechar la caché de capas
-COPY package*.json ./
-RUN npm ci
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile
 
 # Copiar el resto del código fuente
 COPY . .
 
 # Compilar en modo producción con base-href para el prefijo /app/
-RUN npm run build -- --base-href=/menu/
+# pnpm exec invoca ng directamente: evita el doble `--` que pnpm 10 reenvía
+# literalmente al script (`ng build -- --base-href`), rechazado por Angular CLI.
+RUN pnpm exec ng build --base-href=/menu/
 
 # ── Stage 2: Serve ────────────────────────────────────────────────────────────
 # nginx:alpine — imagen final (Alpine minimiza la superficie de ataque; rebuild periódico para parches)

@@ -5,6 +5,18 @@ description: Consulta los precios de Stay Sidekick — planes para empresas de a
 section: producto
 permalink: /precios/
 ---
+{#
+  PAGE: /precios/ (planes y precios — permalink personalizado, sin /producto/)
+  Propósito  : transparencia de precios; enlazada como acción comercial desde
+               el hero principal y el footer.
+  Datos      : ninguno externo; contenido editorial estático.
+  Macros     : atoms.button (CTA presentar solicitud), molecules.card (planes),
+               organisms.pageHeader.
+  Scripts    : ninguno extra.
+  Cuidado    : el `permalink: /precios/` sobrescribe la URL por defecto
+               `/producto/precios/`; ambos referenciantes externos pueden
+               existir, no romper redirects al cambiarla.
+#}
 
 {% import "macros/atoms.njk" as atoms %}
 {% import "macros/molecules.njk" as molecules %}

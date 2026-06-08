@@ -1,14 +1,14 @@
-import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { AfterViewInit, Component, computed, DestroyRef, ElementRef, inject, OnDestroy, OnInit, signal, ViewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import flatpickr from 'flatpickr';
 import { NgIconComponent } from '@ng-icons/core';
 import { ButtonComponent } from '../../components/atoms/button/button';
 import { TagComponent } from '../../components/atoms/tag/tag';
 import { FormInputComponent } from '../../components/atoms/form-input/form-input';
 import { FormSelectComponent } from '../../components/atoms/form-select/form-select';
 import { FormFieldComponent } from '../../components/molecules/form-field/form-field';
-import { FormInputIconComponent } from '../../components/molecules/form-input-icon/form-input-icon';
 import { HowItWorksButtonComponent } from '../../components/molecules/how-it-works-button/how-it-works-button';
 import { PageHeaderComponent } from '../../components/organisms/page-header/page-header';
 import { PanelSeccionComponent } from '../../components/organisms/panel-seccion/panel-seccion';
@@ -43,14 +43,13 @@ const _FECHA_PREVIEW: Record<string, string> = {
     ButtonComponent,
     TagComponent,
     PanelSeccionComponent,
-    FormInputIconComponent,
     FormInputComponent,
     FormSelectComponent,
     FormFieldComponent,
     HowItWorksButtonComponent,
   ],
 })
-export class SincronizadorContactosPageComponent implements OnInit {
+export class SincronizadorContactosPageComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private readonly http             = inject(HttpClient);
   private readonly route            = inject(ActivatedRoute);
@@ -73,6 +72,12 @@ export class SincronizadorContactosPageComponent implements OnInit {
   // ── Fechas ────────────────────────────────────────────────────────────────
   readonly fechaDesde = signal('');
   readonly fechaHasta = signal('');
+
+  @ViewChild('inputDesde') private readonly inputDesdeRef?: ElementRef<HTMLInputElement>;
+  @ViewChild('inputHasta') private readonly inputHastaRef?: ElementRef<HTMLInputElement>;
+
+  private _pickerDesde?: flatpickr.Instance;
+  private _pickerHasta?: flatpickr.Instance;
 
   readonly fechasValidas = computed(() => {
     const desde = this.fechaDesde();
@@ -134,6 +139,34 @@ export class SincronizadorContactosPageComponent implements OnInit {
     this.cargarEstadoPms();
   }
 
+  ngAfterViewInit(): void {
+    // Mismo selector visual (flatpickr) que el Mapa de calor, manteniendo el
+    // formato DD/MM/YYYY que valida y parsea esta página.
+    const baseConfig = { dateFormat: 'd/m/Y', locale: { firstDayOfWeek: 1 } };
+
+    if (this.inputDesdeRef) {
+      this._pickerDesde = flatpickr(this.inputDesdeRef.nativeElement, {
+        ...baseConfig,
+        onChange: ([date], dateStr) => {
+          this.fechaDesde.set(dateStr);
+          if (date) this._pickerHasta?.set('minDate', date);
+        },
+      }) as flatpickr.Instance;
+    }
+
+    if (this.inputHastaRef) {
+      this._pickerHasta = flatpickr(this.inputHastaRef.nativeElement, {
+        ...baseConfig,
+        onChange: (_dates, dateStr) => this.fechaHasta.set(dateStr),
+      }) as flatpickr.Instance;
+    }
+  }
+
+  ngOnDestroy(): void {
+    this._pickerDesde?.destroy();
+    this._pickerHasta?.destroy();
+  }
+
   // ── Carga inicial ─────────────────────────────────────────────────────────
 
   private cargarEstadoGoogle(): void {
@@ -188,14 +221,6 @@ export class SincronizadorContactosPageComponent implements OnInit {
   }
 
   // ── Fechas ────────────────────────────────────────────────────────────────
-
-  onFechaDesdeChange(valor: string): void {
-    this.fechaDesde.set(valor);
-  }
-
-  onFechaHastaChange(valor: string): void {
-    this.fechaHasta.set(valor);
-  }
 
   private _parseFechasPayload(): { desde?: string; hasta?: string } {
     const desde = this.fechaDesde();

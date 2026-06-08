@@ -296,7 +296,7 @@ Archivo: `frontend/Dockerfile`
 
 ```dockerfile
 # Compilar en modo producción con base-href para el prefijo /menu/
-RUN npm run build -- --base-href=/menu/
+RUN pnpm run build -- --base-href=/menu/
 ```
 
 El frontend se sirve bajo `/menu` detras de Nginx. Este ajuste evita rutas rotas al desplegar y fue clave para convivir con el sitio 11ty servido en `/`.

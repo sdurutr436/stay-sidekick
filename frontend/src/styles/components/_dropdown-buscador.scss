@@ -18,6 +18,15 @@
 
 @use '../shared' as *;
 
+// El host es el flex-item real dentro de los toolbars: debe poder encogerse
+// (min-width: 0) para no desbordar el contenedor padre cuando el espacio
+// es reducido. Sin esto, el panel/trigger empuja fuera de la tarjeta.
+app-dropdown-buscador {
+  display: block;
+  flex: 1;
+  min-width: 0;
+}
+
 .dropdown-buscador {
   position: relative;
 

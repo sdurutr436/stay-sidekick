@@ -4,8 +4,8 @@
 
 | Servicio | URL | Comando |
 |----------|-----|---------|
-| Sitio estático (11ty) | http://localhost:8080 | `npm run dev:web` |
-| App Angular | http://localhost:4200 | `npm run dev:app` |
+| Sitio estático (11ty) | http://localhost:8080 | `pnpm run dev:web` |
+| App Angular | http://localhost:4200 | `pnpm run dev:app` |
 | API Flask | http://localhost:5000 | `cd backend && python run.py` |
 
 ## Inicio de todos los servicios frontend
@@ -19,8 +19,8 @@ Desde la raíz del proyecto:
 # Windows
 dev.bat
 
-# Cualquier plataforma (requiere npm install en raíz primero)
-npm run dev
+# Cualquier plataforma (requiere pnpm install en raíz primero)
+pnpm run dev
 ```
 
 El script levanta 11ty y Angular en paralelo con salida de logs diferenciada por color. Si alguno de los dos falla, el otro también se detiene (`--kill-others-on-fail`).

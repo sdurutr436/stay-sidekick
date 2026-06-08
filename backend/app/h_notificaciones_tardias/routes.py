@@ -3,8 +3,8 @@
 Rutas (todas requieren JWT):
 - GET  /api/notificaciones/checkin-tardio/status     → estado PMS, check-ins hoy, apartamentos, hora_corte
 - POST /api/notificaciones/checkin-tardio/checkins   → parsea XLSX, devuelve check-ins tardíos; en memoria, no persiste — RGPD
-- GET  /api/notificaciones/checkin-tardio/plantillas → lista plantillas de categoría 'checkin_tardio'
-- POST /api/notificaciones/checkin-tardio/plantillas → crea plantilla de categoría 'checkin_tardio'
+- GET  /api/notificaciones/checkin-tardio/plantillas → lista plantillas de categoría 'CHECKIN_TARDIO'
+- POST /api/notificaciones/checkin-tardio/plantillas → crea plantilla de categoría 'CHECKIN_TARDIO'
 """
 
 import logging
@@ -22,7 +22,9 @@ logger = logging.getLogger(__name__)
 
 notificaciones_bp = Blueprint("notificaciones", __name__)
 
-_CATEGORIA = "checkin_tardio"
+# Debe coincidir con el canon de categorías del Vault (schemas._CATEGORIAS),
+# si no, estas plantillas no aparecen al filtrar por categoría en el Vault.
+_CATEGORIA = "CHECKIN_TARDIO"
 
 
 def _empresa_id() -> str:
