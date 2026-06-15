@@ -60,6 +60,18 @@
 }
 
 // -----------------------------------------------------------------------------
+// Formulario de cambio de contraseña — ritmo vertical holgado.
+// Los campos necesitan más aire ahora que el campo «nueva contraseña» despliega
+// la lista de requisitos de fortaleza debajo.
+// -----------------------------------------------------------------------------
+.form-cambio-pwd {
+  display: flex;
+  flex-direction: column;
+  gap: $space-8;
+  margin-top: $space-10;
+}
+
+// -----------------------------------------------------------------------------
 // Form hero layout — imagen izquierda + formulario derecha en desktop (≥lg)
 // Reutilizable en login, solicitud y cambio-password
 // -----------------------------------------------------------------------------
