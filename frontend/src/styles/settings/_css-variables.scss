@@ -74,34 +74,37 @@
   --shadow-2xl: 1px 4px 5px 0px hsl(0 0% 0% / 0.07);
 
   // ── Paleta base (light mode) ──────────────────────────────────────────────
-  --background:          hsl(0 0% 97.6471%);
-  --foreground:          hsl(0 0% 22.7451%);
-  --card:                hsl(0 0% 100%);
-  --card-foreground:     hsl(0 0% 22.7451%);
-  --popover:             hsl(0 0% 100%);
-  --popover-foreground:  hsl(0 0% 22.7451%);
-  --primary:             hsl(0 0% 37.6471%);
-  --primary-foreground:  hsl(0 0% 94.1176%);
-  --secondary:           hsl(0 0% 87.0588%);
-  --secondary-foreground: hsl(0 0% 22.7451%);
-  --muted:               hsl(0 0% 89.0196%);
-  --muted-foreground:    hsl(0 0% 31.3725%);
+  // Superficies cálidas y poco saturadas (crema ámbar) en lugar de blanco frío:
+  // armonizan con el degradado y, al ser más claras, despegan sobre él.
+  //   card/popover (más claro) → base/inputs → secondary/muted (panel teñido)
+  --background:          hsl(41 45% 96%);
+  --foreground:          hsl(30 8% 18%);
+  --card:                hsl(44 56% 98.5%);
+  --card-foreground:     hsl(30 8% 18%);
+  --popover:             hsl(44 56% 98.5%);
+  --popover-foreground:  hsl(30 8% 18%);
+  --primary:             hsl(35 68% 36%);
+  --primary-foreground:  hsl(0 0% 100%);
+  --secondary:           hsl(40 38% 90.5%);
+  --secondary-foreground: hsl(30 8% 18%);
+  --muted:               hsl(40 36% 92%);
+  --muted-foreground:    hsl(34 10% 34%);
   --accent:              hsl(47.4419 64.1791% 86.8627%);
   --accent-foreground:   hsl(14.2105 25.6757% 29.0196%);
   --destructive:         hsl(0 41.4894% 63.1373%);
   --destructive-foreground: hsl(0 0% 100%);
-  --border:              hsl(0 0.8696% 45.0980%);
-  --border-strong:       hsl(0 0% 31.3725%);
-  --input:               hsl(0 0% 100%);
-  --ring:                hsl(0 0% 62.7451%);
-  --sidebar:             hsl(0 0% 94.1176%);
-  --sidebar-foreground:  hsl(0 0% 22.7451%);
-  --sidebar-primary:     hsl(0 0% 37.6471%);
-  --sidebar-primary-foreground: hsl(0 0% 94.1176%);
+  --border:              hsl(35 17% 66%);
+  --border-strong:       hsl(34 18% 40%);
+  --input:               hsl(41 45% 96%);
+  --ring:                hsl(38 40% 60%);
+  --sidebar:             hsl(42 42% 94%);
+  --sidebar-foreground:  hsl(30 8% 18%);
+  --sidebar-primary:     hsl(35 68% 36%);
+  --sidebar-primary-foreground: hsl(0 0% 100%);
   --sidebar-accent:      hsl(47.4419 64.1791% 86.8627%);
   --sidebar-accent-foreground: hsl(14.2105 25.6757% 29.0196%);
-  --sidebar-border:      hsl(0 0% 75.2941%);
-  --sidebar-ring:        hsl(0 0% 62.7451%);
+  --sidebar-border:      hsl(38 24% 80%);
+  --sidebar-ring:        hsl(38 40% 60%);
 
   // ── Tokens semánticos derivados ──────────────────────────────────────────
   // Texto
@@ -117,18 +120,18 @@
   --surface-alt:         var(--secondary);
   --surface-raised:      var(--card);
 
-  // Botón primario
-  --btn-primary-bg:        hsl(0 0% 37.6471%);
-  --btn-primary-bg-hover:  hsl(0 0% 31.3725%);
-  --btn-primary-bg-active: hsl(0 0% 22.7451%);
-  --btn-primary-text:      hsl(0 0% 94.1176%);
+  // Botón primario — ámbar oscuro; se esclarece al pasar el cursor
+  --btn-primary-bg:        hsl(35 68% 36%);
+  --btn-primary-bg-hover:  hsl(37 72% 46%);
+  --btn-primary-bg-active: hsl(33 70% 30%);
+  --btn-primary-text:      hsl(0 0% 100%);
 
-  // Botón secundario
-  --btn-secondary-bg:        hsl(0 0% 100%);
-  --btn-secondary-bg-hover:  hsl(0 0% 97.6471%);
-  --btn-secondary-bg-active: hsl(0 0% 89.0196%);
-  --btn-secondary-border:    hsl(0 0.8696% 45.0980%);
-  --btn-secondary-text:      hsl(0 0% 22.7451%);
+  // Botón secundario — crema cálida en vez de blanco frío
+  --btn-secondary-bg:        hsl(44 56% 98.5%);
+  --btn-secondary-bg-hover:  hsl(41 45% 95%);
+  --btn-secondary-bg-active: hsl(40 38% 90.5%);
+  --btn-secondary-border:    hsl(35 17% 66%);
+  --btn-secondary-text:      hsl(30 8% 18%);
 
   // Botón danger (fijo en ambos temas — semántica destructiva)
   --btn-danger-bg:        hsl(0 72% 51%);
@@ -136,17 +139,24 @@
   --btn-danger-bg-active: hsl(0 72% 37%);
   --btn-danger-text:      hsl(0 0% 100%);
 
-  // Botón ghost (transparencias)
-  --btn-ghost-bg-hover:   hsl(0 0% 94.1176%);
-  --btn-ghost-bg-active:  hsl(0 0% 89.0196%);
+  // Botón ghost (transparencias cálidas)
+  --btn-ghost-bg-hover:   hsl(40 38% 91%);
+  --btn-ghost-bg-active:  hsl(40 36% 86%);
 
   // Badge
-  --badge-bg:    hsl(0 0% 87.0588%);
-  --badge-text:  hsl(0 0% 31.3725%);
+  --badge-bg:    hsl(40 38% 90.5%);
+  --badge-text:  hsl(34 12% 32%);
 
-  // Header
-  --header-bg:      hsl(0 0% 100%);
-  --header-border:  hsl(0 0% 87.0588%);
+  // Página — degradado de fondo: color estable (cima) → tenue (pie)
+  --page-bg-top:    hsl(42 64% 87%);    // estable — ámbar cálido
+  --page-bg-bottom: hsl(43 55% 96.5%);  // tenue — al que desciende el body
+
+  // Header — color estable (cima del degradado)
+  --header-bg:      var(--page-bg-top);
+  --header-border:  hsl(40 34% 80%);
+
+  // Footer — tono tenue final del degradado
+  --footer-bg:      var(--page-bg-bottom);
 
   // Aliases legacy (compat con componentes existentes)
   --color-surface:        var(--surface);
@@ -163,62 +173,70 @@
 // =============================================================================
 .dark,
 [data-theme="dark"] {
-  --background:          hsl(0 0% 16.8627%);
-  --foreground:          hsl(0 0% 86.2745%);
-  --card:                hsl(0 0% 20%);
-  --card-foreground:     hsl(0 0% 86.2745%);
-  --popover:             hsl(0 0% 20%);
-  --popover-foreground:  hsl(0 0% 86.2745%);
-  --primary:             hsl(0 0% 69.0196%);
-  --primary-foreground:  hsl(0 0% 16.8627%);
-  --secondary:           hsl(0 0% 35.2941%);
-  --secondary-foreground: hsl(0 0% 75.2941%);
-  --muted:               hsl(0 0% 27.0588%);
-  --muted-foreground:    hsl(0 0% 62.7451%);
-  --accent:              hsl(0 0% 87.8431%);
-  --accent-foreground:   hsl(0 0% 20%);
+  // Superficies cálidas y poco saturadas (carbón ámbar) en vez de gris frío.
+  --background:          hsl(33 9% 14%);
+  --foreground:          hsl(38 12% 86%);
+  --card:                hsl(33 11% 22%);
+  --card-foreground:     hsl(38 12% 86%);
+  --popover:             hsl(33 11% 22%);
+  --popover-foreground:  hsl(38 12% 86%);
+  --primary:             hsl(40 60% 58%);
+  --primary-foreground:  hsl(36 40% 12%);
+  --secondary:           hsl(33 9% 35%);
+  --secondary-foreground: hsl(38 10% 75%);
+  --muted:               hsl(33 9% 27%);
+  --muted-foreground:    hsl(36 10% 63%);
+  --accent:              hsl(44 55% 62%);
+  --accent-foreground:   hsl(34 40% 12%);
   --destructive:         hsl(0 35.5932% 76.8627%);
   --destructive-foreground: hsl(0 0% 16.8627%);
-  --border:              hsl(0 0% 30.9804%);
-  --border-strong:       hsl(0 0% 50%);
-  --input:               hsl(0 0% 20%);
-  --ring:                hsl(0 0% 75.2941%);
-  --sidebar:             hsl(0 0% 12.9412%);
-  --sidebar-foreground:  hsl(0 0% 86.2745%);
-  --sidebar-primary:     hsl(0 0% 69.0196%);
-  --sidebar-primary-foreground: hsl(0 0% 12.9412%);
-  --sidebar-accent:      hsl(0 0% 87.8431%);
-  --sidebar-accent-foreground: hsl(0 0% 20%);
-  --sidebar-border:      hsl(0 0% 30.9804%);
-  --sidebar-ring:        hsl(0 0% 75.2941%);
+  --border:              hsl(33 10% 31%);
+  --border-strong:       hsl(33 11% 50%);
+  --input:               hsl(33 11% 21%);
+  --ring:                hsl(40 36% 66%);
+  --sidebar:             hsl(32 10% 12%);
+  --sidebar-foreground:  hsl(38 12% 86%);
+  --sidebar-primary:     hsl(40 60% 58%);
+  --sidebar-primary-foreground: hsl(36 40% 12%);
+  --sidebar-accent:      hsl(44 55% 62%);
+  --sidebar-accent-foreground: hsl(34 40% 12%);
+  --sidebar-border:      hsl(33 10% 31%);
+  --sidebar-ring:        hsl(40 36% 66%);
 
   // Tokens semánticos derivados — overrides oscuros
   --text-disabled:       hsl(0 0% 50%);
   --text-inverse:        hsl(0 0% 16.8627%);
   --text-placeholder:    hsl(0 0% 50%);
 
-  // Botón primario
-  --btn-primary-bg:        hsl(0 0% 69.0196%);
-  --btn-primary-bg-hover:  hsl(0 0% 80%);
-  --btn-primary-bg-active: hsl(0 0% 86.2745%);
-  --btn-primary-text:      hsl(0 0% 16.8627%);
+  // Botón primario — ámbar (glow en oscuro); se esclarece al pasar el cursor
+  --btn-primary-bg:        hsl(40 62% 50%);
+  --btn-primary-bg-hover:  hsl(42 70% 58%);
+  --btn-primary-bg-active: hsl(38 58% 44%);
+  --btn-primary-text:      hsl(36 40% 10%);
 
-  // Botón secundario
-  --btn-secondary-bg:        hsl(0 0% 20%);
-  --btn-secondary-bg-hover:  hsl(0 0% 27.0588%);
-  --btn-secondary-bg-active: hsl(0 0% 35.2941%);
-  --btn-secondary-border:    hsl(0 0% 30.9804%);
-  --btn-secondary-text:      hsl(0 0% 86.2745%);
+  // Botón secundario — carbón cálido
+  --btn-secondary-bg:        hsl(33 11% 22%);
+  --btn-secondary-bg-hover:  hsl(33 10% 28%);
+  --btn-secondary-bg-active: hsl(33 9% 35%);
+  --btn-secondary-border:    hsl(33 10% 33%);
+  --btn-secondary-text:      hsl(38 12% 86%);
 
   // Botón ghost
-  --btn-ghost-bg-hover:   hsl(0 0% 27.0588%);
-  --btn-ghost-bg-active:  hsl(0 0% 35.2941%);
+  --btn-ghost-bg-hover:   hsl(33 10% 27%);
+  --btn-ghost-bg-active:  hsl(33 9% 34%);
 
   // Badge
-  --badge-bg:    hsl(0 0% 35.2941%);
-  --badge-text:  hsl(0 0% 75.2941%);
+  --badge-bg:    hsl(33 9% 35%);
+  --badge-text:  hsl(38 10% 75%);
 
-  // Header
-  --header-bg:      hsl(0 0% 20%);
-  --header-border:  hsl(0 0% 30.9804%);
+  // Página — degradado de fondo (estable → tenue) en oscuro
+  --page-bg-top:    hsl(34 16% 18%);
+  --page-bg-bottom: hsl(32 12% 11%);
+
+  // Header — color estable
+  --header-bg:      var(--page-bg-top);
+  --header-border:  hsl(34 14% 27%);
+
+  // Footer — tono tenue final
+  --footer-bg:      var(--page-bg-bottom);
 }

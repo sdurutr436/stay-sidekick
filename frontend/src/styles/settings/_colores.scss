@@ -139,6 +139,13 @@ $color-header-bg:     var(--header-bg);
 $color-header-border: var(--header-border);
 
 // ---------------------------------------------------------------------------
+// Página y footer — degradado estable → tenue (reactivo)
+// ---------------------------------------------------------------------------
+$color-page-bg-top:    var(--page-bg-top);
+$color-page-bg-bottom: var(--page-bg-bottom);
+$color-footer-bg:      var(--footer-bg);
+
+// ---------------------------------------------------------------------------
 // Dark mode — escalas crudas para usos donde se necesite el color de oscuro
 // directamente (rara vez necesario; los componentes deben usar var(--*))
 // ---------------------------------------------------------------------------

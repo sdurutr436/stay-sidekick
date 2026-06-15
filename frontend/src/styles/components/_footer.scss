@@ -21,8 +21,9 @@
 @use '../shared' as *;
 
 .footer {
-  background-color: $color-surface-alt;
-  border-top: $border-width $border-style $color-border;
+  // Tono tenue al que desciende el degradado del body — enlaza sin costura.
+  background-color: $color-footer-bg;
+  border-top: $border-width $border-style $color-header-border;
 
   // -------------------------------------------------------------------------
   // Inner — contenedor centrado
@@ -157,8 +158,9 @@
   // Barra de copyright
   // -------------------------------------------------------------------------
   &__bar {
-    border-top: $border-width $border-style $color-border;
-    background-color: $color-btn-ghost-bg-hover;
+    // Misma superficie tenue que el footer; solo una línea fina lo separa.
+    border-top: $border-width $border-style $color-header-border;
+    background-color: transparent;
     padding-block: $space-2;
   }
 
