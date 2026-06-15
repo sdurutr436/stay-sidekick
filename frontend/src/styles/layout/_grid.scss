@@ -72,6 +72,14 @@
 
 .l-page__main {
   flex: 1 1 auto;
+  // Degradado del color estable (cima, bajo el header) al tono tenue (pie,
+  // donde enlaza con el footer). Continúa visualmente la cabecera y desemboca
+  // en el footer sin costuras.
+  background: linear-gradient(
+    to bottom,
+    $color-page-bg-top 0%,
+    $color-page-bg-bottom 100%
+  );
 }
 
 .l-page__footer {

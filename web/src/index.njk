@@ -6,16 +6,14 @@ description: Stay Sidekick — La plataforma SaaS para gestionar alojamientos tu
 {#
   PAGE: / (landing pública — index)
   Propósito  : punto de entrada al sitio; presenta el producto a visitantes nuevos.
-  Secciones  : hero animado, herramientas (showcase con lightbox), clientes, CTA final.
+  Secciones  : hero animado, herramientas (showcase con lightbox), CTA final.
   Datos      : `tools[]` local (5 herramientas); no consume `site.*` más allá del layout.
-  Macros     : atoms.button (CTAs), molecules.card (logos clientes).
+  Macros     : atoms.button (CTAs).
   Partials   : ninguno extra (layout aporta header/footer).
   Scripts    : landing-lightbox.js (defer) para ampliar capturas del showcase.
   Cuidado    : el carrusel duplica `tools` para que el translateX -50% sea seamless.
 #}
 {% import "macros/atoms.njk" as atoms %}
-{% import "macros/molecules.njk" as molecules %}
-{% import "macros/organisms.njk" as organisms %}
 
 {# ─────────────────────────────────────────────────────────────────────────────
    Datos compartidos: las 5 herramientas del showcase.
@@ -118,62 +116,6 @@ description: Stay Sidekick — La plataforma SaaS para gestionar alojamientos tu
         <p class="tools-showcase__caption">{{ tool.caption }}</p>
       </li>
     {% endfor %}
-  </ul>
-</section>
-
-{# § 4 — SEPARADOR #}
-<hr class="landing-divider" aria-hidden="true" />
-
-{# § 5 — CLIENTES #}
-<section class="clients l-container" aria-labelledby="clients-heading">
-  <h2 id="clients-heading" class="clients__title">Alojamientos que confían en Stay Sidekick</h2>
-  <ul class="clients__grid" role="list">
-
-    <li role="listitem">
-      {% call molecules.card() %}
-        <figure class="clients__logo-wrapper">
-          <picture>
-            <source srcset="/assets/img/empresas/Cadiz4Rentals-Gestion-800x800-1-244x300.webp" type="image/webp">
-            <img src="/assets/img/empresas/Cadiz4Rentals-Gestion-800x800-1-244x300.png"
-                 alt="Logotipo de Cadiz 4 Rentals"
-                 width="244" height="300" loading="lazy" />
-          </picture>
-        </figure>
-        <h3 class="clients__name">Cadiz 4 Rentals</h3>
-        <span class="clients__location">Cádiz, España</span>
-      {% endcall %}
-    </li>
-
-    <li role="listitem">
-      {% call molecules.card() %}
-        <figure class="clients__logo-wrapper">
-          <picture>
-            <source srcset="/assets/img/empresas/AV-800x800-1-244x300.webp" type="image/webp">
-            <img src="/assets/img/empresas/AV-800x800-1-244x300.png"
-                 alt="Logotipo de Alquiler Vacacional Cádiz"
-                 width="244" height="300" loading="lazy" />
-          </picture>
-        </figure>
-        <h3 class="clients__name">Alquiler Vacacional Cádiz</h3>
-        <span class="clients__location">Cádiz, España</span>
-      {% endcall %}
-    </li>
-
-    <li role="listitem">
-      {% call molecules.card() %}
-        <figure class="clients__logo-wrapper">
-          <picture>
-            <source srcset="/assets/img/empresas/AC-Gestion-800x800-1-244x300.webp" type="image/webp">
-            <img src="/assets/img/empresas/AC-Gestion-800x800-1-244x300.png"
-                 alt="Logotipo de AC-Gestión"
-                 width="244" height="300" loading="lazy" />
-          </picture>
-        </figure>
-        <h3 class="clients__name">AC-Gestión</h3>
-        <span class="clients__location">Cádiz, España</span>
-      {% endcall %}
-    </li>
-
   </ul>
 </section>
 
