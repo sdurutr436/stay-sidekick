@@ -11,6 +11,6 @@
     "install:all": "pnpm -C frontend install && pnpm -C web install"
   },
   "devDependencies": {
-    "concurrently": "^9.0.0"
+    "concurrently": "^10.0.3"
   }
 }
